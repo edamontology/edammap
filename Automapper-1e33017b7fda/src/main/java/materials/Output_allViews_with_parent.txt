@@ -1,0 +1,1124 @@
+Software | Software engineering | http://edamontology.org/topic_3372 | NO | LABEL | INEXACT | TOPIC || 0.42105263157894735 | 0.42105263157894735 | 0.42105263157894735
+AnnotationData | Annotation | http://edamontology.org/data_2018 | YES | LABEL | INEXACT | DATA || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+AnnotationData | Annotation | http://edamontology.org/operation_0226 | NO | LABEL | INEXACT | OPERATION || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+AnnotationData | Notation3 | http://edamontology.org/format_3257 | NO | LABEL | INEXACT | FORMAT || 0.5714285714285714 | 0.0 | 0.38095238095238093
+AnnotationData | Biomarkers | http://edamontology.org/topic_3360 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+ExperimentData | Experimental data | http://edamontology.org/data_2028 | YES | LABEL | INEXACT | DATA || 0.875 | 0.0 | 0.5833333333333334
+ExperimentData | Experiment annotation format | http://edamontology.org/format_3167 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+ExperimentData | PCR experiment | http://edamontology.org/topic_3519 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+AssayDomain | Software engineering | http://edamontology.org/topic_3372 | NO | LABEL | INEXACT | TOPIC || 0.42105263157894735 | 0.42105263157894735 | 0.42105263157894735
+Technology | Biotechnology | http://edamontology.org/topic_3297 | NO | LABEL | INEXACT | TOPIC || 0.7692307692307692 | 0.7692307692307692 | 0.7692307692307692
+Technology | CATH topology | http://edamontology.org/data_1558 | YES | LABEL | INEXACT | DATA || 0.5 | 0.0 | 0.3333333333333333
+ResearchField | Search | http://edamontology.org/operation_0224 | NO | NARROW_SYNONYM | INEXACT | OPERATION || 0.46153846153846156 | 0.46153846153846156 | 0.4615384615384615
+ResearchField | Software development | http://edamontology.org/topic_3372 | NO | LABEL | INEXACT | TOPIC || 0.42105263157894735 | 0.42105263157894735 | 0.42105263157894735
+BiologicalQuestion | Software engineering | http://edamontology.org/topic_3372 | NO | LABEL | INEXACT | TOPIC || 0.42105263157894735 | 0.42105263157894735 | 0.42105263157894735
+BiologicalQuestion | Biological pathway map | http://edamontology.org/data_0947 | YES | LABEL | INEXACT | DATA || 0.5 | 0.0 | 0.3333333333333333
+BiologicalQuestion | Tau angle calculation | http://edamontology.org/operation_1828 | NO | LABEL | INEXACT | OPERATION || 0.4736842105263158 | 0.0 | 0.31578947368421056
+WorkflowStep | Workflows | http://edamontology.org/topic_0769 | YES | LABEL | INEXACT | TOPIC || 0.75 | 0.75 | 0.75
+WorkflowStep | Workflow data | http://edamontology.org/data_2971 | YES | LABEL | INEXACT | DATA || 0.6666666666666667 | 0.0 | 0.4444444444444445
+StatisticalMethod | Software engineering | http://edamontology.org/topic_3372 | NO | LABEL | INEXACT | TOPIC || 0.42105263157894735 | 0.42105263157894735 | 0.42105263157894735
+Infrastructure | Structure | http://edamontology.org/data_0883 | NO | LABEL | INEXACT | DATA || 0.6428571428571428 | 0.6428571428571428 | 0.6428571428571428
+Infrastructure | RNA structure | http://edamontology.org/topic_0697 | YES | LABEL | INEXACT | TOPIC || 0.7857142857142857 | 0.0 | 0.5238095238095238
+Organism | Organisms | http://edamontology.org/topic_0621 | NO | EXACT_SYNONYM | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Organism | Annotation | http://edamontology.org/operation_0226 | NO | LABEL | INEXACT | OPERATION || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+Organism | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Organism | Notation3 | http://edamontology.org/format_3257 | NO | LABEL | INEXACT | FORMAT || 0.5714285714285714 | 0.0 | 0.38095238095238093
+ChipManufacturer | Annotation | http://edamontology.org/data_2018 | YES | LABEL | INEXACT | DATA || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+ChipManufacturer | Annotation | http://edamontology.org/operation_0226 | NO | LABEL | INEXACT | OPERATION || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+ChipManufacturer | Notation3 | http://edamontology.org/format_3257 | NO | LABEL | INEXACT | FORMAT || 0.5714285714285714 | 0.0 | 0.38095238095238093
+ChipManufacturer | Information retrieval | http://edamontology.org/topic_0090 | NO | LABEL | INEXACT | TOPIC || 0.44999999999999996 | 0.0 | 0.3
+CustomCDF | Annotation | http://edamontology.org/data_2018 | YES | LABEL | INEXACT | DATA || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+CustomCDF | Annotation | http://edamontology.org/operation_0226 | NO | LABEL | INEXACT | OPERATION || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+CustomCDF | Notation3 | http://edamontology.org/format_3257 | NO | LABEL | INEXACT | FORMAT || 0.5714285714285714 | 0.0 | 0.38095238095238093
+CustomCDF | Information retrieval | http://edamontology.org/topic_0090 | NO | LABEL | INEXACT | TOPIC || 0.44999999999999996 | 0.0 | 0.3
+CustomArray | Annotation | http://edamontology.org/data_2018 | YES | LABEL | INEXACT | DATA || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+CustomArray | Annotation | http://edamontology.org/operation_0226 | NO | LABEL | INEXACT | OPERATION || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+CustomArray | Notation3 | http://edamontology.org/format_3257 | NO | LABEL | INEXACT | FORMAT || 0.5714285714285714 | 0.0 | 0.38095238095238093
+CustomArray | Microarrays | http://edamontology.org/topic_0200 | YES | LABEL | INEXACT | TOPIC || 0.4545454545454546 | 0.0 | 0.30303030303030304
+CustomDBSchema | Annotation | http://edamontology.org/data_2018 | YES | LABEL | INEXACT | DATA || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+CustomDBSchema | Annotation | http://edamontology.org/operation_0226 | NO | LABEL | INEXACT | OPERATION || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+CustomDBSchema | Notation3 | http://edamontology.org/format_3257 | NO | LABEL | INEXACT | FORMAT || 0.5714285714285714 | 0.0 | 0.38095238095238093
+CustomDBSchema | Information retrieval | http://edamontology.org/topic_0090 | NO | LABEL | INEXACT | TOPIC || 0.44999999999999996 | 0.0 | 0.3
+FunctionalAnnotation | Annotation | http://edamontology.org/data_2018 | YES | LABEL | INEXACT | DATA || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+FunctionalAnnotation | Annotation | http://edamontology.org/operation_0226 | NO | LABEL | INEXACT | OPERATION || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+FunctionalAnnotation | Genome annotation | http://edamontology.org/topic_0222 | YES | LABEL | INEXACT | TOPIC || 0.6 | 0.0 | 0.39999999999999997
+FunctionalAnnotation | Notation3 | http://edamontology.org/format_3257 | NO | LABEL | INEXACT | FORMAT || 0.5714285714285714 | 0.0 | 0.38095238095238093
+SequenceAnnotation | Sequence annotation | http://edamontology.org/operation_0361 | NO | LABEL | EXACT | OPERATION || 1.0 | 1.0 | 1.0
+SequenceAnnotation | Sequence annotation | http://edamontology.org/topic_0221 | YES | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+SequenceAnnotation | Scent annotation | http://edamontology.org/data_0964 | YES | LABEL | INEXACT | DATA || 0.7222222222222222 | 0.0 | 0.48148148148148145
+SequenceAnnotation | Notation3 | http://edamontology.org/format_3257 | NO | LABEL | INEXACT | FORMAT || 0.5714285714285714 | 0.0 | 0.38095238095238093
+ChipName | Annotation | http://edamontology.org/data_2018 | YES | LABEL | INEXACT | DATA || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+ChipName | Annotation | http://edamontology.org/operation_0226 | NO | LABEL | INEXACT | OPERATION || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+ChipName | Notation3 | http://edamontology.org/format_3257 | NO | LABEL | INEXACT | FORMAT || 0.5714285714285714 | 0.0 | 0.38095238095238093
+ChipName | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+PackageType | Annotation | http://edamontology.org/data_2018 | YES | LABEL | INEXACT | DATA || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+PackageType | Annotation | http://edamontology.org/operation_0226 | NO | LABEL | INEXACT | OPERATION || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+PackageType | Notation3 | http://edamontology.org/format_3257 | NO | LABEL | INEXACT | FORMAT || 0.5714285714285714 | 0.0 | 0.38095238095238093
+PackageType | Information retrieval | http://edamontology.org/topic_0090 | NO | LABEL | INEXACT | TOPIC || 0.44999999999999996 | 0.0 | 0.3
+SpecimenSource | Experimental data | http://edamontology.org/data_2028 | YES | LABEL | INEXACT | DATA || 0.875 | 0.0 | 0.5833333333333334
+SpecimenSource | Experiment annotation format | http://edamontology.org/format_3167 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+SpecimenSource | PCR experiment | http://edamontology.org/topic_3519 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+OrganismData | Experimental data | http://edamontology.org/data_2028 | YES | LABEL | INEXACT | DATA || 0.875 | 0.0 | 0.5833333333333334
+OrganismData | Experiment annotation format | http://edamontology.org/format_3167 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+OrganismData | PCR experiment | http://edamontology.org/topic_3519 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+DiseaseModel | Experimental data | http://edamontology.org/data_2028 | YES | LABEL | INEXACT | DATA || 0.875 | 0.0 | 0.5833333333333334
+DiseaseModel | Experiment annotation format | http://edamontology.org/format_3167 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+DiseaseModel | PCR experiment | http://edamontology.org/topic_3519 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+TechnologyData | Experimental data | http://edamontology.org/data_2028 | YES | LABEL | INEXACT | DATA || 0.875 | 0.0 | 0.5833333333333334
+TechnologyData | Biotechnology | http://edamontology.org/topic_3297 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+TechnologyData | Experiment annotation format | http://edamontology.org/format_3167 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+AssayDomainData | Experimental data | http://edamontology.org/data_2028 | YES | LABEL | INEXACT | DATA || 0.875 | 0.0 | 0.5833333333333334
+AssayDomainData | Experiment annotation format | http://edamontology.org/format_3167 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+AssayDomainData | PCR experiment | http://edamontology.org/topic_3519 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+RepositoryData | Experimental data | http://edamontology.org/data_2028 | YES | LABEL | INEXACT | DATA || 0.875 | 0.0 | 0.5833333333333334
+RepositoryData | Experiment annotation format | http://edamontology.org/format_3167 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+RepositoryData | PCR experiment | http://edamontology.org/topic_3519 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+aCGH | GCG | http://edamontology.org/format_1935 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+CellBasedAssays | SMART domain name | http://edamontology.org/data_2782 | NO | LABEL | INEXACT | DATA || 0.4666666666666667 | 0.0 | 0.3111111111111111
+ChIPchip | ChIP-chip | http://edamontology.org/topic_3179 | YES | EXACT_SYNONYM | INEXACT | TOPIC || 0.8888888888888888 | 0.0 | 0.5925925925925926
+CopyNumberVariation | Copy number estimation | http://edamontology.org/operation_3233 | NO | LABEL | INEXACT | OPERATION || 0.8 | 0.0 | 0.5333333333333333
+CopyNumberVariation | Genetic variation | http://edamontology.org/topic_0199 | NO | LABEL | INEXACT | TOPIC || 0.5263157894736843 | 0.0 | 0.3508771929824562
+CopyNumberVariation | DNA variation | http://edamontology.org/data_0918 | YES | LABEL | INEXACT | DATA || 0.5263157894736843 | 0.0 | 0.3508771929824562
+CpGIsland | CpG island and isochores | http://edamontology.org/topic_1304 | NO | LABEL | INEXACT | TOPIC || 0.4285714285714286 | 0.4285714285714286 | 0.4285714285714286
+CpGIsland | CpG island and isochores detection | http://edamontology.org/operation_0430 | NO | EXACT_SYNONYM | INEXACT | OPERATION || 0.30000000000000004 | 0.30000000000000004 | 0.30000000000000004
+DNAMethylation | DNA methylation | http://edamontology.org/topic_3171 | YES | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+DNAMethylation | SNP detection | http://edamontology.org/operation_0484 | NO | LABEL | INEXACT | OPERATION || 0.5 | 0.0 | 0.3333333333333333
+DNAMethylation | PubMed citation | http://edamontology.org/format_1734 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+DNAMethylation | Annotation | http://edamontology.org/data_2018 | YES | LABEL | INEXACT | DATA || 0.5 | 0.0 | 0.3333333333333333
+ExonArray | Array | http://edamontology.org/data_2082 | NO | EXACT_SYNONYM | INEXACT | DATA || 0.5555555555555556 | 0.5555555555555556 | 0.5555555555555556
+GeneExpression | Gene expression | http://edamontology.org/topic_0203 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+GeneExpression | Gene expression analysis | http://edamontology.org/operation_2410 | YES | LABEL | INEXACT | OPERATION || 0.6363636363636364 | 0.6363636363636364 | 0.6363636363636364
+GeneExpression | Gene expression data format | http://edamontology.org/format_2058 | NO | EXACT_SYNONYM | INEXACT | FORMAT || 0.5833333333333333 | 0.5833333333333333 | 0.5833333333333333
+GeneExpression | Gene Expression Atlas Experiment ID | http://edamontology.org/data_3568 | NO | LABEL | INEXACT | DATA || 0.4516129032258065 | 0.4516129032258065 | 0.4516129032258065
+GeneticVariability | Genetic variation | http://edamontology.org/topic_0199 | NO | LABEL | INEXACT | TOPIC || 0.7222222222222222 | 0.0 | 0.48148148148148145
+SNP | SNP | http://edamontology.org/topic_2277 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+SNP | SNP | http://edamontology.org/data_2092 | YES | LABEL | EXACT | DATA || 1.0 | 1.0 | 1.0
+SNP | hssp | http://edamontology.org/format_1455 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+Transcription | Transcription | http://edamontology.org/topic_0110 | YES | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+Transcription | Transcriptional features (report) | http://edamontology.org/data_3138 | YES | LABEL | INEXACT | DATA || 0.4193548387096774 | 0.4193548387096774 | 0.4193548387096773
+Transcription | Transposon prediction | http://edamontology.org/operation_0427 | NO | LABEL | INEXACT | OPERATION || 0.55 | 0.0 | 0.3666666666666667
+Sequencing | Sequencing | http://edamontology.org/topic_3168 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+Sequencing | Sequence | http://edamontology.org/data_2044 | NO | LABEL | INEXACT | DATA || 0.7 | 0.0 | 0.4666666666666666
+Sequencing | Sequence merging | http://edamontology.org/operation_0232 | NO | LABEL | INEXACT | OPERATION || 0.6666666666666667 | 0.0 | 0.4444444444444445
+Sequencing | Sequence range format | http://edamontology.org/format_2078 | NO | LABEL | INEXACT | FORMAT || 0.4736842105263158 | 0.0 | 0.31578947368421056
+Microarray | Microarrays | http://edamontology.org/topic_0200 | YES | LABEL | INEXACT | TOPIC || 0.9090909090909091 | 0.9090909090909091 | 0.9090909090909091
+Microarray | Microarray metadata | http://edamontology.org/data_3115 | NO | LABEL | INEXACT | DATA || 0.5555555555555556 | 0.5555555555555556 | 0.5555555555555556
+Microarray | Microarray wave graph plotting | http://edamontology.org/operation_2935 | NO | LABEL | INEXACT | OPERATION || 0.37037037037037035 | 0.37037037037037035 | 0.3703703703703704
+Microarray | Microarray experiment data format | http://edamontology.org/format_2056 | NO | LABEL | INEXACT | FORMAT || 0.33333333333333337 | 0.33333333333333337 | 0.3333333333333333
+FlowCytometry | Biotechnology | http://edamontology.org/topic_3297 | NO | LABEL | INEXACT | TOPIC || 0.7692307692307692 | 0.7692307692307692 | 0.7692307692307692
+FlowCytometry | CATH topology | http://edamontology.org/data_1558 | YES | LABEL | INEXACT | DATA || 0.5 | 0.0 | 0.3333333333333333
+MassSpectrometry | Mass spectrometry | http://edamontology.org/topic_0134 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+MassSpectrometry | Mass spectrometry experiment | http://edamontology.org/data_3147 | YES | LABEL | INEXACT | DATA || 0.6153846153846154 | 0.6153846153846154 | 0.6153846153846154
+qPCR | Biotechnology | http://edamontology.org/topic_3297 | NO | LABEL | INEXACT | TOPIC || 0.7692307692307692 | 0.7692307692307692 | 0.7692307692307692
+qPCR | CATH topology | http://edamontology.org/data_1558 | YES | LABEL | INEXACT | DATA || 0.5 | 0.0 | 0.3333333333333333
+qPCR | pcx | http://edamontology.org/format_3595 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+MicrotitrePlateAssay | Biotechnology | http://edamontology.org/topic_3297 | NO | LABEL | INEXACT | TOPIC || 0.7692307692307692 | 0.7692307692307692 | 0.7692307692307692
+MicrotitrePlateAssay | CATH topology | http://edamontology.org/data_1558 | YES | LABEL | INEXACT | DATA || 0.5 | 0.0 | 0.3333333333333333
+SAGE | Biotechnology | http://edamontology.org/topic_3297 | NO | LABEL | INEXACT | TOPIC || 0.7692307692307692 | 0.7692307692307692 | 0.7692307692307692
+SAGE | Image | http://edamontology.org/data_2968 | NO | LABEL | INEXACT | DATA || 0.6 | 0.0 | 0.39999999999999997
+SAGE | svg | http://edamontology.org/format_3604 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+CellBiology | Cell biology | http://edamontology.org/topic_2229 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+CellBiology | Cell type ontology ID | http://edamontology.org/data_3238 | NO | LABEL | INEXACT | DATA || 0.5 | 0.0 | 0.3333333333333333
+CellBiology | CellML | http://edamontology.org/format_3240 | NO | LABEL | INEXACT | FORMAT || 0.4545454545454546 | 0.0 | 0.30303030303030304
+Genetics | Genetics | http://edamontology.org/topic_3053 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+Genetics | Gene ID | http://edamontology.org/data_2295 | NO | LABEL | INEXACT | DATA || 0.625 | 0.0 | 0.4166666666666667
+Genetics | Genetic mapping | http://edamontology.org/operation_0282 | NO | LABEL | INEXACT | OPERATION || 0.5 | 0.0 | 0.3333333333333333
+Genetics | geneseq | http://edamontology.org/format_2186 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+Metabolomics | Metabolomics | http://edamontology.org/topic_3172 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+Metabolomics | JASPAR profile ID | http://edamontology.org/data_1119 | NO | LABEL | INEXACT | DATA || 0.4666666666666667 | 0.0 | 0.3111111111111111
+Metagenomics | Metagenomics | http://edamontology.org/topic_3174 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+Metagenomics | JASPAR profile ID | http://edamontology.org/data_1119 | NO | LABEL | INEXACT | DATA || 0.4666666666666667 | 0.0 | 0.3111111111111111
+Proteomics | Proteomics | http://edamontology.org/topic_0121 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+Proteomics | Protein 3D motifs | http://edamontology.org/data_0899 | NO | EXACT_SYNONYM | INEXACT | DATA || 0.5333333333333333 | 0.0 | 0.35555555555555557
+Proteomics | Protein docking | http://edamontology.org/operation_0478 | NO | EXACT_SYNONYM | INEXACT | OPERATION || 0.5 | 0.0 | 0.3333333333333333
+Proteomics | prosite-profile | http://edamontology.org/format_1366 | NO | LABEL | INEXACT | FORMAT || 0.4666666666666667 | 0.0 | 0.3111111111111111
+Lipidomics | Omics | http://edamontology.org/topic_3391 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.5 | 0.5
+Lipidomics | LIPID MAPS ID | http://edamontology.org/data_2625 | NO | LABEL | INEXACT | DATA || 0.5454545454545454 | 0.0 | 0.3636363636363636
+Pharmacogenomics | Pharmacogenomics | http://edamontology.org/topic_0208 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+Pharmacogenomics | JASPAR profile ID | http://edamontology.org/data_1119 | NO | LABEL | INEXACT | DATA || 0.4666666666666667 | 0.0 | 0.3111111111111111
+Pharmacogenetics | Pharmacogenomics | http://edamontology.org/topic_0208 | NO | LABEL | INEXACT | TOPIC || 0.875 | 0.0 | 0.5833333333333334
+Pharmacogenetics | Heat map generation | http://edamontology.org/operation_0531 | NO | LABEL | INEXACT | OPERATION || 0.47058823529411764 | 0.0 | 0.3137254901960784
+Pharmacogenetics | JASPAR profile ID | http://edamontology.org/data_1119 | NO | LABEL | INEXACT | DATA || 0.4666666666666667 | 0.0 | 0.3111111111111111
+Cheminformatics | Cheminformatics | http://edamontology.org/topic_2258 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+Cheminformatics | PHYLIP format | http://edamontology.org/format_1997 | NO | LABEL | INEXACT | FORMAT || 0.5333333333333333 | 0.0 | 0.35555555555555557
+Cheminformatics | Taxonomic information | http://edamontology.org/data_1872 | NO | EXACT_SYNONYM | INEXACT | DATA || 0.5 | 0.0 | 0.3333333333333333
+Cheminformatics | Demonstration | http://edamontology.org/operation_2246 | YES | LABEL | INEXACT | OPERATION || 0.4666666666666667 | 0.0 | 0.3111111111111111
+StructuralGenomics | Structural genomics | http://edamontology.org/topic_0122 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+StructuralGenomics | Structure alignment | http://edamontology.org/data_0886 | NO | LABEL | INEXACT | DATA || 0.6111111111111112 | 0.0 | 0.40740740740740744
+StructuralGenomics | Structure alignment (RNA) | http://edamontology.org/operation_0506 | YES | LABEL | INEXACT | OPERATION || 0.5652173913043479 | 0.0 | 0.3768115942028986
+Biophysics | Biophysics | http://edamontology.org/topic_3306 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+Biophysics | JASPAR profile ID | http://edamontology.org/data_1119 | NO | LABEL | INEXACT | DATA || 0.4666666666666667 | 0.0 | 0.3111111111111111
+MathematicalBiology | Mathematical biology | http://edamontology.org/topic_3307 | NO | NARROW_SYNONYM | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+MathematicalBiology | Methylation calling | http://edamontology.org/operation_3205 | NO | LABEL | INEXACT | OPERATION || 0.4736842105263158 | 0.0 | 0.31578947368421056
+MathematicalBiology | JASPAR profile ID | http://edamontology.org/data_1119 | NO | LABEL | INEXACT | DATA || 0.4666666666666667 | 0.0 | 0.3111111111111111
+BiomedicalInformatics | Biomedical informatics | http://edamontology.org/topic_3063 | NO | EXACT_SYNONYM | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+BiomedicalInformatics | BioXSD XML format | http://edamontology.org/format_2352 | NO | EXACT_SYNONYM | INEXACT | FORMAT || 0.5238095238095238 | 0.0 | 0.34920634920634924
+BiomedicalInformatics | Taxonomic information | http://edamontology.org/data_1872 | NO | EXACT_SYNONYM | INEXACT | DATA || 0.5238095238095238 | 0.0 | 0.34920634920634924
+ComparativeGenomics | Comparative genomics | http://edamontology.org/topic_0797 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+ComparativeGenomics | JASPAR profile ID | http://edamontology.org/data_1119 | NO | LABEL | INEXACT | DATA || 0.4666666666666667 | 0.0 | 0.3111111111111111
+FunctionalGenomics | Functional genomics | http://edamontology.org/topic_0085 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+FunctionalGenomics | Functional mapping | http://edamontology.org/operation_0486 | YES | LABEL | INEXACT | OPERATION || 0.6111111111111112 | 0.0 | 0.40740740740740744
+FunctionalGenomics | JASPAR profile ID | http://edamontology.org/data_1119 | NO | LABEL | INEXACT | DATA || 0.4666666666666667 | 0.0 | 0.3111111111111111
+SystemsBiology | Systems biology | http://edamontology.org/topic_2259 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+SystemsBiology | Protein topology | http://edamontology.org/data_0875 | YES | LABEL | INEXACT | DATA || 0.4666666666666667 | 0.0 | 0.3111111111111111
+ComputationalChemistry | Computational chemistry | http://edamontology.org/topic_3332 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+ComputationalChemistry | Computational procedure | http://edamontology.org/operation_0004 | NO | NARROW_SYNONYM | INEXACT | OPERATION || 0.6363636363636364 | 0.0 | 0.42424242424242425
+ComputationalChemistry | JASPAR profile ID | http://edamontology.org/data_1119 | NO | LABEL | INEXACT | DATA || 0.4666666666666667 | 0.0 | 0.3111111111111111
+Agroinformatics | Informatics | http://edamontology.org/topic_0605 | NO | LABEL | INEXACT | TOPIC || 0.7333333333333334 | 0.7333333333333334 | 0.7333333333333334
+Agroinformatics | Version information | http://edamontology.org/data_0953 | YES | LABEL | INEXACT | DATA || 0.6111111111111112 | 0.0 | 0.40740740740740744
+Agroinformatics | URI format | http://edamontology.org/format_2334 | YES | LABEL | INEXACT | FORMAT || 0.5333333333333333 | 0.0 | 0.35555555555555557
+Transcriptomics | Transcriptomics | http://edamontology.org/topic_3308 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+Transcriptomics | JASPAR profile ID | http://edamontology.org/data_1119 | NO | LABEL | INEXACT | DATA || 0.4666666666666667 | 0.0 | 0.3111111111111111
+LinkageDisequilibrium | Linkage disequilibrium (report) | http://edamontology.org/data_1634 | YES | LABEL | INEXACT | DATA || 0.7241379310344828 | 0.7241379310344828 | 0.7241379310344828
+LinkageDisequilibrium | Biological modelling | http://edamontology.org/topic_2259 | NO | LABEL | INEXACT | TOPIC || 0.631578947368421 | 0.0 | 0.42105263157894735
+LinkageDisequilibrium | Tau angle calculation | http://edamontology.org/operation_1828 | NO | LABEL | INEXACT | OPERATION || 0.4736842105263158 | 0.0 | 0.31578947368421056
+MetagenomeAssembly | Genome assembly | http://edamontology.org/operation_3440 | NO | LABEL | INEXACT | OPERATION || 0.7777777777777778 | 0.7777777777777778 | 0.7777777777777778
+MetagenomeAssembly | Sequence assembly | http://edamontology.org/topic_0196 | NO | LABEL | INEXACT | TOPIC || 0.6666666666666667 | 0.0 | 0.4444444444444445
+MetagenomeAssembly | Biological model ID | http://edamontology.org/data_1085 | NO | LABEL | INEXACT | DATA || 0.6111111111111112 | 0.0 | 0.40740740740740744
+MetagenomeAssembly | Biological model format | http://edamontology.org/format_2034 | YES | LABEL | INEXACT | FORMAT || 0.5238095238095238 | 0.0 | 0.34920634920634924
+MicrosatelliteDetection | Microsatellite annotation | http://edamontology.org/topic_2868 | NO | EXACT_SYNONYM | INEXACT | TOPIC || 0.75 | 0.0 | 0.5
+MicrosatelliteDetection | Biological model ID | http://edamontology.org/data_1085 | NO | LABEL | INEXACT | DATA || 0.6111111111111112 | 0.0 | 0.40740740740740744
+MicrosatelliteDetection | Frameshift detection | http://edamontology.org/operation_0265 | NO | LABEL | INEXACT | OPERATION || 0.5652173913043479 | 0.0 | 0.3768115942028986
+MotifAnnotation | Sequence annotation | http://edamontology.org/operation_0361 | NO | LABEL | EXACT | OPERATION || 1.0 | 1.0 | 1.0
+MotifAnnotation | Sequence annotation | http://edamontology.org/topic_0221 | YES | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+MotifAnnotation | Annotation | http://edamontology.org/data_2018 | YES | LABEL | INEXACT | DATA || 0.6666666666666667 | 0.6666666666666667 | 0.6666666666666666
+MotifAnnotation | Sequence variation annotation format | http://edamontology.org/format_2921 | NO | LABEL | INEXACT | FORMAT || 0.5454545454545454 | 0.0 | 0.3636363636363636
+MotifDiscovery | Motif discovery | http://edamontology.org/operation_0238 | NO | EXACT_SYNONYM | EXACT | OPERATION || 1.0 | 1.0 | 1.0
+MotifDiscovery | Biological modelling | http://edamontology.org/topic_2259 | NO | LABEL | INEXACT | TOPIC || 0.631578947368421 | 0.0 | 0.42105263157894735
+MotifDiscovery | Biological model ID | http://edamontology.org/data_1085 | NO | LABEL | INEXACT | DATA || 0.6111111111111112 | 0.0 | 0.40740740740740744
+NetworkEnrichment | Enrichment | http://edamontology.org/operation_3501 | NO | LABEL | INEXACT | OPERATION || 0.5882352941176471 | 0.5882352941176471 | 0.5882352941176471
+NetworkEnrichment | Biological modelling | http://edamontology.org/topic_2259 | NO | LABEL | INEXACT | TOPIC || 0.631578947368421 | 0.0 | 0.42105263157894735
+NetworkEnrichment | Biological model ID | http://edamontology.org/data_1085 | NO | LABEL | INEXACT | DATA || 0.6111111111111112 | 0.0 | 0.40740740740740744
+NetworkInference | Network | http://edamontology.org/data_2600 | NO | EXACT_SYNONYM | INEXACT | DATA || 0.4375 | 0.4375 | 0.4375
+NetworkInference | Biological modelling | http://edamontology.org/topic_2259 | NO | LABEL | INEXACT | TOPIC || 0.631578947368421 | 0.0 | 0.42105263157894735
+NetworkInference | Network analysis | http://edamontology.org/operation_2497 | NO | EXACT_SYNONYM | INEXACT | OPERATION || 0.5 | 0.0 | 0.3333333333333333
+NucleosomePositioning | Biological chemistry | http://edamontology.org/topic_3292 | NO | LABEL | INEXACT | TOPIC || 0.631578947368421 | 0.0 | 0.42105263157894735
+NucleosomePositioning | Biological model ID | http://edamontology.org/data_1085 | NO | LABEL | INEXACT | DATA || 0.6111111111111112 | 0.0 | 0.40740740740740744
+NucleosomePositioning | Ontology visualisation | http://edamontology.org/operation_3559 | NO | LABEL | INEXACT | OPERATION || 0.47619047619047616 | 0.0 | 0.31746031746031744
+PeakDetection | Peak detection | http://edamontology.org/operation_3215 | NO | LABEL | EXACT | OPERATION || 1.0 | 1.0 | 1.0
+PeakDetection | Biological modelling | http://edamontology.org/topic_2259 | NO | LABEL | INEXACT | TOPIC || 0.631578947368421 | 0.0 | 0.42105263157894735
+PeakDetection | Biological model ID | http://edamontology.org/data_1085 | NO | LABEL | INEXACT | DATA || 0.6111111111111112 | 0.0 | 0.40740740740740744
+QuantitativeTrailLocus | Quantitative trait locus | http://edamontology.org/data_1906 | YES | LABEL | INEXACT | DATA || 0.9545454545454546 | 0.0 | 0.6363636363636364
+QuantitativeTrailLocus | Biological modelling | http://edamontology.org/topic_2259 | NO | LABEL | INEXACT | TOPIC || 0.631578947368421 | 0.0 | 0.42105263157894735
+QuantitativeTrailLocus | Tau angle calculation | http://edamontology.org/operation_1828 | NO | LABEL | INEXACT | OPERATION || 0.4736842105263158 | 0.0 | 0.31578947368421056
+Scaffolding | Scaffolding | http://edamontology.org/operation_3216 | NO | LABEL | EXACT | OPERATION || 1.0 | 1.0 | 1.0
+Scaffolding | Biological modelling | http://edamontology.org/topic_2259 | NO | LABEL | INEXACT | TOPIC || 0.631578947368421 | 0.0 | 0.42105263157894735
+Scaffolding | Biological model ID | http://edamontology.org/data_1085 | NO | LABEL | INEXACT | DATA || 0.6111111111111112 | 0.0 | 0.40740740740740744
+SequenceMatching | Sequence masking | http://edamontology.org/operation_0368 | NO | LABEL | INEXACT | OPERATION || 0.8125 | 0.0 | 0.5416666666666666
+SequenceMatching | Sequence motifs | http://edamontology.org/topic_0158 | YES | LABEL | INEXACT | TOPIC || 0.6875 | 0.0 | 0.4583333333333333
+SequenceMatching | Sequence motif | http://edamontology.org/data_1353 | NO | LABEL | INEXACT | DATA || 0.6875 | 0.0 | 0.4583333333333333
+SequenceMatching | Biological model format | http://edamontology.org/format_2034 | YES | LABEL | INEXACT | FORMAT || 0.5238095238095238 | 0.0 | 0.34920634920634924
+SomaticMutation | Mutation | http://edamontology.org/topic_0199 | NO | NARROW_SYNONYM | INEXACT | TOPIC || 0.5333333333333333 | 0.5333333333333333 | 0.5333333333333333
+SomaticMutation | Biological model ID | http://edamontology.org/data_1085 | NO | LABEL | INEXACT | DATA || 0.6111111111111112 | 0.0 | 0.40740740740740744
+SomaticMutation | Computation | http://edamontology.org/operation_2420 | NO | EXACT_SYNONYM | INEXACT | OPERATION || 0.6 | 0.0 | 0.39999999999999997
+SomaticMutation | PubMed citation | http://edamontology.org/format_1734 | NO | LABEL | INEXACT | FORMAT || 0.4666666666666667 | 0.0 | 0.3111111111111111
+SplicedAlignment | Alignment | http://edamontology.org/operation_2928 | NO | LABEL | INEXACT | OPERATION || 0.5625 | 0.5625 | 0.5625
+SplicedAlignment | Alignment | http://edamontology.org/topic_0083 | YES | LABEL | INEXACT | TOPIC || 0.5625 | 0.5625 | 0.5625
+SplicedAlignment | Alignment | http://edamontology.org/data_1916 | NO | LABEL | INEXACT | DATA || 0.5625 | 0.5625 | 0.5625
+SplicedAlignment | Biological model format | http://edamontology.org/format_2034 | YES | LABEL | INEXACT | FORMAT || 0.5238095238095238 | 0.0 | 0.34920634920634924
+StructuralVariation | Structural variation | http://edamontology.org/topic_3175 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+StructuralVariation | Structure visualisation | http://edamontology.org/operation_0570 | NO | LABEL | INEXACT | OPERATION || 0.6818181818181819 | 0.0 | 0.4545454545454546
+StructuralVariation | Structural data | http://edamontology.org/data_2053 | YES | LABEL | INEXACT | DATA || 0.631578947368421 | 0.0 | 0.42105263157894735
+TranscriptomeVariant | Transcriptome | http://edamontology.org/topic_3308 | NO | NARROW_SYNONYM | INEXACT | TOPIC || 0.65 | 0.65 | 0.65
+TranscriptomeVariant | Biological model ID | http://edamontology.org/data_1085 | NO | LABEL | INEXACT | DATA || 0.6111111111111112 | 0.0 | 0.40740740740740744
+TranscriptomeVariant | Transcript copy number estimation | http://edamontology.org/operation_3233 | NO | EXACT_SYNONYM | INEXACT | OPERATION || 0.5 | 0.0 | 0.3333333333333333
+TranscriptomeVariant | GCG format variant | http://edamontology.org/format_3486 | NO | LABEL | INEXACT | FORMAT || 0.44999999999999996 | 0.0 | 0.3
+VariantAnnotation | Annotation | http://edamontology.org/data_2018 | YES | LABEL | INEXACT | DATA || 0.5882352941176471 | 0.5882352941176471 | 0.5882352941176471
+VariantAnnotation | Annotation | http://edamontology.org/operation_0226 | NO | LABEL | INEXACT | OPERATION || 0.5882352941176471 | 0.5882352941176471 | 0.5882352941176471
+VariantAnnotation | RFLP annotation | http://edamontology.org/topic_2869 | NO | EXACT_SYNONYM | INEXACT | TOPIC || 0.6470588235294117 | 0.0 | 0.4313725490196078
+VariantDetection | Detection | http://edamontology.org/operation_2423 | NO | NARROW_SYNONYM | INEXACT | OPERATION || 0.5625 | 0.5625 | 0.5625
+VariantDetection | Biological modelling | http://edamontology.org/topic_2259 | NO | LABEL | INEXACT | TOPIC || 0.631578947368421 | 0.0 | 0.42105263157894735
+VariantDetection | Biological model accession | http://edamontology.org/data_2891 | NO | LABEL | INEXACT | DATA || 0.625 | 0.0 | 0.4166666666666667
+AlternativeSplicing | Alternative medicine | http://edamontology.org/topic_3423 | NO | BROAD_SYNONYM | INEXACT | TOPIC || 0.7894736842105263 | 0.0 | 0.5263157894736842
+AlternativeSplicing | Biological model ID | http://edamontology.org/data_1085 | NO | LABEL | INEXACT | DATA || 0.6111111111111112 | 0.0 | 0.40740740740740744
+AlternativeSplicing | Tau angle calculation | http://edamontology.org/operation_1828 | NO | LABEL | INEXACT | OPERATION || 0.4736842105263158 | 0.0 | 0.31578947368421056
+Coverage | Biological chemistry | http://edamontology.org/topic_3292 | NO | LABEL | INEXACT | TOPIC || 0.631578947368421 | 0.0 | 0.42105263157894735
+Coverage | Biological model ID | http://edamontology.org/data_1085 | NO | LABEL | INEXACT | DATA || 0.6111111111111112 | 0.0 | 0.40740740740740744
+Coverage | Tau angle calculation | http://edamontology.org/operation_1828 | NO | LABEL | INEXACT | OPERATION || 0.4736842105263158 | 0.0 | 0.31578947368421056
+DemethylateRegionDetection | Biological chemistry | http://edamontology.org/topic_3292 | NO | LABEL | INEXACT | TOPIC || 0.631578947368421 | 0.0 | 0.42105263157894735
+DemethylateRegionDetection | Biological model ID | http://edamontology.org/data_1085 | NO | LABEL | INEXACT | DATA || 0.6111111111111112 | 0.0 | 0.40740740740740744
+DemethylateRegionDetection | Protein feature detection | http://edamontology.org/operation_3092 | NO | LABEL | INEXACT | OPERATION || 0.5 | 0.0 | 0.3333333333333333
+DenovoAssembler | Genome assembly | http://edamontology.org/operation_3440 | NO | LABEL | INEXACT | OPERATION || 0.6666666666666667 | 0.0 | 0.4444444444444445
+DenovoAssembler | Biological modelling | http://edamontology.org/topic_2259 | NO | LABEL | INEXACT | TOPIC || 0.631578947368421 | 0.0 | 0.42105263157894735
+DenovoAssembler | Biological model ID | http://edamontology.org/data_1085 | NO | LABEL | INEXACT | DATA || 0.6111111111111112 | 0.0 | 0.40740740740740744
+DifferentialExpression | Differential expression analysis | http://edamontology.org/operation_3223 | NO | LABEL | INEXACT | OPERATION || 0.7333333333333334 | 0.7333333333333334 | 0.7333333333333334
+DifferentialExpression | Biological modelling | http://edamontology.org/topic_2259 | NO | LABEL | INEXACT | TOPIC || 0.631578947368421 | 0.0 | 0.42105263157894735
+DifferentialExpression | Biological model ID | http://edamontology.org/data_1085 | NO | LABEL | INEXACT | DATA || 0.6111111111111112 | 0.0 | 0.40740740740740744
+DifferentialMethylation | Biological chemistry | http://edamontology.org/topic_3292 | NO | LABEL | INEXACT | TOPIC || 0.631578947368421 | 0.0 | 0.42105263157894735
+DifferentialMethylation | Biological model ID | http://edamontology.org/data_1085 | NO | LABEL | INEXACT | DATA || 0.6111111111111112 | 0.0 | 0.40740740740740744
+DifferentialMethylation | Differential expression analysis | http://edamontology.org/operation_3223 | NO | LABEL | INEXACT | OPERATION || 0.5 | 0.0 | 0.3333333333333333
+DifferentialPeakCalling | Peak calling | http://edamontology.org/operation_3222 | NO | LABEL | INEXACT | OPERATION || 0.4782608695652174 | 0.4782608695652174 | 0.47826086956521746
+DifferentialPeakCalling | Biological modelling | http://edamontology.org/topic_2259 | NO | LABEL | INEXACT | TOPIC || 0.631578947368421 | 0.0 | 0.42105263157894735
+DifferentialPeakCalling | Biological model ID | http://edamontology.org/data_1085 | NO | LABEL | INEXACT | DATA || 0.6111111111111112 | 0.0 | 0.40740740740740744
+DifferentialSplicing | Biological chemistry | http://edamontology.org/topic_3292 | NO | LABEL | INEXACT | TOPIC || 0.631578947368421 | 0.0 | 0.42105263157894735
+DifferentialSplicing | Biological model ID | http://edamontology.org/data_1085 | NO | LABEL | INEXACT | DATA || 0.6111111111111112 | 0.0 | 0.40740740740740744
+DifferentialSplicing | Differential expression analysis | http://edamontology.org/operation_3223 | NO | LABEL | INEXACT | OPERATION || 0.5 | 0.0 | 0.3333333333333333
+DriverMutation | Mutation | http://edamontology.org/topic_0199 | NO | NARROW_SYNONYM | INEXACT | TOPIC || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+DriverMutation | Biological model ID | http://edamontology.org/data_1085 | NO | LABEL | INEXACT | DATA || 0.6111111111111112 | 0.0 | 0.40740740740740744
+DriverMutation | Imputation | http://edamontology.org/operation_3557 | NO | LABEL | INEXACT | OPERATION || 0.5714285714285714 | 0.0 | 0.38095238095238093
+DriverMutation | PubMed citation | http://edamontology.org/format_1734 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+FunctionalPrediction | Prediction | http://edamontology.org/operation_2423 | NO | NARROW_SYNONYM | INEXACT | OPERATION || 0.5 | 0.5 | 0.5
+FunctionalPrediction | Biological modelling | http://edamontology.org/topic_2259 | NO | LABEL | INEXACT | TOPIC || 0.631578947368421 | 0.0 | 0.42105263157894735
+FunctionalPrediction | Biological model ID | http://edamontology.org/data_1085 | NO | LABEL | INEXACT | DATA || 0.6111111111111112 | 0.0 | 0.40740740740740744
+GeneFusionDetection | Detection | http://edamontology.org/operation_2423 | NO | NARROW_SYNONYM | INEXACT | OPERATION || 0.4736842105263158 | 0.4736842105263158 | 0.47368421052631576
+GeneFusionDetection | Biological modelling | http://edamontology.org/topic_2259 | NO | LABEL | INEXACT | TOPIC || 0.631578947368421 | 0.0 | 0.42105263157894735
+GeneFusionDetection | Biological model ID | http://edamontology.org/data_1085 | NO | LABEL | INEXACT | DATA || 0.6111111111111112 | 0.0 | 0.40740740740740744
+GenePrediction | Gene prediction | http://edamontology.org/operation_2454 | NO | LABEL | EXACT | OPERATION || 1.0 | 1.0 | 1.0
+GenePrediction | Biological modelling | http://edamontology.org/topic_2259 | NO | LABEL | INEXACT | TOPIC || 0.631578947368421 | 0.0 | 0.42105263157894735
+GenePrediction | Biological model ID | http://edamontology.org/data_1085 | NO | LABEL | INEXACT | DATA || 0.6111111111111112 | 0.0 | 0.40740740740740744
+GeneRegulation | Gene regulation | http://edamontology.org/topic_0204 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+GeneRegulation | Biological model ID | http://edamontology.org/data_1085 | NO | LABEL | INEXACT | DATA || 0.6111111111111112 | 0.0 | 0.40740740740740744
+GeneRegulation | Genome visualisation | http://edamontology.org/operation_3208 | NO | LABEL | INEXACT | OPERATION || 0.5789473684210527 | 0.0 | 0.3859649122807018
+GeneSetEnrichment | Enrichment | http://edamontology.org/operation_3501 | NO | LABEL | INEXACT | OPERATION || 0.5882352941176471 | 0.5882352941176471 | 0.5882352941176471
+GeneSetEnrichment | Biological modelling | http://edamontology.org/topic_2259 | NO | LABEL | INEXACT | TOPIC || 0.631578947368421 | 0.0 | 0.42105263157894735
+GeneSetEnrichment | Biological model ID | http://edamontology.org/data_1085 | NO | LABEL | INEXACT | DATA || 0.6111111111111112 | 0.0 | 0.40740740740740744
+GeneSignaling | Gene finding | http://edamontology.org/topic_0109 | YES | LABEL | INEXACT | TOPIC || 0.6923076923076923 | 0.0 | 0.4615384615384615
+GeneSignaling | Biological model ID | http://edamontology.org/data_1085 | NO | LABEL | INEXACT | DATA || 0.6111111111111112 | 0.0 | 0.40740740740740744
+GeneSignaling | Torsion angle calculation | http://edamontology.org/operation_0249 | NO | LABEL | INEXACT | OPERATION || 0.4782608695652174 | 0.0 | 0.31884057971014496
+GeneTarget | Gene tree | http://edamontology.org/data_3271 | NO | LABEL | INEXACT | DATA || 0.7 | 0.0 | 0.4666666666666666
+GeneTarget | Biological modelling | http://edamontology.org/topic_2259 | NO | LABEL | INEXACT | TOPIC || 0.631578947368421 | 0.0 | 0.42105263157894735
+GeneTarget | genePred | http://edamontology.org/format_3011 | NO | LABEL | INEXACT | FORMAT || 0.6 | 0.0 | 0.39999999999999997
+GeneTarget | Generation | http://edamontology.org/operation_3429 | NO | LABEL | INEXACT | OPERATION || 0.5 | 0.0 | 0.3333333333333333
+GenomeAssembly | Genome assembly | http://edamontology.org/operation_3440 | NO | LABEL | EXACT | OPERATION || 1.0 | 1.0 | 1.0
+GenomeAssembly | Biological modelling | http://edamontology.org/topic_2259 | NO | LABEL | INEXACT | TOPIC || 0.631578947368421 | 0.0 | 0.42105263157894735
+GenomeAssembly | Biological model accession | http://edamontology.org/data_2891 | NO | LABEL | INEXACT | DATA || 0.625 | 0.0 | 0.4166666666666667
+GenomeWideAssociation | Genome-wide association study | http://edamontology.org/data_3231 | YES | EXACT_SYNONYM | INEXACT | DATA || 0.7777777777777778 | 0.0 | 0.5185185185185185
+GenomeWideAssociation | Genome-wide association study | http://edamontology.org/topic_3517 | NO | EXACT_SYNONYM | INEXACT | TOPIC || 0.7777777777777778 | 0.0 | 0.5185185185185185
+GenomeWideAssociation | Genome visualisation | http://edamontology.org/operation_3208 | NO | LABEL | INEXACT | OPERATION || 0.6190476190476191 | 0.0 | 0.41269841269841273
+GenomeWideAssociation | Biological model format | http://edamontology.org/format_2034 | YES | LABEL | INEXACT | FORMAT || 0.5238095238095238 | 0.0 | 0.34920634920634924
+GenomicVariation | Genetic variation | http://edamontology.org/topic_0199 | NO | LABEL | INEXACT | TOPIC || 0.875 | 0.0 | 0.5833333333333334
+GenomicVariation | Genome visualization | http://edamontology.org/operation_3208 | NO | EXACT_SYNONYM | INEXACT | OPERATION || 0.6842105263157895 | 0.0 | 0.456140350877193
+GenomicVariation | Biological model accession | http://edamontology.org/data_2891 | NO | LABEL | INEXACT | DATA || 0.625 | 0.0 | 0.4166666666666667
+GenomeAnnotation | Genome annotation | http://edamontology.org/operation_0362 | NO | LABEL | EXACT | OPERATION || 1.0 | 1.0 | 1.0
+GenomeAnnotation | Genome annotation | http://edamontology.org/topic_0222 | YES | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+GenomeAnnotation | Fungi annotation | http://edamontology.org/data_2395 | YES | LABEL | INEXACT | DATA || 0.6875 | 0.0 | 0.4583333333333333
+GenomeAnnotation | Experiment annotation format | http://edamontology.org/format_3167 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+GermlineMutation | Mutation | http://edamontology.org/topic_0199 | NO | NARROW_SYNONYM | INEXACT | TOPIC || 0.5 | 0.5 | 0.5
+GermlineMutation | Biological model ID | http://edamontology.org/data_1085 | NO | LABEL | INEXACT | DATA || 0.6111111111111112 | 0.0 | 0.40740740740740744
+GermlineMutation | Genome annotation | http://edamontology.org/operation_0362 | NO | LABEL | INEXACT | OPERATION || 0.5625 | 0.0 | 0.375
+HistoneModification | Histone modification | http://edamontology.org/topic_3295 | NO | NARROW_SYNONYM | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+HistoneModification | Biological model ID | http://edamontology.org/data_1085 | NO | LABEL | INEXACT | DATA || 0.6111111111111112 | 0.0 | 0.40740740740740744
+HistoneModification | Biological model format | http://edamontology.org/format_2034 | YES | LABEL | INEXACT | FORMAT || 0.5238095238095238 | 0.0 | 0.34920634920634924
+HistoneModification | Sequence classification | http://edamontology.org/operation_2995 | NO | LABEL | INEXACT | OPERATION || 0.5 | 0.0 | 0.3333333333333333
+IndelDetection | Indel detection | http://edamontology.org/operation_0452 | NO | LABEL | EXACT | OPERATION || 1.0 | 1.0 | 1.0
+IndelDetection | Biological modelling | http://edamontology.org/topic_2259 | NO | LABEL | INEXACT | TOPIC || 0.631578947368421 | 0.0 | 0.42105263157894735
+IndelDetection | Biological model ID | http://edamontology.org/data_1085 | NO | LABEL | INEXACT | DATA || 0.6111111111111112 | 0.0 | 0.40740740740740744
+ExperimentalDesign | Workflows | http://edamontology.org/topic_0769 | YES | LABEL | INEXACT | TOPIC || 0.75 | 0.75 | 0.75
+ExperimentalDesign | Workflow data | http://edamontology.org/data_2971 | YES | LABEL | INEXACT | DATA || 0.6666666666666667 | 0.0 | 0.4444444444444445
+ExperimentalDesign | Experiment annotation format | http://edamontology.org/format_3167 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+Alignment | Alignment | http://edamontology.org/operation_2928 | NO | LABEL | EXACT | OPERATION || 1.0 | 1.0 | 1.0
+Alignment | Alignment | http://edamontology.org/topic_0083 | YES | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+Alignment | Alignment | http://edamontology.org/data_1916 | NO | LABEL | EXACT | DATA || 1.0 | 1.0 | 1.0
+Alignment | msf alignment format | http://edamontology.org/format_1993 | YES | LABEL | INEXACT | FORMAT || 0.5 | 0.5 | 0.5
+Annotation | Annotation | http://edamontology.org/data_2018 | YES | LABEL | EXACT | DATA || 1.0 | 1.0 | 1.0
+Annotation | Annotation | http://edamontology.org/operation_0226 | NO | LABEL | EXACT | OPERATION || 1.0 | 1.0 | 1.0
+Annotation | VNTR annotation | http://edamontology.org/topic_2867 | NO | EXACT_SYNONYM | INEXACT | TOPIC || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+Annotation | Sequence annotation track format | http://edamontology.org/format_2919 | NO | LABEL | INEXACT | FORMAT || 0.3448275862068966 | 0.3448275862068966 | 0.3448275862068966
+BatchEffect | Workflows | http://edamontology.org/topic_0769 | YES | LABEL | INEXACT | TOPIC || 0.75 | 0.75 | 0.75
+BatchEffect | Workflow data | http://edamontology.org/data_2971 | YES | LABEL | INEXACT | DATA || 0.6666666666666667 | 0.0 | 0.4444444444444445
+MultipleComparison | Workflows | http://edamontology.org/topic_0769 | YES | LABEL | INEXACT | TOPIC || 0.75 | 0.75 | 0.75
+MultipleComparison | Workflow data | http://edamontology.org/data_2971 | YES | LABEL | INEXACT | DATA || 0.6666666666666667 | 0.0 | 0.4444444444444445
+MultipleComparison | Structure comparison | http://edamontology.org/operation_2483 | NO | LABEL | INEXACT | OPERATION || 0.631578947368421 | 0.0 | 0.42105263157894735
+Normalization | Workflows | http://edamontology.org/topic_0769 | YES | LABEL | INEXACT | TOPIC || 0.75 | 0.75 | 0.75
+Normalization | Workflow data | http://edamontology.org/data_2971 | YES | LABEL | INEXACT | DATA || 0.6666666666666667 | 0.0 | 0.4444444444444445
+Normalization | Correlation | http://edamontology.org/operation_3465 | NO | LABEL | INEXACT | OPERATION || 0.6153846153846154 | 0.0 | 0.4102564102564103
+Normalization | Notation3 | http://edamontology.org/format_3257 | NO | LABEL | INEXACT | FORMAT || 0.46153846153846156 | 0.0 | 0.3076923076923077
+Pathways | Pathway | http://edamontology.org/data_2600 | NO | EXACT_SYNONYM | INEXACT | DATA || 0.875 | 0.875 | 0.875
+Pathways | Signaling pathways | http://edamontology.org/topic_0754 | NO | LABEL | INEXACT | TOPIC || 0.47058823529411764 | 0.47058823529411764 | 0.4705882352941176
+Preprocessing | Processing | http://edamontology.org/operation_2420 | NO | EXACT_SYNONYM | INEXACT | OPERATION || 0.7692307692307692 | 0.7692307692307692 | 0.7692307692307692
+Preprocessing | Workflow data | http://edamontology.org/data_2971 | YES | LABEL | INEXACT | DATA || 0.6666666666666667 | 0.0 | 0.4444444444444445
+Preprocessing | Proteins | http://edamontology.org/topic_0078 | NO | LABEL | INEXACT | TOPIC || 0.46153846153846156 | 0.0 | 0.3076923076923077
+QualityControl | Workflows | http://edamontology.org/topic_0769 | YES | LABEL | INEXACT | TOPIC || 0.75 | 0.75 | 0.75
+QualityControl | Workflow data | http://edamontology.org/data_2971 | YES | LABEL | INEXACT | DATA || 0.6666666666666667 | 0.0 | 0.4444444444444445
+ReportWriting | Workflows | http://edamontology.org/topic_0769 | YES | LABEL | INEXACT | TOPIC || 0.75 | 0.75 | 0.75
+ReportWriting | Workflow data | http://edamontology.org/data_2971 | YES | LABEL | INEXACT | DATA || 0.6666666666666667 | 0.0 | 0.4444444444444445
+ReportWriting | Splitting | http://edamontology.org/operation_3359 | NO | LABEL | INEXACT | OPERATION || 0.46153846153846156 | 0.0 | 0.3076923076923077
+Visualization | Workflows | http://edamontology.org/topic_0769 | YES | LABEL | INEXACT | TOPIC || 0.75 | 0.75 | 0.75
+Visualization | Workflow data | http://edamontology.org/data_2971 | YES | LABEL | INEXACT | DATA || 0.6666666666666667 | 0.0 | 0.4444444444444445
+Visualization | Sequence visualisation | http://edamontology.org/operation_0564 | NO | LABEL | INEXACT | OPERATION || 0.5714285714285714 | 0.0 | 0.38095238095238093
+GenomeBrowsers | Workflows | http://edamontology.org/topic_0769 | YES | LABEL | INEXACT | TOPIC || 0.75 | 0.75 | 0.75
+GenomeBrowsers | Workflow data | http://edamontology.org/data_2971 | YES | LABEL | INEXACT | DATA || 0.6666666666666667 | 0.0 | 0.4444444444444445
+GenomeBrowsers | Genome comparison | http://edamontology.org/operation_3209 | NO | LABEL | INEXACT | OPERATION || 0.5 | 0.0 | 0.3333333333333333
+Bayesian | Statistical calculation | http://edamontology.org/operation_2238 | NO | LABEL | INEXACT | OPERATION || 0.5909090909090908 | 0.0 | 0.39393939393939387
+Bayesian | EMBL accession | http://edamontology.org/data_2290 | NO | LABEL | INEXACT | DATA || 0.46153846153846156 | 0.0 | 0.3076923076923077
+Classification | Classification | http://edamontology.org/topic_2230 | YES | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+Classification | Classification | http://edamontology.org/operation_2990 | NO | LABEL | EXACT | OPERATION || 1.0 | 1.0 | 1.0
+Classification | Protein classification | http://edamontology.org/data_2980 | NO | LABEL | INEXACT | DATA || 0.6666666666666667 | 0.6666666666666667 | 0.6666666666666666
+Classification | Raw CATH domain classification format | http://edamontology.org/format_3099 | NO | LABEL | INEXACT | FORMAT || 0.4242424242424242 | 0.4242424242424242 | 0.42424242424242414
+Clustering | Clustering | http://edamontology.org/operation_3432 | NO | LABEL | EXACT | OPERATION || 1.0 | 1.0 | 1.0
+Clustering | Sequence clustering | http://edamontology.org/topic_0164 | YES | LABEL | INEXACT | TOPIC || 0.5555555555555556 | 0.5555555555555556 | 0.5555555555555556
+Clustering | SMILES string | http://edamontology.org/data_2301 | NO | LABEL | INEXACT | DATA || 0.5 | 0.0 | 0.3333333333333333
+Clustering | clustal | http://edamontology.org/format_1982 | NO | EXACT_SYNONYM | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+DecisionTree | Statistical calculation | http://edamontology.org/operation_2238 | NO | LABEL | INEXACT | OPERATION || 0.5909090909090908 | 0.0 | 0.39393939393939387
+DecisionTree | Species tree | http://edamontology.org/data_3272 | NO | LABEL | INEXACT | DATA || 0.5 | 0.0 | 0.3333333333333333
+DimensionReduction | Statistical calculation | http://edamontology.org/operation_2238 | NO | LABEL | INEXACT | OPERATION || 0.5909090909090908 | 0.0 | 0.39393939393939387
+FeatureExtraction | Entity extraction | http://edamontology.org/operation_3280 | NO | EXACT_SYNONYM | INEXACT | OPERATION || 0.7058823529411764 | 0.0 | 0.4705882352941176
+FeatureExtraction | Feature location | http://edamontology.org/format_1248 | NO | EXACT_SYNONYM | INEXACT | FORMAT || 0.7058823529411764 | 0.0 | 0.4705882352941176
+FeatureExtraction | Feature table | http://edamontology.org/data_1270 | NO | LABEL | INEXACT | DATA || 0.5294117647058824 | 0.0 | 0.35294117647058826
+FeatureExtraction | Protein feature detection | http://edamontology.org/topic_3074 | YES | LABEL | INEXACT | TOPIC || 0.5217391304347826 | 0.0 | 0.34782608695652173
+GraphAndNetwork | Network | http://edamontology.org/data_2600 | NO | EXACT_SYNONYM | INEXACT | DATA || 0.4666666666666667 | 0.4666666666666667 | 0.4666666666666666
+HiddenMarkovModel | Hidden Markov model | http://edamontology.org/data_1364 | NO | LABEL | EXACT | DATA || 1.0 | 1.0 | 1.0
+MultidimensionalScaling | Statistical calculation | http://edamontology.org/operation_2238 | NO | LABEL | INEXACT | OPERATION || 0.5909090909090908 | 0.0 | 0.39393939393939387
+NeuralNetwork | Network | http://edamontology.org/data_2600 | NO | EXACT_SYNONYM | INEXACT | DATA || 0.5384615384615384 | 0.5384615384615384 | 0.5384615384615384
+NeuralNetwork | Gene regulatory networks | http://edamontology.org/topic_2846 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+PatternLogic | Statistical calculation | http://edamontology.org/operation_2238 | NO | LABEL | INEXACT | OPERATION || 0.5909090909090908 | 0.0 | 0.39393939393939387
+PrincipalComponent | Microarray principal component plotting | http://edamontology.org/operation_2939 | NO | LABEL | INEXACT | OPERATION || 0.5 | 0.5 | 0.5
+Regression | Drug accession | http://edamontology.org/data_2895 | NO | LABEL | INEXACT | DATA || 0.6153846153846154 | 0.0 | 0.4102564102564103
+Regression | Conversion | http://edamontology.org/operation_3434 | NO | LABEL | INEXACT | OPERATION || 0.5 | 0.0 | 0.3333333333333333
+Regression | Drug design | http://edamontology.org/topic_0209 | NO | EXACT_SYNONYM | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+StructuralEquationModels | Structural variation discovery | http://edamontology.org/operation_3228 | NO | LABEL | INEXACT | OPERATION || 0.6071428571428572 | 0.0 | 0.4047619047619048
+StructuralEquationModels | Structural variation | http://edamontology.org/topic_3175 | NO | LABEL | INEXACT | TOPIC || 0.5833333333333333 | 0.0 | 0.38888888888888884
+StructuralEquationModels | Statistical estimate score | http://edamontology.org/data_0951 | NO | LABEL | INEXACT | DATA || 0.5833333333333333 | 0.0 | 0.38888888888888884
+SupportVectorMachine | Statistical calculation | http://edamontology.org/operation_2238 | NO | LABEL | INEXACT | OPERATION || 0.5909090909090908 | 0.0 | 0.39393939393939387
+Survival | Statistical calculation | http://edamontology.org/operation_2238 | NO | LABEL | INEXACT | OPERATION || 0.5909090909090908 | 0.0 | 0.39393939393939387
+TimeCourse | Statistical calculation | http://edamontology.org/operation_2238 | NO | LABEL | INEXACT | OPERATION || 0.5909090909090908 | 0.0 | 0.39393939393939387
+ThirdPartyClient | Structure | http://edamontology.org/data_0883 | NO | LABEL | INEXACT | DATA || 0.6428571428571428 | 0.6428571428571428 | 0.6428571428571428
+ThirdPartyClient | RNA structure | http://edamontology.org/topic_0097 | NO | LABEL | INEXACT | TOPIC || 0.7857142857142857 | 0.0 | 0.5238095238095238
+ThirdPartyClient | Protein secondary structure | http://edamontology.org/operation_2488 | NO | LABEL | INEXACT | OPERATION || 0.48 | 0.0 | 0.32
+DataImport | Structure | http://edamontology.org/data_0883 | NO | LABEL | INEXACT | DATA || 0.6428571428571428 | 0.6428571428571428 | 0.6428571428571428
+DataImport | RNA structure | http://edamontology.org/topic_0097 | NO | LABEL | INEXACT | TOPIC || 0.7857142857142857 | 0.0 | 0.5238095238095238
+DataImport | Matrix format | http://edamontology.org/format_3033 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+DataImport | Data deposition | http://edamontology.org/operation_3431 | NO | EXACT_SYNONYM | INEXACT | OPERATION || 0.5 | 0.0 | 0.3333333333333333
+DataRepresentation | Structure | http://edamontology.org/data_0883 | NO | LABEL | INEXACT | DATA || 0.6428571428571428 | 0.6428571428571428 | 0.6428571428571428
+DataRepresentation | RNA structure | http://edamontology.org/topic_0097 | NO | LABEL | INEXACT | TOPIC || 0.7857142857142857 | 0.0 | 0.5238095238095238
+DataRepresentation | Data deposition | http://edamontology.org/operation_3431 | NO | EXACT_SYNONYM | INEXACT | OPERATION || 0.6111111111111112 | 0.0 | 0.40740740740740744
+GUI | Structure | http://edamontology.org/data_0883 | NO | LABEL | INEXACT | DATA || 0.6428571428571428 | 0.6428571428571428 | 0.6428571428571428
+GUI | RNA structure | http://edamontology.org/topic_0097 | NO | LABEL | INEXACT | TOPIC || 0.7857142857142857 | 0.0 | 0.5238095238095238
+GUI | Protein secondary structure | http://edamontology.org/operation_2488 | NO | LABEL | INEXACT | OPERATION || 0.48 | 0.0 | 0.32
+DNASeq | Sequencing | http://edamontology.org/topic_3168 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+DNASeq | dna | http://edamontology.org/format_1212 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.5 | 0.5
+DNASeq | DNA sequences | http://edamontology.org/data_3495 | NO | EXACT_SYNONYM | INEXACT | DATA || 0.5 | 0.5 | 0.5
+DNASeq | Sequence mapping | http://edamontology.org/operation_2871 | NO | LABEL | INEXACT | OPERATION || 0.6666666666666667 | 0.0 | 0.4444444444444445
+RNASeq | Sequencing | http://edamontology.org/topic_3168 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+RNASeq | Sequences | http://edamontology.org/data_2044 | NO | LABEL | INEXACT | DATA || 0.7 | 0.0 | 0.4666666666666666
+RNASeq | Sequence mapping | http://edamontology.org/operation_2871 | NO | LABEL | INEXACT | OPERATION || 0.6666666666666667 | 0.0 | 0.4444444444444445
+RNASeq | refseqp | http://edamontology.org/format_1958 | NO | LABEL | INEXACT | FORMAT || 0.5714285714285714 | 0.0 | 0.38095238095238093
+ChIPSeq | Sequencing | http://edamontology.org/topic_3168 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+ChIPSeq | Sequences | http://edamontology.org/data_2044 | NO | LABEL | INEXACT | DATA || 0.7 | 0.0 | 0.4666666666666666
+ChIPSeq | Sequence mapping | http://edamontology.org/operation_2871 | NO | LABEL | INEXACT | OPERATION || 0.6666666666666667 | 0.0 | 0.4444444444444445
+ChIPSeq | Sequence range format | http://edamontology.org/format_2078 | NO | LABEL | INEXACT | FORMAT || 0.4736842105263158 | 0.0 | 0.31578947368421056
+RIPSeq | Sequencing | http://edamontology.org/topic_3168 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+RIPSeq | Sequences | http://edamontology.org/data_2044 | NO | LABEL | INEXACT | DATA || 0.7 | 0.0 | 0.4666666666666666
+RIPSeq | Sequence mapping | http://edamontology.org/operation_2871 | NO | LABEL | INEXACT | OPERATION || 0.6666666666666667 | 0.0 | 0.4444444444444445
+RIPSeq | refseqp | http://edamontology.org/format_1958 | NO | LABEL | INEXACT | FORMAT || 0.5714285714285714 | 0.0 | 0.38095238095238093
+MethylSeq | Sequencing | http://edamontology.org/topic_3168 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+MethylSeq | Sequences | http://edamontology.org/data_2044 | NO | LABEL | INEXACT | DATA || 0.7 | 0.0 | 0.4666666666666666
+MethylSeq | Sequence mapping | http://edamontology.org/operation_2871 | NO | LABEL | INEXACT | OPERATION || 0.6666666666666667 | 0.0 | 0.4444444444444445
+MethylSeq | mega-seq | http://edamontology.org/format_1946 | NO | LABEL | INEXACT | FORMAT || 0.5555555555555556 | 0.0 | 0.3703703703703704
+ExomeSeq | Sequencing | http://edamontology.org/topic_3168 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+ExomeSeq | Sequences | http://edamontology.org/data_2044 | NO | LABEL | INEXACT | DATA || 0.7 | 0.0 | 0.4666666666666666
+ExomeSeq | Sequence mapping | http://edamontology.org/operation_2871 | NO | LABEL | INEXACT | OPERATION || 0.6666666666666667 | 0.0 | 0.4444444444444445
+ExomeSeq | nexus-seq | http://edamontology.org/format_1949 | NO | LABEL | INEXACT | FORMAT || 0.5555555555555556 | 0.0 | 0.3703703703703704
+miRNA | Sequence annotation | http://edamontology.org/operation_0361 | NO | LABEL | EXACT | OPERATION || 1.0 | 1.0 | 1.0
+miRNA | Sequencing | http://edamontology.org/topic_3168 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+miRNA | miRNA ID | http://edamontology.org/data_2642 | NO | EXACT_SYNONYM | INEXACT | DATA || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+miRNA | rna | http://edamontology.org/format_1213 | NO | LABEL | INEXACT | FORMAT || 0.6 | 0.6 | 0.6
+SangerSeq | Sequencing | http://edamontology.org/topic_3168 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+SangerSeq | Sequences | http://edamontology.org/data_2044 | NO | LABEL | INEXACT | DATA || 0.7 | 0.0 | 0.4666666666666666
+SangerSeq | Sequence mapping | http://edamontology.org/operation_2871 | NO | LABEL | INEXACT | OPERATION || 0.6666666666666667 | 0.0 | 0.4444444444444445
+SangerSeq | geneseq | http://edamontology.org/format_2186 | NO | LABEL | INEXACT | FORMAT || 0.5555555555555556 | 0.0 | 0.3703703703703704
+SmallRNA | Sequencing | http://edamontology.org/topic_3168 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+SmallRNA | Sequences | http://edamontology.org/data_2044 | NO | LABEL | INEXACT | DATA || 0.7 | 0.0 | 0.4666666666666666
+SmallRNA | Sequence mapping | http://edamontology.org/operation_2871 | NO | LABEL | INEXACT | OPERATION || 0.6666666666666667 | 0.0 | 0.4444444444444445
+SmallRNA | Sequence range format | http://edamontology.org/format_2078 | NO | LABEL | INEXACT | FORMAT || 0.4736842105263158 | 0.0 | 0.31578947368421056
+Microbiome | Sequencing | http://edamontology.org/topic_3168 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+Microbiome | Sequences | http://edamontology.org/data_2044 | NO | LABEL | INEXACT | DATA || 0.7 | 0.0 | 0.4666666666666666
+Microbiome | Sequence mapping | http://edamontology.org/operation_2871 | NO | LABEL | INEXACT | OPERATION || 0.6666666666666667 | 0.0 | 0.4444444444444445
+Microbiome | Sequence range format | http://edamontology.org/format_2078 | NO | LABEL | INEXACT | FORMAT || 0.4736842105263158 | 0.0 | 0.31578947368421056
+WholeGenome | Sequencing | http://edamontology.org/topic_3168 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+WholeGenome | Sequences | http://edamontology.org/data_2044 | NO | LABEL | INEXACT | DATA || 0.7 | 0.0 | 0.4666666666666666
+WholeGenome | Sequence mapping | http://edamontology.org/operation_2871 | NO | LABEL | INEXACT | OPERATION || 0.6666666666666667 | 0.0 | 0.4444444444444445
+WholeGenome | Sequence range format | http://edamontology.org/format_2078 | NO | LABEL | INEXACT | FORMAT || 0.4736842105263158 | 0.0 | 0.31578947368421056
+DenovoGenome | Sequencing | http://edamontology.org/topic_3168 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+DenovoGenome | Sequences | http://edamontology.org/data_2044 | NO | LABEL | INEXACT | DATA || 0.7 | 0.0 | 0.4666666666666666
+DenovoGenome | Sequence mapping | http://edamontology.org/operation_2871 | NO | LABEL | INEXACT | OPERATION || 0.6666666666666667 | 0.0 | 0.4444444444444445
+DenovoGenome | Sequence range format | http://edamontology.org/format_2078 | NO | LABEL | INEXACT | FORMAT || 0.4736842105263158 | 0.0 | 0.31578947368421056
+TargetedResequencing | Sequencing | http://edamontology.org/topic_3168 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+TargetedResequencing | Sequences | http://edamontology.org/data_2044 | NO | LABEL | INEXACT | DATA || 0.7 | 0.0 | 0.4666666666666666
+TargetedResequencing | Sequence mapping | http://edamontology.org/operation_2871 | NO | LABEL | INEXACT | OPERATION || 0.6666666666666667 | 0.0 | 0.4444444444444445
+TargetedResequencing | Sequence range format | http://edamontology.org/format_2078 | NO | LABEL | INEXACT | FORMAT || 0.4736842105263158 | 0.0 | 0.31578947368421056
+DenovoTranscriptome | Sequencing | http://edamontology.org/topic_3168 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+DenovoTranscriptome | Sequences | http://edamontology.org/data_2044 | NO | LABEL | INEXACT | DATA || 0.7 | 0.0 | 0.4666666666666666
+DenovoTranscriptome | Sequence mapping | http://edamontology.org/operation_2871 | NO | LABEL | INEXACT | OPERATION || 0.6666666666666667 | 0.0 | 0.4444444444444445
+DenovoTranscriptome | Sequence range format | http://edamontology.org/format_2078 | NO | LABEL | INEXACT | FORMAT || 0.4736842105263158 | 0.0 | 0.31578947368421056
+MicrobialStrain | Sequencing | http://edamontology.org/topic_3168 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+MicrobialStrain | Sequences | http://edamontology.org/data_2044 | NO | LABEL | INEXACT | DATA || 0.7 | 0.0 | 0.4666666666666666
+MicrobialStrain | Sequence mapping | http://edamontology.org/operation_2871 | NO | LABEL | INEXACT | OPERATION || 0.6666666666666667 | 0.0 | 0.4444444444444445
+MicrobialStrain | Sequence range format | http://edamontology.org/format_2078 | NO | LABEL | INEXACT | FORMAT || 0.4736842105263158 | 0.0 | 0.31578947368421056
+HiC | Sequencing | http://edamontology.org/topic_3168 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+HiC | Sequences | http://edamontology.org/data_2044 | NO | LABEL | INEXACT | DATA || 0.7 | 0.0 | 0.4666666666666666
+HiC | Sequence mapping | http://edamontology.org/operation_2871 | NO | LABEL | INEXACT | OPERATION || 0.6666666666666667 | 0.0 | 0.4444444444444445
+HiC | Sequence range format | http://edamontology.org/format_2078 | NO | LABEL | INEXACT | FORMAT || 0.4736842105263158 | 0.0 | 0.31578947368421056
+MultiChannel | Microarrays | http://edamontology.org/topic_0200 | YES | LABEL | INEXACT | TOPIC || 0.9090909090909091 | 0.9090909090909091 | 0.9090909090909091
+MultiChannel | Microarray metadata | http://edamontology.org/data_3115 | NO | LABEL | INEXACT | DATA || 0.5555555555555556 | 0.5555555555555556 | 0.5555555555555556
+MultiChannel | Microarray view rendering | http://edamontology.org/operation_2936 | NO | LABEL | INEXACT | OPERATION || 0.4347826086956522 | 0.4347826086956522 | 0.43478260869565216
+MultiChannel | Microarray experiment data format | http://edamontology.org/format_2056 | NO | LABEL | INEXACT | FORMAT || 0.33333333333333337 | 0.33333333333333337 | 0.3333333333333333
+OneChannel | Microarrays | http://edamontology.org/topic_0200 | YES | LABEL | INEXACT | TOPIC || 0.9090909090909091 | 0.9090909090909091 | 0.9090909090909091
+OneChannel | Microarray metadata | http://edamontology.org/data_3115 | NO | LABEL | INEXACT | DATA || 0.5555555555555556 | 0.5555555555555556 | 0.5555555555555556
+OneChannel | Microarray view rendering | http://edamontology.org/operation_2936 | NO | LABEL | INEXACT | OPERATION || 0.4347826086956522 | 0.4347826086956522 | 0.43478260869565216
+OneChannel | Microarray experiment data format | http://edamontology.org/format_2056 | NO | LABEL | INEXACT | FORMAT || 0.33333333333333337 | 0.33333333333333337 | 0.3333333333333333
+TwoChannel | Microarrays | http://edamontology.org/topic_0200 | YES | LABEL | INEXACT | TOPIC || 0.9090909090909091 | 0.9090909090909091 | 0.9090909090909091
+TwoChannel | Microarray metadata | http://edamontology.org/data_3115 | NO | LABEL | INEXACT | DATA || 0.5555555555555556 | 0.5555555555555556 | 0.5555555555555556
+TwoChannel | Microarray view rendering | http://edamontology.org/operation_2936 | NO | LABEL | INEXACT | OPERATION || 0.4347826086956522 | 0.4347826086956522 | 0.43478260869565216
+TwoChannel | Microarray experiment data format | http://edamontology.org/format_2056 | NO | LABEL | INEXACT | FORMAT || 0.33333333333333337 | 0.33333333333333337 | 0.3333333333333333
+MethylationArray | Microarrays | http://edamontology.org/topic_0200 | YES | LABEL | INEXACT | TOPIC || 0.9090909090909091 | 0.9090909090909091 | 0.9090909090909091
+MethylationArray | Microarray metadata | http://edamontology.org/data_3115 | NO | LABEL | INEXACT | DATA || 0.5555555555555556 | 0.5555555555555556 | 0.5555555555555556
+MethylationArray | Microarray view rendering | http://edamontology.org/operation_2936 | NO | LABEL | INEXACT | OPERATION || 0.4347826086956522 | 0.4347826086956522 | 0.43478260869565216
+MethylationArray | Microarray experiment data format | http://edamontology.org/format_2056 | NO | LABEL | INEXACT | FORMAT || 0.33333333333333337 | 0.33333333333333337 | 0.3333333333333333
+GenotypingArray | Microarrays | http://edamontology.org/topic_0200 | YES | LABEL | INEXACT | TOPIC || 0.9090909090909091 | 0.9090909090909091 | 0.9090909090909091
+GenotypingArray | Genotyping | http://edamontology.org/operation_3196 | NO | LABEL | INEXACT | OPERATION || 0.6666666666666667 | 0.6666666666666667 | 0.6666666666666666
+GenotypingArray | Microarray metadata | http://edamontology.org/data_3115 | NO | LABEL | INEXACT | DATA || 0.5555555555555556 | 0.5555555555555556 | 0.5555555555555556
+GenotypingArray | Microarray experiment data format | http://edamontology.org/format_2056 | NO | LABEL | INEXACT | FORMAT || 0.33333333333333337 | 0.33333333333333337 | 0.3333333333333333
+MicroRNAArray | Microarrays | http://edamontology.org/topic_0200 | YES | LABEL | INEXACT | TOPIC || 0.9090909090909091 | 0.9090909090909091 | 0.9090909090909091
+MicroRNAArray | Microarray metadata | http://edamontology.org/data_3115 | NO | LABEL | INEXACT | DATA || 0.5555555555555556 | 0.5555555555555556 | 0.5555555555555556
+MicroRNAArray | Microarray view rendering | http://edamontology.org/operation_2936 | NO | LABEL | INEXACT | OPERATION || 0.4347826086956522 | 0.4347826086956522 | 0.43478260869565216
+MicroRNAArray | Microarray experiment data format | http://edamontology.org/format_2056 | NO | LABEL | INEXACT | FORMAT || 0.33333333333333337 | 0.33333333333333337 | 0.3333333333333333
+mRNAMicroarray | Microarrays | http://edamontology.org/topic_0200 | YES | LABEL | INEXACT | TOPIC || 0.9090909090909091 | 0.9090909090909091 | 0.9090909090909091
+mRNAMicroarray | Microarray metadata | http://edamontology.org/data_3115 | NO | LABEL | INEXACT | DATA || 0.5555555555555556 | 0.5555555555555556 | 0.5555555555555556
+mRNAMicroarray | Microarray view rendering | http://edamontology.org/operation_2936 | NO | LABEL | INEXACT | OPERATION || 0.4347826086956522 | 0.4347826086956522 | 0.43478260869565216
+mRNAMicroarray | Microarray experiment data format | http://edamontology.org/format_2056 | NO | LABEL | INEXACT | FORMAT || 0.33333333333333337 | 0.33333333333333337 | 0.3333333333333333
+ChipOnChip | Microarrays | http://edamontology.org/topic_0200 | YES | LABEL | INEXACT | TOPIC || 0.9090909090909091 | 0.9090909090909091 | 0.9090909090909091
+ChipOnChip | Microarray metadata | http://edamontology.org/data_3115 | NO | LABEL | INEXACT | DATA || 0.5555555555555556 | 0.5555555555555556 | 0.5555555555555556
+ChipOnChip | Microarray view rendering | http://edamontology.org/operation_2936 | NO | LABEL | INEXACT | OPERATION || 0.4347826086956522 | 0.4347826086956522 | 0.43478260869565216
+ChipOnChip | Microarray experiment data format | http://edamontology.org/format_2056 | NO | LABEL | INEXACT | FORMAT || 0.33333333333333337 | 0.33333333333333337 | 0.3333333333333333
+ReversePhaseProteinArray | Microarrays | http://edamontology.org/topic_0200 | YES | LABEL | INEXACT | TOPIC || 0.9090909090909091 | 0.9090909090909091 | 0.9090909090909091
+ReversePhaseProteinArray | Microarray metadata | http://edamontology.org/data_3115 | NO | LABEL | INEXACT | DATA || 0.5555555555555556 | 0.5555555555555556 | 0.5555555555555556
+ReversePhaseProteinArray | Microarray view rendering | http://edamontology.org/operation_2936 | NO | LABEL | INEXACT | OPERATION || 0.4347826086956522 | 0.4347826086956522 | 0.43478260869565216
+ReversePhaseProteinArray | Microarray experiment data format | http://edamontology.org/format_2056 | NO | LABEL | INEXACT | FORMAT || 0.33333333333333337 | 0.33333333333333337 | 0.3333333333333333
+TissueMicroarray | Microarrays | http://edamontology.org/topic_0200 | YES | LABEL | INEXACT | TOPIC || 0.9090909090909091 | 0.9090909090909091 | 0.9090909090909091
+TissueMicroarray | Microarray metadata | http://edamontology.org/data_3115 | NO | LABEL | INEXACT | DATA || 0.5555555555555556 | 0.5555555555555556 | 0.5555555555555556
+TissueMicroarray | Microarray view rendering | http://edamontology.org/operation_2936 | NO | LABEL | INEXACT | OPERATION || 0.4347826086956522 | 0.4347826086956522 | 0.43478260869565216
+TissueMicroarray | Microarray experiment data format | http://edamontology.org/format_2056 | NO | LABEL | INEXACT | FORMAT || 0.33333333333333337 | 0.33333333333333337 | 0.3333333333333333
+ProprietaryPlatforms | Microarrays | http://edamontology.org/topic_0200 | YES | LABEL | INEXACT | TOPIC || 0.9090909090909091 | 0.9090909090909091 | 0.9090909090909091
+ProprietaryPlatforms | Microarray metadata | http://edamontology.org/data_3115 | NO | LABEL | INEXACT | DATA || 0.5555555555555556 | 0.5555555555555556 | 0.5555555555555556
+ProprietaryPlatforms | Microarray view rendering | http://edamontology.org/operation_2936 | NO | LABEL | INEXACT | OPERATION || 0.4347826086956522 | 0.4347826086956522 | 0.43478260869565216
+ProprietaryPlatforms | Microarray experiment data format | http://edamontology.org/format_2056 | NO | LABEL | INEXACT | FORMAT || 0.33333333333333337 | 0.33333333333333337 | 0.3333333333333333
+ImagingMassSpectrometry | Mass spectrometry | http://edamontology.org/topic_0134 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+ImagingMassSpectrometry | Mass spectrometry spectra | http://edamontology.org/data_0943 | NO | LABEL | INEXACT | DATA || 0.6956521739130435 | 0.6956521739130435 | 0.6956521739130435
+Epigenetics | Epigenetics | http://edamontology.org/topic_3295 | NO | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+Epigenetics | EcoGene ID | http://edamontology.org/data_1795 | NO | EXACT_SYNONYM | INEXACT | DATA || 0.5454545454545454 | 0.0 | 0.3636363636363636
+MultipleSequenceAlignment | Alignment | http://edamontology.org/operation_2928 | NO | LABEL | EXACT | OPERATION || 1.0 | 1.0 | 1.0
+MultipleSequenceAlignment | Alignment | http://edamontology.org/topic_0083 | YES | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+MultipleSequenceAlignment | Alignment | http://edamontology.org/data_1916 | NO | LABEL | EXACT | DATA || 1.0 | 1.0 | 1.0
+MultipleSequenceAlignment | Alignment format | http://edamontology.org/format_1921 | NO | LABEL | INEXACT | FORMAT || 0.6 | 0.6 | 0.6
+GO | GO | http://edamontology.org/data_1716 | YES | LABEL | EXACT | DATA || 1.0 | 1.0 | 1.0
+GO | Signaling pathways | http://edamontology.org/topic_0754 | NO | LABEL | INEXACT | TOPIC || 0.47058823529411764 | 0.47058823529411764 | 0.4705882352941176
+GO | Pathway simulation | http://edamontology.org/operation_3562 | NO | LABEL | INEXACT | OPERATION || 0.47058823529411764 | 0.47058823529411764 | 0.4705882352941176
+GO | Panther Pathways entry format | http://edamontology.org/format_1655 | YES | LABEL | INEXACT | FORMAT || 0.3076923076923077 | 0.3076923076923077 | 0.3076923076923077
+KEGG | Pathway | http://edamontology.org/data_2600 | NO | LABEL | INEXACT | DATA || 0.875 | 0.875 | 0.875
+KEGG | Signaling pathways | http://edamontology.org/topic_0754 | NO | LABEL | INEXACT | TOPIC || 0.47058823529411764 | 0.47058823529411764 | 0.4705882352941176
+KEGG | Pathway simulation | http://edamontology.org/operation_3562 | NO | LABEL | INEXACT | OPERATION || 0.47058823529411764 | 0.47058823529411764 | 0.4705882352941176
+KEGG | mega | http://edamontology.org/format_1991 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+Reactome | Pathway | http://edamontology.org/data_2600 | NO | LABEL | INEXACT | DATA || 0.875 | 0.875 | 0.875
+Reactome | Signaling pathways | http://edamontology.org/topic_0754 | NO | LABEL | INEXACT | TOPIC || 0.47058823529411764 | 0.47058823529411764 | 0.4705882352941176
+Reactome | Pathway simulation | http://edamontology.org/operation_3562 | NO | LABEL | INEXACT | OPERATION || 0.47058823529411764 | 0.47058823529411764 | 0.4705882352941176
+Reactome | Panther Pathways entry format | http://edamontology.org/format_1655 | YES | LABEL | INEXACT | FORMAT || 0.3076923076923077 | 0.3076923076923077 | 0.3076923076923077
+BioCarta | Pathway | http://edamontology.org/data_2600 | NO | LABEL | INEXACT | DATA || 0.875 | 0.875 | 0.875
+BioCarta | Signaling pathways | http://edamontology.org/topic_0754 | NO | LABEL | INEXACT | TOPIC || 0.47058823529411764 | 0.47058823529411764 | 0.4705882352941176
+BioCarta | Pathway simulation | http://edamontology.org/operation_3562 | NO | LABEL | INEXACT | OPERATION || 0.47058823529411764 | 0.47058823529411764 | 0.4705882352941176
+BioCarta | BioPAX | http://edamontology.org/format_3156 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+NCINatureCurated | Pathway | http://edamontology.org/data_2600 | NO | LABEL | INEXACT | DATA || 0.875 | 0.875 | 0.875
+NCINatureCurated | Signaling pathways | http://edamontology.org/topic_0754 | NO | LABEL | INEXACT | TOPIC || 0.47058823529411764 | 0.47058823529411764 | 0.4705882352941176
+NCINatureCurated | Pathway simulation | http://edamontology.org/operation_3562 | NO | LABEL | INEXACT | OPERATION || 0.47058823529411764 | 0.47058823529411764 | 0.4705882352941176
+NCINatureCurated | Panther Pathways entry format | http://edamontology.org/format_1655 | YES | LABEL | INEXACT | FORMAT || 0.3076923076923077 | 0.3076923076923077 | 0.3076923076923077
+Network | Network | http://edamontology.org/data_2600 | NO | EXACT_SYNONYM | EXACT | DATA || 1.0 | 1.0 | 1.0
+Network | Genome visualisation | http://edamontology.org/operation_3208 | NO | LABEL | INEXACT | OPERATION || 0.631578947368421 | 0.0 | 0.42105263157894735
+Network | newick | http://edamontology.org/format_1910 | NO | LABEL | INEXACT | FORMAT || 0.5714285714285714 | 0.0 | 0.38095238095238093
+Network | VNTR annotation | http://edamontology.org/topic_2867 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Anopheles_gambiae | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Anopheles_gambiae | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Apis_mellifera | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Apis_mellifera | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Arabidopsis_lyrata | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Arabidopsis_lyrata | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Arabidopsis_thaliana | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Arabidopsis_thaliana | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Bacillus_subtilis | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Bacillus_subtilis | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Bos_taurus | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Bos_taurus | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Caenorhabditis_elegans | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Caenorhabditis_elegans | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Canis_familiaris | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Canis_familiaris | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Ciona_intestinalis | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Ciona_intestinalis | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Danio_rerio | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Danio_rerio | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Drosophila_melanogaster | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Drosophila_melanogaster | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Eremothecium_gossypii | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Eremothecium_gossypii | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Escherichia_coli | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Escherichia_coli | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Gallus_gallus | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Gallus_gallus | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Gasterosteus_aculeatus | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Gasterosteus_aculeatus | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Glycine_max | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Glycine_max | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Homo_sapiens | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Homo_sapiens | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Hordeum_vulgare | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Hordeum_vulgare | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Kluyveromyces_lactis | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Kluyveromyces_lactis | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Macaca_fascicularis | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Macaca_fascicularis | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Macaca_mulatta | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Macaca_mulatta | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Magnaporthe_grisea | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Magnaporthe_grisea | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Medicago_truncatula | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Medicago_truncatula | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Mus_musculus | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Mus_musculus | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Neurospora_crassa | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Neurospora_crassa | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Oncorhynchus_mykiss | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Oncorhynchus_mykiss | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Oryza_sativa | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Oryza_sativa | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Pan_troglodytes | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Pan_troglodytes | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Plasmodium_falciparum | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Plasmodium_falciparum | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Pseudomonas_aeruginosa | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Pseudomonas_aeruginosa | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Rattus_norvegicus | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Rattus_norvegicus | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Saccharomyces_cerevisiae | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Saccharomyces_cerevisiae | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Saccharum_officinarum | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Saccharum_officinarum | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Schizosaccharomyces_pombe | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Schizosaccharomyces_pombe | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Staphylococcus_aureus | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Staphylococcus_aureus | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Sus_scrofa | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Sus_scrofa | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Taeniopygia_guttata | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Taeniopygia_guttata | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Triticum_aestivum | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Triticum_aestivum | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Vitis_vinifera | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Vitis_vinifera | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Xenopus_laevis | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Xenopus_laevis | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Xenopus_tropicalis | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Xenopus_tropicalis | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+Zea_mays | Organisms | http://edamontology.org/topic_0621 | NO | LABEL | INEXACT | TOPIC || 0.8888888888888888 | 0.8888888888888888 | 0.8888888888888888
+Zea_mays | iHOP organism ID | http://edamontology.org/data_1873 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+AffymetrixChip | affymetrix | http://edamontology.org/format_1639 | NO | LABEL | INEXACT | FORMAT || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+AgilentChip | AGI identifier | http://edamontology.org/data_1895 | NO | EXACT_SYNONYM | INEXACT | DATA || 0.5384615384615384 | 0.0 | 0.358974358974359
+ClonetechChip | Clone ID | http://edamontology.org/data_1855 | NO | LABEL | INEXACT | DATA || 0.46153846153846156 | 0.0 | 0.3076923076923077
+GEChip | EC | http://edamontology.org/data_1011 | NO | EXACT_SYNONYM | INEXACT | DATA || 0.33333333333333337 | 0.33333333333333337 | 0.3333333333333333
+GEChip | CHP | http://edamontology.org/format_1644 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+INDACChip | InChI | http://edamontology.org/format_1197 | NO | LABEL | INEXACT | FORMAT || 0.5555555555555556 | 0.0 | 0.3703703703703704
+IlluminaChip | Good manufacturing practice | http://edamontology.org/topic_3393 | NO | LABEL | INEXACT | TOPIC || 0.43999999999999995 | 0.0 | 0.2933333333333333
+QiagenChip | ChIP-on-chip | http://edamontology.org/topic_3179 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+QiagenChip | InChI | http://edamontology.org/format_1197 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+RNG_MRCChip | Good manufacturing practice | http://edamontology.org/topic_3393 | NO | LABEL | INEXACT | TOPIC || 0.43999999999999995 | 0.0 | 0.2933333333333333
+RocheChip | ChEBI | http://edamontology.org/data_1724 | YES | LABEL | INEXACT | DATA || 0.4444444444444444 | 0.0 | 0.2962962962962963
+UniversityHealthNetwork | Network | http://edamontology.org/data_2600 | NO | EXACT_SYNONYM | INEXACT | DATA || 0.30434782608695654 | 0.30434782608695654 | 0.30434782608695654
+CodelinkChip | ChIP-on-chip | http://edamontology.org/topic_3179 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+GACustomCDF | customtrack | http://edamontology.org/format_3588 | NO | LABEL | INEXACT | FORMAT || 0.5454545454545454 | 0.0 | 0.3636363636363636
+MBNICustomCDF | customtrack | http://edamontology.org/format_3588 | NO | LABEL | INEXACT | FORMAT || 0.5454545454545454 | 0.0 | 0.3636363636363636
+GeneCardsCustomSchema | Schema | http://edamontology.org/data_2248 | YES | LABEL | INEXACT | DATA || 0.4285714285714286 | 0.4285714285714286 | 0.4285714285714286
+GeneCardsCustomSchema | customtrack | http://edamontology.org/format_3588 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+GenomicSequence | Sequence annotation | http://edamontology.org/operation_0361 | NO | LABEL | EXACT | OPERATION || 1.0 | 1.0 | 1.0
+GenomicSequence | Sequence annotation | http://edamontology.org/topic_0221 | YES | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+GenomicSequence | Sequence position | http://edamontology.org/data_1016 | NO | LABEL | INEXACT | DATA || 0.7222222222222222 | 0.0 | 0.48148148148148145
+GenomicSequence | Sequence variation annotation format | http://edamontology.org/format_2921 | NO | LABEL | INEXACT | FORMAT || 0.5454545454545454 | 0.0 | 0.3636363636363636
+OperonHumanV3 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+OperonHumanV3 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+OperonHumanV3 | Operon drawing | http://edamontology.org/operation_0579 | NO | LABEL | INEXACT | OPERATION || 0.46153846153846156 | 0.0 | 0.3076923076923077
+pedbarrayv9 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+pedbarrayv9 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+pedbarrayv10 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+pedbarrayv10 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+PartheenMetaData | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+PartheenMetaData | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+r10kcod | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+r10kcod | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+rae230a | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+rae230a | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+rae230b | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+rae230b | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+rat2302 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+rat2302 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+rgu34a | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+rgu34a | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+rgu34b | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+rgu34b | rgb | http://edamontology.org/format_3600 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+rgu34b | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+rgu34c | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+rgu34c | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+rgug4130a | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+rgug4130a | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+ri16cod | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+ri16cod | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+rnu34 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+rnu34 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Roberts2005Annotation | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+Roberts2005Annotation | Annotation | http://edamontology.org/operation_0226 | NO | LABEL | INEXACT | OPERATION || 0.47619047619047616 | 0.47619047619047616 | 0.4761904761904761
+Roberts2005Annotation | Sequence annotation | http://edamontology.org/topic_0221 | YES | LABEL | INEXACT | TOPIC || 0.5238095238095238 | 0.0 | 0.34920634920634924
+rtu34 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+rtu34 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+rwgcod | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+rwgcod | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+SHDZ | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+SHDZ | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+SHDZ | PHD | http://edamontology.org/format_1633 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+u133x3p | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+u133x3p | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+xenopuslaevis | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+xenopuslaevis | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+yeast2 | Yeast | http://edamontology.org/topic_2817 | YES | LABEL | INEXACT | TOPIC || 0.8333333333333334 | 0.8333333333333334 | 0.8333333333333334
+yeast2 | Codon name | http://edamontology.org/data_1024 | YES | LABEL | INEXACT | DATA || 0.5555555555555556 | 0.0 | 0.3703703703703704
+yeast2 | rast | http://edamontology.org/format_3605 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+ygs98 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+ygs98 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+zebrafish | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+zebrafish | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+hcgi12k | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+hcgi12k | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+hcgi8k | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+hcgi8k | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+adme16cod | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+adme16cod | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+ag | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+ag | Ageing | http://edamontology.org/topic_3401 | NO | EXACT_SYNONYM | INEXACT | TOPIC || 0.33333333333333337 | 0.33333333333333337 | 0.3333333333333333
+ag | ig | http://edamontology.org/format_1942 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+ath1121501 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+ath1121501 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+celegans | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+celegans | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+drosgenome1 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+drosgenome1 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+drosophila2 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+drosophila2 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+h10kcod | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+h10kcod | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+h20kcod | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+h20kcod | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+hcg110 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+hcg110 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+hgfocus | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+hgfocus | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+hgu133a2 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+hgu133a2 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+hgu133a | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+hgu133a | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+hgu133b | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+hgu133b | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+hgu133plus2 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+hgu133plus2 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+hgu95a | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+hgu95a | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+hgu95av2 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+hgu95av2 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+hgu95b | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+hgu95b | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+hgu95c | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+hgu95c | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+hgu95d | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+hgu95d | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+hgu95e | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+hgu95e | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+hguatlas13k | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+hguatlas13k | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+hgug4100a | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+hgug4100a | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+hgug4101a | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+hgug4101a | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+hgug4110b | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+hgug4110b | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+hgug4111a | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+hgug4111a | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+hgug4112a | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+hgug4112a | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+hguqiagenv3 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+hguqiagenv3 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+hi16cod | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+hi16cod | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+hs25kresogen | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+hs25kresogen | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+hu35ksuba | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+hu35ksuba | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+hu35ksubb | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+hu35ksubb | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+hu35ksubc | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+hu35ksubc | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+hu35ksubd | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+hu35ksubd | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+hu6800 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+hu6800 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+HuO22 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+HuO22 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+hwgcod | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+hwgcod | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+indac | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+indac | findkm | http://edamontology.org/format_1582 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+indac | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+illuminaHumanv1 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+illuminaHumanv1 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+illuminaHumanv2 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+illuminaHumanv2 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+illuminaMousev1 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+illuminaMousev1 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+illuminaMousev1p1 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+illuminaMousev1p1 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+illuminaRatv1 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+illuminaRatv1 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+JazaerimetaData | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+JazaerimetaData | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+lumiHumanV1 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+lumiHumanV1 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+lumiMouseV1 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+lumiMouseV1 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+lumiHumanV2 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+lumiHumanV2 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+lumiRatV1 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+lumiRatV1 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+m10kcod | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+m10kcod | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+m20kcod | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+m20kcod | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+mi16cod | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+mi16cod | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+mm24kresogen | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+mm24kresogen | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+mgu74a | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+mgu74a | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+mgu74av2 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+mgu74av2 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+mgu74b | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+mgu74b | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+mgu74bv2 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+mgu74bv2 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+mgu74c | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+mgu74c | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+mgu74cv2 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+mgu74cv2 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+mguatlas5k | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+mguatlas5k | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+mgug4121a | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+mgug4121a | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+mgug4122a | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+mgug4122a | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+moe430a | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+moe430a | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+moe430b | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+moe430b | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+mouse4302 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+mouse4302 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+mouse430a2 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+mouse430a2 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+mpedbarray | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+mpedbarray | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+mu11ksuba | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+mu11ksuba | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+mu11ksubb | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+mu11ksubb | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+mu19ksuba | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+mu19ksuba | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+mu19ksubb | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+mu19ksubb | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+mu19ksubc | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+mu19ksubc | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Mu15v1 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+Mu15v1 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Mu22v3 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+Mu22v3 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+mwgcod | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+mwgcod | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Norway981 | Name | http://edamontology.org/data_2099 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+Norway981 | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+BSgenome | Type | http://edamontology.org/data_2100 | YES | LABEL | INEXACT | DATA || 0.36363636363636365 | 0.36363636363636365 | 0.3636363636363636
+BSgenome | Epigenomics | http://edamontology.org/topic_3173 | NO | LABEL | INEXACT | TOPIC || 0.4545454545454546 | 0.0 | 0.30303030303030304
+cdf | PDF | http://edamontology.org/format_3508 | NO | LABEL | INEXACT | FORMAT || 0.6666666666666667 | 0.0 | 0.4444444444444445
+cdf | Cancer type | http://edamontology.org/data_2592 | YES | LABEL | INEXACT | DATA || 0.4545454545454546 | 0.0 | 0.30303030303030304
+ChipDb | PDB | http://edamontology.org/format_1476 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.5 | 0.5
+ChipDb | ChIP-seq | http://edamontology.org/topic_3169 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+ChipDb | ChEBI IDs | http://edamontology.org/data_1174 | NO | EXACT_SYNONYM | INEXACT | DATA || 0.5 | 0.0 | 0.3333333333333333
+db0 | Type | http://edamontology.org/data_2100 | YES | LABEL | INEXACT | DATA || 0.36363636363636365 | 0.36363636363636365 | 0.3636363636363636
+InparanoidDb | Type | http://edamontology.org/data_2100 | YES | LABEL | INEXACT | DATA || 0.36363636363636365 | 0.36363636363636365 | 0.3636363636363636
+OrganismDb | Organisms | http://edamontology.org/topic_0621 | NO | EXACT_SYNONYM | INEXACT | TOPIC || 0.8 | 0.0 | 0.5333333333333333
+OrganismDb | Organism report | http://edamontology.org/data_2530 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.0 | 0.38095238095238093
+OrgDb | rgb | http://edamontology.org/format_3600 | NO | LABEL | INEXACT | FORMAT || 0.6 | 0.0 | 0.39999999999999997
+OrgDb | Cancer type | http://edamontology.org/data_2592 | YES | LABEL | INEXACT | DATA || 0.4545454545454546 | 0.0 | 0.30303030303030304
+PolyPhen | Type | http://edamontology.org/data_2100 | YES | LABEL | INEXACT | DATA || 0.36363636363636365 | 0.36363636363636365 | 0.3636363636363636
+probe | Probes | http://edamontology.org/topic_0632 | NO | NARROW_SYNONYM | INEXACT | TOPIC || 0.8333333333333334 | 0.8333333333333334 | 0.8333333333333334
+probe | Cancer type | http://edamontology.org/data_2592 | YES | LABEL | INEXACT | DATA || 0.4545454545454546 | 0.0 | 0.30303030303030304
+SIFT | sif | http://edamontology.org/format_3619 | NO | LABEL | INEXACT | FORMAT || 0.75 | 0.75 | 0.75
+SIFT | Cancer type | http://edamontology.org/data_2592 | YES | LABEL | INEXACT | DATA || 0.4545454545454546 | 0.0 | 0.30303030303030304
+SNPlocs | SNP | http://edamontology.org/topic_2277 | NO | LABEL | INEXACT | TOPIC || 0.4285714285714286 | 0.4285714285714286 | 0.4285714285714286
+SNPlocs | SNP | http://edamontology.org/data_2092 | YES | LABEL | INEXACT | DATA || 0.4285714285714286 | 0.4285714285714286 | 0.4285714285714286
+XtraSNPlocs | Type | http://edamontology.org/data_2100 | YES | LABEL | INEXACT | DATA || 0.36363636363636365 | 0.36363636363636365 | 0.3636363636363636
+TxDb | Type | http://edamontology.org/data_2100 | YES | LABEL | INEXACT | DATA || 0.36363636363636365 | 0.36363636363636365 | 0.3636363636363636
+MeSHDb | MeSH | http://edamontology.org/data_1717 | YES | LABEL | INEXACT | DATA || 0.6666666666666667 | 0.6666666666666667 | 0.6666666666666666
+FRMA | FMA | http://edamontology.org/data_1722 | YES | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+FRMA | rRNA | http://edamontology.org/topic_0660 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Tissue | Tissue culture | http://edamontology.org/topic_0608 | YES | NARROW_SYNONYM | INEXACT | TOPIC || 0.46153846153846156 | 0.46153846153846156 | 0.4615384615384615
+Tissue | Species name | http://edamontology.org/data_1045 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.0 | 0.38095238095238093
+Proteome | Proteome | http://edamontology.org/topic_0644 | YES | LABEL | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+Proteome | Species name | http://edamontology.org/data_1045 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.0 | 0.38095238095238093
+Proteome | prosite-profile | http://edamontology.org/format_1366 | NO | LABEL | INEXACT | FORMAT || 0.4666666666666667 | 0.0 | 0.3111111111111111
+Genome | Genome map | http://edamontology.org/data_1288 | NO | LABEL | INEXACT | DATA || 0.6666666666666667 | 0.6666666666666667 | 0.6666666666666666
+Genome | Genome assembly | http://edamontology.org/operation_3440 | NO | LABEL | INEXACT | OPERATION || 0.4285714285714286 | 0.4285714285714286 | 0.4285714285714286
+Genome | geneseq | http://edamontology.org/format_2186 | NO | LABEL | INEXACT | FORMAT || 0.5714285714285714 | 0.0 | 0.38095238095238093
+Genome | Genome annotation | http://edamontology.org/topic_0222 | YES | LABEL | INEXACT | TOPIC || 0.375 | 0.375 | 0.375
+StemCell | Stem cell research | http://edamontology.org/topic_3395 | NO | EXACT_SYNONYM | INEXACT | TOPIC || 0.5 | 0.5 | 0.5
+StemCell | Species name | http://edamontology.org/data_1045 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.0 | 0.38095238095238093
+CellCulture | Cell culture | http://edamontology.org/topic_0608 | YES | NARROW_SYNONYM | EXACT | TOPIC || 1.0 | 1.0 | 1.0
+CellCulture | Species name | http://edamontology.org/data_1045 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.0 | 0.38095238095238093
+CellCulture | EMBL feature | http://edamontology.org/format_1980 | YES | LABEL | INEXACT | FORMAT || 0.4545454545454546 | 0.0 | 0.30303030303030304
+Germline | GermOnline ID | http://edamontology.org/data_1148 | NO | LABEL | INEXACT | DATA || 0.6666666666666667 | 0.0 | 0.4444444444444445
+Germline | Gene resources | http://edamontology.org/topic_2816 | YES | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Germline | GelML | http://edamontology.org/format_3249 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+Somatic | Species tree | http://edamontology.org/data_3272 | NO | LABEL | INEXACT | DATA || 0.6428571428571428 | 0.0 | 0.42857142857142855
+Somatic | Formatting | http://edamontology.org/operation_0335 | NO | LABEL | INEXACT | OPERATION || 0.5 | 0.0 | 0.3333333333333333
+Anopheles_gambiae_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Anopheles_gambiae_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Apis_mellifera_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Apis_mellifera_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Arabidopsis_lyrata_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Arabidopsis_lyrata_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Arabidopsis_thaliana_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Arabidopsis_thaliana_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Bacillus_subtilis_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Bacillus_subtilis_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Bos_taurus_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Bos_taurus_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Caenorhabditis_elegans_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Caenorhabditis_elegans_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Canis_familiaris_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Canis_familiaris_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Ciona_intestinalis_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Ciona_intestinalis_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Danio_rerio_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Danio_rerio_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Drosophila_melanogaster_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Drosophila_melanogaster_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Eremothecium_gossypii_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Eremothecium_gossypii_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Escherichia_coli_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Escherichia_coli_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Gallus_gallus_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Gallus_gallus_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Gasterosteus_aculeatus_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Gasterosteus_aculeatus_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Glycine_max_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Glycine_max_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Homo_sapiens_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Homo_sapiens_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Hordeum_vulgare_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Hordeum_vulgare_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Kluyveromyces_lactis_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Kluyveromyces_lactis_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Macaca_mulatta_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Macaca_mulatta_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Magnaporthe_grisea_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Magnaporthe_grisea_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Medicago_truncatul_Dataa | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Medicago_truncatul_Dataa | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Mus_musculus_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Mus_musculus_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Neurospora_crassa_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Neurospora_crassa_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Oncorhynchus_mykiss_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Oncorhynchus_mykiss_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Oryza_sativa_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Oryza_sativa_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Pan_troglodytes_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Pan_troglodytes_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Plasmodium_falciparum_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Plasmodium_falciparum_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Pseudomonas_aeruginosa_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Pseudomonas_aeruginosa_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Rattus_norvegicus_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Rattus_norvegicus_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Saccharomyces_cerevisiae_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Saccharomyces_cerevisiae_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Saccharum_officinarum_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Saccharum_officinarum_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Schizosaccharomyces_pombe_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Schizosaccharomyces_pombe_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Staphylococcus_aureus_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Staphylococcus_aureus_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Sus_scrofa_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Sus_scrofa_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Taeniopygia_guttata_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Taeniopygia_guttata_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Triticum_aestivum_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Triticum_aestivum_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Vitis_vinifera_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Vitis_vinifera_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Xenopus_laevis_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Xenopus_laevis_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Xenopus_tropicalis_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Xenopus_tropicalis_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+Zea_mays_Data | Organism name | http://edamontology.org/data_2909 | NO | LABEL | INEXACT | DATA || 0.75 | 0.0 | 0.5
+Zea_mays_Data | Organic chemistry | http://edamontology.org/topic_3314 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+CancerData | Cancer | http://edamontology.org/topic_2640 | NO | NARROW_SYNONYM | INEXACT | TOPIC || 0.6 | 0.6 | 0.6
+CancerData | Core data | http://edamontology.org/data_3031 | YES | LABEL | INEXACT | DATA || 0.6 | 0.0 | 0.39999999999999997
+CancerData | Data model | http://edamontology.org/format_1915 | NO | LABEL | INEXACT | FORMAT || 0.5833333333333333 | 0.0 | 0.38888888888888884
+CancerData | Primer removal | http://edamontology.org/operation_3237 | NO | LABEL | INEXACT | OPERATION || 0.46153846153846156 | 0.0 | 0.3076923076923077
+HIVData | Data | http://edamontology.org/data_0006 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+HIVData | Data model | http://edamontology.org/format_1915 | NO | LABEL | INEXACT | FORMAT || 0.5833333333333333 | 0.0 | 0.38888888888888884
+HIVData | Disease (specific) | http://edamontology.org/topic_2847 | YES | LABEL | INEXACT | TOPIC || 0.47058823529411764 | 0.0 | 0.3137254901960784
+HIVData | Primer removal | http://edamontology.org/operation_3237 | NO | LABEL | INEXACT | OPERATION || 0.46153846153846156 | 0.0 | 0.3076923076923077
+COPDData | Data | http://edamontology.org/data_0006 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+COPDData | codata | http://edamontology.org/format_1925 | NO | LABEL | INEXACT | FORMAT || 0.75 | 0.0 | 0.5
+COPDData | Disease (specific) | http://edamontology.org/topic_2847 | YES | LABEL | INEXACT | TOPIC || 0.47058823529411764 | 0.0 | 0.3137254901960784
+COPDData | Primer removal | http://edamontology.org/operation_3237 | NO | LABEL | INEXACT | OPERATION || 0.46153846153846156 | 0.0 | 0.3076923076923077
+FlowCytometryData | Ontology data | http://edamontology.org/data_2353 | NO | LABEL | INEXACT | DATA || 0.6428571428571428 | 0.0 | 0.42857142857142855
+FlowCytometryData | Biotechnology | http://edamontology.org/topic_3297 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+HighThroughputImagingData | Ontology data | http://edamontology.org/data_2353 | NO | LABEL | INEXACT | DATA || 0.6428571428571428 | 0.0 | 0.42857142857142855
+HighThroughputImagingData | Biotechnology | http://edamontology.org/topic_3297 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+MassSpectrometryData | Mass spectrometry data | http://edamontology.org/data_2536 | NO | LABEL | EXACT | DATA || 1.0 | 1.0 | 1.0
+MassSpectrometryData | Biotechnology | http://edamontology.org/topic_3297 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+MassSpectrometryData | FSSP entry format | http://edamontology.org/format_1581 | YES | LABEL | INEXACT | FORMAT || 0.44999999999999996 | 0.0 | 0.3
+qPCRData | Data | http://edamontology.org/data_0006 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+qPCRData | Biotechnology | http://edamontology.org/topic_3297 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+MicrotitrePlateAssayData | Ontology data | http://edamontology.org/data_2353 | NO | LABEL | INEXACT | DATA || 0.6428571428571428 | 0.0 | 0.42857142857142855
+MicrotitrePlateAssayData | Biotechnology | http://edamontology.org/topic_3297 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+SAGEData | Codon usage data | http://edamontology.org/data_0914 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+SAGEData | MAGE-TAB | http://edamontology.org/format_3162 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+SAGEData | Biotechnology | http://edamontology.org/topic_3297 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+CGHData | Data | http://edamontology.org/data_0006 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+CGHData | Biotechnology | http://edamontology.org/topic_3297 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+SequencingData | Sequencing | http://edamontology.org/topic_3168 | NO | LABEL | INEXACT | TOPIC || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+SequencingData | Ontology data | http://edamontology.org/data_2353 | NO | LABEL | INEXACT | DATA || 0.6428571428571428 | 0.0 | 0.42857142857142855
+SequencingData | Sequence generation | http://edamontology.org/operation_0230 | NO | LABEL | INEXACT | OPERATION || 0.5555555555555556 | 0.0 | 0.3703703703703704
+SequencingData | Sequence range format | http://edamontology.org/format_2078 | NO | LABEL | INEXACT | FORMAT || 0.5263157894736843 | 0.0 | 0.3508771929824562
+MicroarrayData | Microarray data | http://edamontology.org/data_2603 | NO | NARROW_SYNONYM | EXACT | DATA || 1.0 | 1.0 | 1.0
+MicroarrayData | Biotechnology | http://edamontology.org/topic_3297 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+CopyNumberVariationData | Copy number estimation | http://edamontology.org/operation_3233 | NO | LABEL | INEXACT | OPERATION || 0.6521739130434783 | 0.0 | 0.43478260869565216
+CopyNumberVariationData | Pfam domain name | http://edamontology.org/data_2757 | NO | LABEL | INEXACT | DATA || 0.5333333333333333 | 0.0 | 0.35555555555555557
+CpGIslandData | SMART domain name | http://edamontology.org/data_2782 | NO | LABEL | INEXACT | DATA || 0.5333333333333333 | 0.0 | 0.35555555555555557
+SNPData | Data | http://edamontology.org/data_0006 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.5714285714285714 | 0.5714285714285714
+SNPData | dat | http://edamontology.org/format_1637 | NO | LABEL | INEXACT | FORMAT || 0.4285714285714286 | 0.4285714285714286 | 0.4285714285714286
+ExpressionData | Gene expression data | http://edamontology.org/data_2603 | NO | LABEL | INEXACT | DATA || 0.7777777777777778 | 0.7777777777777778 | 0.7777777777777778
+ExpressionData | Gene expression data format | http://edamontology.org/format_2058 | NO | EXACT_SYNONYM | INEXACT | FORMAT || 0.5833333333333333 | 0.5833333333333333 | 0.5833333333333333
+ExpressionData | Gene expression analysis | http://edamontology.org/operation_2410 | YES | LABEL | INEXACT | OPERATION || 0.5 | 0.0 | 0.3333333333333333
+ExpressionData | Gene expression analysis | http://edamontology.org/topic_0203 | NO | EXACT_SYNONYM | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+HapMap | MAP | http://edamontology.org/format_3285 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.5 | 0.5
+HapMap | Map | http://edamontology.org/data_1274 | NO | LABEL | INEXACT | DATA || 0.5 | 0.5 | 0.5
+HapMap | Regulatory RNA | http://edamontology.org/topic_0659 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+GEO | GO | http://edamontology.org/data_1716 | YES | LABEL | INEXACT | DATA || 0.6666666666666667 | 0.0 | 0.4444444444444445
+GEO | Regulatory RNA | http://edamontology.org/topic_0659 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+ArrayExpress | ArrayExpress entry format | http://edamontology.org/format_1640 | YES | LABEL | INEXACT | FORMAT || 0.5217391304347826 | 0.5217391304347826 | 0.5217391304347826
+ArrayExpress | Microarray experiment | http://edamontology.org/topic_3518 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+ArrayExpress | Ontology data | http://edamontology.org/data_2353 | NO | LABEL | INEXACT | DATA || 0.5 | 0.0 | 0.3333333333333333
+NCI | HGNC ID | http://edamontology.org/data_2298 | NO | EXACT_SYNONYM | INEXACT | DATA || 0.5 | 0.5 | 0.5
+NCI | Regulatory RNA | http://edamontology.org/topic_0659 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+PathwayInteractionDatabase | Atom interaction data | http://edamontology.org/data_1540 | NO | EXACT_SYNONYM | INEXACT | DATA || 0.6538461538461539 | 0.0 | 0.4358974358974359
+PathwayInteractionDatabase | Protein interaction format | http://edamontology.org/format_2054 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+PathwayInteractionDatabase | Regulatory RNA | http://edamontology.org/topic_0659 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+PathwayInteractionDatabase | Molecular interaction analysis | http://edamontology.org/operation_2948 | YES | LABEL | INEXACT | OPERATION || 0.5 | 0.0 | 0.3333333333333333
+Project1000genomes | Reaction data | http://edamontology.org/data_2978 | NO | LABEL | INEXACT | DATA || 0.5714285714285714 | 0.0 | 0.38095238095238093
+Project1000genomes | Regulatory RNA | http://edamontology.org/topic_0659 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+ENCODE | EC code | http://edamontology.org/data_1011 | NO | EXACT_SYNONYM | INEXACT | DATA || 0.8333333333333334 | 0.0 | 0.5555555555555556
+ENCODE | Regulatory RNA | http://edamontology.org/topic_0659 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+BreastCancerData | Cancer | http://edamontology.org/topic_2640 | NO | LABEL | INEXACT | TOPIC || 0.6 | 0.6 | 0.6
+BreastCancerData | Core data | http://edamontology.org/data_3031 | YES | LABEL | INEXACT | DATA || 0.6 | 0.0 | 0.39999999999999997
+BreastCancerData | codata | http://edamontology.org/format_1925 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+ColonCancerData | Cancer | http://edamontology.org/topic_2640 | NO | LABEL | INEXACT | TOPIC || 0.6 | 0.6 | 0.6
+ColonCancerData | Core data | http://edamontology.org/data_3031 | YES | LABEL | INEXACT | DATA || 0.6 | 0.0 | 0.39999999999999997
+ColonCancerData | codata | http://edamontology.org/format_1925 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+KidneyCancerData | Cancer | http://edamontology.org/topic_2640 | NO | LABEL | INEXACT | TOPIC || 0.6 | 0.6 | 0.6
+KidneyCancerData | Core data | http://edamontology.org/data_3031 | YES | LABEL | INEXACT | DATA || 0.6 | 0.0 | 0.39999999999999997
+KidneyCancerData | codata | http://edamontology.org/format_1925 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+LeukemiaCancerData | Cancer | http://edamontology.org/topic_2640 | NO | LABEL | INEXACT | TOPIC || 0.6 | 0.6 | 0.6
+LeukemiaCancerData | Core data | http://edamontology.org/data_3031 | YES | LABEL | INEXACT | DATA || 0.6 | 0.0 | 0.39999999999999997
+LeukemiaCancerData | codata | http://edamontology.org/format_1925 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+LungCancerData | Cancer | http://edamontology.org/topic_2640 | NO | LABEL | INEXACT | TOPIC || 0.6 | 0.6 | 0.6
+LungCancerData | Core data | http://edamontology.org/data_3031 | YES | LABEL | INEXACT | DATA || 0.6 | 0.0 | 0.39999999999999997
+LungCancerData | codata | http://edamontology.org/format_1925 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+OvarianCancerData | Cancer | http://edamontology.org/topic_2640 | NO | LABEL | INEXACT | TOPIC || 0.6 | 0.6 | 0.6
+OvarianCancerData | Core data | http://edamontology.org/data_3031 | YES | LABEL | INEXACT | DATA || 0.6 | 0.0 | 0.39999999999999997
+OvarianCancerData | codata | http://edamontology.org/format_1925 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+OvarianCancerData | Variant pattern analysis | http://edamontology.org/operation_3504 | NO | LABEL | INEXACT | OPERATION || 0.4545454545454546 | 0.0 | 0.30303030303030304
+ProstateCancerData | Cancer | http://edamontology.org/topic_2640 | NO | LABEL | INEXACT | TOPIC || 0.6 | 0.6 | 0.6
+ProstateCancerData | Core data | http://edamontology.org/data_3031 | YES | LABEL | INEXACT | DATA || 0.6 | 0.0 | 0.39999999999999997
+ProstateCancerData | codata | http://edamontology.org/format_1925 | NO | LABEL | INEXACT | FORMAT || 0.5 | 0.0 | 0.3333333333333333
+ImagingMassSpectrometryData | Mass spectrometry data | http://edamontology.org/data_2536 | NO | LABEL | EXACT | DATA || 1.0 | 1.0 | 1.0
+ImagingMassSpectrometryData | Mass spectrum analysis | http://edamontology.org/operation_3214 | NO | LABEL | INEXACT | OPERATION || 0.55 | 0.0 | 0.3666666666666667
+ImagingMassSpectrometryData | FSSP entry format | http://edamontology.org/format_1581 | YES | LABEL | INEXACT | FORMAT || 0.44999999999999996 | 0.0 | 0.3
+DNASeqData | Sequencing | http://edamontology.org/topic_3168 | NO | LABEL | INEXACT | TOPIC || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+DNASeqData | Sequence name | http://edamontology.org/data_2154 | NO | LABEL | INEXACT | DATA || 0.6428571428571428 | 0.0 | 0.42857142857142855
+DNASeqData | Sequence generation | http://edamontology.org/operation_0230 | NO | LABEL | INEXACT | OPERATION || 0.5555555555555556 | 0.0 | 0.3703703703703704
+DNASeqData | Sequence range format | http://edamontology.org/format_2078 | NO | LABEL | INEXACT | FORMAT || 0.5263157894736843 | 0.0 | 0.3508771929824562
+RNASeqData | Sequencing | http://edamontology.org/topic_3168 | NO | LABEL | INEXACT | TOPIC || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+RNASeqData | Sequence name | http://edamontology.org/data_2154 | NO | LABEL | INEXACT | DATA || 0.6428571428571428 | 0.0 | 0.42857142857142855
+RNASeqData | Sequence generation | http://edamontology.org/operation_0230 | NO | LABEL | INEXACT | OPERATION || 0.5555555555555556 | 0.0 | 0.3703703703703704
+RNASeqData | Sequence range format | http://edamontology.org/format_2078 | NO | LABEL | INEXACT | FORMAT || 0.5263157894736843 | 0.0 | 0.3508771929824562
+ChIPSeqData | Sequencing | http://edamontology.org/topic_3168 | NO | LABEL | INEXACT | TOPIC || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+ChIPSeqData | Sequence name | http://edamontology.org/data_2154 | NO | LABEL | INEXACT | DATA || 0.6428571428571428 | 0.0 | 0.42857142857142855
+ChIPSeqData | Sequence generation | http://edamontology.org/operation_0230 | NO | LABEL | INEXACT | OPERATION || 0.5555555555555556 | 0.0 | 0.3703703703703704
+ChIPSeqData | Sequence range format | http://edamontology.org/format_2078 | NO | LABEL | INEXACT | FORMAT || 0.5263157894736843 | 0.0 | 0.3508771929824562
+RIPSeqData | Sequencing | http://edamontology.org/topic_3168 | NO | LABEL | INEXACT | TOPIC || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+RIPSeqData | Sequence name | http://edamontology.org/data_2154 | NO | LABEL | INEXACT | DATA || 0.6428571428571428 | 0.0 | 0.42857142857142855
+RIPSeqData | Sequence generation | http://edamontology.org/operation_0230 | NO | LABEL | INEXACT | OPERATION || 0.5555555555555556 | 0.0 | 0.3703703703703704
+RIPSeqData | Sequence range format | http://edamontology.org/format_2078 | NO | LABEL | INEXACT | FORMAT || 0.5263157894736843 | 0.0 | 0.3508771929824562
+MethylSeqData | Sequencing | http://edamontology.org/topic_3168 | NO | LABEL | INEXACT | TOPIC || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+MethylSeqData | Sequence name | http://edamontology.org/data_2154 | NO | LABEL | INEXACT | DATA || 0.6428571428571428 | 0.0 | 0.42857142857142855
+MethylSeqData | Sequence generation | http://edamontology.org/operation_0230 | NO | LABEL | INEXACT | OPERATION || 0.5555555555555556 | 0.0 | 0.3703703703703704
+MethylSeqData | Sequence range format | http://edamontology.org/format_2078 | NO | LABEL | INEXACT | FORMAT || 0.5263157894736843 | 0.0 | 0.3508771929824562
+ExomeSeqData | Sequencing | http://edamontology.org/topic_3168 | NO | LABEL | INEXACT | TOPIC || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+ExomeSeqData | Sequence name | http://edamontology.org/data_2154 | NO | LABEL | INEXACT | DATA || 0.6428571428571428 | 0.0 | 0.42857142857142855
+ExomeSeqData | Sequence generation | http://edamontology.org/operation_0230 | NO | LABEL | INEXACT | OPERATION || 0.5555555555555556 | 0.0 | 0.3703703703703704
+ExomeSeqData | Sequence range format | http://edamontology.org/format_2078 | NO | LABEL | INEXACT | FORMAT || 0.5263157894736843 | 0.0 | 0.3508771929824562
+miRNAData | Sequencing | http://edamontology.org/topic_3168 | NO | LABEL | INEXACT | TOPIC || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+miRNAData | Sequence name | http://edamontology.org/data_2154 | NO | LABEL | INEXACT | DATA || 0.6428571428571428 | 0.0 | 0.42857142857142855
+miRNAData | Sequence annotation | http://edamontology.org/operation_0361 | NO | LABEL | INEXACT | OPERATION || 0.5555555555555556 | 0.0 | 0.3703703703703704
+miRNAData | Sequence range format | http://edamontology.org/format_2078 | NO | LABEL | INEXACT | FORMAT || 0.5263157894736843 | 0.0 | 0.3508771929824562
+SangerSeqData | Sequencing | http://edamontology.org/topic_3168 | NO | LABEL | INEXACT | TOPIC || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+SangerSeqData | Sequence name | http://edamontology.org/data_2154 | NO | LABEL | INEXACT | DATA || 0.6428571428571428 | 0.0 | 0.42857142857142855
+SangerSeqData | Sequence generation | http://edamontology.org/operation_0230 | NO | LABEL | INEXACT | OPERATION || 0.5555555555555556 | 0.0 | 0.3703703703703704
+SangerSeqData | Sequence range format | http://edamontology.org/format_2078 | NO | LABEL | INEXACT | FORMAT || 0.5263157894736843 | 0.0 | 0.3508771929824562
+SmallRNAData | Sequencing | http://edamontology.org/topic_3168 | NO | LABEL | INEXACT | TOPIC || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+SmallRNAData | Sequence name | http://edamontology.org/data_2154 | NO | LABEL | INEXACT | DATA || 0.6428571428571428 | 0.0 | 0.42857142857142855
+SmallRNAData | Sequence generation | http://edamontology.org/operation_0230 | NO | LABEL | INEXACT | OPERATION || 0.5555555555555556 | 0.0 | 0.3703703703703704
+SmallRNAData | Sequence range format | http://edamontology.org/format_2078 | NO | LABEL | INEXACT | FORMAT || 0.5263157894736843 | 0.0 | 0.3508771929824562
+MicrobiomeData | Sequencing | http://edamontology.org/topic_3168 | NO | LABEL | INEXACT | TOPIC || 0.7142857142857143 | 0.7142857142857143 | 0.7142857142857143
+MicrobiomeData | Sequence name | http://edamontology.org/data_2154 | NO | LABEL | INEXACT | DATA || 0.6428571428571428 | 0.0 | 0.42857142857142855
+MicrobiomeData | Sequence generation | http://edamontology.org/operation_0230 | NO | LABEL | INEXACT | OPERATION || 0.5555555555555556 | 0.0 | 0.3703703703703704
+MicrobiomeData | Sequence range format | http://edamontology.org/format_2078 | NO | LABEL | INEXACT | FORMAT || 0.5263157894736843 | 0.0 | 0.3508771929824562
+MultiChannelData | Microarray data | http://edamontology.org/data_2603 | NO | LABEL | EXACT | DATA || 1.0 | 1.0 | 1.0
+MultiChannelData | Microarray data processing | http://edamontology.org/operation_2432 | YES | LABEL | INEXACT | OPERATION || 0.5833333333333333 | 0.5833333333333333 | 0.5833333333333333
+MultiChannelData | Microarray experiment | http://edamontology.org/topic_3518 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+OneChannelData | Microarray data | http://edamontology.org/data_2603 | NO | LABEL | EXACT | DATA || 1.0 | 1.0 | 1.0
+OneChannelData | Microarray data processing | http://edamontology.org/operation_2432 | YES | LABEL | INEXACT | OPERATION || 0.5833333333333333 | 0.5833333333333333 | 0.5833333333333333
+OneChannelData | Microarray experiment | http://edamontology.org/topic_3518 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+TwoChannelData | Microarray data | http://edamontology.org/data_2603 | NO | LABEL | EXACT | DATA || 1.0 | 1.0 | 1.0
+TwoChannelData | Microarray data processing | http://edamontology.org/operation_2432 | YES | LABEL | INEXACT | OPERATION || 0.5833333333333333 | 0.5833333333333333 | 0.5833333333333333
+TwoChannelData | Microarray experiment | http://edamontology.org/topic_3518 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+MethylationArrayData | Microarray data | http://edamontology.org/data_2603 | NO | LABEL | EXACT | DATA || 1.0 | 1.0 | 1.0
+MethylationArrayData | Microarray data processing | http://edamontology.org/operation_2432 | YES | LABEL | INEXACT | OPERATION || 0.5833333333333333 | 0.5833333333333333 | 0.5833333333333333
+MethylationArrayData | Microarray experiment | http://edamontology.org/topic_3518 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+GenotypingArrayData | Microarray data | http://edamontology.org/data_2603 | NO | LABEL | EXACT | DATA || 1.0 | 1.0 | 1.0
+GenotypingArrayData | Microarray data processing | http://edamontology.org/operation_2432 | YES | LABEL | INEXACT | OPERATION || 0.5833333333333333 | 0.5833333333333333 | 0.5833333333333333
+GenotypingArrayData | Microarray experiment | http://edamontology.org/topic_3518 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+MicroRNAArrayData | Microarray data | http://edamontology.org/data_2603 | NO | LABEL | EXACT | DATA || 1.0 | 1.0 | 1.0
+MicroRNAArrayData | Microarray data processing | http://edamontology.org/operation_2432 | YES | LABEL | INEXACT | OPERATION || 0.5833333333333333 | 0.5833333333333333 | 0.5833333333333333
+MicroRNAArrayData | Microarray experiment | http://edamontology.org/topic_3518 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+mRNAArrayData | Microarray data | http://edamontology.org/data_2603 | NO | LABEL | EXACT | DATA || 1.0 | 1.0 | 1.0
+mRNAArrayData | Microarray data processing | http://edamontology.org/operation_2432 | YES | LABEL | INEXACT | OPERATION || 0.5833333333333333 | 0.5833333333333333 | 0.5833333333333333
+mRNAArrayData | Microarray experiment | http://edamontology.org/topic_3518 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+mRNAArrayData | Microarray experiment data format | http://edamontology.org/format_2056 | NO | LABEL | INEXACT | FORMAT || 0.4666666666666667 | 0.0 | 0.3111111111111111
+ChipOnChipData | Microarray data | http://edamontology.org/data_2603 | NO | LABEL | EXACT | DATA || 1.0 | 1.0 | 1.0
+ChipOnChipData | Microarray data processing | http://edamontology.org/operation_2432 | YES | LABEL | INEXACT | OPERATION || 0.5833333333333333 | 0.5833333333333333 | 0.5833333333333333
+ChipOnChipData | Mice or rats | http://edamontology.org/topic_0213 | NO | LABEL | INEXACT | TOPIC || 0.5714285714285714 | 0.0 | 0.38095238095238093
+ReversePhaseProteinArrayData | Microarray data | http://edamontology.org/data_2603 | NO | LABEL | EXACT | DATA || 1.0 | 1.0 | 1.0
+ReversePhaseProteinArrayData | Microarray data processing | http://edamontology.org/operation_2432 | YES | LABEL | INEXACT | OPERATION || 0.5833333333333333 | 0.5833333333333333 | 0.5833333333333333
+ReversePhaseProteinArrayData | Microarray experiment | http://edamontology.org/topic_3518 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+TissueMicroarrayData | Microarray data | http://edamontology.org/data_2603 | NO | LABEL | EXACT | DATA || 1.0 | 1.0 | 1.0
+TissueMicroarrayData | Microarray data processing | http://edamontology.org/operation_2432 | YES | LABEL | INEXACT | OPERATION || 0.5833333333333333 | 0.5833333333333333 | 0.5833333333333333
+TissueMicroarrayData | Microarray experiment | http://edamontology.org/topic_3518 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
+ProprietaryPlatformsData | Microarray data | http://edamontology.org/data_2603 | NO | LABEL | EXACT | DATA || 1.0 | 1.0 | 1.0
+ProprietaryPlatformsData | Microarray data processing | http://edamontology.org/operation_2432 | YES | LABEL | INEXACT | OPERATION || 0.5833333333333333 | 0.5833333333333333 | 0.5833333333333333
+ProprietaryPlatformsData | Protein report format | http://edamontology.org/format_2062 | NO | LABEL | INEXACT | FORMAT || 0.5416666666666667 | 0.0 | 0.36111111111111116
+ProprietaryPlatformsData | Microarray experiment | http://edamontology.org/topic_3518 | NO | LABEL | INEXACT | TOPIC || 0.5 | 0.0 | 0.3333333333333333
