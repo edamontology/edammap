@@ -27,7 +27,7 @@ The basic problem is to map a list of text, which may be:
 * short phrases (typically in a text file, one word or phrase / line) 
 * free text
 
-to EDAM class labels and synonyms, including obsolete classes, and generate a text output file including the following information:
+to EDAM class labels and synonyms, including obsolete classes, and generate a text output file including (at least) the following information:
 
 * keyword_or_phrase 	: supplier-provided keyword, short phrase or text
 * label_or_synonym 	: EDAM label or synonym that keyword / phrase was matched to
