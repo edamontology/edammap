@@ -3,12 +3,14 @@ Tool for mapping text (terms, phrases, free text) to the EDAM ontology
 
 # Background
 [EDAM](http://bioportal.bioontology.org/ontologies/EDAM?p=classes) includes 4 branches of different concepts (OWL classes): topic, operation, data & format.  A concept is assigned to a branch by its URI (id), thus:
-http://edamontology.org/topic_xxxx
-http://edamontology.org/operation_xxxx 
-http://edamontology.org/data_xxxx 
-http://edamontology.org/format_xxxx 
+
+* http://edamontology.org/topic_xxxx
+* http://edamontology.org/operation_xxxx 
+* http://edamontology.org/data_xxxx 
+* http://edamontology.org/format_xxxx 
 
 In the following, text in parenthesis refers to statements in the OWL file.  Each concept has a:
+
 * preferred term (rdfs:label)
 * definition (oboInOwl:hasDefinition)
 * parent concept (rdfs:subClassOf)
@@ -20,9 +22,11 @@ In the following, text in parenthesis refers to statements in the OWL file.  Eac
 
 # The problem
 The basic problem is to map a list of text, which may be:
+
 * key words 
 * short phrases (typically in a text file, one word or phrase / line) 
 * free text
+
 to EDAM class labels and synonyms, including obsolete classes, and generate a text output file including the following information:
 
 * keyword_or_phrase 	: supplier-provided keyword, short phrase or text
@@ -41,6 +45,7 @@ keyword_or_phrase | label_or_synonym | URI | obsolete | match_type | match_conf 
 At least one output line is required for every input keyword/phrase, even in cases where no match was found.  
 
 In practice, flexible output options will be needed to suit various applications, e.g.:
+
 * Where matches are identified to more than 1 branch, the best match can be reported for each branch, i.e. a maximum of 4 matches per keyword/phrase
 * Reporting of top-n hits in each branch
 * etc.
