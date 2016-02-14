@@ -64,3 +64,12 @@ and:
 exact full-text matches > "fuzzy" matches
 
 i.e. an exact full-text match to the concept label is best of all.
+
+
+See also:
+
+https://docs.google.com/document/d/1Ms04Fm-n9RJzhNLdeYQCKGHK03fgsSrztglVR-VvQUw/edit
+
+which should move to:
+
+https://github.com/bio-tools/biotoolsConnect/wiki
