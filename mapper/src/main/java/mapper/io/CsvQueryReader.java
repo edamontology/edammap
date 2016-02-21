@@ -14,6 +14,11 @@ import java.util.List;
  * @author Rabie Saidi
  */
 public class CsvQueryReader {
+    private boolean parents;
+
+    public CsvQueryReader(boolean parents) {
+        this.parents = parents;
+    }
 
     public List<Keyword> readKeywords(String fileName) {
 
@@ -29,8 +34,12 @@ public class CsvQueryReader {
                 }
                 for (String[] entry : entries) {
                     String value = entry[1];
-                    String parenValue = entry[2];
-                    keywords.add(new Keyword(value, parenValue));
+                    if (parents) {
+                        String parenValue = entry[2];
+                        keywords.add(new Keyword(value, parenValue));
+                    } else {
+                        keywords.add(new Keyword(value));
+                    }
                 }
             } catch (FileNotFoundException e) {
                 e.printStackTrace();

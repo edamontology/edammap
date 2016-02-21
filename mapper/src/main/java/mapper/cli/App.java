@@ -50,7 +50,7 @@ public class App
         String referencePath = args.files.get(1);
         EdamReader edamReader = new EdamReader();
         OntModel model = edamReader.getOntologyModel(referencePath);
-        CsvQueryReader termReader = new CsvQueryReader();
+        CsvQueryReader termReader = new CsvQueryReader(args.parents);
         List<Keyword> queryTerms = termReader.readKeywords(queryPath);
         List<Concept> concepts =  new ArrayList<>();
         Iterator<OntClass> ontClassIterator = model.listClasses();
@@ -115,7 +115,7 @@ public class App
         double elapsedSeconds = tDelta / 1000.0;
         System.out.println("Concepts loaded in " + elapsedSeconds + "s");
         //Mapper2 mapper = new Mapper2(model.listClasses().toList(), queryTerms);
-        Mapper mapper = new Mapper(concepts, queryTerms);
+        Mapper mapper = new Mapper(concepts, queryTerms, args.parents);
         mapper.map();
         mapper.print2();
 

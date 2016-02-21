@@ -11,4 +11,7 @@ public class Args {
 
 	@Parameter(names = { "-h", "--help" }, description = "Print this help", help = true)
 	boolean help;
+
+	@Parameter(names = { "-p", "--parents" }, description = "Query terms have parents")
+	boolean parents = false;
 }

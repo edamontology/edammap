@@ -13,6 +13,7 @@ public class Mapper {
     private final List<Keyword> queryTerms;
     private  List<ComparisonResult> results;
     private Map<String, List<ComparisonResult>> map = new LinkedHashMap<>();
+    private boolean parents;
 
 
 
@@ -23,11 +24,12 @@ public class Mapper {
 //        this.results = new ArrayList<>();
 //    }
 
-    public Mapper(List<Concept> concepts, List<Keyword> queryTerms) {
+    public Mapper(List<Concept> concepts, List<Keyword> queryTerms, boolean parents) {
         //this.model = model;
         this.concepts = concepts;
         this.queryTerms = queryTerms;
         this.results = new ArrayList<>();
+        this.parents = parents;
     }
 
 
@@ -50,36 +52,43 @@ public class Mapper {
 
                 ComparisonResult referenceResult = getResult(term.getValue(), concept.getLabel(), concept, MatchType.LABEL);
                 if(referenceResult.getEditScore() >= 0.2)referenceResults.add(referenceResult);
-                ComparisonResult referenceParentResult = getResult(term.getParent().getValue(), concept.getLabel(), concept, MatchType.LABEL);
-                referenceParentResult.setQuery(term.getValue());
-                if(referenceParentResult.getEditScore() >= 0.2)referenceResults.add(referenceParentResult);
+                if (parents) {
+                    ComparisonResult referenceParentResult = getResult(term.getParent().getValue(), concept.getLabel(), concept, MatchType.LABEL);
+                    referenceParentResult.setQuery(term.getValue());
+                    if(referenceParentResult.getEditScore() >= 0.2)referenceResults.add(referenceParentResult);
+                }
 
                 //Process exact synonyms
                 for(String statement : concept.getExactSynonyms()){
                     ComparisonResult exactSynonymResult = getResult(term.getValue(), statement, concept, MatchType.EXACT_SYNONYM);
                     if(exactSynonymResult.getEditScore() >= 0.2) exactSynonymResults.add(exactSynonymResult);
-                    ComparisonResult exactParentResult = getResult(term.getParent().getValue(), statement, concept, MatchType.LABEL);
-                    exactParentResult.setQuery(term.getValue());
-                    if(exactParentResult.getEditScore() >= 0.2)exactSynonymResults.add(exactParentResult);
+                    if (parents) {
+                        ComparisonResult exactParentResult = getResult(term.getParent().getValue(), statement, concept, MatchType.LABEL);
+                        exactParentResult.setQuery(term.getValue());
+                        if(exactParentResult.getEditScore() >= 0.2)exactSynonymResults.add(exactParentResult);
+                    }
                 }
 
                 //Process narrow synonyms
                 for(String statement : concept.getNarrowSynonyms()){
                     ComparisonResult narrowSynonymResult = getResult(term.getValue(), statement, concept, MatchType.NARROW_SYNONYM);
                     if(narrowSynonymResult.getEditScore() >= 0.2) narrowSynonymResults.add(narrowSynonymResult);
-                    ComparisonResult narrowParentResult = getResult(term.getParent().getValue(), statement, concept, MatchType.LABEL);
-                    narrowParentResult.setQuery(term.getValue());
-                    if(narrowParentResult.getEditScore() >= 0.2)narrowSynonymResults.add(narrowParentResult);
-
+                    if (parents) {
+                        ComparisonResult narrowParentResult = getResult(term.getParent().getValue(), statement, concept, MatchType.LABEL);
+                        narrowParentResult.setQuery(term.getValue());
+                        if(narrowParentResult.getEditScore() >= 0.2)narrowSynonymResults.add(narrowParentResult);
+                    }
                 }
 
                 //Process broad synonyms
                 for(String statement : concept.getBroadSynonyms()){
                     ComparisonResult broadSynonymResult = getResult(term.getValue(), statement, concept, MatchType.BROAD_SYNONYM);
                     if(broadSynonymResult.getEditScore() >= 0.2) broadSynonymResults.add(broadSynonymResult);
-                    ComparisonResult broadParentResult = getResult(term.getParent().getValue(), statement, concept, MatchType.LABEL);
-                    broadParentResult.setQuery(term.getValue());
-                    if(broadParentResult.getEditScore() >= 0.2)broadSynonymResults.add(broadParentResult);
+                    if (parents) {
+                        ComparisonResult broadParentResult = getResult(term.getParent().getValue(), statement, concept, MatchType.LABEL);
+                        broadParentResult.setQuery(term.getValue());
+                        if(broadParentResult.getEditScore() >= 0.2)broadSynonymResults.add(broadParentResult);
+                    }
                 }
 
                 List<ComparisonResult> temp = new ArrayList<>();
