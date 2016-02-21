@@ -14,6 +14,8 @@ public class Mapper {
     private  List<ComparisonResult> results;
     private Map<String, List<ComparisonResult>> map = new LinkedHashMap<>();
     private boolean parents;
+    private int match;
+    private List<BranchType> includedBranches;
 
 
 
@@ -24,12 +26,14 @@ public class Mapper {
 //        this.results = new ArrayList<>();
 //    }
 
-    public Mapper(List<Concept> concepts, List<Keyword> queryTerms, boolean parents) {
+    public Mapper(List<Concept> concepts, List<Keyword> queryTerms, boolean parents, int match, List<BranchType> includedBranches) {
         //this.model = model;
         this.concepts = concepts;
         this.queryTerms = queryTerms;
         this.results = new ArrayList<>();
         this.parents = parents;
+        this.match = match;
+        this.includedBranches = includedBranches;
     }
 
 
@@ -109,25 +113,15 @@ public class Mapper {
     private List<ComparisonResult> bestOf(List<ComparisonResult> comparisonResults) {
         Collections.sort(comparisonResults);
         List<ComparisonResult> temp = new ArrayList<>();
-        List<BranchType> branches = new ArrayList<>();
-        int count = 0;
-        int i = 0;
-        while(count < 5 && count < comparisonResults.size() && i < comparisonResults.size()){
-            if(i == 0){
-                temp.add(comparisonResults.get(i));
-                branches.add(temp.get(temp.size() - 1).getBranch());
-                count++;
-            }
-            else{
-                if(!branches.contains(comparisonResults.get(i).getBranch())){
-                    temp.add(comparisonResults.get(i));
-                    if(!branches.contains(temp.get(temp.size() - 1).getBranch())){
-                        branches.add(temp.get(temp.size() - 1).getBranch());
-                    }
-                    count++;
+        Map<BranchType, Integer> branches = new LinkedHashMap<>();
+        for (ComparisonResult comparisonResult : comparisonResults) {
+            BranchType branch = comparisonResult.getBranch();
+            if (includedBranches.isEmpty() || includedBranches.contains(branch)) {
+                if (branches.get(branch) == null || branches.get(branch).intValue() < match) {
+                    temp.add(comparisonResult);
+                    branches.merge(branch, 1, Integer::sum);
                 }
             }
-            i++;
         }
 
         //At least one output line is required for every input keyword/phrase, even in cases where no match was found.

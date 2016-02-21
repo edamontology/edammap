@@ -115,7 +115,7 @@ public class App
         double elapsedSeconds = tDelta / 1000.0;
         System.out.println("Concepts loaded in " + elapsedSeconds + "s");
         //Mapper2 mapper = new Mapper2(model.listClasses().toList(), queryTerms);
-        Mapper mapper = new Mapper(concepts, queryTerms, args.parents);
+        Mapper mapper = new Mapper(concepts, queryTerms, args.parents, args.match, args.branches);
         mapper.map();
         mapper.print2();
 
