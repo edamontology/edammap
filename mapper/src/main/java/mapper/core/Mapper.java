@@ -102,7 +102,7 @@ public class Mapper {
             }
         }
         for (Map.Entry<String, List<ComparisonResult>> entry : map.entrySet()) {
-            map.put(entry.getKey(), bestOf(entry.getValue()));
+            entry.setValue(bestOf(entry.getValue()));
         }
     }
 
@@ -119,8 +119,7 @@ public class Mapper {
                 count++;
             }
             else{
-                if(comparisonResults.get(i).compareTo(comparisonResults.get(i-1)) == 0
-                        && !branches.contains(comparisonResults.get(i).getBranch())){
+                if(!branches.contains(comparisonResults.get(i).getBranch())){
                     temp.add(comparisonResults.get(i));
                     if(!branches.contains(temp.get(temp.size() - 1).getBranch())){
                         branches.add(temp.get(temp.size() - 1).getBranch());
