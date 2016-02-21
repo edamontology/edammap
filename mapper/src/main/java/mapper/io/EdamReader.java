@@ -26,7 +26,7 @@ public class EdamReader {
         try{
             File file = new File(filePath);
             InputStream istream = new FileInputStream(file);
-            OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM_RDFS_INF);
+            OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM_TRANS_INF);
             model.read(istream, null);
             return model;
         } catch (FileNotFoundException e) {
