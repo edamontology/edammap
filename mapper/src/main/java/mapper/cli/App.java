@@ -8,6 +8,9 @@ import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Statement;
 
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -25,9 +28,26 @@ public class App
      * Example: allViews.csv edam.owl
      * @param args
      */
-    public static void main( String[] args ){
-        String queryPath = args[0];
-        String referencePath = args[1];
+    public static void main( String[] argv ){
+        Args args = new Args();
+        JCommander jcommander = new JCommander(args);
+        try {
+            jcommander.parse(argv);
+        } catch (ParameterException e) {
+            System.err.println(e.getLocalizedMessage());
+            jcommander.usage();
+            System.exit(1);
+        }
+        if (args.files.size() != 2) {
+            jcommander.usage();
+            System.exit(1);
+        }
+        if (args.help) {
+            jcommander.usage();
+            System.exit(0);
+        }
+        String queryPath = args.files.get(0);
+        String referencePath = args.files.get(1);
         EdamReader edamReader = new EdamReader();
         OntModel model = edamReader.getOntologyModel(referencePath);
         CsvQueryReader termReader = new CsvQueryReader();
