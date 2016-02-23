@@ -57,12 +57,12 @@ public class App
         //Query q;
 
         long tStart = System.currentTimeMillis();
-        System.out.println("Loading concepts..");
+        System.out.println("Loading concepts...");
         int conceptCount = 0;
        while(ontClassIterator.hasNext()){
         //for(OntClass ontClass : ontClassIterator){
             conceptCount++;
-            System.out.println("Concept " + conceptCount);
+            System.out.print("Concept " + conceptCount + "\r");
             OntClass ontClass = ontClassIterator.next();
             Concept concept = new Concept();
             String uri = ontClass.getURI();

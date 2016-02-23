@@ -47,7 +47,14 @@ public class Mapper {
 
     public void map() {
         int classCount = 0;
+        double conceptSize = concepts.size();
+        long progressPrevious = 0;
         for(Concept concept : concepts){
+            long progress = Math.round(classCount / conceptSize * 100);
+            if (progressPrevious != progress) {
+                System.out.print("Mapping " + progress + "%" + "\r");
+                progressPrevious = progress;
+            }
             classCount++;
             //System.out.println("Concept " + classCount);
             int termCount = 0;
