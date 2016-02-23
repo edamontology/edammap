@@ -117,7 +117,7 @@ public class App
         //Mapper2 mapper = new Mapper2(model.listClasses().toList(), queryTerms);
         Mapper mapper = new Mapper(concepts, queryTerms, args.parents, args.match, args.branches);
         mapper.map();
-        mapper.print2();
+        mapper.print2(args.output);
 
         tStart = tEnd;
         tEnd = System.currentTimeMillis();

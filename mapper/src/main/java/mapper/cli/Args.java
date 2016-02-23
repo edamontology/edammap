@@ -23,4 +23,7 @@ public class Args {
 
 	@Parameter(names = { "-b", "--branches" }, variableArity = true, description = "Branches to include. Space separated from list [topic, operation, data, format, other]. If ommitted, all branches are considered.")
 	List<BranchType> branches = new ArrayList<>();
+
+	@Parameter(names = { "-o", "--output" }, description = "File to write results to. If not specified or invalid, will be written to standard output.")
+	String output = "";
 }

@@ -1,5 +1,11 @@
 package mapper.core;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -172,13 +178,27 @@ public class Mapper {
         return result;
     }
 
-    public void print2() {
-        for (Map.Entry<String, List<ComparisonResult>> entry : map.entrySet()) {
-            for (ComparisonResult result : entry.getValue()){
-                System.out.println(result);
+    public void print2(String path) {
+        boolean stdout = path.isEmpty();
+        if (!stdout) {
+            Path file = Paths.get(path);
+            try (BufferedWriter writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
+                for (Map.Entry<String, List<ComparisonResult>> entry : map.entrySet()) {
+                    for (ComparisonResult result : entry.getValue()) {
+                        writer.write(result.toString() + "\n");
+                    }
+                }
+            } catch (IOException x) {
+                stdout = true;
             }
         }
-
+        if (stdout) {
+            for (Map.Entry<String, List<ComparisonResult>> entry : map.entrySet()) {
+                for (ComparisonResult result : entry.getValue()) {
+                    System.out.println(result);
+                }
+            }
+        }
     }
 
 }

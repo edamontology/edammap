@@ -46,6 +46,8 @@ public class CsvQueryReader {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        } else {
+            System.err.println("Query file does not exist!");
         }
         return keywords;
     }
