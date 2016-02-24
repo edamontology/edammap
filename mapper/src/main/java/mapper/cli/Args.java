@@ -15,9 +15,6 @@ public class Args {
 	@Parameter(names = { "-h", "--help" }, help = true, description = "Print this help")
 	boolean help;
 
-	@Parameter(names = { "-p", "--parents" }, description = "Query terms have parents")
-	boolean parents = false;
-
 	@Parameter(names = { "-m", "--match" }, validateWith = PositiveInteger.class, description = "Number of best matches per branch to output")
 	int match = 1;
 

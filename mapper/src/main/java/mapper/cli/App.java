@@ -14,6 +14,7 @@ import com.beust.jcommander.ParameterException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 /**
@@ -50,8 +51,8 @@ public class App
         String referencePath = args.files.get(1);
         EdamReader edamReader = new EdamReader();
         OntModel model = edamReader.getOntologyModel(referencePath);
-        CsvQueryReader termReader = new CsvQueryReader(args.parents);
-        List<Keyword> queryTerms = termReader.readKeywords(queryPath);
+        CsvQueryReader termReader = new CsvQueryReader();
+        Map<String, Keyword> queryTerms = termReader.readKeywords(queryPath);
         List<Concept> concepts =  new ArrayList<>();
         Iterator<OntClass> ontClassIterator = model.listClasses();
         //Query q;
@@ -115,7 +116,7 @@ public class App
         double elapsedSeconds = tDelta / 1000.0;
         System.out.println("Concepts loaded in " + elapsedSeconds + "s");
         //Mapper2 mapper = new Mapper2(model.listClasses().toList(), queryTerms);
-        Mapper mapper = new Mapper(concepts, queryTerms, args.parents, args.match, args.branches);
+        Mapper mapper = new Mapper(concepts, queryTerms, args.match, args.branches);
         mapper.map();
         mapper.print2(args.output);
 

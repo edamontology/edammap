@@ -1,54 +1,41 @@
 package mapper.io;
 
-import au.com.bytecode.opencsv.CSVReader;
+import com.opencsv.CSVReader;
+import com.opencsv.bean.HeaderColumnNameMappingStrategy;
+import com.opencsv.bean.IterableCSVToBean;
+
 import mapper.core.Keyword;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.text.ParseException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-/**
- * @author Rabie Saidi
- */
 public class CsvQueryReader {
-    private boolean parents;
-
-    public CsvQueryReader(boolean parents) {
-        this.parents = parents;
-    }
-
-    public List<Keyword> readKeywords(String fileName) {
-
-        List<Keyword> keywords = new ArrayList<Keyword>();
-        CSVReader reader = null;
-        if (new File(fileName).exists()) {
-            try {
-                reader = new CSVReader(new FileReader(fileName));
-                List<String[]> entries = reader.readAll();
-                if (entries.isEmpty()) {
-                    System.out.println("No query !!");
-                    return keywords;
-                }
-                for (String[] entry : entries) {
-                    String value = entry[1];
-                    if (parents) {
-                        String parenValue = entry[2];
-                        keywords.add(new Keyword(value, parenValue));
-                    } else {
-                        keywords.add(new Keyword(value));
-                    }
-                }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            System.err.println("Query file does not exist!");
-        }
-        return keywords;
-    }
+	public Map<String, Keyword> readKeywords(String file) {
+		Map<String, Keyword> keywords = new LinkedHashMap<>();
+		try {
+			if (file == null || !(new File(file).canRead())) {
+				throw new FileNotFoundException("Query file does not exist or is not readable!");
+			}
+			CSVReader csvReader = new CSVReader(new FileReader(file), ',', '"');
+			HeaderColumnNameMappingStrategy<CsvRecord> strategy = new HeaderColumnNameMappingStrategy<>();
+			strategy.setType(CsvRecord.class);
+			IterableCSVToBean<CsvRecord> csvToBean = new IterableCSVToBean<>(csvReader, strategy, null);
+			for (CsvRecord csvRecord : csvToBean) {
+				if (csvRecord.getKeyword() == null || csvRecord.getKeyword().equals("")) {
+					throw new ParseException("\"keyword\" column missing or some entry in that column missing!", 0);
+				}
+				Keyword keyword = new Keyword(csvRecord.getKeyword(), csvRecord.getMatch(), csvRecord.getParent());
+				keywords.merge(csvRecord.getKeyword(), keyword, Keyword::merge);
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return keywords;
+	}
 }

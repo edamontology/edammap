@@ -1,30 +1,42 @@
 package mapper.core;
 
-/**
- * @author Rabie Saidi
- */
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 public class Keyword {
-    private String value;
-    private Keyword parent;
 
-    public Keyword(String value) {
-        this.value = value;
-    }
+	private String keyword;
 
-    public Keyword(String value, String parent) {
-        this.value = value;
-        this.parent = new Keyword(parent);
-    }
+	private Set<String> matches = new LinkedHashSet<>();
 
-    public void setParent(Keyword parent) {
-        this.parent = parent;
-    }
+	private Set<String> parents = new LinkedHashSet<>();
 
-    public String getValue() {
-        return value;
-    }
+	public Keyword(String keyword, String match, String parent) {
+		this.keyword = keyword;
+		if (match != null && !match.isEmpty()) {
+			this.matches.add(match);
+		}
+		if (parent != null && !parent.isEmpty()) {
+			this.parents.add(parent);
+		}
+	}
 
-    public Keyword getParent() {
-        return parent;
-    }
+	public String getKeyword() {
+		return keyword;
+	}
+
+	public Set<String> getMatches() {
+		return matches;
+	}
+
+	public Set<String> getParents() {
+		return parents;
+	}
+
+	public Keyword merge(Keyword keyword) {
+		if (keyword == null) return this;
+		matches.addAll(keyword.matches);
+		parents.addAll(keyword.parents);
+		return this;
+	}
 }
