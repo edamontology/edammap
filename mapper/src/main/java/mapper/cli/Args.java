@@ -18,9 +18,28 @@ public class Args {
 	@Parameter(names = { "-m", "--match" }, validateWith = PositiveInteger.class, description = "Number of best matches per branch to output")
 	int match = 1;
 
-	@Parameter(names = { "-b", "--branches" }, variableArity = true, description = "Branches to include. Space separated from list [topic, operation, data, format, other]. If ommitted, all branches are considered.")
+	@Parameter(names = { "-b", "--branches" }, variableArity = true, description = "Branches to include. Space separated from list [topic, operation, data, format]. If ommitted, all branches are considered.")
 	List<BranchType> branches = new ArrayList<>();
 
 	@Parameter(names = { "-o", "--output" }, description = "File to write results to. If not specified or invalid, will be written to standard output.")
 	String output = "";
+
+	@Parameter(names = { "-r", "--report" }, description = "File to write HTML benchmark report to. It will contain metrics and comparisons to the manual mapping specified in the input query file.")
+	String report = "";
+
+	public List<String> getFiles() {
+		return files;
+	}
+
+	public int getMatch() {
+		return match;
+	}
+
+	public List<BranchType> getBranches() {
+		return branches;
+	}
+
+	public String getOutput() {
+		return output;
+	}
 }

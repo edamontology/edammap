@@ -1,5 +1,7 @@
 package mapper.core;
 
+import java.util.Locale;
+
 /**
  * @author Rabie Saidi
  * Date: 09/10/2014
@@ -23,7 +25,12 @@ public class ComparisonResult implements Comparable {
         this.uri = uri;
     }
 
+    public void setMatch(String uri) {
+        this.match = new EdamUri(uri);
+    }
+
     private String uri;
+    private EdamUri match;
     private String obselete;
     private MatchType matchType;
     private MatchConfidence matchConfidence;
@@ -146,7 +153,7 @@ public class ComparisonResult implements Comparable {
                 obselete + " | " +
                 matchType + " | " +
                 matchConfidence + " | " +
-                branch + " || " +
+                branch.toString().toUpperCase(Locale.ROOT) + " || " +
                 editScore + " | " +
                 substringScore + " | " +
                 getGlobalScore();
@@ -170,5 +177,9 @@ public class ComparisonResult implements Comparable {
 
     public String getUri() {
         return uri;
+    }
+
+    public EdamUri getMatch() {
+        return match;
     }
 }

@@ -60,17 +60,19 @@ public class App
         long tStart = System.currentTimeMillis();
         System.out.println("Loading concepts...");
         int conceptCount = 0;
-       while(ontClassIterator.hasNext()){
+        while(ontClassIterator.hasNext()){
         //for(OntClass ontClass : ontClassIterator){
+            OntClass ontClass = ontClassIterator.next();
+            try {
+                new EdamUri(ontClass.getURI());
+            } catch (Exception e) {
+                continue;
+            }
             conceptCount++;
             System.out.print("Concept " + conceptCount + "\r");
-            OntClass ontClass = ontClassIterator.next();
             Concept concept = new Concept();
             String uri = ontClass.getURI();
             if(uri == null) uri = "##########";
-           if(uri.equals("http://edamontology.org/data_0582")){
-               uri = uri;
-           }
             concept.setUri(uri);
             String label = ontClass.getLabel("");
             if(label == null) label = "##########";
@@ -126,9 +128,10 @@ public class App
         elapsedSeconds = tDelta / 1000.0;
         System.out.println("Mapping done in " + elapsedSeconds + "s");
 
+        if (!args.report.isEmpty()) {
+            Benchmark benchmark = new Benchmark(queryTerms, mapper.getMap(), model, args);
+            benchmark.calculate();
+            benchmark.generateReport(args.report);
+        }
     }
-
-
-
 }
-

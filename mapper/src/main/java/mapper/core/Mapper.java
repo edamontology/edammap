@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -17,7 +16,6 @@ public class Mapper {
 
     private final List<Concept> concepts;
     private final Map<String, Keyword> queryTerms;
-    private  List<ComparisonResult> results;
     private Map<String, List<ComparisonResult>> map = new LinkedHashMap<>();
     private int match;
     private List<BranchType> includedBranches;
@@ -35,13 +33,9 @@ public class Mapper {
         //this.model = model;
         this.concepts = concepts;
         this.queryTerms = queryTerms;
-        this.results = new ArrayList<>();
         this.match = match;
         this.includedBranches = includedBranches;
     }
-
-
-
 
     public void map() {
         System.out.println("Mapping...");
@@ -108,13 +102,13 @@ public class Mapper {
                 }
 
                 List<ComparisonResult> temp = new ArrayList<>();
-                if(map.containsKey(term.getKeyword())) temp.addAll(map.get(term.getKeyword()));
+                if(map.containsKey(term.getKeyword().toLowerCase(Locale.ROOT))) temp.addAll(map.get(term.getKeyword().toLowerCase(Locale.ROOT)));
                 temp.addAll(referenceResults);
                 temp.addAll(exactSynonymResults);
                 temp.addAll(narrowSynonymResults);
                 temp.addAll(broadSynonymResults);
                 //Collections.sort(temp);
-                map.put(term.getKeyword(), temp);
+                map.put(term.getKeyword().toLowerCase(Locale.ROOT), temp);
             }
         }
         for (Map.Entry<String, List<ComparisonResult>> entry : map.entrySet()) {
@@ -160,19 +154,20 @@ public class Mapper {
 
         //uri
         result.setUri(ontClass.getUri());
+        result.setMatch(ontClass.getUri());
         //branch
         if (!ontClass.getUri().equals("##########")) {
             String uri = ontClass.getUri();
-            BranchType branch;
-            if(uri.contains("topic"))branch = BranchType.TOPIC;
-            else if(uri.contains("operation"))branch = BranchType.OPERATION;
-            else if(uri.contains("data"))branch = BranchType.DATA;
-            else if(uri.contains("format"))branch = BranchType.FORMAT;
-            else branch = BranchType.OTHER;
+            BranchType branch = null;
+            if(uri.contains("topic"))branch = BranchType.topic;
+            else if(uri.contains("operation"))branch = BranchType.operation;
+            else if(uri.contains("data"))branch = BranchType.data;
+            else if(uri.contains("format"))branch = BranchType.format;
+            // else branch = BranchType.OTHER;
             result.setBranch(branch);
         }
         else{
-            result.setBranch(BranchType.OTHER);
+            // result.setBranch(BranchType.OTHER);
         }
         //obsolete
         if(ontClass.isObsolete()) result.setObselete("YES");
@@ -205,5 +200,9 @@ public class Mapper {
                 }
             }
         }
+    }
+
+    public Map<String, List<ComparisonResult>> getMap() {
+        return map;
     }
 }

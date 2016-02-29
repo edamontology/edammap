@@ -7,6 +7,9 @@ public class CsvRecord {
 	private String keyword;
 
 	@CsvBind
+	private String url;
+
+	@CsvBind
 	private String match;
 
 	@CsvBind
@@ -18,6 +21,14 @@ public class CsvRecord {
 
 	public void setKeyword(String keyword) {
 		this.keyword = keyword;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 
 	public String getMatch() {

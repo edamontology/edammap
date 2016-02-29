@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.text.ParseException;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class CsvQueryReader {
@@ -28,8 +29,8 @@ public class CsvQueryReader {
 				if (csvRecord.getKeyword() == null || csvRecord.getKeyword().equals("")) {
 					throw new ParseException("\"keyword\" column missing or some entry in that column missing!", 0);
 				}
-				Keyword keyword = new Keyword(csvRecord.getKeyword(), csvRecord.getMatch(), csvRecord.getParent());
-				keywords.merge(csvRecord.getKeyword(), keyword, Keyword::merge);
+				Keyword keyword = new Keyword(csvRecord.getKeyword(), csvRecord.getUrl(), csvRecord.getMatch(), csvRecord.getParent());
+				keywords.merge(csvRecord.getKeyword().toLowerCase(Locale.ROOT), keyword, Keyword::merge);
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

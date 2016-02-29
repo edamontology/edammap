@@ -290,17 +290,17 @@ public class OldMapper2 {
             String uri = ontClass.getURI();
             result.setUri(uri);
             //String branch = uri.substring(uri.indexOf("org/")+4, uri.indexOf("_"));
-            BranchType branch;
-            if(uri.contains("topic"))branch = BranchType.TOPIC;
-            else if(uri.contains("operation"))branch = BranchType.OPERATION;
-            else if(uri.contains("data"))branch = BranchType.DATA;
-            else if(uri.contains("format"))branch = BranchType.FORMAT;
-            else branch = BranchType.OTHER;
-            result.setBranch(branch);
+//            BranchType branch;
+//            if(uri.contains("topic"))branch = BranchType.TOPIC;
+//            else if(uri.contains("operation"))branch = BranchType.OPERATION;
+//            else if(uri.contains("data"))branch = BranchType.DATA;
+//            else if(uri.contains("format"))branch = BranchType.FORMAT;
+//            else branch = BranchType.OTHER;
+//            result.setBranch(branch);
         }
         else{
             result.setUri("NO URI DEFINED");
-            result.setBranch(BranchType.OTHER);
+//            result.setBranch(BranchType.OTHER);
         }
         //obsolete
         boolean obsolete = false;

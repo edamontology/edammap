@@ -7,14 +7,17 @@ public class Keyword {
 
 	private String keyword;
 
-	private Set<String> matches = new LinkedHashSet<>();
+	private String url;
+
+	private Set<EdamUri> matches = new LinkedHashSet<>();
 
 	private Set<String> parents = new LinkedHashSet<>();
 
-	public Keyword(String keyword, String match, String parent) {
+	public Keyword(String keyword, String url, String match, String parent) {
 		this.keyword = keyword;
+		this.url = url;
 		if (match != null && !match.isEmpty()) {
-			this.matches.add(match);
+			this.matches.add(new EdamUri(match));
 		}
 		if (parent != null && !parent.isEmpty()) {
 			this.parents.add(parent);
@@ -25,7 +28,11 @@ public class Keyword {
 		return keyword;
 	}
 
-	public Set<String> getMatches() {
+	public String getUrl() {
+		return url;
+	}
+
+	public Set<EdamUri> getMatches() {
 		return matches;
 	}
 
