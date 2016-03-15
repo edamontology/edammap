@@ -1,4 +1,4 @@
-# edammap
+# edamMap
 Tool for mapping text to [EDAM](http://bioportal.bioontology.org/ontologies/EDAM?p=classes).  It is designed to assist not replace a curator.
 
 ###Summary
