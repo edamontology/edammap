@@ -75,3 +75,5 @@ __Validation and benchmarking__
 __Related concepts__
 http://ceur-ws.org/Vol-774/das.pdf
 https://www.kcura.com/relativity/Portals/0/Documents/8.0%20Documentation%20Help%20Site/Content/Features/Analytics/Concept%20searching.htm
+
+to be continued ...
