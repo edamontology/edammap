@@ -25,7 +25,7 @@ _Mapping to EDAM concepts_ (including deprecated concepts), specifically
 * concept definition (maybe)
 * concept comments (maybe)
 
-_Output_ includes (proivisionally) at least the following information:
+_Output_ includes (provisionally) at least the following information:
 
 * text input 	    	: supplier-provided keyword, short phrase or text
 * label_or_synonym 	: EDAM label or synonym that keyword / phrase was matched to
@@ -40,7 +40,7 @@ _Output_ includes (proivisionally) at least the following information:
 __Definition of input data__
 - Define a document: title, abstract, text, outlines, figures, ..
 - Define what can be mapped against EDAM: abstracts of papers defining a tool and/or database in the registry; tool collections with describing terms/keywords
-- Continuously adapt tool to manage larger descriptions
+- Continuously adapt tool to manage larger text
 
 __Implement specific implementations_
 
@@ -56,11 +56,13 @@ _Different mapping techniques_
 - Start from text and parse it into vector of words then compare each word to the concept, then aggregate results and compare again with compound words
 - Sequence alignment (how to fix the threshold for a positive hit)
 - Prediction based on machine learning
+- Apply search engines to find EDAM terms in text
 
 __Methodology__
 - _Pre-processing:_ 
-   * Find treatment of specific characters like hyphens
-   * Elimination of promiscous words from the documents (i.e. conjunctives, prepositions, ..) and applying information retrieval techniques to weight the words concerning the significance
+   * Try without 
+   * Find treatment of specific characters like hyphens, points, ...
+   * Elimination of promiscous words from the documents (i.e. conjunctives, prepositions, ..) and applying information retrieval techniques to weight the words concerning the significance (look for available software and apply tf-idf)
 - _Processing:_ Running the selected technique(s) on the input data to obtain the matches
 - _Post-processing:_ Elimination of the matches with low significance from the output (based on a measure of match confidence and/or a defined score)
 
@@ -71,9 +73,7 @@ __Validation and benchmarking__
 - Parameter optimization
 - Find optimal score to distinguish good matches
 
-
 __Related concepts__
 http://ceur-ws.org/Vol-774/das.pdf
 https://www.kcura.com/relativity/Portals/0/Documents/8.0%20Documentation%20Help%20Site/Content/Features/Analytics/Concept%20searching.htm
 
-to be continued ...
