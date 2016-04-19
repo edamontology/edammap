@@ -1,0 +1,35 @@
+# Apache lucene stopwords
+# https://github.com/apache/lucene-solr/blob/813ca77250db29116812bc949e2a466a70f969a3/lucene/analysis/common/src/java/org/apache/lucene/analysis/core/StopAnalyzer.java
+a
+an
+and
+are
+as
+at
+be
+but
+by
+for
+if
+in
+into
+is
+it
+no
+not
+of
+on
+or
+such
+that
+the
+their
+then
+there
+these
+they
+this
+to
+was
+will
+with
