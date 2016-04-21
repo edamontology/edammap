@@ -60,11 +60,11 @@ public class Mapping {
 		if (!branches.contains(branch)) {
 			//
 		}
-		int size = matches.get(branch).size();
-		if (size == 0) {
-			return 0;
+		List<Match> matchesBranch = matches.get(branch);
+		if (matchesBranch.size() == matchesTop && matchesTop > 0) {
+			return matchesBranch.get(matchesBranch.size() - 1).getScore();
 		} else {
-			return matches.get(branch).get(size - 1).getScore();
+			return 0;
 		}
 	}
 

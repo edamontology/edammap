@@ -252,10 +252,10 @@ public class Mapper {
 						bestMatch = getMatch(query.getQuery(), queryPP, edamUri, concept, conceptPP, lastMatchScore, bestMatch, MatchType.broad_synonym, i);
 					}
 				}
-				if (args.algo().getDefinitionMultiplier() > 0) {
+				if (args.algo().getDefinitionMultiplier() > 0 && !concept.getDefinition().isEmpty()) {
 					bestMatch = getMatch(query.getQuery(), queryPP, edamUri, concept, conceptPP, lastMatchScore, bestMatch, MatchType.definition);
 				}
-				if (args.algo().getCommentMultiplier() > 0) {
+				if (args.algo().getCommentMultiplier() > 0 && !concept.getComment().isEmpty()) {
 					bestMatch = getMatch(query.getQuery(), queryPP, edamUri, concept, conceptPP, lastMatchScore, bestMatch, MatchType.comment);
 				}
 

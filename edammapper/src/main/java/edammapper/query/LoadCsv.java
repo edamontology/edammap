@@ -44,7 +44,9 @@ public class LoadCsv {
 
 	private static Query csv(CsvRecord csvRecord) {
 		Set<EdamUri> matches = new LinkedHashSet<>();
-		matches.addAll(edamUris(csvRecord.getMatches()));
+		if (csvRecord.getMatches() != null) {
+			matches.addAll(edamUris(csvRecord.getMatches()));
+		}
 		return new Query(csvRecord.getQuery(), csvRecord.getUrl(), matches);
 	}
 
