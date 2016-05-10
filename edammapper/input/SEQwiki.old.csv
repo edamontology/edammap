@@ -1,4 +1,4 @@
-"query","url","matches"
+"name","webpageUrls","annotations"
 "Alignment","http://seqanswers.com/wiki/Alignment","http://edamontology.org/topic_0083|http://edamontology.org/operation_0292"
 "ChIP-Seq","http://seqanswers.com/wiki/ChIP-Seq","http://edamontology.org/topic_3169"
 "Alignment Analysis","http://seqanswers.com/wiki/Alignment_Analysis","http://edamontology.org/operation_0258"
