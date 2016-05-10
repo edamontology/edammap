@@ -5,9 +5,9 @@ import java.util.List;
 
 public class Concept {
 
-	private String label = "";
-
 	private boolean obsolete = false;
+
+	private String label = ""; // TODO set to null ?
 
 	private List<String> exactSynonyms = new ArrayList<>();
 	private List<String> narrowSynonyms = new ArrayList<>();
@@ -16,18 +16,18 @@ public class Concept {
 	private String definition = "";
 	private String comment = "";
 
-	public String getLabel() {
-		return label;
-	}
-	public void setLabel(String label) {
-		this.label = label;
-	}
-
 	public boolean isObsolete() {
 		return obsolete;
 	}
 	public void setObsolete(boolean obsolete) {
 		this.obsolete = obsolete;
+	}
+
+	public String getLabel() {
+		return label;
+	}
+	public void setLabel(String label) {
+		this.label = label;
 	}
 
 	public List<String> getExactSynonyms() {

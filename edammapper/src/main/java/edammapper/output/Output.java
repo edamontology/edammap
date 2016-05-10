@@ -9,15 +9,16 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
-import edammapper.args.Args;
+import edammapper.args.MainArgs;
 import edammapper.edam.Concept;
 import edammapper.edam.EdamUri;
+import edammapper.fetching.Publication;
 import edammapper.mapping.Mapping;
 import edammapper.query.Query;
 
 public class Output {
 
-	private Args args;
+	private MainArgs args;
 
 	private Path output;
 
@@ -25,7 +26,7 @@ public class Output {
 
 	private Path benchmarkReport;
 
-	public Output(Args args) throws AccessDeniedException, FileAlreadyExistsException {
+	public Output(MainArgs args) throws AccessDeniedException, FileAlreadyExistsException {
 		this.args = args;
 
 		this.output = check(args.getOutput());
@@ -51,9 +52,9 @@ public class Output {
 		}
 	}
 
-	public void output(Map<EdamUri, Concept> concepts, List<Query> queries, List<Mapping> mappings) throws IOException {
-		Txt.output(args.getType(), output, concepts, queries, mappings);
-		Html.output(args, report, concepts, queries, mappings);
-		Benchmark.output(args, benchmarkReport, concepts, queries, mappings);
+	public void output(Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publications, List<Mapping> mappings) throws IOException {
+		Txt.output(args.getType(), output, concepts, queries, publications, mappings);
+		Html.output(args, report, concepts, queries, publications, mappings);
+		Benchmark.output(args, benchmarkReport, concepts, queries, publications, mappings);
 	}
 }

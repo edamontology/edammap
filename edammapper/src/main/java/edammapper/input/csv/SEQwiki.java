@@ -1,10 +1,12 @@
-package edammapper.query;
+package edammapper.input.csv;
 
 import java.text.ParseException;
 
 import com.opencsv.bean.CsvBind;
 
-public class CsvSEQwiki implements InputRecord {
+import edammapper.input.Input;
+
+public class SEQwiki implements Input {
 
 	@CsvBind(required = true)
 	private String name;
@@ -33,6 +35,7 @@ public class CsvSEQwiki implements InputRecord {
 	@CsvBind
 	private String os;
 
+	@Override
 	public void check(int i) throws ParseException {
 		if (name == null || name.equals("")) {
 			throw new ParseException("\"Name\" column missing or some entry in that column missing! (" + i + ")", i);

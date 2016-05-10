@@ -11,8 +11,6 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.search.EntitySearcher;
 
-import edammapper.preprocessing.PreProcessor;
-
 public class Edam {
 	public static Map<EdamUri, Concept> load(String edamPath) throws OWLOntologyCreationException {
 
@@ -50,13 +48,5 @@ public class Edam {
 				(u, v) -> { throw new IllegalStateException(String.format("Duplicate key %s", u)); },
 				LinkedHashMap::new
 			));
-	}
-
-	public static Map<EdamUri, ConceptPP> process(Map<EdamUri, Concept> concepts, PreProcessor pp) {
-		Map<EdamUri, ConceptPP> conceptsPP = new LinkedHashMap<>();
-		concepts.forEach((e, c) -> {
-			conceptsPP.put(e, new ConceptPP(c, pp));
-		});
-		return conceptsPP;
 	}
 }

@@ -1,9 +1,7 @@
-package edammapper.args;
+package edammapper.preprocessing;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.validators.PositiveInteger;
-
-import edammapper.preprocessing.Stopwords;
 
 public class PreProcessorArgs {
 	@Parameter(names = { "--remove-numbers" }, description = "Remove freestanding numbers (i.e., that not part of a word) as part of preprocessing")

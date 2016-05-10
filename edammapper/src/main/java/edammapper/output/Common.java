@@ -4,34 +4,36 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-import edammapper.args.Args;
+import edammapper.args.MainArgs;
 import edammapper.edam.Concept;
 import edammapper.edam.EdamUri;
+import edammapper.fetching.Fetcher;
+import edammapper.fetching.MeshTerm;
+import edammapper.fetching.MinedTerm;
+import edammapper.fetching.Publication;
+import edammapper.mapping.ConceptMatchType;
+import edammapper.mapping.MapperArgs;
 import edammapper.mapping.Match;
-import edammapper.mapping.MatchConfidence;
-import edammapper.mapping.MatchType;
-import edammapper.query.IOType;
+import edammapper.mapping.QueryMatchType;
+import edammapper.query.Keyword;
 import edammapper.query.Query;
-import edammapper.query.QueryMsutils;
-import edammapper.query.QuerySEQwiki;
-import edammapper.query.QuerySEQwikiTags;
-import edammapper.query.QuerySEQwikiTool;
 
 class Common {
 
-	private static final String SEQWIKI = "http://seqanswers.com/wiki/";
-
-	static String matchString(Match match, Concept concept) {
-		switch (match.getMatchType()) {
+	static String conceptMatchString(Match match, Concept concept) {
+		switch (match.getConceptMatch().getType()) {
 			case label: return concept.getLabel();
-			case exact_synonym: return concept.getExactSynonyms().get(match.getSynonymIndex());
-			case narrow_synonym: return concept.getNarrowSynonyms().get(match.getSynonymIndex());
-			case broad_synonym: return concept.getBroadSynonyms().get(match.getSynonymIndex());
+			case exact_synonym: return concept.getExactSynonyms().get(match.getConceptMatch().getSynonymIndex());
+			case narrow_synonym: return concept.getNarrowSynonyms().get(match.getConceptMatch().getSynonymIndex());
+			case broad_synonym: return concept.getBroadSynonyms().get(match.getConceptMatch().getSynonymIndex());
 			case definition: return concept.getDefinition();
 			case comment: return concept.getComment();
 			default: return "";
@@ -39,7 +41,16 @@ class Common {
 	}
 
 	private static double averageArray(double[] a) {
-		return Arrays.stream(a).average().orElse(0);
+		//return Arrays.stream(a).average().orElse(0);
+		double numerator = 0, denominator = 0;
+		for (double e : a) {
+			if (!Double.isNaN(e)) {
+				numerator += e;
+				++denominator;
+			}
+		}
+		if (denominator > 0) return numerator / denominator;
+		else return 0;
 	}
 
 	private static String percent(double val) {
@@ -92,6 +103,18 @@ class Common {
 		writer.write("] (" + percent(averageArray(a)) + ")</dd>");
 	}
 
+	// TODO temp
+	static void writeVal(double[] a) {
+		System.err.print("[");
+		for (int i = 0; i < a.length; ++i) {
+			System.err.print(percent(a[i]));
+			if (i < a.length - 1) {
+				System.err.print(", ");
+			}
+		}
+		System.err.println("] (" + percent(averageArray(a)) + ")");
+	}
+
 	private static void writeVarVal(Writer writer, String var, String val) throws IOException {
 		writeVar(writer, var);
 		writeVal(writer, val);
@@ -132,6 +155,42 @@ class Common {
 		writeVal(writer, a);
 	}
 
+	private static String getLinkHtml(String link) {
+		return "<a href=\"" + link + "\">" + link + "</a>";
+	}
+
+	private static String getPublicationLinkHtml(String publicationId) {
+		if (publicationId == null) return "";
+		if (Fetcher.isDoi(publicationId)) {
+			publicationId = Fetcher.normalizeDoi(publicationId);
+		}
+		String link = Fetcher.getPublicationLink(publicationId);
+		if (link == null) {
+			return publicationId;
+		} else {
+			return "<a href=\"" + link + "\">" + publicationId + "</a>";
+		}
+	}
+
+	private static String getMeshLinkHtml(MeshTerm mesh) {
+		String s = "";
+		String link = Fetcher.getMeshLink(mesh);
+		if (link != null) s += "<a href=\"" + link + "\">";
+		s += (mesh.getTerm() == null ? "NA" : mesh.getTerm());
+		if (link != null) s += "</a>";
+		return s;
+	}
+
+	private static String getMinedLinkHtml(MinedTerm mined) {
+		String s = "";
+		String link = Fetcher.getMinedLink(mined);
+		if (link != null) s += "<a href=\"" + link + "\">";
+		s += (mined.getTerm() == null ? "NA" : mined.getTerm());
+		if (link != null) s += "</a>";
+		if (mined.getCount() != 0) s += " <small>" + mined.getCount() + "</small>";
+		return s;
+	}
+
 	private static String getStyle() {
 		return
 		"a { text-decoration: none; color: black }\n" +
@@ -140,26 +199,27 @@ class Common {
 		"dt, dt a { color: blue }\n" +
 		"dt:after { content: \":\" }\n" +
 		"dd { margin-left: 13em; padding-left: 0.5em }\n" +
-		"table { border-collapse: separate; border-spacing: 0px 0px }\n" +
+		"table { border-collapse: separate; border-spacing: 0px 0px; table-layout: fixed; width: 100% }\n" +
 		"thead, tfoot { text-align: center; font-weight: bold }\n" +
 		"thead th { border-bottom: 2px solid black }\n" +
 		"tfoot td { border-top: 3px solid black }\n" +
+		"td { word-wrap: break-word }\n" +
 		"h3 { margin-top: 0 }\n" +
-		"h4 { margin-bottom: 0 }\n" +
-		".query td { border-top: 1px solid black; vertical-align: top }\n" +
+		"h4 { margin-bottom: 0; text-decoration: overline }\n" +
+		".query td { border-top: 1px solid black; vertical-align: top; padding-right: 1em; border-right: 1px dotted black }\n" +
 		".sep { height: 3em }\n" +
 		".sep td { border-bottom: 1px solid black }\n" +
 		".sep-branch { height: 1em }\n" +
-		".row td { border-top: 1px solid black }\n" +
+		".row td { border-top: 1px solid black; padding: 0.1em 0.2em }\n" +
 		".obsolete { text-decoration: line-through }\n" +
-		".topic td, .topic { background-color: rgba(222,184,135,0.5) } /* BurlyWood */\n" +
-		".topic:hover td, .topic:hover { background-color: rgba(222,184,135,1) } /* BurlyWood */\n" +
-		".operation td, .operation { background-color: rgba(211,211,211,0.5) } /* LightGray */\n" +
-		".operation:hover td, .operation:hover { background-color: rgba(211,211,211,1) } /* LightGray */\n" +
-		".data td, .data { background-color: rgba(135,206,235,0.5) } /* SkyBlue */\n" +
-		".data:hover td, .data:hover { background-color: rgba(135,206,235,1) } /* SkyBlue */\n" +
-		".format td, .format { background-color: rgba(216,191,216,0.5) } /* Thistle */\n" +
-		".format:hover td, .format:hover { background-color: rgba(216,191,216,1) } /* Thistle */\n" +
+		".topic td, .Domain { background-color: rgba(222,184,135,0.5) } /* BurlyWood */\n" +
+		".topic:hover td, .Domain:hover { background-color: rgba(222,184,135,1) } /* BurlyWood */\n" +
+		".operation td, .Method { background-color: rgba(211,211,211,0.5) } /* LightGray */\n" +
+		".operation:hover td, .Method:hover { background-color: rgba(211,211,211,1) } /* LightGray */\n" +
+		".data td { background-color: rgba(135,206,235,0.5) } /* SkyBlue */\n" +
+		".data:hover td { background-color: rgba(135,206,235,1) } /* SkyBlue */\n" +
+		".format td { background-color: rgba(216,191,216,0.5) } /* Thistle */\n" +
+		".format:hover td { background-color: rgba(216,191,216,1) } /* Thistle */\n" +
 		".type { text-align: center; color: #666 }\n" +
 		".score { text-align: right; font-weight: bold }\n" +
 		".good { color: green }\n" +
@@ -182,7 +242,7 @@ class Common {
 		"tr .fn, tr:hover .fn { background-color: red }\n";
 	}
 
-	static void writePreamble(boolean benchmark, Args args, Writer writer, Date date) throws IOException {
+	static void writePreamble(boolean benchmark, MainArgs args, Writer writer, Date date) throws IOException {
 		writer.write("<!DOCTYPE html>\n");
 		writer.write("<html>\n");
 		writer.write("\n");
@@ -224,15 +284,26 @@ class Common {
 		writeVarVal(writer, "Report file", (reportFile.isEmpty() ? "&nbsp;" : reportFile));
 		String benchmarkReportFile = new File(args.getBenchmarkReport()).getName();
 		writeVarVal(writer, "Benchmark report file", (benchmarkReportFile.isEmpty() ? "&nbsp;" : benchmarkReportFile));
+		writeVarVal(writer, "Number of threads", args.getThreads());
 		writer.write("</dl>\n");
 		writer.write("\n");
 
 		writer.write("<h2>Preprocessing</h2>\n");
 		writer.write("<dl>\n");
-		writeVarVal(writer, "Remove freestanding numbers", args.getPreProcessorArgs().isNumberRemove());
-		writeVarVal(writer, "Stopword list", args.getPreProcessorArgs().getStopwords().toString());
-		writeVarVal(writer, "Do stemming", !args.getPreProcessorArgs().isNoStemming());
-		writeVarVal(writer, "Remove tokens of length", args.getPreProcessorArgs().getShortWord());
+		writeVarVal(writer, "Remove freestanding numbers", args.getProcessorArgs().getPreProcessorArgs().isNumberRemove());
+		writeVarVal(writer, "Stopword list", args.getProcessorArgs().getPreProcessorArgs().getStopwords().toString());
+		writeVarVal(writer, "Do stemming", !args.getProcessorArgs().getPreProcessorArgs().isNoStemming());
+		writeVarVal(writer, "Remove tokens of length", args.getProcessorArgs().getPreProcessorArgs().getShortWord());
+		writer.write("</dl>\n");
+		writer.write("\n");
+
+		writer.write("<h2>Processing</h2>\n");
+		writer.write("<dl>\n");
+		writeVarVal(writer, "Fetching is disabled", args.getProcessorArgs().isFetchingDisabled());
+		String databaseFile = new File(args.getProcessorArgs().getDatabase()).getName();
+		writeVarVal(writer, "Database file", (databaseFile.isEmpty() ? "&nbsp;" : databaseFile));
+		String queryIdfFile = new File(args.getProcessorArgs().getQueryIdf()).getName();
+		writeVarVal(writer, "Query IDF file", (queryIdfFile.isEmpty() ? "&nbsp;" : queryIdfFile));
 		writer.write("</dl>\n");
 		writer.write("\n");
 
@@ -246,76 +317,210 @@ class Common {
 
 		writer.write("<h2>Mapping algorithm</h2>\n");
 		writer.write("<dl>\n");
-		writeVarVal(writer, "Compound words", args.getMapperArgs().algo().getCompoundWords());
-		writeVarVal(writer, "Mismatch multiplier", args.getMapperArgs().algo().getMismatchMultiplier());
-		writeVarVal(writer, "Position off by 1", args.getMapperArgs().algo().getPositionOffBy1());
-		writeVarVal(writer, "Position off by 2", args.getMapperArgs().algo().getPositionOffBy2());
-		writeVarVal(writer, "Position loss", args.getMapperArgs().algo().getPositionLoss());
-		writeVarVal(writer, "Concept weight", args.getMapperArgs().algo().getConceptWeight());
-		writeVarVal(writer, "Query weight", args.getMapperArgs().algo().getQueryWeight());
-		writeVarVal(writer, "Label multiplier", args.getMapperArgs().algo().getLabelMultiplier());
-		writeVarVal(writer, "Exact synonym multiplier", args.getMapperArgs().algo().getExactSynonymMultiplier());
-		writeVarVal(writer, "Narrow/Broad multiplier", args.getMapperArgs().algo().getNarrowBroadMultiplier());
-		writeVarVal(writer, "Definition multiplier", args.getMapperArgs().algo().getDefinitionMultiplier());
-		writeVarVal(writer, "Comment multiplier", args.getMapperArgs().algo().getCommentMultiplier());
+		writeVarVal(writer, "Compound words", args.getMapperArgs().getAlgorithmArgs().getCompoundWords());
+		writeVarVal(writer, "Mismatch multiplier", args.getMapperArgs().getAlgorithmArgs().getMismatchMultiplier());
+		writeVarVal(writer, "Match minimum", args.getMapperArgs().getAlgorithmArgs().getMatchMinimum());
+		writeVarVal(writer, "Position off by 1", args.getMapperArgs().getAlgorithmArgs().getPositionOffBy1());
+		writeVarVal(writer, "Position off by 2", args.getMapperArgs().getAlgorithmArgs().getPositionOffBy2());
+		writeVarVal(writer, "Position match scaling", args.getMapperArgs().getAlgorithmArgs().getPositionMatchScaling());
+		writeVarVal(writer, "Position loss", args.getMapperArgs().getAlgorithmArgs().getPositionLoss());
+		writeVarVal(writer, "Score scaling", args.getMapperArgs().getAlgorithmArgs().getScoreScaling());
+		writeVarVal(writer, "Concept weight", args.getMapperArgs().getAlgorithmArgs().getConceptWeight());
+		writeVarVal(writer, "Query weight", args.getMapperArgs().getAlgorithmArgs().getQueryWeight());
+		writeVarVal(writer, "Mapping strategy", args.getMapperArgs().getIdfMultiplierArgs().getMappingStrategy().toString());
+		writeVarVal(writer, "Average strategy scaling", args.getMapperArgs().getIdfMultiplierArgs().getAverageScaling());
+		writer.write("</dl>\n");
+		writer.write("\n");
+
+		writer.write("<h2>IDF</h2>\n");
+		writer.write("<dl>\n");
+		writeVarVal(writer, "Concept IDF scaling", args.getMapperArgs().getIdfMultiplierArgs().getConceptIdfScaling());
+		writeVarVal(writer, "Query IDF scaling", args.getMapperArgs().getIdfMultiplierArgs().getQueryIdfScaling());
+		writeVarVal(writer, "Enable label/synonyms IDF", args.getMapperArgs().getIdfMultiplierArgs().isEnableLabelSynonymsIdf());
+		writeVarVal(writer, "Disable name/keywords IDF", args.getMapperArgs().getIdfMultiplierArgs().isDisableNameKeywordsIdf());
+		writeVarVal(writer, "Disable description IDF", args.getMapperArgs().getIdfMultiplierArgs().isDisableDescriptionIdf());
+		writeVarVal(writer, "Disable title/keywords IDF", args.getMapperArgs().getIdfMultiplierArgs().isDisableTitleKeywordsIdf());
+		writeVarVal(writer, "Disable abstract IDF", args.getMapperArgs().getIdfMultiplierArgs().isDisableAbstractIdf());
+		writeVarVal(writer, "Disable query IDF branches", args.getMapperArgs().getIdfMultiplierArgs().getDisableQueryIdfBranches().toString());
+		writer.write("</dl>\n");
+		writer.write("\n");
+
+		writer.write("<h2>Concept multipliers</h2>\n");
+		writer.write("<dl>\n");
+		writeVarVal(writer, "Label multiplier", args.getMapperArgs().getIdfMultiplierArgs().getLabelMultiplier());
+		writeVarVal(writer, "Exact synonym multiplier", args.getMapperArgs().getIdfMultiplierArgs().getExactSynonymMultiplier());
+		writeVarVal(writer, "Narrow/Broad multiplier", args.getMapperArgs().getIdfMultiplierArgs().getNarrowBroadMultiplier());
+		writeVarVal(writer, "Definition multiplier", args.getMapperArgs().getIdfMultiplierArgs().getDefinitionMultiplier());
+		writeVarVal(writer, "Comment multiplier", args.getMapperArgs().getIdfMultiplierArgs().getCommentMultiplier());
+		writer.write("</dl>\n");
+		writer.write("\n");
+
+		writer.write("<h2>Query normalizers</h2>\n");
+		writer.write("<dl>\n");
+		writeVarVal(writer, "Name norm", args.getMapperArgs().getIdfMultiplierArgs().getNameNormalizer());
+		writeVarVal(writer, "Webpage norm", args.getMapperArgs().getIdfMultiplierArgs().getWebpageNormalizer());
+		writeVarVal(writer, "Description norm", args.getMapperArgs().getIdfMultiplierArgs().getDescriptionNormalizer());
+		writeVarVal(writer, "Keyword norm", args.getMapperArgs().getIdfMultiplierArgs().getKeywordNormalizer());
+		writeVarVal(writer, "Publication title norm", args.getMapperArgs().getIdfMultiplierArgs().getPublicationTitleNormalizer());
+		writeVarVal(writer, "Publication keyword norm", args.getMapperArgs().getIdfMultiplierArgs().getPublicationKeywordNormalizer());
+		writeVarVal(writer, "Publication MeSH norm", args.getMapperArgs().getIdfMultiplierArgs().getPublicationMeshNormalizer());
+		writeVarVal(writer, "Publication EFO/GO norm", args.getMapperArgs().getIdfMultiplierArgs().getPublicationMinedNormalizer());
+		writeVarVal(writer, "Publication abstract norm", args.getMapperArgs().getIdfMultiplierArgs().getPublicationAbstractNormalizer());
+		writeVarVal(writer, "Publication fulltext norm", args.getMapperArgs().getIdfMultiplierArgs().getPublicationFulltextNormalizer());
+		writeVarVal(writer, "Doc norm", args.getMapperArgs().getIdfMultiplierArgs().getDocNormalizer());
+		writer.write("</dl>\n");
+		writer.write("\n");
+
+		writer.write("<h2>Query weights</h2>\n");
+		writer.write("<dl>\n");
+		writeVarVal(writer, "Name weight", args.getMapperArgs().getIdfMultiplierArgs().getNameWeight());
+		writeVarVal(writer, "Webpage weight", args.getMapperArgs().getIdfMultiplierArgs().getWebpageWeight());
+		writeVarVal(writer, "Description weight", args.getMapperArgs().getIdfMultiplierArgs().getDescriptionWeight());
+		writeVarVal(writer, "Keyword weight", args.getMapperArgs().getIdfMultiplierArgs().getKeywordWeight());
+		writeVarVal(writer, "Publication title weight", args.getMapperArgs().getIdfMultiplierArgs().getPublicationTitleWeight());
+		writeVarVal(writer, "Publication keyword weight", args.getMapperArgs().getIdfMultiplierArgs().getPublicationKeywordWeight());
+		writeVarVal(writer, "Publication MeSH weight", args.getMapperArgs().getIdfMultiplierArgs().getPublicationMeshWeight());
+		writeVarVal(writer, "Publication EFO/GO weight", args.getMapperArgs().getIdfMultiplierArgs().getPublicationMinedWeight());
+		writeVarVal(writer, "Publication abstract weight", args.getMapperArgs().getIdfMultiplierArgs().getPublicationAbstractWeight());
+		writeVarVal(writer, "Publication fulltext weight", args.getMapperArgs().getIdfMultiplierArgs().getPublicationFulltextWeight());
+		writeVarVal(writer, "Doc weight", args.getMapperArgs().getIdfMultiplierArgs().getDocWeight());
+		writer.write("</dl>\n");
+		writer.write("\n");
+
+		writer.write("<h2>Score limits</h2>\n");
+		writer.write("<dl>\n");
+		writeVarVal(writer, "Good score for topic", args.getMapperArgs().getGoodScoreTopic());
+		writeVarVal(writer, "Good score for operation", args.getMapperArgs().getGoodScoreOperation());
+		writeVarVal(writer, "Good score for data", args.getMapperArgs().getGoodScoreData());
+		writeVarVal(writer, "Good score for format", args.getMapperArgs().getGoodScoreFormat());
+		writeVarVal(writer, "Bad score for topic", args.getMapperArgs().getBadScoreTopic());
+		writeVarVal(writer, "Bad score for operation", args.getMapperArgs().getBadScoreOperation());
+		writeVarVal(writer, "Bad score for data", args.getMapperArgs().getBadScoreData());
+		writeVarVal(writer, "Bad score for format", args.getMapperArgs().getBadScoreFormat());
 		writer.write("</dl>\n");
 		writer.write("\n");
 	}
 
-	static void writeQuery(Writer writer, Query query, int rowspan, IOType type) throws IOException {
+	static void writeQuery(Writer writer, Query query, List<Publication> publications, int rowspan) throws IOException {
 		writer.write("<tr class=\"query\">");
 		writer.write("<td rowspan=\"" + rowspan + "\">\n");
 
-		writer.write("<h3>");
-		if (type == IOType.SEQwikiTool) {
-			QuerySEQwikiTool querySEQwikiTool = (QuerySEQwikiTool)query;
-			writer.write("<a href=\"" + SEQWIKI + querySEQwikiTool.getName().replace(" ", "_") + "\">");
-			writer.write(querySEQwikiTool.getName());
-			writer.write("</a>");
-		} else if (type == IOType.SEQwiki) {
-			QuerySEQwiki querySEQwiki = (QuerySEQwiki)query;
-			writer.write("<a href=\"" + querySEQwiki.getUrl() + "\">");
-			writer.write(querySEQwiki.getName());
-			writer.write("</a>");
-		} else if (type == IOType.msutils) {
-			QueryMsutils queryMsutils = (QueryMsutils)query;
-			writer.write("<a href=\"" + queryMsutils.getUrl() + "\">");
-			writer.write(queryMsutils.getName());
-			writer.write("</a>");
-		} else {
-			boolean a = (query.getUrl() != null && !query.getUrl().isEmpty());
-			if (a) writer.write("<a href=\"" + query.getUrl() + "\">");
-			writer.write(query.getQuery());
-			if (a) writer.write("</a>");
-		}
-		writer.write("</h3>\n");
+		if (query.getName() != null || (query.getWebpageUrls() != null && !query.getWebpageUrls().isEmpty())) {
+			writer.write("<h3>");
 
-		if (type == IOType.SEQwikiTags || type == IOType.SEQwikiTool) {
-			QuerySEQwikiTags querySEQwikiTags = (QuerySEQwikiTags)query;
-			switch (querySEQwikiTags.getBranch()) {
-				case domain: writer.write("<h4><span class=\"topic\">Domain</span></h4>\n"); break;
-				case method: writer.write("<h4><span class=\"operation\">Method</span></h4>\n"); break;
+			String webpageUrl = null;
+			if (query.getWebpageUrls() != null && !query.getWebpageUrls().isEmpty()) {
+				webpageUrl = query.getWebpageUrls().get(0);
 			}
-			if (type == IOType.SEQwikiTool) {
-				writer.write("<span>");
-				writer.write("<a href=\"" + SEQWIKI + querySEQwikiTags.getQuery().replace(" ", "_") + "\">");
-				writer.write(querySEQwikiTags.getQuery());
+
+			if (webpageUrl != null) {
+				writer.write("<a href=\"" + webpageUrl + "\">");
+			}
+
+			if (query.getName() != null) {
+				writer.write(query.getName());
+			} else if (webpageUrl != null) {
+				writer.write(webpageUrl);
+			}
+
+			if (webpageUrl != null) {
 				writer.write("</a>");
-				writer.write("</span>\n");
 			}
-		} else if (type == IOType.SEQwiki) {
-			QuerySEQwiki querySEQwiki = (QuerySEQwiki)query;
-			writer.write("<p>" + querySEQwiki.getQuery() + "</p>\n");
-			writer.write("<h4><span class=\"topic\">Domain</span></h4>\n");
-			writer.write("<span>");
-			writer.write(querySEQwiki.getDomains().stream().map(s -> "<a href=\"" + SEQWIKI + s.replace(" ", "_") + "\">" + s + "</a>").collect(Collectors.joining(", ")));
-			writer.write("</span>\n");
-			writer.write("<h4><span class=\"operation\">Method</span></h4>\n");
-			writer.write("<span>");
-			writer.write(querySEQwiki.getMethods().stream().map(s -> "<a href=\"" + SEQWIKI + s.replace(" ", "_") + "\">" + s + "</a>").collect(Collectors.joining(", ")));
-			writer.write("</span>\n");
-		} else if (type == IOType.msutils) {
-			writer.write("<p>" + query.getQuery() + "</p>\n");
+
+			writer.write("</h3>\n");
+
+			if (query.getWebpageUrls() != null) {
+				for (int i = 1; i < query.getWebpageUrls().size(); ++i) {
+					webpageUrl = query.getWebpageUrls().get(i);
+					if (webpageUrl != null) {
+						writer.write(getLinkHtml(webpageUrl) + "<br>\n");
+					}
+				}
+			}
+
+			// TODO if zero webpages, write "No homepage" (but sometimes we don't actually want any homepages ?)
+		}
+
+		if (query.getDescription() != null) {
+			writer.write("<p>" + query.getDescription().replaceAll("\n", "<br>\n").replaceAll("<br>\n<br>\n", "</p>\n<p>") + "</p>\n");
+		}
+
+		if (query.getKeywords() != null && !query.getKeywords().isEmpty()) {
+			Map<String, List<Keyword>> keywords = new LinkedHashMap<>();
+			for (Keyword keyword : query.getKeywords()) {
+				if (keywords.get(keyword.getType()) == null) {
+					keywords.put(keyword.getType(), new ArrayList<>());
+				}
+				keywords.get(keyword.getType()).add(keyword);
+			}
+			for (Map.Entry<String, List<Keyword>> entry : keywords.entrySet()) {
+				writer.write("<h4><span class=\"" + entry.getKey() + "\">" + entry.getKey() + "</span></h4>\n");
+				writer.write(entry.getValue().stream()
+					.map(k -> {
+						if (k.getUrl() != null) {
+							return "<a href=\"" + k.getUrl() + "\">" + k.getValue() + "</a>";
+						} else {
+							return k.getValue();
+						}
+					}).collect(Collectors.joining("; ")));
+			}
+			writer.write("\n");
+		}
+
+		for (int i = 0; i < publications.size(); ++i) {
+			Publication publication = publications.get(i);
+			if (publication == null) continue;
+
+			writer.write("<h4>Publication ");
+			writer.write(getPublicationLinkHtml(query.getPublicationIds().get(i))); // TODO why can't be out of bounds ?
+			writer.write("</h4>\n");
+
+			writer.write("<p><strong>Title:</strong> " + publication.getTitle() + "<p>\n");
+
+			if (!publication.getKeywords().isEmpty()) {
+				writer.write("<p><strong>Keywords:</strong> ");
+				writer.write(publication.getKeywords().stream().collect(Collectors.joining("; ")));
+				writer.write("</p>\n");
+			}
+
+			if (!publication.getMeshTerms().isEmpty()) {
+				writer.write("<p><strong>MeSH terms:</strong> ");
+				writer.write(publication.getMeshTerms().stream()
+					.map(t -> getMeshLinkHtml(t))
+					.collect(Collectors.joining("; ")));
+				writer.write("</p>\n");
+			}
+
+			if (!publication.getEfoTerms().isEmpty()) {
+				writer.write("<p><strong>EFO terms:</strong> ");
+				writer.write(publication.getEfoTerms().stream()
+					.map(t -> getMinedLinkHtml(t))
+					.collect(Collectors.joining("; ")));
+				writer.write("</p>\n");
+			}
+
+			if (!publication.getGoTerms().isEmpty()) {
+				writer.write("<p><strong>GO terms:</strong> ");
+				writer.write(publication.getGoTerms().stream()
+					.map(t -> getMinedLinkHtml(t))
+					.collect(Collectors.joining("; ")));
+				writer.write("</p>\n");
+			}
+
+			if (!publication.getAbstract().isEmpty()) {
+				writer.write("<p>" + publication.getAbstract().replaceAll("\n", "<br>\n").replaceAll("<br>\n<br>\n", "</p>\n<p>") + "</p>\n");
+			}
+
+			if (!publication.getFulltext().isEmpty()) {
+				writer.write("<p><strong>Full text present</strong> (" + publication.getFulltext().length() + " characters)</p>\n");
+			}
+		}
+
+		if (query.getDocUrls() != null && !query.getDocUrls().isEmpty()) {
+			writer.write("<h4>Docs</h4>\n");
+			for (String docUrl : query.getDocUrls()) {
+				writer.write(getLinkHtml(docUrl) + "<br>\n");
+			}
 		}
 
 		writer.write("</td></tr>\n\n");
@@ -323,36 +528,113 @@ class Common {
 
 	static void writeTr(Writer writer, EdamUri edamUri) throws IOException {
 		writer.write("<tr class=\"row " + edamUri.getBranch() + "\"");
-		writer.write(" title=\"" + edamUri.getBranch() + "_" + edamUri.getNr() + "\">\n");
+		writer.write(" title=\"" + edamUri.getBranch() + "_" + edamUri.getNrString() + "\">\n");
 	}
 
 	static void writeMatch(Writer writer, Match match, EdamUri edamUri, Concept concept, String clazz) throws IOException {
 		writer.write("<td class=\"" + clazz + "\"><a href=\"" + edamUri + "\"");
 		if (concept == null) {
-			writer.write(">" + edamUri); // error
+			writer.write(">" + edamUri); // TODO error
 		} else {
 			if (concept.isObsolete()) writer.write(" class=\"obsolete\"");
 			writer.write(">" + concept.getLabel());
-			if (match != null && match.getMatchType() != MatchType.label) {
-				writer.write(" (" + matchString(match, concept) + ")");
+			if (match != null && match.getConceptMatch().getType() != ConceptMatchType.label && match.getConceptMatch().getType() != ConceptMatchType.none) {
+				writer.write(" (" + conceptMatchString(match, concept) + ")");
 			}
 			writer.write("</a></td>\n");
 		}
 	}
 
 	static void writeMatchType(Writer writer, Match match) throws IOException {
-		writer.write("<td class=\"type\">" + match.getMatchType() + "</td>\n");
+		writer.write("<td class=\"type\">" + match.getConceptMatch().getType() + "</td>\n");
 	}
 
-	static void writeScore(Writer writer, Match match) throws IOException {
-		double score = match.getScore();
-		writer.write("<td class=\"score");
-		if (score > 2.0 / 3.0) writer.write(" good");
-		else if (score < 1.0 / 3.0) writer.write(" bad");
-		else writer.write(" medium");
-		if (match.getMatchConfidence() == MatchConfidence.exact) {
-			writer.write(" exact");
+	static void writeQueryMatch(Writer writer, Match match, Query query, List<Publication> publications) throws IOException {
+		writer.write("<td class=\"type\">");
+		QueryMatchType type = match.getQueryMatch().getType();
+		int index = match.getQueryMatch().getIndex();
+		String link = null;
+		if (match.getQueryMatch().getType() == QueryMatchType.webpage || match.getQueryMatch().getType() == QueryMatchType.doc) {
+			if (match.getQueryMatch().getType() == QueryMatchType.webpage) {
+				link = query.getWebpageUrls().get(index);
+			} else if (match.getQueryMatch().getType() == QueryMatchType.doc) {
+				link = query.getDocUrls().get(index);
+			}
+			if (link != null && !link.isEmpty()) {
+				writer.write("<a href=\"" + link + "\">");
+			}
 		}
-		writer.write("\">" + percent(score) + "</td>\n");
+		writer.write(match.getQueryMatch().getType().toString());
+		if (type == QueryMatchType.keyword) {
+			writer.write("<br>" + query.getKeywords().get(index).getValue());
+		}
+		if (publications != null && publications.size() > 1 &&
+			(type == QueryMatchType.publication_title ||
+			type == QueryMatchType.publication_keyword ||
+			type == QueryMatchType.publication_mesh ||
+			type == QueryMatchType.publication_efo ||
+			type == QueryMatchType.publication_go ||
+			type == QueryMatchType.publication_abstract ||
+			type == QueryMatchType.publication_fulltext)) {
+			writer.write("<br>" + getPublicationLinkHtml(query.getPublicationIds().get(index)));
+		}
+		if (type == QueryMatchType.publication_keyword ||
+			type == QueryMatchType.publication_mesh ||
+			type == QueryMatchType.publication_efo ||
+			type == QueryMatchType.publication_go) {
+			writer.write("<br>");
+			int indexInPublication = match.getQueryMatch().getIndexInPublication();
+			if (type == QueryMatchType.publication_keyword) {
+				writer.write(publications.get(index).getKeywords().get(indexInPublication));
+			} else if (type == QueryMatchType.publication_mesh) {
+				writer.write(getMeshLinkHtml(publications.get(index).getMeshTerms().get(indexInPublication)));
+			} else if (type == QueryMatchType.publication_efo) {
+				writer.write(getMinedLinkHtml(publications.get(index).getEfoTerms().get(indexInPublication)));
+			} else if (type == QueryMatchType.publication_go) {
+				writer.write(getMinedLinkHtml(publications.get(index).getGoTerms().get(indexInPublication)));
+			}
+		}
+		if (link != null && !link.isEmpty()) {
+			writer.write("</a>");
+		}
+		writer.write("</td>\n");
+	}
+
+	static void writeScore(Writer writer, Match match, MapperArgs args) throws IOException {
+		double bestOneScore;
+		if (match.getBestOneScore() > 0) {
+			bestOneScore = match.getBestOneScore();
+		} else {
+			bestOneScore = match.getScore();
+		}
+		writer.write("<td class=\"score");
+		double goodScore = 0;
+		double badScore = 0;
+		switch (match.getEdamUri().getBranch()) {
+		case topic:
+			goodScore = args.getGoodScoreTopic();
+			badScore = args.getBadScoreTopic();
+			break;
+		case operation:
+			goodScore = args.getGoodScoreOperation();
+			badScore = args.getBadScoreOperation();
+			break;
+		case data:
+			goodScore = args.getGoodScoreData();
+			badScore = args.getBadScoreData();
+			break;
+		case format:
+			goodScore = args.getGoodScoreFormat();
+			badScore = args.getBadScoreFormat();
+			break;
+		}
+		if (bestOneScore > goodScore) writer.write(" good");
+		else if (bestOneScore < badScore) writer.write(" bad");
+		else writer.write(" medium");
+		// TODO
+		//if (match.getMatchConfidence() == MatchConfidence.exact) {
+		//	writer.write(" exact");
+		//}
+		writer.write("\">" + percent(match.getScore()) + "</td>\n");
 	}
 }

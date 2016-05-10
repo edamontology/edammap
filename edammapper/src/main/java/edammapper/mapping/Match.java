@@ -4,51 +4,49 @@ import edammapper.edam.EdamUri;
 
 public class Match implements Comparable<Match> {
 
-	private final int queryLength;
-	private final int matchLength;
+	private double score;
 
-	private final EdamUri edamUri;
+	private double bestOneScore = 0;
 
-	private final MatchType matchType;
+	private final ConceptMatch conceptMatch;
 
-	private final int synonymIndex;
+	private final QueryMatch queryMatch;
 
-	private final MatchConfidence matchConfidence;
+	private EdamUri edamUri;
 
-	private final double score;
+	Match(double score, ConceptMatch conceptMatch, QueryMatch queryMatch) {
+		this.score = score;
+		this.conceptMatch = conceptMatch;
+		this.queryMatch = queryMatch;
+	}
 
-	public Match(int queryLength, int matchLength, EdamUri edamUri, MatchType matchType, int synonymIndex, MatchConfidence matchConfidence, double score) {
-		this.queryLength = queryLength;
-		this.matchLength = matchLength;
-		this.edamUri = edamUri;
-		this.matchType = matchType;
-		this.synonymIndex = synonymIndex;
-		this.matchConfidence = matchConfidence;
+	public double getScore() {
+		return score;
+	}
+	public void setScore(double score) {
 		this.score = score;
 	}
 
-	public Match(int queryLength, int matchLength, EdamUri edamUri, MatchType matchType, MatchConfidence matchConfidence, double score) {
-		this(queryLength, matchLength, edamUri, matchType, -1, matchConfidence, score);
+	public double getBestOneScore() {
+		return bestOneScore;
+	}
+	public void setBestOneScore(double bestOneScore) {
+		this.bestOneScore = bestOneScore;
+	}
+
+	public ConceptMatch getConceptMatch() {
+		return conceptMatch;
+	}
+
+	public QueryMatch getQueryMatch() {
+		return queryMatch;
 	}
 
 	public EdamUri getEdamUri() {
 		return edamUri;
 	}
-
-	public MatchType getMatchType() {
-		return matchType;
-	}
-
-	public int getSynonymIndex() {
-		return synonymIndex;
-	}
-
-	public MatchConfidence getMatchConfidence() {
-		return matchConfidence;
-	}
-
-	public double getScore() {
-		return score;
+	public void setEdamUri(EdamUri edamUri) {
+		this.edamUri = edamUri;
 	}
 
 	@Override
@@ -58,31 +56,32 @@ public class Match implements Comparable<Match> {
 		if (this.score > m.score) return 1;
 		if (this.score < m.score) return -1;
 
-		if (this.matchConfidence == MatchConfidence.exact && m.matchConfidence == MatchConfidence.inexact) return 1;
-		if (this.matchConfidence == MatchConfidence.inexact && m.matchConfidence == MatchConfidence.exact) return -1;
-
-		switch (this.matchType) {
+		switch (this.conceptMatch.getType()) {
 		case label:
-			if (m.matchType != MatchType.label) return 1;
+			if (m.conceptMatch.getType() != ConceptMatchType.label) return 1;
 			break;
 		case exact_synonym:
-			if (m.matchType == MatchType.label) return -1;
-			else if (m.matchType != MatchType.exact_synonym) return 1;
+			if (m.conceptMatch.getType() == ConceptMatchType.label) return -1;
+			else if (m.conceptMatch.getType() != ConceptMatchType.exact_synonym) return 1;
 			break;
 		case narrow_synonym:
 		case broad_synonym:
-			if (m.matchType == MatchType.label || m.matchType == MatchType.exact_synonym) return -1;
-			else if (m.matchType == MatchType.definition || m.matchType == MatchType.comment) return 1;
+			if (m.conceptMatch.getType() == ConceptMatchType.label || m.conceptMatch.getType() == ConceptMatchType.exact_synonym) return -1;
+			else if (m.conceptMatch.getType() == ConceptMatchType.definition || m.conceptMatch.getType() == ConceptMatchType.comment || m.conceptMatch.getType() == ConceptMatchType.none) return 1;
 			break;
 		case definition:
-			if (m.matchType == MatchType.comment) return 1;
-			else if (m.matchType != MatchType.definition) return -1;
+			if (m.conceptMatch.getType() == ConceptMatchType.comment || m.conceptMatch.getType() == ConceptMatchType.none) return 1;
+			else if (m.conceptMatch.getType() != ConceptMatchType.definition) return -1;
 			break;
 		case comment:
-			if (m.matchType != MatchType.comment) return -1;
+			if (m.conceptMatch.getType() == ConceptMatchType.none) return 1;
+			else if (m.conceptMatch.getType() != ConceptMatchType.comment) return -1;
+			break;
+		case none:
+			if (m.conceptMatch.getType() != ConceptMatchType.none) return -1;
 			break;
 		}
 
-		return Math.abs(m.queryLength - m.matchLength) - Math.abs(this.queryLength - this.matchLength);
+		return 0;
 	}
 }

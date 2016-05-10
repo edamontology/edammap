@@ -1,10 +1,12 @@
-package edammapper.query;
+package edammapper.input.csv;
 
 import java.text.ParseException;
 
 import com.opencsv.bean.CsvBind;
 
-public class CsvMsutils implements InputRecord {
+import edammapper.input.Input;
+
+public class Msutils implements Input {
 
 	@CsvBind(required = true)
 	private String name;
@@ -54,6 +56,7 @@ public class CsvMsutils implements InputRecord {
 	@CsvBind
 	private String comment;
 
+	@Override
 	public void check(int i) throws ParseException {
 		if (name == null || name.equals("")) {
 			throw new ParseException("\"Name\" column missing or some entry in that column missing! (" + i + ")", i);
@@ -61,6 +64,7 @@ public class CsvMsutils implements InputRecord {
 		if (description == null || description.equals("")) {
 			throw new ParseException("\"Description\" column missing or some entry in that column missing! (" + i + ")", i);
 		}
+		// TODO isEdamUri ?
 	}
 
 	public String getName() {

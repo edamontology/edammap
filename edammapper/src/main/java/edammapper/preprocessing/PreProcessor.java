@@ -12,7 +12,6 @@ import java.util.MissingResourceException;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import edammapper.args.PreProcessorArgs;
 import edammapper.cots.Stemmer;
 
 public class PreProcessor {

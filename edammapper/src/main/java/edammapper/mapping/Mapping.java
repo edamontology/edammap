@@ -17,9 +17,9 @@ public class Mapping {
 
 	public Mapping(int matchesTop, List<Branch> branches) {
 		if (matchesTop < 0) {
-			//
+			// TODO
 		} else if (branches == null || branches.isEmpty()) {
-			//
+			// TODO
 		}
 
 		matches = new EnumMap<>(Branch.class);
@@ -56,6 +56,7 @@ public class Mapping {
 		return matches.get(branch).get(index);
 	}
 
+	// TODO needed ?
 	public double getLastMatchScore(Branch branch) {
 		if (!branches.contains(branch)) {
 			//

@@ -1,5 +1,7 @@
 package edammapper.edam;
 
+import java.util.Locale;
+
 public class EdamUri {
 
 	private String uri;
@@ -47,6 +49,10 @@ public class EdamUri {
 
 	public int getNr() {
 		return nr;
+	}
+
+	public String getNrString() {
+		return String.format(Locale.ROOT, "%04d", nr);
 	}
 
 	@Override

@@ -3,9 +3,11 @@ package edammapper.args;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParametersDelegate;
 
-import edammapper.query.IOType;
+import edammapper.mapping.MapperArgs;
+import edammapper.processing.ProcessorArgs;
+import edammapper.query.QueryType;
 
-public class Args {
+public class MainArgs {
 	@Parameter(names = { "-e", "--edam" }, required = true, description = "Path of the EDAM ontology file")
 	private String edam;
 
@@ -16,7 +18,7 @@ public class Args {
 	private boolean help;
 
 	@Parameter(names = { "-t", "--type" }, description = "Specifies the type of the query and how to output the results")
-	private IOType type = IOType.csv;
+	private QueryType type = QueryType.generic;
 
 	@Parameter(names = { "-o", "--output" }, description = "File to write results to. If not specified or invalid, will be written to standard output.")
 	private String output = "";
@@ -27,8 +29,11 @@ public class Args {
 	@Parameter(names = { "-k", "--benchmark-report" }, description = "File to write HTML benchmark report to. It will contain metrics and comparisons to the manual mapping specified in the input query file.")
 	private String benchmarkReport = "";
 
+	@Parameter(names = { "--threads" }, description = "How many threads to use for mapping (one query is processed by one thread)")
+	private int threads = 4;
+
 	@ParametersDelegate
-	private PreProcessorArgs preProcessorArgs = new PreProcessorArgs();
+	private ProcessorArgs processorArgs = new ProcessorArgs();
 
 	@ParametersDelegate
 	private MapperArgs mapperArgs = new MapperArgs();
@@ -45,7 +50,7 @@ public class Args {
 		return help;
 	}
 
-	public IOType getType() {
+	public QueryType getType() {
 		return type;
 	}
 
@@ -61,8 +66,12 @@ public class Args {
 		return benchmarkReport;
 	}
 
-	public PreProcessorArgs getPreProcessorArgs() {
-		return preProcessorArgs;
+	public int getThreads() {
+		return threads;
+	}
+
+	public ProcessorArgs getProcessorArgs() {
+		return processorArgs;
 	}
 
 	public MapperArgs getMapperArgs() {
