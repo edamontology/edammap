@@ -1,0 +1,521 @@
+# doi: site
+
+'1002': onlinelibrary.wiley.com
+'1110': onlinelibrary.wiley.com
+'1111': onlinelibrary.wiley.com
+'1006': www.sciencedirect.com
+'1016': www.sciencedirect.com
+'5936': www.sciencedirect.com
+'1007': link.springer.com
+'1385': link.springer.com
+'2165': link.springer.com
+'1017': ebooks.cambridge.org
+'1021': pubs.acs.org
+'1038': www.nature.com
+'1073': www.pnas.org
+'1074': www.mcponline.org
+'1080': www.tandfonline.com
+'1089': online.liebertpub.com
+'1093': oxfordjournals.org
+'1101': biorxiv.org_genome.cshlp.org
+'1107': iucr.org
+'1109': ieeexplore.ieee.org
+'1126': science.sciencemag.org
+'1145': dl.acm.org
+'1146': www.annualreviews.org
+'1155': www.hindawi.com
+'1186': biomedcentral.com
+'1261': rnajournal.cshlp.org
+'12688': f1000research.com
+'13140': www.researchgate.net
+'1371': journals.plos.org
+'1534': www.genetics.org
+'2174': www.eurekaselect.com
+'2390': biecoll.ub.uni-bielefeld.de
+'3233': content.iospress.com
+'3389': journal.frontiersin.org
+'3390': www.mdpi.com
+'3835': dl.sciencesocieties.org
+'4137': www.la-press.com
+'4172': www.omicsonline.org
+'4230': drops.dagstuhl.de
+'4236': file.scirp.org
+'5281': zenodo.org
+'6084': figshare.com
+'7150': www.jgenomics.com
+'7287': peerj.com
+'7717': peerj.com
+'1039': pubs.rsc.org
+'1099': mic.microbiologyresearch.org
+'1104': highwire # www.plantphysiol.org
+'1128': highwire # jcm.asm.org
+'1182': www.bloodjournal.org
+'3732': highwire # www.amjbot.org
+
+---
+
+# site:
+#   title:
+#   keywords:
+#   keywords_split:
+#   abstract:
+#   fulltext:
+#   fulltext_src:
+#   fulltext_dst:
+#   fulltext_a:
+#   pdf_src:
+#   pdf_dst:
+#   pdf_a:
+
+# For reference:
+# https://jsoup.org/apidocs/org/jsoup/select/Selector.html
+
+# check that selectors don't select text multiple times (for example, if p
+# inside p, then both outer p and duplicated inner p could be selected)
+
+# if fulltext_src + fulltext_dst or fulltext_a are specified, then fulltext
+# is only extracted on that separate page; otherwise the current page is used
+
+# fulltext will be title + abstract + fulltext; if title and abstract are to
+# be extracted differently on the separate page, then title and abstract have
+# to be specified in fulltext; otherwise, it's not necessary to repeat them
+
+# sometimes, pdf_a should be preferred over pdf_src + pdf_dst
+
+# pdf is in iframe
+onlinelibrary.wiley.com:
+  title:
+   '#articleTitle h1,
+    .article-header__title'
+  keywords:
+   '.keywordList li,
+    .article-info__keywords-item'
+  abstract: '#abstract p'
+  fulltext:
+   '#fulltext h3,
+    #fulltext h4,
+    #fulltext h5,
+    #fulltext p,
+    #fulltext .protocolSectionTitle,
+    .article-body-section h2,
+    .article-body-section h3,
+    .article-body-section h4,
+    .article-body-section p'
+  fulltext_src: /abstract
+  fulltext_dst: /full
+  pdf_src: /abstract
+  pdf_dst: /pdf
+
+# cut off at some point (only first few paragraphs of article fetched)
+# and first run might fail to fetch anything at all, so run twice
+www.sciencedirect.com:
+  title: .svTitle
+  keywords: .svKeywords span
+  abstract: .svAbstract p
+  fulltext: .svArticle
+  pdf_a: '#pdfLink'
+
+link.springer.com:
+  title: .MainTitleSection
+  keywords: .Keyword
+  abstract: .Abstract p
+  fulltext:
+   '#content .Heading,
+    #content .Para'
+  fulltext_src: /*$
+  fulltext_dst: /fulltext.html
+  pdf_src: /chapter/10\.(.+)$
+  pdf_dst: /content/pdf/10\.$1\.pdf
+
+ebooks.cambridge.org:
+  title: .module-book-detail header
+  keywords: .book-subject a
+  abstract: '#tabs-1 p'
+
+# pdf address correct, but not working
+pubs.acs.org:
+  title: .articleTitle
+  abstract: '#abstractBox p'
+  fulltext:
+   '.NLM_sec_level_1 h2,
+    .NLM_sec_level_1 div'
+  fulltext_src: /doi/abs/
+  fulltext_dst: /doi/full/
+  pdf_src: /doi/abs/
+  pdf_dst: /doi/pdf/
+
+# different versions, pdf not working for all
+www.nature.com:
+  title:
+   '#atl,
+    .article-heading,
+    article header h1'
+  keywords:
+   '.article-keywords a,
+    .subject-tag-link'
+  abstract:
+   '#abs p,
+    #first-paragraph p,
+    #abstract p,
+    #abstract-content p'
+  fulltext:
+   '#articlebody h3, #articlebody p,
+    .second p,
+    #introduction h2, #introduction p,
+    #main h2, #main p,
+    #results h2, #results p,
+    #discussion h2, #discussion p,
+    #methods h2, #methods p,
+    #introduction-section h2, #introduction-section p,
+    #main-section h2, #main-section p,
+    #results-section h2, #results-section p,
+    #discussion-section h2, #discussion-section p,
+    #methods-section h2, #methods-section p'
+  pdf_src: /full/(.*)\.html$
+  pdf_dst: /pdf/$1\.pdf
+
+www.pnas.org:
+  title: '#article-title-1'
+  keywords: .kwd
+  abstract: '#abstract-1 p'
+
+www.mcponline.org:
+  title: '#article-title-1'
+  abstract: '#abstract-1 p'
+  fulltext:
+   '.fulltext-view h2,
+    .fulltext-view h5,
+    .fulltext-view p'
+  fulltext_src: /*$
+  fulltext_dst: \.full
+  pdf_src: /*$
+  pdf_dst: \.full.pdf
+
+www.tandfonline.com:
+  title: .description h1
+  abstract: .abstract .paragraph
+  fulltext:
+   '#fulltextPanel h2,
+    #fulltextPanel h3,
+    #fulltextPanel .paragraph'
+  fulltext_src: /doi/abs/
+  fulltext_dst: /doi/full/
+  pdf_src: /doi/abs/
+  pdf_dst: /doi/pdf/
+
+online.liebertpub.com:
+  title: .artTitle
+  keywords: '[name=keyword] + label'
+  abstract: .abstractSection p
+  fulltext:
+   '.NLM_sec_level_1 h3,
+    .NLM_sec_level_1 .title2,
+    .NLM_sec_level_1 .title3,
+    .NLM_sec_level_1 p'
+  fulltext_src: /doi/abs/
+  fulltext_dst: /doi/full/
+  pdf_src: /doi/abs/
+  pdf_dst: /doi/pdf/
+
+oxfordjournals.org:
+  title: '#article-title-1'
+  keywords: .kwd
+  abstract: '#abstract-1 p'
+  fulltext:
+   '.fulltext-view h2,
+    .fulltext-view h3,
+    .fulltext-view h4,
+    .fulltext-view p'
+  fulltext_src: /*$
+  fulltext_dst: \.full
+  pdf_src: /*$
+  pdf_dst: \.full.pdf
+
+biorxiv.org_genome.cshlp.org:
+  title:
+   '#page-title,
+    #article-title-1'
+  abstract: '#abstract-1 p'
+  fulltext:
+   '.fulltext-view h2,
+    .fulltext-view h3,
+    .fulltext-view h4,
+    .fulltext-view p'
+  fulltext_src: /*$
+  fulltext_dst: \.full
+  pdf_src: /*$
+  pdf_dst: \.full.pdf
+
+# pdf also available
+iucr.org:
+  title: .ica_title h3
+  keywords: .kwdg a
+  abstract: .ica_abstract
+  fulltext:
+   '#atl h2, #abs p,
+    #body h3, #body h4, #body p'
+  fulltext_a: .ica_readmore a
+
+# title and abstract for fulltext not working
+# pdf in iframe
+ieeexplore.ieee.org:
+  title: .title h1
+  keywords: '#abstractKeywords li'
+  abstract: '#articleDetails p'
+  fulltext:
+   '#at-glance .text h1, #at-glance .text p,
+    #article h2, #article h3, #article p'
+  fulltext_src: /xpl/articleDetails.jsp\?
+  fulltext_dst: /xpls/icp.jsp\?
+  pdf_src: /xpl/articleDetails.jsp\?
+  pdf_dst: /stamp/stamp.jsp\?
+
+# abstract not working
+science.sciencemag.org:
+  title: .article__headline
+  abstract: .abstract-view p
+  fulltext:
+   '.fulltext-view h2,
+    .fulltext-view h3,
+    .fulltext-view p'
+  fulltext_src: /*$
+  fulltext_dst: \.full
+  pdf_src: /*$
+  pdf_dst: \.full-text.pdf
+
+# abstract and keywords not working
+dl.acm.org:
+  title: '#divmain h1'
+  keywords: '#chart_div a'
+  abstract: '#abstract p'
+  pdf_a: 'a[name=FullTextPDF]'
+
+# pdf address correct, but not working
+www.annualreviews.org:
+  title: .arttitle
+  abstract: .abstractSection p
+  fulltext:
+   '.NLM_sec_level_1 .headerTitle,
+    .NLM_sec_level_1 p'
+  pdf_src: /doi/
+  pdf_dst: /doi/pdf/
+
+www.hindawi.com:
+  title: .middle_content div h2
+  abstract: .middle_content div div .header + p
+  fulltext:
+   '.middle_content div div h4,
+    .middle_content div div h5,
+    .middle_content div div p'
+  pdf_src: //www\.(.*)/$
+  pdf_dst: //downloads\.$1\.pdf
+
+biomedcentral.com:
+  title: .ArticleTitle
+  abstract: .Abstract p
+  fulltext:
+   '#main-content .Main_content .Heading,
+    #main-content .Main_content .Para'
+  pdf_a: '#articlePdf'
+
+rnajournal.cshlp.org:
+  title: '#article-title-1'
+  keywords: .kwd
+  abstract: '#abstract-1 p'
+  fulltext:
+   '.fulltext-view h2,
+    .fulltext-view h3,
+    .fulltext-view h4,
+    .fulltext-view p'
+  fulltext_src: /*$
+  fulltext_dst: \.full
+  pdf_src: /*$
+  pdf_dst: \.full.pdf
+
+f1000research.com:
+  title: '#anchor-title'
+  abstract: .f1r-article-desk .article-abstract
+  fulltext:
+   '#article1-body h2,
+    #article1-body h3,
+    #article1-body p'
+  pdf_src: /*$
+  pdf_dst: /pdf
+
+www.researchgate.net:
+  title: .pub-title
+  abstract: .pub-abstract div div div
+  pdf_a: .pdf-js-header .right-side a
+
+journals.plos.org:
+  title: '#artTitle'
+  keywords: '#subjectList a'
+  abstract: .abstract p
+  fulltext:
+   '#artText h2,
+    #artText h3,
+    #artText p'
+  pdf_a: '#downloadPdf'
+
+# abstract not working
+www.genetics.org:
+  title: '#page-title'
+  abstract: '#abstract-1 p'
+  fulltext:
+   '.fulltext-view h2,
+    .fulltext-view h4,
+    .fulltext-view h5,
+    .fulltext-view p'
+  fulltext_src: /*$
+  fulltext_dst: \.full
+  pdf_src: /*$
+  pdf_dst: \.full.pdf
+
+www.eurekaselect.com:
+  title: .abstract_area > h4
+  keywords_split: .abstract_area > .well + p
+  abstract: .abstract_area > .well h4 ~ p
+
+biecoll.ub.uni-bielefeld.de:
+  title: .haupt br + b.p95
+  abstract: .haupt b.p80 + div.p80
+  pdf_a: .rahmendownload a
+
+content.iospress.com:
+  title: .article-header h1
+  keywords_split: .metadata-entry:matches((?i)^\s*keywords\s*:)
+  abstract: '#article1-front p'
+  pdf_src: /articles/(.*)$
+  pdf_dst: /download/$1?id=$1
+
+# pdf address correct, but not working
+journal.frontiersin.org:
+  title: .JournalAbstract h1
+  keywords_split: .AbstractSummary p:matches((?i)^\s*keywords\s*:)
+  abstract: .JournalAbstract p
+  fulltext:
+   '.JournalFullText h2,
+    .JournalFullText h3,
+    .JournalFullText p'
+  pdf_src: /full/*$
+  pdf_dst: /pdf
+
+www.mdpi.com:
+  title: '#abstract .art-title'
+  keywords: .art-keywords a
+  abstract: '#abstract .art-abstract'
+  fulltext:
+   '#html-article-title,
+    #html-abstract,
+    .html-body h2,
+    .html-body h4,
+    .html-body p'
+  fulltext_src: /*$
+  fulltext_dst: /htm
+  pdf_src: /*$
+  pdf_dst: /pdf
+
+dl.sciencesocieties.org:
+  title: '#article-title'
+  abstract: .abstract p
+  fulltext:
+   '#article h2,
+    #article h3,
+    #article p'
+  fulltext_src: /abstracts/
+  fulltext_dst: /articles/
+  pdf_src: /abstracts/
+  pdf_dst: /pdfs/
+
+www.la-press.com:
+  title: .articleviews_journal h2
+  abstract: .abstract strong ~ p
+  pdf_a: .downloadsSegmentLeft a
+
+# has keywords
+www.omicsonline.org:
+  title: .fulltext_h1heading
+  abstract: '#Abstract p'
+  fulltext: '#Full-Text td'
+  pdf_src: omicsonline.org/(.*)\.php\?aid=.*$
+  pdf_dst: omicsonline.org/pdfdownload.php\?download=$1\.pdf
+
+drops.dagstuhl.de:
+  title: '[itemprop=name]'
+  keywords: tr:matches((?i)^\s*keywords\s*:)
+  abstract: '[itemprop=about]'
+  pdf_a: '[href$=.pdf]'
+
+file.scirp.org:
+  # points directly to a pdf
+
+zenodo.org:
+  title: 'h1[itemprop=name]'
+  abstract:
+   '#authors_long + p ~ p,
+    #authors_long + p ~ ul li'
+
+figshare.com:
+  title: .title
+  keywords: .tags a
+  abstract: .description
+
+www.jgenomics.com:
+  title: .title
+  keywords_split: '#headingAa + p + p'
+  abstract: '#headingAa + p'
+  fulltext:
+   '#content_container h1,
+    #content_container p'
+
+peerj.com:
+  title: article header h1
+  keywords: .kwd
+  abstract: .abstract p
+  fulltext: main h2, main h3, main p
+  pdf_src: /*$
+  pdf_dst: \.pdf
+
+pubs.rsc.org:
+  title: .article_left_inner > div > h2
+  abstract: .abstract_new p
+  fulltext:
+   '.title_heading, .abstract,
+    #wrapper > h2, #wrapper > h3,
+    #wrapper > span, #wrapper > .otherpara,
+    #wrapper > table, #wrapper > .table_caption,
+    #wrapper > .image_table'
+  fulltext_src: /ArticleLanding/
+  fulltext_dst: /articlehtml/
+  pdf_src: /ArticleLanding/
+  pdf_dst: /articlepdf/
+
+mic.microbiologyresearch.org:
+  title: .article-metadata-container > h1
+  keywords: .article-keywords a
+  abstract: .meta-pub-desc p
+  pdf_a: .fulltext .pdf
+
+highwire:
+  title: '#article-title-1'
+  keywords: li.kwd
+  abstract: '#abstract-1 p'
+  fulltext:
+   '.fulltext-view > p,
+    .fulltext-view > .section > h2,
+    .fulltext-view > .section > p,
+    .fulltext-view .subsection > h3,
+    .fulltext-view .subsection > h4,
+    .fulltext-view .subsection > p,
+    .fulltext-view .subsection > .fig,
+    .fulltext-view .subsection > .table'
+  fulltext_src: /*$
+  fulltext_dst: \.full
+  pdf_src: /*$
+  pdf_dst: \.full.pdf
+
+# pdf not working
+www.bloodjournal.org:
+  title: .page-title h1
+  abstract: .fulltext-view > p, .fulltext-view > .fig p
+  pdf_a: .pdf-download-link a
