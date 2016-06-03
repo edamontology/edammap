@@ -53,37 +53,37 @@ public class MapperIdfMultiplierArgs {
 	@Parameter(names = { "--mapping-strategy" }, description = "Choose the best or take the average of query parts matches")
 	private MapperStrategy mappingStrategy = MapperStrategy.average;
 
-	@Parameter(names = { "--name-normalizer" }, validateWith = ZeroToOneDouble.class, description = "Score normalizer for matching a query name. Set to 0 to disable matching of names.")
+	@Parameter(names = { "--name-normaliser" }, validateWith = ZeroToOneDouble.class, description = "Score normaliser for matching a query name. Set to 0 to disable matching of names.")
 	private double nameNormalizer = 0.81;
 
-	@Parameter(names = { "--keyword-normalizer" }, validateWith = ZeroToOneDouble.class, description = "Score normalizer for matching a query keyword. Set to 0 to disable matching of keywords.")
+	@Parameter(names = { "--keyword-normaliser" }, validateWith = ZeroToOneDouble.class, description = "Score normaliser for matching a query keyword. Set to 0 to disable matching of keywords.")
 	private double keywordNormalizer = 0.77;
 
-	@Parameter(names = { "--description-normalizer" }, validateWith = ZeroToOneDouble.class, description = "Score normalizer for matching a query description. Set to 0 to disable matching of descriptions.")
+	@Parameter(names = { "--description-normaliser" }, validateWith = ZeroToOneDouble.class, description = "Score normaliser for matching a query description. Set to 0 to disable matching of descriptions.")
 	private double descriptionNormalizer = 0.92;
 
-	@Parameter(names = { "--publication-title-normalizer" }, validateWith = ZeroToOneDouble.class, description = "Score normalizer for matching a publication title. Set to 0 to disable matching of titles.")
+	@Parameter(names = { "--publication-title-normaliser" }, validateWith = ZeroToOneDouble.class, description = "Score normaliser for matching a publication title. Set to 0 to disable matching of titles.")
 	private double publicationTitleNormalizer = 0.91;
 
-	@Parameter(names = { "--publication-keyword-normalizer" }, validateWith = ZeroToOneDouble.class, description = "Score normalizer for matching a publication keyword. Set to 0 to disable matching of keywords.")
+	@Parameter(names = { "--publication-keyword-normaliser" }, validateWith = ZeroToOneDouble.class, description = "Score normaliser for matching a publication keyword. Set to 0 to disable matching of keywords.")
 	private double publicationKeywordNormalizer = 0.77;
 
-	@Parameter(names = { "--publication-mesh-normalizer" }, validateWith = ZeroToOneDouble.class, description = "Score normalizer for matching a publication MeSH term. Set to 0 to disable matching of MeSH terms.")
+	@Parameter(names = { "--publication-mesh-normaliser" }, validateWith = ZeroToOneDouble.class, description = "Score normaliser for matching a publication MeSH term. Set to 0 to disable matching of MeSH terms.")
 	private double publicationMeshNormalizer = 0.75;
 
-	@Parameter(names = { "--publication-mined-term-normalizer" }, validateWith = ZeroToOneDouble.class, description = "Score normalizer for matching a publication mined term (EFO, GO). Set to 0 to disable matching of mined terms.")
+	@Parameter(names = { "--publication-mined-term-normaliser" }, validateWith = ZeroToOneDouble.class, description = "Score normaliser for matching a publication mined term (EFO, GO). Set to 0 to disable matching of mined terms.")
 	private double publicationMinedNormalizer = 1;
 
-	@Parameter(names = { "--publication-abstract-normalizer" }, validateWith = ZeroToOneDouble.class, description = "Score normalizer for matching a publication abstract. Set to 0 to disable matching of abstracts.")
+	@Parameter(names = { "--publication-abstract-normaliser" }, validateWith = ZeroToOneDouble.class, description = "Score normaliser for matching a publication abstract. Set to 0 to disable matching of abstracts.")
 	private double publicationAbstractNormalizer = 0.985;
 
-	@Parameter(names = { "--publication-fulltext-normalizer" }, validateWith = ZeroToOneDouble.class, description = "Score normalizer for matching a publication fulltext. Set to 0 to disable matching of fulltexts.")
+	@Parameter(names = { "--publication-fulltext-normaliser" }, validateWith = ZeroToOneDouble.class, description = "Score normaliser for matching a publication fulltext. Set to 0 to disable matching of fulltexts.")
 	private double publicationFulltextNormalizer = 1;
 
-	@Parameter(names = { "--doc-normalizer" }, validateWith = ZeroToOneDouble.class, description = "Score normalizer for matching a query doc. Set to 0 to disable matching of docs.")
+	@Parameter(names = { "--doc-normaliser" }, validateWith = ZeroToOneDouble.class, description = "Score normaliser for matching a query doc. Set to 0 to disable matching of docs.")
 	private double docNormalizer = 1;
 
-	@Parameter(names = { "--webpage-normalizer" }, validateWith = ZeroToOneDouble.class, description = "Score normalizer for matching a query webpage. Set to 0 to disable matching of webpages.")
+	@Parameter(names = { "--webpage-normaliser" }, validateWith = ZeroToOneDouble.class, description = "Score normaliser for matching a query webpage. Set to 0 to disable matching of webpages.")
 	private double webpageNormalizer = 1;
 
 	@Parameter(names = { "--average-scaling" }, validateWith = PositiveDouble.class, description = "Scaling for the average strategy")

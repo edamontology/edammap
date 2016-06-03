@@ -25,7 +25,7 @@ public class MapperAlgorithmArgs {
 	@Parameter(names = { "--position-match-scaling" }, validateWith = PositiveDouble.class, description = "Set to 0 to not have match score of neighbor influence position score. Setting to 1 means linear influence.")
 	private double positionMatchScaling = 0.5;
 
-	@Parameter(names = { "--position-loss" }, validateWith = ZeroToOneDouble.class, description = "Maximum loss, given as fraction of score, caused by wrong positions of matched words")
+	@Parameter(names = { "--position-loss" }, validateWith = ZeroToOneDouble.class, description = "Maximum loss caused by wrong positions of matched words")
 	private double positionLoss = 0.4;
 
 	@Parameter(names = { "--score-scaling" }, validateWith = PositiveDouble.class, description = "Score is scaled before appyling multiplier and weighting with other direction match. Setting to 0 or 1 means no scaling.")

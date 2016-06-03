@@ -112,8 +112,6 @@ public class Mapper {
 	}
 
 	private void scorePosition(double[] bestPositionScores, int to, int from, List<M> matches, int index, double[] positionOffScores, double positionMatchScaling, double matchMinimum) {
-		M match = matches.get(index);
-
 		for (int i = index - 1; i >= 0; --i) {
 			M matcho = matches.get(i);
 
@@ -132,7 +130,7 @@ public class Mapper {
 				double score = positionOffScores[positionOff];
 
 				if (matchMinimum < 1 && positionMatchScaling > 0) {
-					score *= Math.pow(match.score, positionMatchScaling);
+					score *= Math.pow(matcho.score, positionMatchScaling);
 				}
 
 				scorePositionIfBest(bestPositionScores, score);
@@ -157,7 +155,7 @@ public class Mapper {
 				double score = positionOffScores[positionOff];
 
 				if (matchMinimum < 1 && positionMatchScaling > 0) {
-					score *= Math.pow(match.score, positionMatchScaling);
+					score *= Math.pow(matcho.score, positionMatchScaling);
 				}
 
 				scorePositionIfBest(bestPositionScores, score);
@@ -192,7 +190,7 @@ public class Mapper {
 				bestPositionScores[1] = 0;
 			}
 
-			if (tos.size() > 1) {
+			if (tos.size() > 1 && args.getPositionLoss() > 0) {
 				scorePosition(bestPositionScores, match.to, match.from, matches, i, positionOffScores, args.getPositionMatchScaling(), args.getMatchMinimum());
 			}
 
@@ -204,6 +202,9 @@ public class Mapper {
 			}
 
 			double score = match.score - args.getPositionLoss() * (1 - bestPositionScore);
+			if (score < 0) {
+				score = 0;
+			}
 			if (fromIdfScaling > 0) {
 				score *= Math.pow(fromIdfs.get(match.from), fromIdfScaling);
 			}

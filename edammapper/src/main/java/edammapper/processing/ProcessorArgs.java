@@ -6,13 +6,13 @@ import com.beust.jcommander.ParametersDelegate;
 import edammapper.preprocessing.PreProcessorArgs;
 
 public class ProcessorArgs {
-	@Parameter(names = { "--fetching-disabled" }, description = "")
+	@Parameter(names = { "--fetching-disabled" }, description = "Disable fetching of webpages, publications and docs")
 	private boolean fetchingDisabled = false;
 
-	@Parameter(names = { "-d", "--database" }, description = "")
+	@Parameter(names = { "-d", "--database" }, description = "Use the given database for getting and storing webpages, publications and docs")
 	private String database = "";
 
-	@Parameter(names = { "--query-idf" }, description = "")
+	@Parameter(names = { "--query-idf" }, description = "Use the given query IDF file; if not specified, weighting of queries with IDF scores will be disabled")
 	private String queryIdf = "";
 
 	@ParametersDelegate
