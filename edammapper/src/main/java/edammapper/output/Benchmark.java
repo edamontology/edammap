@@ -294,23 +294,40 @@ class Benchmark {
 		Common.writeVal(AveP);
 
 		writer.write("<h2>Table</h2>\n");
+		Common.writeLegend(writer, args.getMapperArgs());
 		writer.write("<table>\n");
 		writer.write("\n");
 		writer.write("<colgroup>\n");
 
-		// TODO look more than just the first entry (which might be missing publications for example)
-		if (!queries.isEmpty() && queries.get(0).getPublicationIds() != null && !queries.get(0).getPublicationIds().isEmpty() && !queries.get(0).getPublicationIds().get(0).trim().isEmpty()) {
-			writer.write("<col style=\"width:45%\">\n");
+		boolean publicationPresent = false;
+		boolean descriptionPresent = false;
+		for (Query query : queries) {
+			if (query.getPublicationIds() != null) {
+				for (String publicationId : query.getPublicationIds()) {
+					if (!publicationId.trim().isEmpty()) {
+						publicationPresent = true;
+					}
+				}
+			}
+			if (publicationPresent) break;
+			if (query.getDescription() != null) {
+				if (!query.getDescription().trim().isEmpty()) {
+					descriptionPresent = true;
+				}
+			}
+		}
+		if (publicationPresent) {
+			writer.write("<col style=\"width:43%\">\n");
 			writer.write("<col style=\"width:10%\">\n");
 			writer.write("<col style=\"width:10%\">\n");
 			writer.write("<col style=\"width:10%\">\n");
-		} else if (!queries.isEmpty() && queries.get(0).getDescription() != null && !queries.get(0).getDescription().isEmpty()) {
-			writer.write("<col style=\"width:27%\">\n");
+		} else if (descriptionPresent) {
+			writer.write("<col style=\"width:25%\">\n");
 			writer.write("<col style=\"width:16%\">\n");
 			writer.write("<col style=\"width:16%\">\n");
 			writer.write("<col style=\"width:16%\">\n");
 		} else {
-			writer.write("<col style=\"width:21%\">\n");
+			writer.write("<col style=\"width:19%\">\n");
 			writer.write("<col style=\"width:18%\">\n");
 			writer.write("<col style=\"width:18%\">\n");
 			writer.write("<col style=\"width:18%\">\n");
@@ -319,34 +336,37 @@ class Benchmark {
 		writer.write("<col style=\"width:10%\">\n");
 		writer.write("<col style=\"width:10%\">\n");
 		writer.write("<col style=\"width:5%\">\n");
+		writer.write("<col style=\"width:2%\">\n");
 		writer.write("</colgroup>\n");
 		writer.write("\n");
 
 		writer.write("<thead>\n<tr>\n");
-		writer.write("<th>Query</th>\n<th>TP</th>\n<th>FP</th>\n<th>FN</th>\n<th>Match Type</th>\n<th>Query Match</th>\n<th>Score</th>\n");
+		writer.write("<th>Query</th>\n<th>TP</th>\n<th>FP</th>\n<th>FN</th>\n<th>Match Type</th>\n<th>Query Match</th>\n<th>Score</th>\n<th>✓</th>\n");
 		writer.write("</tr>\n</thead>\n\n");
 
-		writer.write("<tbody>\n\n");
 		for (int i = 0; i < queries.size(); ++i) {
 			Query query = queries.get(i);
 			List<Publication> publication = publications.get(i);
 			List<BenchmarkRow> rows = results.get(i);
 
-			Common.writeQuery(writer, query, publication, rows.size() + 1);
+			writer.write("<tbody id=\"i" + i + "\">\n\n");
 
-			for (int j = 0; j < rows.size(); ++j) {
+			Common.writeQuery(writer, query, publication, rows.size() + 1, i);
+
+			for (int j = 0, k = 0; j < rows.size(); ++j) {
 				BenchmarkRow row = rows.get(j);
 
 				if (row.resultType == ResultType.empty) {
 					writer.write("<tr class=\"sep-branch\">\n");
+					++k;
 				} else if (row.resultType == ResultType.fn) {
-					Common.writeTr(writer, row.edamUri);
+					Common.writeTr(writer, row.edamUri, i, k, j);
 				} else {
-					Common.writeTr(writer, row.match.getEdamUri());
+					Common.writeTr(writer, row.match.getEdamUri(), i, k, j);
 				}
 
 				if (row.resultType == ResultType.empty) {
-					writer.write("<td colspan=\"6\"></td>\n");
+					writer.write("<td colspan=\"7\"></td>\n");
 				} else if (row.resultType == ResultType.fn) {
 					Concept concept = concepts.get(row.edamUri);
 
@@ -358,6 +378,8 @@ class Benchmark {
 					writer.write("<td>&nbsp;</td>\n");
 					writer.write("<td>&nbsp;</td>\n");
 					writer.write("<td>&nbsp;</td>\n");
+
+					Common.writeCheckbox(writer, i, k, j);
 				} else {
 					Concept concept = concepts.get(row.match.getEdamUri());
 
@@ -374,22 +396,26 @@ class Benchmark {
 					Common.writeQueryMatch(writer, row.match, query, publication);
 
 					Common.writeScore(writer, row.match, args.getMapperArgs());
+
+					Common.writeCheckbox(writer, i, k, j);
 				}
 
 				writer.write("</tr>\n\n");
 			}
 
 			if (i < queries.size() - 1) {
-				writer.write("<tr class=\"sep\"><td colspan=\"7\">&nbsp;</td></tr>\n\n");
+				writer.write("<tr class=\"sep\"><td colspan=\"8\">&nbsp;</td></tr>\n\n");
 			}
+
+			writer.write("</tbody>\n");
 		}
-		writer.write("</tbody>\n\n");
 
 		writer.write("<tfoot>\n<tr>\n");
 		writer.write("<td>" + queries.size() + "</td>\n");
 		writer.write("<td>" + tpT + "</td>\n");
 		writer.write("<td>" + fpT + "</td>\n");
 		writer.write("<td>" + fnT + "</td>\n");
+		writer.write("<td>&nbsp;</td>\n");
 		writer.write("<td>&nbsp;</td>\n");
 		writer.write("<td>&nbsp;</td>\n");
 		writer.write("<td>&nbsp;</td>\n");

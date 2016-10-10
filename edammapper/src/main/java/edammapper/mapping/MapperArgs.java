@@ -45,6 +45,18 @@ public class MapperArgs {
 	@Parameter(names = { "--bad-score-format" }, validateWith = ZeroToOneDouble.class, description = "Final scores under this are considered bad (in format branch)")
 	private double badScoreFormat = 0.57;
 
+	@Parameter(names = { "--no-output-good-scores" }, description = "Do not output matches with good scores")
+	private boolean noOutputGoodScores = false;
+
+	@Parameter(names = { "--no-output-medium-scores" }, description = "Do not output matches with medium scores")
+	private boolean noOutputMediumScores = false;
+
+	@Parameter(names = { "--output-bad-scores" }, description = "Output matches with bad scores")
+	private boolean outputBadScores = false;
+
+	@Parameter(names = { "--exclude-annotations" }, description = "Don't suggest concepts already used for annotating query")
+	private boolean excludeAnnotations = false;
+
 	@ParametersDelegate
 	private MapperAlgorithmArgs algorithmArgs = new MapperAlgorithmArgs();
 
@@ -93,6 +105,22 @@ public class MapperArgs {
 
 	public double getBadScoreFormat() {
 		return badScoreFormat;
+	}
+
+	public boolean isNoOutputGoodScores() {
+		return noOutputGoodScores;
+	}
+
+	public boolean isNoOutputMediumScores() {
+		return noOutputMediumScores;
+	}
+
+	public boolean isOutputBadScores() {
+		return outputBadScores;
+	}
+
+	public boolean isExcludeAnnotations() {
+		return excludeAnnotations;
 	}
 
 	public MapperAlgorithmArgs getAlgorithmArgs() {

@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import edammapper.args.MainArgs;
+import edammapper.edam.Branch;
 import edammapper.edam.Concept;
 import edammapper.edam.EdamUri;
 import edammapper.fetching.Fetcher;
@@ -206,6 +207,7 @@ class Common {
 		"td { word-wrap: break-word }\n" +
 		"h3 { margin-top: 0 }\n" +
 		"h4 { margin-bottom: 0; text-decoration: overline }\n" +
+		"#legend { width: 13em }\n" +
 		".query td { border-top: 1px solid black; vertical-align: top; padding-right: 1em; border-right: 1px dotted black }\n" +
 		".sep { height: 3em }\n" +
 		".sep td { border-bottom: 1px solid black }\n" +
@@ -225,7 +227,8 @@ class Common {
 		".good { color: green }\n" +
 		".medium { color: yellow }\n" +
 		".bad { color: red }\n" +
-		".exact { text-decoration: underline }\n";
+		".exact { text-decoration: underline }\n" +
+		".done { text-align: center }\n";
 	}
 
 	private static String getStyleReport() {
@@ -242,6 +245,15 @@ class Common {
 		"tr .fn, tr:hover .fn { background-color: red }\n";
 	}
 
+	private static String getScript() {
+		return
+		"function hide(id) {\n" +
+		"\tif (document.getElementById(id + \"b\").checked) {\n" +
+		"\t\tdocument.getElementById(id).style.display = \"none\";\n" +
+		"\t}\n" +
+		"}\n";
+	}
+
 	static void writePreamble(boolean benchmark, MainArgs args, Writer writer, Date date) throws IOException {
 		writer.write("<!DOCTYPE html>\n");
 		writer.write("<html>\n");
@@ -254,13 +266,16 @@ class Common {
 		} else {
 			writer.write("<title>Report</title>\n");
 		}
-		writer.write("<style type=\"text/css\">\n");
+		writer.write("<style>\n");
 		if (benchmark) {
 			writer.write(getStyleBenchmark());
 		} else {
 			writer.write(getStyleReport());
 		}
 		writer.write("</style>\n");
+		writer.write("<script>\n");
+		writer.write(getScript());
+		writer.write("</script>\n");
 		writer.write("</head>\n");
 		writer.write("\n");
 
@@ -309,9 +324,13 @@ class Common {
 
 		writer.write("<h2>Mapping</h2>\n");
 		writer.write("<dl>\n");
-		writeVarVal(writer, "Top matches per branch", args.getMapperArgs().getMatch());
 		writeVarVal(writer, "http://edamontology.org/page#Scope", "Branches", args.getMapperArgs().getBranches().toString());
+		writeVarVal(writer, "Top matches per branch", args.getMapperArgs().getMatch());
 		writeVarVal(writer, "Include obsolete concepts", args.getMapperArgs().getObsolete());
+		writeVarVal(writer, "Matches with good scores", !args.getMapperArgs().isNoOutputGoodScores());
+		writeVarVal(writer, "Matches with medium scores", !args.getMapperArgs().isNoOutputMediumScores());
+		writeVarVal(writer, "Matches with bad scores", args.getMapperArgs().isOutputBadScores());
+		writeVarVal(writer, "Exclude done annotations", args.getMapperArgs().isExcludeAnnotations());
 		writer.write("</dl>\n");
 		writer.write("\n");
 
@@ -401,12 +420,23 @@ class Common {
 		writer.write("\n");
 	}
 
-	static void writeQuery(Writer writer, Query query, List<Publication> publications, int rowspan) throws IOException {
+	static void writeLegend(Writer writer, MapperArgs args) throws IOException {
+		writer.write("\n<table id=\"legend\">\n");
+		for (Branch branch : args.getBranches()) {
+			writer.write("<tr class=\"row " + branch + "\"><td>" + branch + "</td></tr>\n");
+		}
+		writer.write("<tr class=\"sep-branch\"><td></td></tr>\n");
+		writer.write("</table>\n\n");
+	}
+
+	static void writeQuery(Writer writer, Query query, List<Publication> publications, int rowspan, int id) throws IOException {
 		writer.write("<tr class=\"query\">");
 		writer.write("<td rowspan=\"" + rowspan + "\">\n");
 
 		if (query.getName() != null || (query.getWebpageUrls() != null && !query.getWebpageUrls().isEmpty())) {
 			writer.write("<h3>");
+
+			writer.write("<input id=\"i" + id + "b\" type=\"checkbox\" onclick=\"hide('i" + id + "')\">");
 
 			String webpageUrl = null;
 			if (query.getWebpageUrls() != null && !query.getWebpageUrls().isEmpty()) {
@@ -526,8 +556,9 @@ class Common {
 		writer.write("</td></tr>\n\n");
 	}
 
-	static void writeTr(Writer writer, EdamUri edamUri) throws IOException {
-		writer.write("<tr class=\"row " + edamUri.getBranch() + "\"");
+	static void writeTr(Writer writer, EdamUri edamUri, int i, int j, int k) throws IOException {
+		writer.write("<tr id=\"i" + i + "j" + j + "k" + k + "\"");
+		writer.write(" class=\"row " + edamUri.getBranch() + "\"");
 		writer.write(" title=\"" + edamUri.getBranch() + "_" + edamUri.getNrString() + "\">\n");
 	}
 
@@ -636,5 +667,9 @@ class Common {
 		//	writer.write(" exact");
 		//}
 		writer.write("\">" + percent(match.getScore()) + "</td>\n");
+	}
+
+	static void writeCheckbox(Writer writer, int i, int j, int k) throws IOException {
+		writer.write("<td class=\"done\"><input id=\"i" + i + "j" + j + "k" + k + "b\" type=\"checkbox\" onclick=\"hide('i" + i + "j" + j + "k" + k + "')\"></td>\n");
 	}
 }

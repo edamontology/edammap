@@ -1,12 +1,10 @@
-package edammapper.input.csv;
-
-import java.text.ParseException;
+package edammapper.utils.seqwikimaker;
 
 import com.opencsv.bean.CsvBind;
 
-import edammapper.input.Input;
+public class Tool implements Input {
 
-public class SEQwiki implements Input {
+	private static final String SEP = ",";
 
 	@CsvBind(required = true)
 	private String name;
@@ -27,27 +25,35 @@ public class SEQwiki implements Input {
 	private String features;
 
 	@CsvBind
+	private String input;
+
+	@CsvBind
+	private String output;
+
 	private String publications;
 
-	@CsvBind
 	private String webpages;
 
-	@CsvBind
 	private String docs;
 
 	@Override
-	public void check(int i) throws ParseException {
+	public void check(int i) {
 		if (name == null || name.equals("")) {
-			throw new ParseException("\"Name\" column missing or some entry in that column missing! (" + i + ")", i);
+			System.err.println("\"Name\" column missing or some entry in that column missing! (" + i + ")");
+		} else {
+			name = name.trim();
 		}
 		if (name2 == null || name2.equals("")) {
-			throw new ParseException("\"Name2\" column missing or some entry in that column missing! (" + i + ")", i);
+			System.err.println("\"Name2\" column missing or some entry in that column missing! (" + i + ")");
+		} else {
+			name2 = name2.trim();
 		}
 		if (!name.equals(name2)) {
-			throw new ParseException("\"Name\" and \"Name2\" columns must have equal content! (" + i + ")", i);
+			System.err.println("\"Name\" and \"Name2\" columns must have equal content! (" + i + ")");
 		}
 		if (summary == null || summary.equals("")) {
-			throw new ParseException("\"Summary\" column missing or some entry in that column missing! (" + i + ")", i);
+			System.err.println("\"Summary\" column missing or some entry in that column missing! (" + i + ")");
+			summary = name;
 		}
 	}
 
@@ -93,24 +99,50 @@ public class SEQwiki implements Input {
 		this.features = features;
 	}
 
+	public String getInput() {
+		return input;
+	}
+	public void setInput(String input) {
+		this.input = input;
+	}
+
+	public String getOutput() {
+		return output;
+	}
+	public void setOutput(String output) {
+		this.output = output;
+	}
+
 	public String getPublications() {
 		return publications;
 	}
-	public void setPublications(String publications) {
-		this.publications = publications;
+	public void addPublication(String publication) {
+		if (publications == null || publications.isEmpty()) {
+			publications = publication;
+		} else {
+			publications += SEP + publication;
+		}
 	}
 
 	public String getWebpages() {
 		return webpages;
 	}
-	public void setWebpages(String webpages) {
-		this.webpages = webpages;
+	public void addWebpage(String webpage) {
+		if (webpages == null || webpages.isEmpty()) {
+			webpages = webpage;
+		} else {
+			webpages += SEP + webpage;
+		}
 	}
 
 	public String getDocs() {
 		return docs;
 	}
-	public void setDocs(String docs) {
-		this.docs = docs;
+	public void addDoc(String doc) {
+		if (docs == null || docs.isEmpty()) {
+			docs = doc;
+		} else {
+			docs += SEP + doc;
+		}
 	}
 }

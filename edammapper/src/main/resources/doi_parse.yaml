@@ -51,6 +51,7 @@
 '1128': highwire # jcm.asm.org
 '1182': www.bloodjournal.org
 '3732': highwire # www.amjbot.org
+'1105': highwire # www.plantcell.org
 
 ---
 
@@ -499,7 +500,7 @@ mic.microbiologyresearch.org:
 highwire:
   title: '#article-title-1'
   keywords: li.kwd
-  abstract: '#abstract-1 p'
+  abstract: '#abstract-1 p, #abstract-2 p'
   fulltext:
    '.fulltext-view > p,
     .fulltext-view > .section > h2,

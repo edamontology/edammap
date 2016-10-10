@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -14,6 +15,8 @@ import java.util.stream.Collectors;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 
+import edammapper.edam.Branch;
+import edammapper.edam.Concept;
 import edammapper.edam.EdamUri;
 import edammapper.input.Csv;
 import edammapper.input.Input;
@@ -33,9 +36,9 @@ public class QueryLoader {
 	private static final Pattern INTERNAL_SEPARATOR_BAR = Pattern.compile("\\|");
 	private static final Pattern INTERNAL_SEPARATOR_COMMA = Pattern.compile(",");
 
-	private static List<String> split(String toSplit) {
+	private static List<String> split(String toSplit, Pattern pattern) {
 		if (toSplit == null) return Collections.emptyList();
-		return INTERNAL_SEPARATOR_BAR.splitAsStream(toSplit)
+		return pattern.splitAsStream(toSplit)
 			.map(s -> s.trim())
 			.collect(Collectors.toList());
 	}
@@ -55,70 +58,109 @@ public class QueryLoader {
 			.collect(Collectors.toList());
 	}
 
-	private static List<EdamUri> edamUris(String annotations) {
+	private static EdamUri checkEdamUri(EdamUri edamUri, Map<EdamUri, Concept> concepts) {
+		if (concepts != null && concepts.get(edamUri) == null) {
+			throw new IllegalArgumentException("Non-existent EDAM URI: " + edamUri);
+		}
+		return edamUri;
+	}
+
+	private static List<EdamUri> edamUris(String annotations, Map<EdamUri, Concept> concepts) {
 		if (annotations == null) return Collections.emptyList();
 		return INTERNAL_SEPARATOR_BAR.splitAsStream(annotations)
 			.filter(s -> !s.trim().isEmpty() && !s.trim().equalsIgnoreCase("NA"))
 			.map(s -> (s.contains("/") ? s.trim() : EDAM_PREFIX + "/" + s.trim()))
 			.map(s -> new EdamUri(s.toLowerCase(Locale.ROOT), EDAM_PREFIX))
+			.map(e -> checkEdamUri(e, concepts))
 			.collect(Collectors.toList());
 	}
 
-	private static List<EdamUri> edamUris(List<String> annotations) {
+	private static List<EdamUri> edamUris(List<String> annotations, Map<EdamUri, Concept> concepts) {
 		if (annotations == null) return Collections.emptyList();
 		return annotations.stream()
 			.map(s -> new EdamUri(s.trim().toLowerCase(Locale.ROOT), EDAM_PREFIX))
+			.map(e -> checkEdamUri(e, concepts))
 			.collect(Collectors.toList());
 	}
 
-	private static Query getGeneric(Generic generic) {
+	private static Query getGeneric(Generic generic, Map<EdamUri, Concept> concepts) {
 		List<Keyword> keywords = new ArrayList<>();
 		keywords.addAll(keywords(generic.getKeywords(), "Keywords", null, INTERNAL_SEPARATOR_BAR));
 
 		Set<EdamUri> annotations = new LinkedHashSet<>();
-		annotations.addAll(edamUris(generic.getAnnotations()));
+		annotations.addAll(edamUris(generic.getAnnotations(), concepts));
 
 		return new Query(
 			generic.getName().trim(),
-			split(generic.getWebpageUrls()),
+			split(generic.getWebpageUrls(), INTERNAL_SEPARATOR_BAR),
 			generic.getDescription() != null ? generic.getDescription().trim() : null,
 			keywords,
-			split(generic.getPublicationIds()),
-			split(generic.getDocUrls()),
+			split(generic.getPublicationIds(), INTERNAL_SEPARATOR_BAR),
+			split(generic.getDocUrls(), INTERNAL_SEPARATOR_BAR),
 			annotations);
 	}
 
-	private static Query getSEQwiki(SEQwiki SEQwiki) {
+	private static EdamUri getSEQwikiAnnotation(Keyword keyword, Map<EdamUri, Concept> concepts) {
+		if (concepts == null) return null;
+		for (Map.Entry<EdamUri, Concept> concept : concepts.entrySet()) {
+			if (((keyword.getType().equals("Domain") && concept.getKey().getBranch() == Branch.topic)
+				|| (keyword.getType().equals("Method") && concept.getKey().getBranch() == Branch.operation))
+				&& keyword.getValue().equalsIgnoreCase(concept.getValue().getLabel())) {
+				return concept.getKey();
+			}
+		}
+		return null;
+	}
+
+	private static Query getSEQwiki(SEQwiki SEQwiki, Map<EdamUri, Concept> concepts) {
 		List<String> webpageUrls = new ArrayList<>();
 		webpageUrls.add(SEQWIKI + SEQwiki.getName().trim().replace(" ", "_"));
+		webpageUrls.addAll(split(SEQwiki.getWebpages(), INTERNAL_SEPARATOR_COMMA));
 
 		List<Keyword> keywords = new ArrayList<>();
 		keywords.addAll(keywords(SEQwiki.getDomains(), "Domain", SEQWIKI, INTERNAL_SEPARATOR_COMMA));
 		keywords.addAll(keywords(SEQwiki.getMethods(), "Method", SEQWIKI, INTERNAL_SEPARATOR_COMMA));
 
-		return new Query(SEQwiki.getName().trim(), webpageUrls, SEQwiki.getSummary().trim(), keywords, null, null, null);
+		Set<EdamUri> annotations = new LinkedHashSet<>();
+		for (Keyword keyword : keywords) {
+			EdamUri annotation = getSEQwikiAnnotation(keyword, concepts);
+			if (annotation != null) annotations.add(annotation);
+		}
+
+		return new Query(SEQwiki.getName().trim(), webpageUrls, SEQwiki.getSummary().trim(), keywords,
+				split(SEQwiki.getPublications(), INTERNAL_SEPARATOR_COMMA),
+				split(SEQwiki.getDocs(), INTERNAL_SEPARATOR_COMMA),
+				annotations);
 	}
 
-	private static List<Query> getSEQwikiTags(SEQwiki SEQwiki) {
+	private static List<Query> getSEQwikiTags(SEQwiki SEQwiki, Map<EdamUri, Concept> concepts) {
 		List<Query> queries = new ArrayList<>();
 
 		queries.addAll(INTERNAL_SEPARATOR_COMMA.splitAsStream(SEQwiki.getDomains())
 			.map(s -> {
 				List<Keyword> keywords = new ArrayList<>();
-				keywords.add(new Keyword("Domain", s.trim(), SEQWIKI));
-				return new Query(null, null, null, keywords, null, null, null);
+				Keyword keyword = new Keyword("Domain", s.trim(), SEQWIKI);
+				keywords.add(keyword);
+				Set<EdamUri> annotations = new LinkedHashSet<>();
+				EdamUri annotation = getSEQwikiAnnotation(keyword, concepts);
+				if (annotation != null) annotations.add(annotation);
+				return new Query(null, null, null, keywords, null, null, annotations);
 			}).collect(Collectors.toList()));
 		queries.addAll(INTERNAL_SEPARATOR_COMMA.splitAsStream(SEQwiki.getMethods())
 			.map(s -> {
 				List<Keyword> keywords = new ArrayList<>();
-				keywords.add(new Keyword("Method", s.trim(), SEQWIKI));
-				return new Query(null, null, null, keywords, null, null, null);
+				Keyword keyword = new Keyword("Method", s.trim(), SEQWIKI);
+				keywords.add(keyword);
+				Set<EdamUri> annotations = new LinkedHashSet<>();
+				EdamUri annotation = getSEQwikiAnnotation(keyword, concepts);
+				if (annotation != null) annotations.add(annotation);
+				return new Query(null, null, null, keywords, null, null, annotations);
 			}).collect(Collectors.toList()));
 
 		return queries;
 	}
 
-	private static List<Query> getSEQwikiTool(SEQwiki SEQwiki) {
+	private static List<Query> getSEQwikiTool(SEQwiki SEQwiki, Map<EdamUri, Concept> concepts) {
 		List<Query> queries = new ArrayList<>();
 
 		List<String> webpageUrls = new ArrayList<>();
@@ -127,20 +169,28 @@ public class QueryLoader {
 		queries.addAll(INTERNAL_SEPARATOR_COMMA.splitAsStream(SEQwiki.getDomains())
 			.map(s -> {
 				List<Keyword> keywords = new ArrayList<>();
-				keywords.add(new Keyword("Domain", s.trim(), SEQWIKI));
-				return new Query(SEQwiki.getName().trim(), webpageUrls, null, keywords, null, null, null);
+				Keyword keyword = new Keyword("Domain", s.trim(), SEQWIKI);
+				keywords.add(keyword);
+				Set<EdamUri> annotations = new LinkedHashSet<>();
+				EdamUri annotation = getSEQwikiAnnotation(keyword, concepts);
+				if (annotation != null) annotations.add(annotation);
+				return new Query(SEQwiki.getName().trim(), webpageUrls, null, keywords, null, null, annotations);
 			}).collect(Collectors.toList()));
 		queries.addAll(INTERNAL_SEPARATOR_COMMA.splitAsStream(SEQwiki.getMethods())
 			.map(s -> {
 				List<Keyword> keywords = new ArrayList<>();
-				keywords.add(new Keyword("Method", s.trim(), SEQWIKI));
-				return new Query(SEQwiki.getName().trim(), webpageUrls, null, keywords, null, null, null);
+				Keyword keyword = new Keyword("Method", s.trim(), SEQWIKI);
+				keywords.add(keyword);
+				Set<EdamUri> annotations = new LinkedHashSet<>();
+				EdamUri annotation = getSEQwikiAnnotation(keyword, concepts);
+				if (annotation != null) annotations.add(annotation);
+				return new Query(SEQwiki.getName().trim(), webpageUrls, null, keywords, null, null, annotations);
 			}).collect(Collectors.toList()));
 
 		return queries;
 	}
 
-	private static Query getMsutils(Msutils msutils) {
+	private static Query getMsutils(Msutils msutils, Map<EdamUri, Concept> concepts) {
 		List<String> webpageUrls = new ArrayList<>();
 		if (msutils.getWeblink() != null && !msutils.getWeblink().trim().isEmpty()) {
 			webpageUrls.add(msutils.getWeblink().trim());
@@ -150,15 +200,16 @@ public class QueryLoader {
 		}
 
 		Set<EdamUri> annotations = new LinkedHashSet<>();
-		annotations.addAll(edamUris(msutils.getTopic()));
-		annotations.addAll(edamUris(msutils.getOperation()));
-		annotations.addAll(edamUris(msutils.getFormat_in()));
-		annotations.addAll(edamUris(msutils.getFormat_out()));
+		annotations.addAll(edamUris(msutils.getTopic(), concepts));
+		annotations.addAll(edamUris(msutils.getOperation(), concepts));
+		annotations.addAll(edamUris(msutils.getFormat_in(), concepts));
+		annotations.addAll(edamUris(msutils.getFormat_out(), concepts));
 
-		return new Query(msutils.getName().trim(), webpageUrls, msutils.getDescription().trim(), null, split(msutils.getPaper()), null, annotations);
+		return new Query(msutils.getName().trim(), webpageUrls, msutils.getDescription().trim(), null,
+				split(msutils.getPaper(), INTERNAL_SEPARATOR_BAR), null, annotations);
 	}
 
-	private static Query getBiotools(Biotools biotools) {
+	private static Query getBiotools(Biotools biotools, Map<EdamUri, Concept> concepts) {
 		List<String> webpageUrls = new ArrayList<>();
 		webpageUrls.add(biotools.getHomepage().trim());
 		webpageUrls.addAll(biotools.getMirrors().stream().map(s -> s.trim()).collect(Collectors.toList()));
@@ -178,15 +229,16 @@ public class QueryLoader {
 		}
 
 		Set<EdamUri> annotations = new LinkedHashSet<>();
-		annotations.addAll(edamUris(biotools.getTopics()));
-		annotations.addAll(edamUris(biotools.getFunctionNames()));
-		annotations.addAll(edamUris(biotools.getDataTypes()));
-		annotations.addAll(edamUris(biotools.getDataFormats()));
+		annotations.addAll(edamUris(biotools.getTopics(), concepts));
+		annotations.addAll(edamUris(biotools.getFunctionNames(), concepts));
+		annotations.addAll(edamUris(biotools.getDataTypes(), concepts));
+		annotations.addAll(edamUris(biotools.getDataFormats(), concepts));
 
-		return new Query(biotools.getName().trim(), webpageUrls, biotools.getDescription().trim(), null, publicationIds, docUrls, annotations);
+		return new Query(biotools.getName().trim(), webpageUrls, biotools.getDescription().trim(), null,
+				publicationIds, docUrls, annotations);
 	}
 
-	private static Query getBioConductor(BioConductor bioConductor) {
+	private static Query getBioConductor(BioConductor bioConductor, Map<EdamUri, Concept> concepts) {
 		String name = bioConductor.getName().trim() + " : " + bioConductor.getTitle().trim().replaceAll("\n", " ");
 
 		List<String> webpageUrls = null;
@@ -205,8 +257,8 @@ public class QueryLoader {
 		}
 
 		Set<EdamUri> annotations = new LinkedHashSet<>();
-		annotations.addAll(edamUris(bioConductor.getTopic_URI()));
-		annotations.addAll(edamUris(bioConductor.getOperation_URI()));
+		annotations.addAll(edamUris(bioConductor.getTopic_URI(), concepts));
+		annotations.addAll(edamUris(bioConductor.getOperation_URI(), concepts));
 
 		return new Query(
 			name,
@@ -218,7 +270,7 @@ public class QueryLoader {
 			annotations);
 	}
 
-	public static List<Query> get(String queryPath, QueryType type) throws IOException, ParseException, XMLStreamException, FactoryConfigurationError {
+	public static List<Query> get(String queryPath, QueryType type, Map<EdamUri, Concept> concepts) throws IOException, ParseException, XMLStreamException, FactoryConfigurationError {
 		List<Input> inputs;
 		if (type == QueryType.biotools) {
 			inputs = Xml.load(queryPath, type);
@@ -230,16 +282,20 @@ public class QueryLoader {
 
 		for (Input input : inputs) {
 			switch (type) {
-				case generic: queries.add(getGeneric((Generic) input)); break;
-				case SEQwiki: queries.add(getSEQwiki((SEQwiki) input)); break;
-				case SEQwikiTags: queries.addAll(getSEQwikiTags((SEQwiki) input)); break;
-				case SEQwikiTool: queries.addAll(getSEQwikiTool((SEQwiki) input)); break;
-				case msutils: queries.add(getMsutils((Msutils) input)); break;
-				case biotools: queries.add(getBiotools((Biotools) input)); break;
-				case BioConductor: queries.add(getBioConductor((BioConductor) input)); break;
+				case generic: queries.add(getGeneric((Generic) input, concepts)); break;
+				case SEQwiki: queries.add(getSEQwiki((SEQwiki) input, concepts)); break;
+				case SEQwikiTags: queries.addAll(getSEQwikiTags((SEQwiki) input, concepts)); break;
+				case SEQwikiTool: queries.addAll(getSEQwikiTool((SEQwiki) input, concepts)); break;
+				case msutils: queries.add(getMsutils((Msutils) input, concepts)); break;
+				case biotools: queries.add(getBiotools((Biotools) input, concepts)); break;
+				case BioConductor: queries.add(getBioConductor((BioConductor) input, concepts)); break;
 			}
 		}
 
 		return new ArrayList<>(queries);
+	}
+
+	public static List<Query> get(String queryPath, QueryType type) throws IOException, ParseException, XMLStreamException, FactoryConfigurationError {
+		return get(queryPath, type, null);
 	}
 }

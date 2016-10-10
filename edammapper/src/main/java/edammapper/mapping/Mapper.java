@@ -10,6 +10,7 @@ import edammapper.edam.EdamUri;
 import edammapper.processing.ConceptProcessed;
 import edammapper.processing.PublicationProcessed;
 import edammapper.processing.QueryProcessed;
+import edammapper.query.Query;
 
 public class Mapper {
 
@@ -891,7 +892,7 @@ public class Mapper {
 		return bestMatch;
 	}
 
-	public Mapping map(QueryProcessed processedQuery, MapperArgs args) {
+	public Mapping map(Query query, QueryProcessed processedQuery, MapperArgs args) {
 		Mapping mapping = new Mapping(args.getMatch(), args.getBranches());
 
 		for (Map.Entry<EdamUri, ConceptProcessed> conceptEntry : processedConcepts.entrySet()) {
@@ -900,13 +901,40 @@ public class Mapper {
 
 			if (processedConcept.isObsolete() && !args.getObsolete()) continue;
 			if (!args.getBranches().contains(edamUri.getBranch())) continue;
+			if (args.isExcludeAnnotations() && query.getAnnotations().contains(edamUri)) continue;
 
 			// double lastMatchScore = mapping.getLastMatchScore(edamUri.getBranch()); // TODO
 
 			Match match = getBestMatch(processedConcept, processedQuery, args.getAlgorithmArgs(), args.getIdfMultiplierArgs(), edamUri.getBranch());
 			match.setEdamUri(edamUri);
 
-			mapping.addMatch(edamUri.getBranch(), match);
+			double goodScore = 0;
+			double badScore = 0;
+			switch (edamUri.getBranch()) {
+			case topic:
+				goodScore = args.getGoodScoreTopic();
+				badScore = args.getBadScoreTopic();
+				break;
+			case operation:
+				goodScore = args.getGoodScoreOperation();
+				badScore = args.getBadScoreOperation();
+				break;
+			case data:
+				goodScore = args.getGoodScoreData();
+				badScore = args.getBadScoreData();
+				break;
+			case format:
+				goodScore = args.getGoodScoreFormat();
+				badScore = args.getBadScoreFormat();
+				break;
+			}
+
+			double score = ((args.getIdfMultiplierArgs().getMappingStrategy() == MapperStrategy.average) ? match.getBestOneScore() : match.getScore());
+			if ((!args.isNoOutputGoodScores() && score > goodScore) ||
+				(!args.isNoOutputMediumScores() && score >= badScore && score <= goodScore) ||
+				(args.isOutputBadScores() && score < badScore)) {
+				mapping.addMatch(edamUri.getBranch(), match);
+			}
 		}
 
 		return mapping;

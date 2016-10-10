@@ -88,7 +88,7 @@ public class Main implements Runnable {
 
 			QueryProcessed processedQuery = processor.getProcessedQuery(query, pp, args.getType());
 
-			Mapping mapping = mapper.map(processedQuery, args.getMapperArgs());
+			Mapping mapping = mapper.map(query, processedQuery, args.getMapperArgs());
 
 			synchronized (mappings) {
 				publications.set(localIndex, processedQuery.getPublications());
@@ -153,7 +153,7 @@ public class Main implements Runnable {
 
 		System.err.println("Loading queries");
 		try {
-			queries = QueryLoader.get(args.getQuery(), args.getType());
+			queries = QueryLoader.get(args.getQuery(), args.getType(), concepts);
 		} catch (IOException | ParseException | XMLStreamException | FactoryConfigurationError e) {
 			System.err.println(e);
 			System.exit(1);

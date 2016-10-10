@@ -33,38 +33,57 @@ class Html {
 		writer.write("\n");
 
 		writer.write("<h2>Table</h2>\n");
+		Common.writeLegend(writer, args.getMapperArgs());
 		writer.write("<table>\n");
 		writer.write("\n");
 		writer.write("<colgroup>\n");
 
-		// TODO look more than just the first entry (which might be missing publications for example)
-		if (!queries.isEmpty() && queries.get(0).getPublicationIds() != null && !queries.get(0).getPublicationIds().isEmpty() && !queries.get(0).getPublicationIds().get(0).trim().isEmpty()) {
+		boolean publicationPresent = false;
+		boolean descriptionPresent = false;
+		for (Query query : queries) {
+			if (query.getPublicationIds() != null) {
+				for (String publicationId : query.getPublicationIds()) {
+					if (!publicationId.trim().isEmpty()) {
+						publicationPresent = true;
+					}
+				}
+			}
+			if (publicationPresent) break;
+			if (query.getDescription() != null) {
+				if (!query.getDescription().trim().isEmpty()) {
+					descriptionPresent = true;
+				}
+			}
+		}
+		if (publicationPresent) {
 			writer.write("<col style=\"width:45%\">\n");
-			writer.write("<col style=\"width:30%\">\n");
-		} else if (!queries.isEmpty() && queries.get(0).getDescription() != null && !queries.get(0).getDescription().isEmpty()) {
+			writer.write("<col style=\"width:28%\">\n");
+		} else if (descriptionPresent) {
 			writer.write("<col style=\"width:26%\">\n");
-			writer.write("<col style=\"width:49%\">\n");
+			writer.write("<col style=\"width:47%\">\n");
 		} else {
 			writer.write("<col style=\"width:20%\">\n");
-			writer.write("<col style=\"width:55%\">\n");
+			writer.write("<col style=\"width:53%\">\n");
 		}
 
 		writer.write("<col style=\"width:10%\">\n");
 		writer.write("<col style=\"width:10%\">\n");
 		writer.write("<col style=\"width:5%\">\n");
+		writer.write("<col style=\"width:2%\">\n");
 		writer.write("</colgroup>\n");
 		writer.write("\n");
 
 		writer.write("<thead>\n<tr>\n");
-		writer.write("<th>Query</th>\n<th>Match</th>\n<th>Match Type</th>\n<th>Query Match</th>\n<th>Score</th>\n");
+		writer.write("<th>Query</th>\n<th>Match</th>\n<th>Match Type</th>\n<th>Query Match</th>\n<th>Score</th>\n<th>✓</th>\n");
 		writer.write("</tr>\n</thead>\n\n");
 
-		writer.write("<tbody>\n\n");
 		int matches = 0;
 		for (int i = 0; i < queries.size(); ++i) {
 			Query query = queries.get(i);
 			List<Publication> publication = publications.get(i);
 			Mapping mapping = mappings.get(i);
+
+			writer.write("<tbody id=\"i" + i + "\">\n\n");
 
 			int rowspan = 0;
 			for (Branch branch : mapping.getBranches()) {
@@ -73,7 +92,7 @@ class Html {
 				}
 				++rowspan;
 			}
-			Common.writeQuery(writer, query, publication, rowspan);
+			Common.writeQuery(writer, query, publication, rowspan, i);
 
 			for (int j = 0; j < mapping.getBranches().size(); ++j) {
 				Branch branch = mapping.getBranches().get(j);
@@ -82,7 +101,7 @@ class Html {
 					Match match = mapping.getMatch(branch, k);
 					Concept concept = concepts.get(match.getEdamUri());
 
-					Common.writeTr(writer, match.getEdamUri());
+					Common.writeTr(writer, match.getEdamUri(), i, j, k);
 
 					Common.writeMatch(writer, match, match.getEdamUri(), concept, "match");
 
@@ -92,6 +111,8 @@ class Html {
 
 					Common.writeScore(writer, match, args.getMapperArgs());
 
+					Common.writeCheckbox(writer, i, j, k);
+
 					writer.write("</tr>\n\n");
 
 					++matches;
@@ -99,20 +120,22 @@ class Html {
 
 				if (j < mapping.getBranches().size() - 1) {
 					writer.write("<tr class=\"sep-branch\">\n");
-					writer.write("<td colspan=\"4\"></td>\n");
+					writer.write("<td colspan=\"5\"></td>\n");
 					writer.write("</tr>\n\n");
 				}
 			}
 
 			if (i < queries.size() - 1) {
-				writer.write("<tr class=\"sep\"><td colspan=\"5\">&nbsp;</td></tr>\n\n");
+				writer.write("<tr class=\"sep\"><td colspan=\"6\">&nbsp;</td></tr>\n\n");
 			}
-		}
-		writer.write("</tbody>\n\n");
 
-		writer.write("<tfoot>\n<tr>\n");
+			writer.write("</tbody>\n");
+		}
+
+		writer.write("\n<tfoot>\n<tr>\n");
 		writer.write("<td>" + queries.size() + "</td>\n");
 		writer.write("<td>" + matches + "</td>\n");
+		writer.write("<td>&nbsp;</td>\n");
 		writer.write("<td>&nbsp;</td>\n");
 		writer.write("<td>&nbsp;</td>\n");
 		writer.write("<td>&nbsp;</td>\n");
