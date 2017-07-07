@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<title>Report</title>
+<style>
+a { text-decoration: none; color: black }
+a:hover, a:active { text-decoration: underline }
+dt { float:left; clear: left; text-align: right; width: 13em }
+dt, dt a { color: blue }
+dt:after { content: ":" }
+dd { margin-left: 13em; padding-left: 0.5em }
+table { border-collapse: separate; border-spacing: 0px 0px; table-layout: fixed; width: 100% }
+thead, tfoot { text-align: center; font-weight: bold }
+thead th { border-bottom: 2px solid black }
+tfoot td { border-top: 3px solid black }
+td { word-wrap: break-word }
+h3 { margin-top: 0 }
+h4 { margin-bottom: 0; text-decoration: overline }
+#legend { width: 13em }
+.query td { border-top: 1px solid black; vertical-align: top; padding-right: 1em; border-right: 1px dotted black }
+.sep { height: 3em }
+.sep td { border-bottom: 1px solid black }
+.sep-branch { height: 1em }
+.row td { border-top: 1px solid black; padding: 0.1em 0.2em }
+.obsolete { text-decoration: line-through }
+.topic td, .Domain { background-color: rgba(222,184,135,0.5) } /* BurlyWood */
+.topic:hover td, .Domain:hover { background-color: rgba(222,184,135,1) } /* BurlyWood */
+.operation td, .Method { background-color: rgba(211,211,211,0.5) } /* LightGray */
+.operation:hover td, .Method:hover { background-color: rgba(211,211,211,1) } /* LightGray */
+.data td { background-color: rgba(135,206,235,0.5) } /* SkyBlue */
+.data:hover td { background-color: rgba(135,206,235,1) } /* SkyBlue */
+.format td { background-color: rgba(216,191,216,0.5) } /* Thistle */
+.format:hover td { background-color: rgba(216,191,216,1) } /* Thistle */
+.type { text-align: center; color: #666 }
+.score { text-align: right; font-weight: bold }
+.good { color: green }
+.medium { color: yellow }
+.bad { color: red }
+.exact { text-decoration: underline }
+.done { text-align: center }
+</style>
+<script>
+function hide(id) {
+	if (document.getElementById(id + "b").checked) {
+		document.getElementById(id).style.display = "none";
+	}
+}
+</script>
+</head>
+
+<body>
+<h1>Report</h1>
+<p>2017-07-05T14:10:24+0300</p>
+
+<h2>Input/Output</h2>
+<dl>
+<dt><a href="https://github.com/edamontology/edamontology/tree/master/releases">Ontology file</a></dt>
+<dd>EDAM_1.17.owl</dd>
+<dt>Query file</dt>
+<dd>example.csv</dd>
+<dt>Type</dt>
+<dd>generic</dd>
+<dt>Output file</dt>
+<dd>&nbsp;</dd>
+<dt>Report file</dt>
+<dd>example_results.html</dd>
+<dt>Benchmark report file</dt>
+<dd>example_benchmark.html</dd>
+<dt>Number of threads</dt>
+<dd>4</dd>
+</dl>
+
+<h2>Preprocessing</h2>
+<dl>
+<dt>Remove freestanding numbers</dt>
+<dd>false</dd>
+<dt>Stopword list</dt>
+<dd>lucene</dd>
+<dt>Do stemming</dt>
+<dd>true</dd>
+<dt>Remove tokens of length</dt>
+<dd>0</dd>
+</dl>
+
+<h2>Processing</h2>
+<dl>
+<dt>Fetching is disabled</dt>
+<dd>false</dd>
+<dt>Database file</dt>
+<dd>db.db</dd>
+<dt>Query IDF file</dt>
+<dd>biotools.idf</dd>
+</dl>
+
+<h2>Mapping</h2>
+<dl>
+<dt><a href="http://edamontology.org/page#Scope">Branches</a></dt>
+<dd>[topic, operation, data, format]</dd>
+<dt>Top matches per branch</dt>
+<dd>5</dd>
+<dt>Include obsolete concepts</dt>
+<dd>false</dd>
+<dt>Matches with good scores</dt>
+<dd>true</dd>
+<dt>Matches with medium scores</dt>
+<dd>true</dd>
+<dt>Matches with bad scores</dt>
+<dd>false</dd>
+<dt>Exclude done annotations</dt>
+<dd>false</dd>
+</dl>
+
+<h2>Mapping algorithm</h2>
+<dl>
+<dt>Compound words</dt>
+<dd>0</dd>
+<dt>Mismatch multiplier</dt>
+<dd>2.0</dd>
+<dt>Match minimum</dt>
+<dd>1.0</dd>
+<dt>Position off by 1</dt>
+<dd>0.35</dd>
+<dt>Position off by 2</dt>
+<dd>0.05</dd>
+<dt>Position match scaling</dt>
+<dd>0.5</dd>
+<dt>Position loss</dt>
+<dd>0.4</dd>
+<dt>Score scaling</dt>
+<dd>0.2</dd>
+<dt>Concept weight</dt>
+<dd>1.0</dd>
+<dt>Query weight</dt>
+<dd>1.0</dd>
+<dt>Mapping strategy</dt>
+<dd>average</dd>
+<dt>Average strategy scaling</dt>
+<dd>10.0</dd>
+</dl>
+
+<h2>IDF</h2>
+<dl>
+<dt>Concept IDF scaling</dt>
+<dd>0.5</dd>
+<dt>Query IDF scaling</dt>
+<dd>0.5</dd>
+<dt>Enable label/synonyms IDF</dt>
+<dd>false</dd>
+<dt>Disable name/keywords IDF</dt>
+<dd>false</dd>
+<dt>Disable description IDF</dt>
+<dd>false</dd>
+<dt>Disable title/keywords IDF</dt>
+<dd>false</dd>
+<dt>Disable abstract IDF</dt>
+<dd>false</dd>
+<dt>Disable query IDF branches</dt>
+<dd>[]</dd>
+</dl>
+
+<h2>Concept multipliers</h2>
+<dl>
+<dt>Label multiplier</dt>
+<dd>1.0</dd>
+<dt>Exact synonym multiplier</dt>
+<dd>1.0</dd>
+<dt>Narrow/Broad multiplier</dt>
+<dd>1.0</dd>
+<dt>Definition multiplier</dt>
+<dd>1.0</dd>
+<dt>Comment multiplier</dt>
+<dd>1.0</dd>
+</dl>
+
+<h2>Query normalizers</h2>
+<dl>
+<dt>Name norm</dt>
+<dd>0.81</dd>
+<dt>Webpage norm</dt>
+<dd>1.0</dd>
+<dt>Description norm</dt>
+<dd>0.92</dd>
+<dt>Keyword norm</dt>
+<dd>0.77</dd>
+<dt>Publication title norm</dt>
+<dd>0.91</dd>
+<dt>Publication keyword norm</dt>
+<dd>0.77</dd>
+<dt>Publication MeSH norm</dt>
+<dd>0.75</dd>
+<dt>Publication EFO/GO norm</dt>
+<dd>1.0</dd>
+<dt>Publication abstract norm</dt>
+<dd>0.985</dd>
+<dt>Publication fulltext norm</dt>
+<dd>1.0</dd>
+<dt>Doc norm</dt>
+<dd>1.0</dd>
+</dl>
+
+<h2>Query weights</h2>
+<dl>
+<dt>Name weight</dt>
+<dd>1.0</dd>
+<dt>Webpage weight</dt>
+<dd>0.5</dd>
+<dt>Description weight</dt>
+<dd>1.0</dd>
+<dt>Keyword weight</dt>
+<dd>1.0</dd>
+<dt>Publication title weight</dt>
+<dd>0.25</dd>
+<dt>Publication keyword weight</dt>
+<dd>0.75</dd>
+<dt>Publication MeSH weight</dt>
+<dd>0.25</dd>
+<dt>Publication EFO/GO weight</dt>
+<dd>0.25</dd>
+<dt>Publication abstract weight</dt>
+<dd>0.75</dd>
+<dt>Publication fulltext weight</dt>
+<dd>0.5</dd>
+<dt>Doc weight</dt>
+<dd>0.5</dd>
+</dl>
+
+<h2>Score limits</h2>
+<dl>
+<dt>Good score for topic</dt>
+<dd>0.63</dd>
+<dt>Good score for operation</dt>
+<dd>0.63</dd>
+<dt>Good score for data</dt>
+<dd>0.63</dd>
+<dt>Good score for format</dt>
+<dd>0.63</dd>
+<dt>Bad score for topic</dt>
+<dd>0.57</dd>
+<dt>Bad score for operation</dt>
+<dd>0.57</dd>
+<dt>Bad score for data</dt>
+<dd>0.57</dd>
+<dt>Bad score for format</dt>
+<dd>0.57</dd>
+</dl>
+
+<h2>Total</h2>
+<dl>
+<dt>Total EDAM concepts</dt>
+<dd>3292</dd>
+<dt>Total query keywords</dt>
+<dd>1</dd>
+<dt>Total mapper answers</dt>
+<dd>1</dd>
+</dl>
+
+<h2>Table</h2>
+
+<table id="legend">
+<tr class="row topic"><td>topic</td></tr>
+<tr class="row operation"><td>operation</td></tr>
+<tr class="row data"><td>data</td></tr>
+<tr class="row format"><td>format</td></tr>
+<tr class="sep-branch"><td></td></tr>
+</table>
+
+<table>
+
+<colgroup>
+<col style="width:45%">
+<col style="width:28%">
+<col style="width:10%">
+<col style="width:10%">
+<col style="width:5%">
+<col style="width:2%">
+</colgroup>
+
+<thead>
+<tr>
+<th>Query</th>
+<th>Match</th>
+<th>Match Type</th>
+<th>Query Match</th>
+<th>Score</th>
+<th>✓</th>
+</tr>
+</thead>
+
+<tbody id="i0">
+
+<tr class="query"><td rowspan="24">
+<h3><input id="i0b" type="checkbox" onclick="hide('i0')"><a href="http://apps.cbu.uib.no/webnma">WEBnm@</a></h3>
+<p>WEBnm@ provides users with quick, automated computation and analysis of low-frequency normal modes for protein structures.</p>
+<h4>Publication <a href="http://doi.org/10.1186/s12859-014-0427-6">10.1186/s12859-014-0427-6</a></h4>
+<p><strong>Title:</strong> WEBnm@ v2.0: Web server and services for comparing protein flexibility.<p>
+<p><strong>Keywords:</strong> Elastic network models; Normal mode analysis; Comparative analysis; Web-tool; TIM barrels; Adenylate Kinase; Bhattacharyya Coefficient</p>
+<p><strong>MeSH terms:</strong> <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Humans%22">Humans</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Adenylate+Kinase%22">Adenylate Kinase</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Proteins%22">Proteins</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Sequence+Alignment%22">Sequence Alignment</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Protein+Conformation%22">Protein Conformation</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Protein+Folding%22">Protein Folding</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Multigene+Family%22">Multigene Family</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Internet%22">Internet</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Software%22">Software</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Databases,+Protein%22">Databases, Protein</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Metabolic+Networks+and+Pathways%22">Metabolic Networks and Pathways</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Protein+Interaction+Domains+and+Motifs%22">Protein Interaction Domains and Motifs</a></p>
+<p><strong>EFO terms:</strong> <a href="http://www.ebi.ac.uk/efo/EFO_0000989">Root</a> <small>6</small>; <a href="http://www.ebi.ac.uk/efo/EFO_0004416">acid</a> <small>5</small>; <a href="http://www.ebi.ac.uk/efo/EFO_0001270">alpha</a> <small>4</small>; <a href="http://www.ebi.ac.uk/efo/EFO_0002698">array</a> <small>2</small>; <a href="http://www.ebi.ac.uk/efo/EFO_0001369">backbone</a> <small>2</small>; <a href="http://www.ebi.ac.uk/efo/EFO_0001444">measurements</a> <small>1</small>; <a href="http://www.ebi.ac.uk/efo/EFO_0005061">substrate</a> <small>1</small>; <a href="http://www.ebi.ac.uk/efo/EFO_0005135">strain</a> <small>1</small>; <a href="http://www.ebi.ac.uk/efo/EFO_0000961">segments</a> <small>1</small></p>
+<p><strong>GO terms:</strong> <a href="http://amigo.geneontology.org/amigo/term/GO:0005488">binding</a> <small>21</small>; <a href="http://amigo.geneontology.org/amigo/term/GO:0007613">memory</a> <small>1</small>; <a href="http://amigo.geneontology.org/amigo/term/GO:0043234">protein complex</a> <small>1</small>; <a href="http://amigo.geneontology.org/amigo/term/GO:0005623">cell</a> <small>1</small>; <a href="http://amigo.geneontology.org/amigo/term/GO:0023052">signalling</a> <small>1</small></p>
+<p>BACKGROUND: Normal mode analysis (NMA) using elastic network models is a reliable and cost-effective computational method to characterise protein flexibility and by extension, their dynamics. Further insight into the dynamics-function relationship can be gained by comparing protein motions between protein homologs and functional classifications. This can be achieved by comparing normal modes obtained from sets of evolutionary related proteins. RESULTS: We have developed an automated tool for comparative NMA of a set of pre-aligned protein structures. The user can submit a sequence alignment in the FASTA format and the corresponding coordinate files in the Protein Data Bank (PDB) format. The computed normalised squared atomic fluctuations and atomic deformation energies of the submitted structures can be easily compared on graphs provided by the web user interface. The web server provides pairwise comparison of the dynamics of all proteins included in the submitted set using two measures: the Root Mean Squared Inner Product and the Bhattacharyya Coefficient. The Comparative Analysis has been implemented on our web server for NMA, WEBnm@, which also provides recently upgraded functionality for NMA of single protein structures. This includes new visualisations of protein motion, visualisation of inter-residue correlations and the analysis of conformational change using the overlap analysis. In addition, programmatic access to WEBnm@ is now available through a SOAP-based web service. Webnm@ is available at http://apps.cbu.uib.no/webnma . CONCLUSION: WEBnm@ v2.0 is an online tool offering unique capability for comparative NMA on multiple protein structures. Along with a convenient web interface, powerful computing resources, and several methods for mode analyses, WEBnm@ facilitates the assessment of protein flexibility within protein families and superfamilies. These analyses can give a good view of how the structures move and how the flexibility is conserved over the different structures.</p>
+<p><strong>Full text present</strong> (40050 characters)</p>
+<h4>Publication <a href="http://doi.org/10.1186/1471-2105-6-52">10.1186/1471-2105-6-52</a></h4>
+<p><strong>Title:</strong> WEBnm@: a web application for normal mode analyses of proteins.<p>
+<p><strong>MeSH terms:</strong> <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Cytoplasm%22">Cytoplasm</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Peptides%22">Peptides</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Proteins%22">Proteins</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Nucleic+Acids%22">Nucleic Acids</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Models,+Statistical%22">Models, Statistical</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Sequence+Analysis,+Protein%22">Sequence Analysis, Protein</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Computational+Biology%22">Computational Biology</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Molecular+Structure%22">Molecular Structure</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Protein+Conformation%22">Protein Conformation</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Protein+Structure,+Tertiary%22">Protein Structure, Tertiary</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Protein+Folding%22">Protein Folding</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Genetic+Vectors%22">Genetic Vectors</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Algorithms%22">Algorithms</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Computer+Graphics%22">Computer Graphics</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Internet%22">Internet</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Software%22">Software</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Database+Management+Systems%22">Database Management Systems</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22User-Computer+Interface%22">User-Computer Interface</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Information+Storage+and+Retrieval%22">Information Storage and Retrieval</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Databases,+Protein%22">Databases, Protein</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Calcium-Transporting+ATPases%22">Calcium-Transporting ATPases</a>; <a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Sarcoplasmic+Reticulum+Calcium-Transporting+ATPases%22">Sarcoplasmic Reticulum Calcium-Transporting ATPases</a></p>
+<p><strong>EFO terms:</strong> <a href="http://www.ebi.ac.uk/efo/EFO_0004416">acids</a> <small>7</small>; <a href="http://www.ebi.ac.uk/efo/EFO_0002029">software</a> <small>3</small>; <a href="http://www.ebi.ac.uk/efo/EFO_0002756">fast</a> <small>1</small>; <a href="http://www.ebi.ac.uk/efo/EFO_0000877">hand</a> <small>1</small>; <a href="http://www.ebi.ac.uk/efo/EFO_0002571">procedure</a> <small>1</small></p>
+<p><strong>GO terms:</strong> <a href="http://amigo.geneontology.org/amigo/term/GO:0016529">sarcoplasmic reticulum</a> <small>1</small>; <a href="http://amigo.geneontology.org/amigo/term/GO:0016310">Phosphorylation</a> <small>1</small>; <a href="http://amigo.geneontology.org/amigo/term/GO:0005488">binding</a> <small>1</small>; <a href="http://amigo.geneontology.org/amigo/term/GO:0006810">transport</a> <small>1</small>; <a href="http://amigo.geneontology.org/amigo/term/GO:0007613">memory</a> <small>1</small>; <a href="http://amigo.geneontology.org/amigo/term/GO:0006412">translation</a> <small>1</small></p>
+<p>BACKGROUND: Normal mode analysis (NMA) has become the method of choice to investigate the slowest motions in macromolecular systems. NMA is especially useful for large biomolecular assemblies, such as transmembrane channels or virus capsids. NMA relies on the hypothesis that the vibrational normal modes having the lowest frequencies (also named soft modes) describe the largest movements in a protein and are the ones that are functionally relevant. RESULTS: We developed a web-based server to perform normal modes calculations and different types of analyses. Starting from a structure file provided by the user in the PDB format, the server calculates the normal modes and subsequently offers the user a series of automated calculations; normalized squared atomic displacements, vector field representation and animation of the first six vibrational modes. Each analysis is performed independently from the others and results can be visualized using only a web browser. No additional plug-in or software is required. For users who would like to analyze the results with their favorite software, raw results can also be downloaded. The application is available on http://www.bioinfo.no/tools/normalmodes. We present here the underlying theory, the application architecture and an illustration of its features using a large transmembrane protein as an example. CONCLUSION: We built an efficient and modular web application for normal mode analysis of proteins. Non specialists can easily and rapidly evaluate the degree of flexibility of multi-domain protein assemblies and characterize the large amplitude movements of their domains.</p>
+<p><strong>Full text present</strong> (18699 characters)</p>
+<h4>Docs</h4>
+<a href="http://apps.cbu.uib.no/webnma/howto">http://apps.cbu.uib.no/webnma/howto</a><br>
+</td></tr>
+
+<tr id="i0j0k0" class="row topic" title="topic_2814">
+<td class="match"><a href="http://edamontology.org/topic_2814">Protein structure analysis (Protein structure)</a></td>
+<td class="type">exact_synonym</td>
+<td class="type">description</td>
+<td class="score good">0.66%</td>
+<td class="done"><input id="i0j0k0b" type="checkbox" onclick="hide('i0j0k0')"></td>
+</tr>
+
+<tr id="i0j0k1" class="row topic" title="topic_0736">
+<td class="match"><a href="http://edamontology.org/topic_0736">Protein folds and structural domains (Protein folds)</a></td>
+<td class="type">narrow_synonym</td>
+<td class="type">publication_fulltext<br><a href="http://doi.org/10.1186/s12859-014-0427-6">10.1186/s12859-014-0427-6</a></td>
+<td class="score good">0.60%</td>
+<td class="done"><input id="i0j0k1b" type="checkbox" onclick="hide('i0j0k1')"></td>
+</tr>
+
+<tr id="i0j0k2" class="row topic" title="topic_0078">
+<td class="match"><a href="http://edamontology.org/topic_0078">Proteins</a></td>
+<td class="type">label</td>
+<td class="type">publication_abstract<br><a href="http://doi.org/10.1186/s12859-014-0427-6">10.1186/s12859-014-0427-6</a></td>
+<td class="score good">0.57%</td>
+<td class="done"><input id="i0j0k2b" type="checkbox" onclick="hide('i0j0k2')"></td>
+</tr>
+
+<tr id="i0j0k3" class="row topic" title="topic_0166">
+<td class="match"><a href="http://edamontology.org/topic_0166">Protein structural motifs and surfaces (Protein structural features)</a></td>
+<td class="type">narrow_synonym</td>
+<td class="type">publication_abstract<br><a href="http://doi.org/10.1186/s12859-014-0427-6">10.1186/s12859-014-0427-6</a></td>
+<td class="score good">0.48%</td>
+<td class="done"><input id="i0j0k3b" type="checkbox" onclick="hide('i0j0k3')"></td>
+</tr>
+
+<tr id="i0j0k4" class="row topic" title="topic_0176">
+<td class="match"><a href="http://edamontology.org/topic_0176">Molecular dynamics</a></td>
+<td class="type">label</td>
+<td class="type">publication_fulltext<br><a href="http://doi.org/10.1186/s12859-014-0427-6">10.1186/s12859-014-0427-6</a></td>
+<td class="score good">0.48%</td>
+<td class="done"><input id="i0j0k4b" type="checkbox" onclick="hide('i0j0k4')"></td>
+</tr>
+
+<tr class="sep-branch">
+<td colspan="5"></td>
+</tr>
+
+<tr id="i0j1k0" class="row operation" title="operation_0244">
+<td class="match"><a href="http://edamontology.org/operation_0244">Protein flexibility and motion analysis</a></td>
+<td class="type">label</td>
+<td class="type">publication_abstract<br><a href="http://doi.org/10.1186/s12859-014-0427-6">10.1186/s12859-014-0427-6</a></td>
+<td class="score good">0.71%</td>
+<td class="done"><input id="i0j1k0b" type="checkbox" onclick="hide('i0j1k0')"></td>
+</tr>
+
+<tr id="i0j1k1" class="row operation" title="operation_0477">
+<td class="match"><a href="http://edamontology.org/operation_0477">Protein modelling (Homology modelling)</a></td>
+<td class="type">exact_synonym</td>
+<td class="type">publication_abstract<br><a href="http://doi.org/10.1186/s12859-014-0427-6">10.1186/s12859-014-0427-6</a></td>
+<td class="score good">0.60%</td>
+<td class="done"><input id="i0j1k1b" type="checkbox" onclick="hide('i0j1k1')"></td>
+</tr>
+
+<tr id="i0j1k2" class="row operation" title="operation_2406">
+<td class="match"><a href="http://edamontology.org/operation_2406">Protein structure analysis</a></td>
+<td class="type">label</td>
+<td class="type">description</td>
+<td class="score good">0.57%</td>
+<td class="done"><input id="i0j1k2b" type="checkbox" onclick="hide('i0j1k2')"></td>
+</tr>
+
+<tr id="i0j1k3" class="row operation" title="operation_3435">
+<td class="match"><a href="http://edamontology.org/operation_3435">Standardisation and normalisation (Normalisation)</a></td>
+<td class="type">narrow_synonym</td>
+<td class="type">publication_abstract<br><a href="http://doi.org/10.1186/s12859-014-0427-6">10.1186/s12859-014-0427-6</a></td>
+<td class="score good">0.55%</td>
+<td class="done"><input id="i0j1k3b" type="checkbox" onclick="hide('i0j1k3')"></td>
+</tr>
+
+<tr id="i0j1k4" class="row operation" title="operation_2487">
+<td class="match"><a href="http://edamontology.org/operation_2487">Protein structure comparison</a></td>
+<td class="type">label</td>
+<td class="type">publication_abstract<br><a href="http://doi.org/10.1186/s12859-014-0427-6">10.1186/s12859-014-0427-6</a></td>
+<td class="score good">0.47%</td>
+<td class="done"><input id="i0j1k4b" type="checkbox" onclick="hide('i0j1k4')"></td>
+</tr>
+
+<tr class="sep-branch">
+<td colspan="5"></td>
+</tr>
+
+<tr id="i0j2k0" class="row data" title="data_1460">
+<td class="match"><a href="http://edamontology.org/data_1460">Protein structure</a></td>
+<td class="type">label</td>
+<td class="type">description</td>
+<td class="score good">0.54%</td>
+<td class="done"><input id="i0j2k0b" type="checkbox" onclick="hide('i0j2k0')"></td>
+</tr>
+
+<tr id="i0j2k1" class="row data" title="data_0883">
+<td class="match"><a href="http://edamontology.org/data_0883">Structure</a></td>
+<td class="type">label</td>
+<td class="type"><a href="http://apps.cbu.uib.no/webnma/howto">doc</a></td>
+<td class="score medium">0.46%</td>
+<td class="done"><input id="i0j2k1b" type="checkbox" onclick="hide('i0j2k1')"></td>
+</tr>
+
+<tr id="i0j2k2" class="row data" title="data_1481">
+<td class="match"><a href="http://edamontology.org/data_1481">Structure alignment (protein)</a></td>
+<td class="type">label</td>
+<td class="type"><a href="http://apps.cbu.uib.no/webnma/howto">doc</a></td>
+<td class="score medium">0.45%</td>
+<td class="done"><input id="i0j2k2b" type="checkbox" onclick="hide('i0j2k2')"></td>
+</tr>
+
+<tr id="i0j2k3" class="row data" title="data_1537">
+<td class="match"><a href="http://edamontology.org/data_1537">Protein structure report (Protein structural property)</a></td>
+<td class="type">exact_synonym</td>
+<td class="type">publication_fulltext<br><a href="http://doi.org/10.1186/s12859-014-0427-6">10.1186/s12859-014-0427-6</a></td>
+<td class="score good">0.44%</td>
+<td class="done"><input id="i0j2k3b" type="checkbox" onclick="hide('i0j2k3')"></td>
+</tr>
+
+<tr id="i0j2k4" class="row data" title="data_1470">
+<td class="match"><a href="http://edamontology.org/data_1470">C-alpha trace</a></td>
+<td class="type">label</td>
+<td class="type">publication_fulltext<br><a href="http://doi.org/10.1186/s12859-014-0427-6">10.1186/s12859-014-0427-6</a></td>
+<td class="score good">0.43%</td>
+<td class="done"><input id="i0j2k4b" type="checkbox" onclick="hide('i0j2k4')"></td>
+</tr>
+
+<tr class="sep-branch">
+<td colspan="5"></td>
+</tr>
+
+<tr id="i0j3k0" class="row format" title="format_1476">
+<td class="match"><a href="http://edamontology.org/format_1476">PDB</a></td>
+<td class="type">label</td>
+<td class="type"><a href="http://apps.cbu.uib.no/webnma">webpage</a></td>
+<td class="score good">0.43%</td>
+<td class="done"><input id="i0j3k0b" type="checkbox" onclick="hide('i0j3k0')"></td>
+</tr>
+
+<tr id="i0j3k1" class="row format" title="format_1208">
+<td class="match"><a href="http://edamontology.org/format_1208">protein</a></td>
+<td class="type">label</td>
+<td class="type">publication_mesh<br><a href="http://doi.org/10.1186/s12859-014-0427-6">10.1186/s12859-014-0427-6</a><br><a href="http://www.ncbi.nlm.nih.gov/mesh/?term=%22Proteins%22">Proteins</a></td>
+<td class="score medium">0.39%</td>
+<td class="done"><input id="i0j3k1b" type="checkbox" onclick="hide('i0j3k1')"></td>
+</tr>
+
+<tr id="i0j3k2" class="row format" title="format_1915">
+<td class="match"><a href="http://edamontology.org/format_1915">Format</a></td>
+<td class="type">label</td>
+<td class="type"><a href="http://apps.cbu.uib.no/webnma/howto">doc</a></td>
+<td class="score good">0.37%</td>
+<td class="done"><input id="i0j3k2b" type="checkbox" onclick="hide('i0j3k2')"></td>
+</tr>
+
+<tr id="i0j3k3" class="row format" title="format_1929">
+<td class="match"><a href="http://edamontology.org/format_1929">FASTA</a></td>
+<td class="type">label</td>
+<td class="type"><a href="http://apps.cbu.uib.no/webnma/howto">doc</a></td>
+<td class="score medium">0.30%</td>
+<td class="done"><input id="i0j3k3b" type="checkbox" onclick="hide('i0j3k3')"></td>
+</tr>
+
+<tr id="i0j3k4" class="row format" title="format_3097">
+<td class="match"><a href="http://edamontology.org/format_3097">Protein domain classification format</a></td>
+<td class="type">label</td>
+<td class="type">publication_abstract<br><a href="http://doi.org/10.1186/s12859-014-0427-6">10.1186/s12859-014-0427-6</a></td>
+<td class="score medium">0.24%</td>
+<td class="done"><input id="i0j3k4b" type="checkbox" onclick="hide('i0j3k4')"></td>
+</tr>
+
+</tbody>
+
+<tfoot>
+<tr>
+<td>1</td>
+<td>20</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+</tfoot>
+
+</table>
+
+</body>
+</html>
