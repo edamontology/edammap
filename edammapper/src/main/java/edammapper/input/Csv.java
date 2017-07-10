@@ -35,7 +35,7 @@ public class Csv {
 
 		List<Input> inputs = new ArrayList<>();
 
-		try (CSVReader csvReader = new CSVReader(new InputStreamReader(new FileInputStream(queryPath), StandardCharsets.UTF_8), ',', '"')) {
+		try (CSVReader csvReader = new CSVReader(new InputStreamReader(new FileInputStream(queryPath), StandardCharsets.UTF_8), ',', '\'')) {
 			IterableCSVToBean<? extends Input> csvToBean;
 
 			switch (type) {
