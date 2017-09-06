@@ -5,7 +5,7 @@
   <parent>
     <groupId>edammap</groupId>
     <artifactId>edammap</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.2-SNAPSHOT</version>
   </parent>
 
   <artifactId>edammapper</artifactId>
@@ -68,45 +68,41 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
+        <artifactId>maven-jar-plugin</artifactId>
         <executions>
           <execution>
-            <id>edammap</id>
+            <id>edammapper</id>
+            <goals><goal>jar</goal></goals>
+            <phase>package</phase>
             <configuration>
-              <finalName>edammap</finalName>
               <archive>
                 <manifest>
+                  <addClasspath>true</addClasspath>
+                  <classpathPrefix>lib/</classpathPrefix>
                   <mainClass>edammapper.Main</mainClass>
                 </manifest>
               </archive>
-              <descriptorRefs>
-                <descriptorRef>jar-with-dependencies</descriptorRef>
-              </descriptorRefs>
-              <appendAssemblyId>false</appendAssemblyId>
+              <classifier>edammapper</classifier>
             </configuration>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
           </execution>
           <execution>
             <id>processor</id>
+            <goals><goal>jar</goal></goals>
+            <phase>package</phase>
             <configuration>
-              <finalName>processor</finalName>
               <archive>
                 <manifest>
+                  <addClasspath>true</addClasspath>
+                  <classpathPrefix>lib/</classpathPrefix>
                   <mainClass>edammapper.processing.ProcessorMain</mainClass>
                 </manifest>
               </archive>
-              <descriptorRefs>
-                <descriptorRef>jar-with-dependencies</descriptorRef>
-              </descriptorRefs>
-              <appendAssemblyId>false</appendAssemblyId>
+              <classifier>processor</classifier>
             </configuration>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
+          </execution>
+          <execution>
+            <id>default-jar</id>
+            <phase>none</phase>
           </execution>
         </executions>
       </plugin>
