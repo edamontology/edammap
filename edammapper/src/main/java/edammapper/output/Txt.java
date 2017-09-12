@@ -36,8 +36,8 @@ class Txt {
 				writer.write(query.getKeywords().iterator().next().getValue());
 				writer.write(SEP + query.getKeywords().iterator().next().getType());
 				for (Branch branch : mapping.getBranches()) {
-					for (int j = 0; j < mapping.getMatchesSize(branch); ++j) {
-						Match match = mapping.getMatch(branch, j);
+					for (int j = 0; j < mapping.getMatches(branch).size(); ++j) {
+						Match match = mapping.getMatches(branch).get(j);
 						Concept concept = concepts.get(match.getEdamUri());
 						writer.write(SEP + concept.getLabel());
 						writer.write(" (" + match.getEdamUri().getBranch() + "_" + match.getEdamUri().getNrString() + ")");
@@ -46,8 +46,8 @@ class Txt {
 				writer.write("\n");
 			} else {
 				for (Branch branch : mapping.getBranches()) {
-					for (int j = 0; j < mapping.getMatchesSize(branch); ++j) {
-						Match match = mapping.getMatch(branch, j);
+					for (int j = 0; j < mapping.getMatches(branch).size(); ++j) {
+						Match match = mapping.getMatches(branch).get(j);
 						Concept concept = concepts.get(match.getEdamUri());
 
 						if (query.getName() != null) {

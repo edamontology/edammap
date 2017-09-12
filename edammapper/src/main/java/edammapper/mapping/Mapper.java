@@ -2,8 +2,12 @@ package edammapper.mapping;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import edammapper.edam.Branch;
 import edammapper.edam.EdamUri;
@@ -892,25 +896,173 @@ public class Mapper {
 		return bestMatch;
 	}
 
+	private double bestPathScore(EdamUri edamUri, Map<EdamUri, Match> matches, int level, double current, double parentWeight) {
+		// matches.get(edamUri) is null if edamUri is from some other branch than its child who called us
+		// should not happen if EDAM is consistent
+		double score = (matches.get(edamUri) == null ? 0 : matches.get(edamUri).getWithoutPathScore());
+		current += Math.pow(parentWeight, level) * score;
+		List<EdamUri> parents = processedConcepts.get(edamUri).getDirectParents();
+		if (parents.size() == 0) {
+			double denominator = 0;
+			for (int l = 1; l <= level; ++l) {
+				denominator += Math.pow(parentWeight, l);
+			}
+			return current /= denominator;
+		} else {
+			double bestPathScore = 0;
+			for (EdamUri parent : parents) {
+				double best = bestPathScore(parent, matches, level + 1, current, parentWeight);
+				if (best > bestPathScore) bestPathScore = best;
+			}
+			return bestPathScore;
+		}
+	}
+
+	private void removeParents(EdamUri edamUri, Map<EdamUri, Match> matches) {
+		for (EdamUri parent : processedConcepts.get(edamUri).getDirectParents()) {
+			if (matches.get(parent) != null && !matches.get(parent).isRemoved()) {
+				matches.get(parent).setRemoved(true);
+				removeParents(parent, matches);
+			}
+		}
+	}
+
+	private void removeChildren(EdamUri edamUri, Map<EdamUri, Match> matches) {
+		for (EdamUri child : processedConcepts.get(edamUri).getDirectChildren()) {
+			if (matches.get(child) != null && !matches.get(child).isRemoved()) {
+				matches.get(child).setRemoved(true);
+				removeChildren(child, matches);
+			}
+		}
+	}
+
+	private boolean isParent(EdamUri child, EdamUri parentSearched) {
+		boolean isParent = false;
+		for (EdamUri parent : processedConcepts.get(child).getDirectParents()) {
+			if (parentSearched.equals(parent)) {
+				isParent = true;
+				break;
+			} else if (isParent(parent, parentSearched)) {
+				isParent = true;
+				break;
+			}
+		}
+		return isParent;
+	}
+
+	private void addParentsChildren(Match match, Mapping mapping, boolean remainingAnnotation) {
+		for (Match otherMatch : mapping.getMatches(match.getEdamUri().getBranch())) {
+			if (isParent(match.getEdamUri(), otherMatch.getEdamUri())) {
+
+				if (otherMatch.isExistingAnnotation()) match.addParentAnnotation(otherMatch.getEdamUri());
+				else match.addParent(otherMatch.getEdamUri());
+
+				if (remainingAnnotation) otherMatch.addChildRemainingAnnotation(match.getEdamUri());
+				else if (match.isExistingAnnotation()) otherMatch.addChildAnnotation(match.getEdamUri());
+				else otherMatch.addChild(match.getEdamUri());
+
+			} else if (isParent(otherMatch.getEdamUri(), match.getEdamUri())) {
+
+				if (remainingAnnotation) otherMatch.addParentRemainingAnnotation(match.getEdamUri());
+				else if (match.isExistingAnnotation()) otherMatch.addParentAnnotation(match.getEdamUri());
+				else otherMatch.addParent(match.getEdamUri());
+
+				if (otherMatch.isExistingAnnotation()) match.addChildAnnotation(otherMatch.getEdamUri());
+				else match.addChild(otherMatch.getEdamUri());
+			}
+		}
+		if (remainingAnnotation) {
+			for (Match otherMatch : mapping.getRemainingAnnotations(match.getEdamUri().getBranch())) {
+				if (isParent(match.getEdamUri(), otherMatch.getEdamUri())) {
+					match.addParentRemainingAnnotation(otherMatch.getEdamUri());
+					otherMatch.addChildRemainingAnnotation(match.getEdamUri());
+				} else if (isParent(otherMatch.getEdamUri(), match.getEdamUri())) {
+					otherMatch.addParentRemainingAnnotation(match.getEdamUri());
+					match.addChildRemainingAnnotation(otherMatch.getEdamUri());
+				}
+			}
+		}
+	}
+
 	public Mapping map(Query query, QueryProcessed processedQuery, MapperArgs args) {
 		Mapping mapping = new Mapping(args.getMatch(), args.getBranches());
+
+		Map<EdamUri, Match> matches = new HashMap<>();
 
 		for (Map.Entry<EdamUri, ConceptProcessed> conceptEntry : processedConcepts.entrySet()) {
 			EdamUri edamUri = conceptEntry.getKey();
 			ConceptProcessed processedConcept = conceptEntry.getValue();
 
-			if (processedConcept.isObsolete() && !args.getObsolete()) continue;
 			if (!args.getBranches().contains(edamUri.getBranch())) continue;
-			if (args.isExcludeAnnotations() && query.getAnnotations().contains(edamUri)) continue;
 
-			// double lastMatchScore = mapping.getLastMatchScore(edamUri.getBranch()); // TODO
+			if ((processedConcept.isObsolete() && !args.getObsolete())
+				|| (processedConcept.getDirectParents().isEmpty() && !args.isNoRemoveTopLevel())) {
+				Match zeroMatch = new Match(0, new ConceptMatch(0, ConceptMatchType.none, -1), new QueryMatch(0, QueryMatchType.none, -1, -1));
+				zeroMatch.setEdamUri(edamUri);
+				matches.put(edamUri, zeroMatch);
+				continue;
+			}
 
 			Match match = getBestMatch(processedConcept, processedQuery, args.getAlgorithmArgs(), args.getIdfMultiplierArgs(), edamUri.getBranch());
 			match.setEdamUri(edamUri);
+			matches.put(edamUri, match);
+		}
+
+		Set<EdamUri> annotations = new LinkedHashSet<>();
+		for (EdamUri annotation : query.getAnnotations()) {
+			if (args.getBranches().contains(annotation.getBranch())) {
+				annotations.add(annotation);
+				matches.get(annotation).setExistingAnnotation(true);
+			}
+		}
+
+		if (!args.isNoRemoveInferiorParentChild() && args.isExcludeAnnotations()) {
+			for (EdamUri annotation : annotations) {
+				removeParents(annotation, matches);
+				removeChildren(annotation, matches);
+				matches.get(annotation).setRemoved(true);
+			}
+		}
+
+		if (args.getAlgorithmArgs().getPathWeight() > 0 && args.getAlgorithmArgs().getParentWeight() > 0) {
+			for (Match match : matches.values()) {
+				match.setWithoutPathScore(match.getScore());
+			}
+			for (Map.Entry<EdamUri, Match> matchEntry : matches.entrySet()) {
+				EdamUri edamUri = matchEntry.getKey();
+				Match match = matchEntry.getValue();
+
+				if (processedConcepts.get(edamUri).getDirectParents().isEmpty() && !args.isNoRemoveTopLevel()) {
+					match.setRemoved(true);
+					continue;
+				}
+				if (processedConcepts.get(edamUri).isObsolete() && !args.getObsolete()) {
+					continue;
+				}
+
+				double bestPathScore = 0;
+				for (EdamUri parent : processedConcepts.get(edamUri).getDirectParents()) {
+					double best = bestPathScore(parent, matches, 1, 0, args.getAlgorithmArgs().getParentWeight());
+					if (best > bestPathScore) bestPathScore = best;
+				}
+				match.setScore((match.getScore() + args.getAlgorithmArgs().getPathWeight() * bestPathScore) / (1 + args.getAlgorithmArgs().getPathWeight()));
+			}
+		}
+
+		List<Match> sortedMatches = new ArrayList<>(matches.values());
+		Collections.sort(sortedMatches, Collections.reverseOrder());
+
+		for (Match match : sortedMatches) {
+			if (mapping.isFull()) break;
+			if (mapping.isFull(match.getEdamUri().getBranch())) continue;
+
+			if (match.isRemoved()) continue;
+			if (processedConcepts.get(match.getEdamUri()).isObsolete() && !args.getObsolete()) continue;
+			if (args.isExcludeAnnotations() && match.isExistingAnnotation()) continue;
 
 			double goodScore = 0;
 			double badScore = 0;
-			switch (edamUri.getBranch()) {
+			switch (match.getEdamUri().getBranch()) {
 			case topic:
 				goodScore = args.getGoodScoreTopic();
 				badScore = args.getBadScoreTopic();
@@ -929,11 +1081,43 @@ public class Mapper {
 				break;
 			}
 
-			double score = ((args.getIdfMultiplierArgs().getMappingStrategy() == MapperStrategy.average) ? match.getBestOneScore() : match.getScore());
-			if ((!args.isNoOutputGoodScores() && score > goodScore) ||
-				(!args.isNoOutputMediumScores() && score >= badScore && score <= goodScore) ||
-				(args.isOutputBadScores() && score < badScore)) {
-				mapping.addMatch(edamUri.getBranch(), match);
+			double score = 0;
+			if (args.getIdfMultiplierArgs().getMappingStrategy() == MapperStrategy.average) {
+				score = match.getBestOneScore();
+			} else if (args.getAlgorithmArgs().getPathWeight() > 0 && args.getAlgorithmArgs().getParentWeight() > 0) {
+				score = match.getWithoutPathScore();
+			} else {
+				score = match.getScore();
+			}
+
+			if (score > goodScore) {
+				if (args.isNoOutputGoodScores()) continue;
+			} else if (score >= badScore && score <= goodScore) {
+				if (args.isNoOutputMediumScores()) continue;
+			} else if (score < badScore) {
+				if (!args.isOutputBadScores()) continue;
+			}
+
+			if (!args.isNoRemoveInferiorParentChild()) {
+				removeParents(match.getEdamUri(), matches);
+				removeChildren(match.getEdamUri(), matches);
+			}
+
+			addParentsChildren(match, mapping, false);
+			mapping.addMatch(match);
+		}
+
+		if (!args.isExcludeAnnotations() && annotations.size() > 0) {
+			int annotationsSeen = 0;
+			for (Match match : sortedMatches) {
+				if (annotations.contains(match.getEdamUri())) {
+					++annotationsSeen;
+					if (!mapping.getMatches(match.getEdamUri().getBranch()).contains(match)) {
+						addParentsChildren(match, mapping, true);
+						mapping.addRemainingAnnotation(match);
+					}
+					if (annotationsSeen >= annotations.size()) break;
+				}
 			}
 		}
 

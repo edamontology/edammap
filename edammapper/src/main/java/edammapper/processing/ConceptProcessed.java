@@ -3,6 +3,8 @@ package edammapper.processing;
 import java.util.ArrayList;
 import java.util.List;
 
+import edammapper.edam.EdamUri;
+
 public class ConceptProcessed {
 
 	private boolean obsolete = false;
@@ -29,6 +31,9 @@ public class ConceptProcessed {
 	private List<List<Double>> idfs = new ArrayList<>();
 	private List<Double> idfScalings = new ArrayList<>();
 	private List<Double> multipliers = new ArrayList<>();
+
+	private List<EdamUri> directParents = new ArrayList<>();
+	private List<EdamUri> directChildren = new ArrayList<>();
 
 	public boolean isObsolete() {
 		return obsolete;
@@ -139,5 +144,18 @@ public class ConceptProcessed {
 	}
 	public void addMultiplier(Double multiplier) {
 		this.multipliers.add(multiplier);
+	}
+
+	public List<EdamUri> getDirectParents() {
+		return directParents;
+	}
+	public void setDirectParents(List<EdamUri> directParents) {
+		this.directParents = directParents;
+	}
+	public List<EdamUri> getDirectChildren() {
+		return directChildren;
+	}
+	public void setDirectChildren(List<EdamUri> directChildren) {
+		this.directChildren = directChildren;
 	}
 }

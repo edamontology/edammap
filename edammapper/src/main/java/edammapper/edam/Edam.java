@@ -41,6 +41,14 @@ public class Edam {
 						else if (a.getProperty().isComment() && a.getValue().asLiteral().isPresent())
 							concept.setComment(a.getValue().asLiteral().get().getLiteral());
 					});
+					concept.setDirectParents(EntitySearcher.getSuperClasses(c, ontology)
+						.filter(a -> a.isOWLClass() && !a.asOWLClass().getIRI().toString().equals("http://www.w3.org/2002/07/owl#DeprecatedClass"))
+						.map(a -> new EdamUri(a.asOWLClass().getIRI().toString(), prefix))
+						.collect(Collectors.toList()));
+					concept.setDirectChildren(EntitySearcher.getSubClasses(c, ontology)
+						.filter(a -> a.isOWLClass())
+						.map(a -> new EdamUri(a.asOWLClass().getIRI().toString(), prefix))
+						.collect(Collectors.toList()));
 					if (concept.getLabel().isEmpty())
 						throw new IllegalStateException(String.format("Label of concept %s is empty", c.getIRI()));
 					return concept;

@@ -23,11 +23,8 @@ public class MainArgs {
 	@Parameter(names = { "-o", "--output" }, description = "File to write results to. If not specified or invalid, will be written to standard output.")
 	private String output = "";
 
-	@Parameter(names = { "-r", "--report" }, description = "File to write a HTML report to. In addition to the usual output, but with formatting in a browser.")
+	@Parameter(names = { "-r", "--report" }, description = "File to write a HTML report to. In addition to results, it will contain metrics, comparisons to manual mapping, extended information about queries and nice formatting.")
 	private String report = "";
-
-	@Parameter(names = { "-k", "--benchmark-report" }, description = "File to write HTML benchmark report to. It will contain metrics and comparisons to the manual mapping specified in the input query file.")
-	private String benchmarkReport = "";
 
 	@Parameter(names = { "--threads" }, description = "How many threads to use for mapping (one query is processed by one thread)")
 	private int threads = 4;
@@ -60,10 +57,6 @@ public class MainArgs {
 
 	public String getReport() {
 		return report;
-	}
-
-	public String getBenchmarkReport() {
-		return benchmarkReport;
 	}
 
 	public int getThreads() {

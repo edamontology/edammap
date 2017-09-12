@@ -99,6 +99,9 @@ public class Processor {
 
 		idfMake.endDocument();
 
+		processedConcept.setDirectParents(concept.getDirectParents());
+		processedConcept.setDirectChildren(concept.getDirectChildren());
+
 		return processedConcept;
 	}
 

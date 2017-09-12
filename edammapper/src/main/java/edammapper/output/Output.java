@@ -24,16 +24,12 @@ public class Output {
 
 	private Path report;
 
-	private Path benchmarkReport;
-
 	public Output(MainArgs args) throws AccessDeniedException, FileAlreadyExistsException {
 		this.args = args;
 
 		this.output = check(args.getOutput());
 
 		this.report = check(args.getReport());
-
-		this.benchmarkReport = check(args.getBenchmarkReport());
 	}
 
 	private Path check(String file) throws AccessDeniedException, FileAlreadyExistsException {
@@ -54,7 +50,6 @@ public class Output {
 
 	public void output(Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publications, List<Mapping> mappings) throws IOException {
 		Txt.output(args.getType(), output, concepts, queries, publications, mappings);
-		Html.output(args, report, concepts, queries, publications, mappings);
-		Benchmark.output(args, benchmarkReport, concepts, queries, publications, mappings);
+		Report.output(args, report, concepts, queries, publications, mappings);
 	}
 }

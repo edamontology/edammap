@@ -16,6 +16,9 @@ public class Concept {
 	private String definition = "";
 	private String comment = "";
 
+	private List<EdamUri> directParents = new ArrayList<>();
+	private List<EdamUri> directChildren = new ArrayList<>();
+
 	public boolean isObsolete() {
 		return obsolete;
 	}
@@ -63,5 +66,19 @@ public class Concept {
 	}
 	public void setComment(String comment) {
 		this.comment = comment;
+	}
+
+	public List<EdamUri> getDirectParents() {
+		return directParents;
+	}
+	public void setDirectParents(List<EdamUri> directParents) {
+		this.directParents = directParents;
+	}
+
+	public List<EdamUri> getDirectChildren() {
+		return directChildren;
+	}
+	public void setDirectChildren(List<EdamUri> directChildren) {
+		this.directChildren = directChildren;
 	}
 }

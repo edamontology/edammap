@@ -37,6 +37,12 @@ public class MapperAlgorithmArgs {
 	@Parameter(names = { "--query-weight" }, validateWith = PositiveDouble.class, description = "Weight of matching a query (with a concept). Set to 0 to disable matching of queries.")
 	private double queryWeight = 1;
 
+	@Parameter(names = { "--parent-weight" }, validateWith = PositiveDouble.class, description = "Weight of concept's parent when computing path enrichment. Weight of grand-parent is parent-weight times parent-weight, etc. Set to 0 to disable path enrichment.")
+	private double parentWeight = 0.5;
+
+	@Parameter(names = { "--path-weight" }, validateWith = PositiveDouble.class, description = "Weight of path enrichment. Weight of concept is 1. Set to 0 to disable path enrichment")
+	private double pathWeight = 0.7;
+
 	public int getCompoundWords() {
 		return compoundWords;
 	}
@@ -75,5 +81,13 @@ public class MapperAlgorithmArgs {
 
 	public double getQueryWeight() {
 		return queryWeight;
+	}
+
+	public double getParentWeight() {
+		return parentWeight;
+	}
+
+	public double getPathWeight() {
+		return pathWeight;
 	}
 }

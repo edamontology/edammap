@@ -54,8 +54,14 @@ public class MapperArgs {
 	@Parameter(names = { "--output-bad-scores" }, description = "Output matches with bad scores")
 	private boolean outputBadScores = false;
 
-	@Parameter(names = { "--exclude-annotations" }, description = "Don't suggest concepts already used for annotating query")
+	@Parameter(names = { "--exclude-annotations" }, description = "Don't suggest concepts already used for annotating query. Then parents and children of these concepts are not suggested either (unless --no-remove-inferior-parent-child is specified).")
 	private boolean excludeAnnotations = false;
+
+	@Parameter(names = { "--no-remove-inferior-parent-child" }, description = "Don't remove parents and children of a better matched concept from suggestion results")
+	private boolean noRemoveInferiorParentChild = false;
+
+	@Parameter(names = { "--no-remove-top-level" }, description = "Don't remove the top level concepts (topic, operation, data, format) from suggestion results")
+	private boolean noRemoveTopLevel = false;
 
 	@ParametersDelegate
 	private MapperAlgorithmArgs algorithmArgs = new MapperAlgorithmArgs();
@@ -121,6 +127,14 @@ public class MapperArgs {
 
 	public boolean isExcludeAnnotations() {
 		return excludeAnnotations;
+	}
+
+	public boolean isNoRemoveInferiorParentChild() {
+		return noRemoveInferiorParentChild;
+	}
+
+	public boolean isNoRemoveTopLevel() {
+		return noRemoveTopLevel;
 	}
 
 	public MapperAlgorithmArgs getAlgorithmArgs() {

@@ -11,6 +11,8 @@ public class Mapping {
 
 	private Map<Branch, List<Match>> matches;
 
+	private Map<Branch, List<Match>> remainingAnnotations;
+
 	private final int matchesTop;
 
 	private final List<Branch> branches;
@@ -23,12 +25,16 @@ public class Mapping {
 		}
 
 		matches = new EnumMap<>(Branch.class);
+		remainingAnnotations = new EnumMap<>(Branch.class);
 
 		this.matchesTop = matchesTop;
 		this.branches = branches;
 
 		for (Branch branch : this.branches) {
 			matches.put(branch, new ArrayList<Match>(this.matchesTop));
+		}
+		for (Branch branch : this.branches) {
+			remainingAnnotations.put(branch, new ArrayList<Match>());
 		}
 	}
 
@@ -40,61 +46,36 @@ public class Mapping {
 		return branches;
 	}
 
-	public int getMatchesSize(Branch branch) {
-		if (!branches.contains(branch)) {
-			//
-		}
-		return matches.get(branch).size();
+	public List<Match> getMatches(Branch branch) {
+		return matches.get(branch);
 	}
-
-	public Match getMatch(Branch branch, int index) {
-		if (!branches.contains(branch)) {
-			//
-		} else if (index < 0 || index >= matches.get(branch).size()) {
-			//
-		}
-		return matches.get(branch).get(index);
-	}
-
-	// TODO needed ?
-	public double getLastMatchScore(Branch branch) {
-		if (!branches.contains(branch)) {
-			//
-		}
-		List<Match> matchesBranch = matches.get(branch);
-		if (matchesBranch.size() == matchesTop && matchesTop > 0) {
-			return matchesBranch.get(matchesBranch.size() - 1).getScore();
+	public boolean addMatch(Match match) {
+		List<Match> matchesBranch = matches.get(match.getEdamUri().getBranch());
+		if (matchesBranch.size() < matchesTop) {
+			matchesBranch.add(match);
+			return true;
 		} else {
-			return 0;
+			return false;
 		}
 	}
 
-	public boolean addMatch(Branch branch, Match match) {
-		if (!branches.contains(branch)) {
-			//
-		} else if (match == null) {
-			//
+	public List<Match> getRemainingAnnotations(Branch branch) {
+		return remainingAnnotations.get(branch);
+	}
+	public void addRemainingAnnotation(Match match) {
+		remainingAnnotations.get(match.getEdamUri().getBranch()).add(match);
+	}
+
+	public boolean isFull(Branch branch) {
+		if (matches.get(branch).size() < matchesTop) {
+			return false;
+		} else {
+			return true;
 		}
-		List<Match> matchesBranch = matches.get(branch);
-		if (matchesBranch.size() == matchesTop && matchesTop > 0) {
-			Match lastMatch = matchesBranch.get(matchesBranch.size() - 1);
-			if (match.compareTo(lastMatch) <= 0) {
-				return false;
-			} else {
-				matchesBranch.remove(lastMatch);
-			}
-		}
-		int i = 0;
-		int s = matchesBranch.size();
-		while (i < s) {
-			if (match.compareTo(matchesBranch.get(i)) > 0) {
-				matchesBranch.add(i, match);
-				break;
-			}
-			++i;
-		}
-		if (i == s && matchesTop > 0) {
-			matchesBranch.add(i, match);
+	}
+	public boolean isFull() {
+		for (Branch branch : branches) {
+			if (!isFull(branch)) return false;
 		}
 		return true;
 	}
