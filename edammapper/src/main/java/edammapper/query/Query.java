@@ -9,20 +9,20 @@ public class Query {
 
 	private final String name;
 
-	private final List<String> webpageUrls;
+	private final List<Link> webpageUrls;
 
 	private final String description;
 
 	private final List<Keyword> keywords;
 
-	private final List<String> publicationIds;
+	private final List<PublicationIds> publicationIds;
 
-	private final List<String> docUrls;
+	private final List<Link> docUrls;
 
 	private final Set<EdamUri> annotations;
 
-	public Query(String name, List<String> webpageUrls, String description, List<Keyword> keywords,
-			List<String> publicationIds, List<String> docUrls, Set<EdamUri> annotations) {
+	public Query(String name, List<Link> webpageUrls, String description, List<Keyword> keywords,
+			List<PublicationIds> publicationIds, List<Link> docUrls, Set<EdamUri> annotations) {
 		this.name = name;
 		this.webpageUrls = webpageUrls;
 		this.description = description;
@@ -36,7 +36,7 @@ public class Query {
 		return name;
 	}
 
-	public List<String> getWebpageUrls() {
+	public List<Link> getWebpageUrls() {
 		return webpageUrls;
 	}
 
@@ -48,11 +48,11 @@ public class Query {
 		return keywords;
 	}
 
-	public List<String> getPublicationIds() {
+	public List<PublicationIds> getPublicationIds() {
 		return publicationIds;
 	}
 
-	public List<String> getDocUrls() {
+	public List<Link> getDocUrls() {
 		return docUrls;
 	}
 

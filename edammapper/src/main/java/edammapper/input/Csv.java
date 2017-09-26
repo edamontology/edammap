@@ -1,8 +1,5 @@
 package edammapper.input;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -10,9 +7,9 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.opencsv.CSVReader;
-import com.opencsv.bean.HeaderColumnNameMappingStrategy;
-import com.opencsv.bean.IterableCSVToBean;
+import com.univocity.parsers.common.processor.BeanListProcessor;
+import com.univocity.parsers.csv.CsvParser;
+import com.univocity.parsers.csv.CsvParserSettings;
 
 import edammapper.input.csv.BioConductor;
 import edammapper.input.csv.Generic;
@@ -22,34 +19,43 @@ import edammapper.query.QueryType;
 
 public class Csv {
 
-	private static <T extends Input> IterableCSVToBean<T> getCsvToBean(Class<T> clazz, CSVReader csvReader) {
-		HeaderColumnNameMappingStrategy<T> strategy = new HeaderColumnNameMappingStrategy<>();
-		strategy.setType(clazz);
-		return new IterableCSVToBean<>(csvReader, strategy, null);
-	}
+	public static List<InputType> load(String queryPath, QueryType type) throws IOException, ParseException {
+		List<InputType> inputs = new ArrayList<>();
 
-	public static List<Input> load(String queryPath, QueryType type) throws IOException, ParseException {
-		if (queryPath == null || !(new File(queryPath).canRead())) {
-			throw new FileNotFoundException("Query file does not exist or is not readable!");
+		BeanListProcessor<? extends InputType> rowProcessor;
+		switch (type) {
+			case SEQwiki: case SEQwikiTags: case SEQwikiTool: rowProcessor = new BeanListProcessor<SEQwiki>(SEQwiki.class); break;
+			case msutils: rowProcessor = new BeanListProcessor<Msutils>(Msutils.class); break;
+			case BioConductor: rowProcessor = new BeanListProcessor<BioConductor>(BioConductor.class); break;
+			default: rowProcessor = new BeanListProcessor<Generic>(Generic.class); break;
+		}
+		rowProcessor.setStrictHeaderValidationEnabled(false);
+
+		CsvParserSettings settings = new CsvParserSettings();
+		settings.setProcessor(rowProcessor);
+		settings.setHeaderExtractionEnabled(true);
+		settings.setAutoConfigurationEnabled(true);
+		settings.setReadInputOnSeparateThread(false); // disabling is (slightly) more efficient if your input is small
+		settings.setSkipEmptyLines(true);
+		settings.trimValues(true);
+		settings.setMaxCharsPerColumn(65536);
+		settings.getFormat().setDelimiter(',');
+		settings.getFormat().setQuote('"');
+		settings.getFormat().setQuoteEscape('"');
+		settings.getFormat().setCharToEscapeQuoteEscaping('"');
+		settings.getFormat().setLineSeparator("\n");
+		settings.getFormat().setComment('#');
+
+		Input input = new Input(queryPath, true);
+		try (InputStreamReader reader = new InputStreamReader(input.newInputStream(), StandardCharsets.UTF_8)) {
+			CsvParser parser = new CsvParser(settings);
+			parser.parse(reader);
 		}
 
-		List<Input> inputs = new ArrayList<>();
-
-		try (CSVReader csvReader = new CSVReader(new InputStreamReader(new FileInputStream(queryPath), StandardCharsets.UTF_8), ',', '\'')) {
-			IterableCSVToBean<? extends Input> csvToBean;
-
-			switch (type) {
-				case SEQwiki: case SEQwikiTags: case SEQwikiTool: csvToBean = getCsvToBean(SEQwiki.class, csvReader); break;
-				case msutils: csvToBean = getCsvToBean(Msutils.class, csvReader); break;
-				case BioConductor: csvToBean = getCsvToBean(BioConductor.class, csvReader); break;
-				default: csvToBean = getCsvToBean(Generic.class, csvReader); break;
-			}
-
-			int i = 1; // header line
-			for (Input input : csvToBean) {
-				input.check(++i);
-				inputs.add(input);
-			}
+		int i = 0;
+		for (InputType inputType : rowProcessor.getBeans()) {
+			inputType.check(++i);
+			inputs.add(inputType);
 		}
 
 		return inputs;

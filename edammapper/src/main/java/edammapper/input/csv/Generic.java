@@ -2,39 +2,38 @@ package edammapper.input.csv;
 
 import java.text.ParseException;
 
-import com.opencsv.bean.CsvBind;
+import com.univocity.parsers.annotations.Parsed;
 
-import edammapper.input.Input;
+import edammapper.input.InputType;
 
-public class Generic implements Input {
+public class Generic implements InputType {
 
-	@CsvBind(required = true)
+	@Parsed
 	private String name;
 
-	@CsvBind
+	@Parsed
 	private String webpageUrls;
 
-	@CsvBind
+	@Parsed
 	private String description;
 
-	@CsvBind
+	@Parsed
 	private String keywords;
 
-	@CsvBind
+	@Parsed
 	private String publicationIds;
 
-	@CsvBind
+	@Parsed
 	private String docUrls;
 
-	@CsvBind
+	@Parsed
 	private String annotations;
 
 	@Override
 	public void check(int i) throws ParseException {
 		if (name == null || name.equals("")) {
-			throw new ParseException("\"Name\" column missing or some entry in that column missing! (" + i + ")", i);
+			parseException("name", i);
 		}
-		// TODO isEdamUri ?
 	}
 
 	public String getName() {

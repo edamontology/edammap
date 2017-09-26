@@ -21,6 +21,8 @@ import edammapper.idf.IdfMake;
 import edammapper.mapping.MapperIdfMultiplierArgs;
 import edammapper.preprocessing.PreProcessor;
 import edammapper.query.Keyword;
+import edammapper.query.Link;
+import edammapper.query.PublicationIds;
 import edammapper.query.Query;
 import edammapper.query.QueryType;
 
@@ -301,6 +303,14 @@ public class Processor {
 		return publicationProcessed;
 	}
 
+	public static String choosePublicationId(PublicationIds publicationIds) {
+		String publicationId = null;
+		if (publicationIds.getPmid() != null) publicationId = publicationIds.getPmid();
+		else if (publicationIds.getPmcid() != null) publicationId = publicationIds.getPmcid();
+		else if (publicationIds.getDoi() != null) publicationId = publicationIds.getDoi();
+		return publicationId;
+	}
+
 	public QueryProcessed getProcessedQuery(Query query, PreProcessor pp, QueryType type) {
 		QueryProcessed queryProcessed = new QueryProcessed();
 
@@ -320,8 +330,13 @@ public class Processor {
 		}
 
 		if (query.getWebpageUrls() != null) {
-			for (Iterator<String> it = query.getWebpageUrls().iterator(); it.hasNext(); ) {
-				String webpageUrl = it.next();
+			boolean skipFirst = (type == QueryType.biotools);
+			for (Iterator<Link> it = query.getWebpageUrls().iterator(); it.hasNext(); ) {
+				String webpageUrl = it.next().getUrl();
+				if (skipFirst) {
+					skipFirst = false;
+					continue;
+				}
 				String webpage = null;
 				if (database != null) {
 					webpage = database.getWebpage(webpageUrl);
@@ -381,16 +396,15 @@ public class Processor {
 		}
 
 		if (query.getPublicationIds() != null) {
-			for (String publicationId : query.getPublicationIds()) {
-				if (Fetcher.isDoi(publicationId)) {
-					publicationId = Fetcher.normalizeDoi(publicationId);
-				}
+			for (PublicationIds publicationIds : query.getPublicationIds()) {
+				String publicationId = choosePublicationId(publicationIds);
+				if (publicationId == null) continue;
 				Publication publication = null;
 				if (database != null) {
 					publication = database.getPublication(publicationId);
 				}
 				if (publication == null && fetcher != null) {
-					publication = fetcher.getPublication(publicationId);
+					publication = fetcher.getPublication(publicationIds);
 					if (publication != null && database != null) {
 						database.putPublication(publicationId, publication);
 						databaseUpdated = true;
@@ -407,8 +421,8 @@ public class Processor {
 		}
 
 		if (query.getDocUrls() != null) {
-			for (Iterator<String> it = query.getDocUrls().iterator(); it.hasNext(); ) {
-				String docUrl = it.next();
+			for (Iterator<Link> it = query.getDocUrls().iterator(); it.hasNext(); ) {
+				String docUrl = it.next().getUrl();
 				String doc = null;
 				if (database != null) {
 					doc = database.getDoc(docUrl);

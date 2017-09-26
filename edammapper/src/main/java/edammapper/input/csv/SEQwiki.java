@@ -2,52 +2,52 @@ package edammapper.input.csv;
 
 import java.text.ParseException;
 
-import com.opencsv.bean.CsvBind;
+import com.univocity.parsers.annotations.Parsed;
 
-import edammapper.input.Input;
+import edammapper.input.InputType;
 
-public class SEQwiki implements Input {
+public class SEQwiki implements InputType {
 
-	@CsvBind(required = true)
+	@Parsed
 	private String name;
 
-	@CsvBind(required = true)
+	@Parsed
 	private String name2;
 
-	@CsvBind(required = true)
+	@Parsed
 	private String summary;
 
-	@CsvBind
+	@Parsed
 	private String domains;
 
-	@CsvBind
+	@Parsed
 	private String methods;
 
-	@CsvBind
+	@Parsed
 	private String features;
 
-	@CsvBind
+	@Parsed
 	private String publications;
 
-	@CsvBind
+	@Parsed
 	private String webpages;
 
-	@CsvBind
+	@Parsed
 	private String docs;
 
 	@Override
 	public void check(int i) throws ParseException {
 		if (name == null || name.equals("")) {
-			throw new ParseException("\"Name\" column missing or some entry in that column missing! (" + i + ")", i);
+			parseException("name", i);
 		}
 		if (name2 == null || name2.equals("")) {
-			throw new ParseException("\"Name2\" column missing or some entry in that column missing! (" + i + ")", i);
+			parseException("name2", i);
 		}
 		if (!name.equals(name2)) {
-			throw new ParseException("\"Name\" and \"Name2\" columns must have equal content! (" + i + ")", i);
+			throw new ParseException("Columns \"name\" and \"name2\" must have equal content! (record " + i + ")", i);
 		}
 		if (summary == null || summary.equals("")) {
-			throw new ParseException("\"Summary\" column missing or some entry in that column missing! (" + i + ")", i);
+			parseException("summary", i);
 		}
 	}
 

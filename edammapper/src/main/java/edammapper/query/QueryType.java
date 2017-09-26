@@ -6,6 +6,7 @@ public enum QueryType {
 	SEQwikiTags,
 	SEQwikiTool,
 	msutils,
+	biotools14, // biotools-1.4.xsd
 	biotools,
 	BioConductor
 }

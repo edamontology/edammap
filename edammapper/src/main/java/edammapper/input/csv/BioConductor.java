@@ -2,55 +2,53 @@ package edammapper.input.csv;
 
 import java.text.ParseException;
 
-import com.opencsv.bean.CsvBind;
+import com.univocity.parsers.annotations.Parsed;
 
-import edammapper.input.Input;
+import edammapper.input.InputType;
 
-public class BioConductor implements Input {
+public class BioConductor implements InputType {
 
-	@CsvBind(required = true)
+	@Parsed
 	private String name;
 
-	@CsvBind
+	@Parsed
 	private String title;
 
-	@CsvBind
+	@Parsed
 	private String description;
 
-	@CsvBind
+	@Parsed
 	private String biocViews;
 
-	@CsvBind
+	@Parsed
 	private String reposFullUrl;
 
-	@CsvBind
+	@Parsed
 	private String categories;
 
-	@CsvBind
+	@Parsed
 	private String topic;
 
-	@CsvBind
+	@Parsed
 	private String topic_URI;
 
-	@CsvBind
+	@Parsed
 	private String operation;
 
-	@CsvBind
+	@Parsed
 	private String operation_URI;
 
 	@Override
 	public void check(int i) throws ParseException {
 		if (name == null || name.equals("")) {
-			throw new ParseException("\"Name\" column missing or some entry in that column missing! (" + i + ")", i);
+			parseException("name", i);
 		}
 		if (title == null || title.equals("")) {
-			throw new ParseException("\"Title\" column missing or some entry in that column missing! (" + i + ")", i);
+			parseException("title", i);
 		}
 		if (description == null || description.equals("")) {
-			throw new ParseException("\"Description\" column missing or some entry in that column missing! (" + i + ")", i);
+			parseException("description", i);
 		}
-		// some other columns also required?
-		// TODO isEdamUri ?
 	}
 
 	public String getName() {

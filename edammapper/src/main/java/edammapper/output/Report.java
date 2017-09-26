@@ -25,12 +25,15 @@ import edammapper.fetching.Fetcher;
 import edammapper.fetching.MeshTerm;
 import edammapper.fetching.MinedTerm;
 import edammapper.fetching.Publication;
+import edammapper.input.Input;
 import edammapper.mapping.ConceptMatchType;
 import edammapper.mapping.MapperArgs;
 import edammapper.mapping.Mapping;
 import edammapper.mapping.Match;
 import edammapper.mapping.QueryMatchType;
 import edammapper.query.Keyword;
+import edammapper.query.Link;
+import edammapper.query.PublicationIds;
 import edammapper.query.Query;
 
 class Report {
@@ -378,16 +381,29 @@ class Report {
 	}
 
 	private static String getPublicationLinkHtml(String publicationId) {
-		if (publicationId == null) return "";
-		if (Fetcher.isDoi(publicationId)) {
-			publicationId = Fetcher.normalizeDoi(publicationId);
-		}
 		String link = Fetcher.getPublicationLink(publicationId);
 		if (link == null) {
 			return publicationId;
 		} else {
 			return "<a href=\"" + link + "\">" + publicationId + "</a>";
 		}
+	}
+
+	private static String getPublicationLinkHtml(PublicationIds publicationIds) {
+		if (publicationIds == null) return "";
+		String s = "";
+		if (publicationIds.getPmid() != null && !publicationIds.getPmid().isEmpty()) {
+			s += getPublicationLinkHtml(publicationIds.getPmid());
+		}
+		if (publicationIds.getPmcid() != null && !publicationIds.getPmcid().isEmpty()) {
+			if (!s.isEmpty()) s += ", ";
+			s += getPublicationLinkHtml(publicationIds.getPmcid());
+		}
+		if (publicationIds.getDoi() != null && !publicationIds.getDoi().isEmpty()) {
+			if (!s.isEmpty()) s += ", ";
+			s += getPublicationLinkHtml(publicationIds.getDoi());
+		}
+		return s;
 	}
 
 	private static String getMeshLinkHtml(MeshTerm mesh) {
@@ -490,7 +506,11 @@ class Report {
 		writer.write("<h2>Input/Output</h2>\n");
 		writer.write("<dl>\n");
 		writeVarVal(writer, "https://github.com/edamontology/edamontology/tree/master/releases", "Ontology file", new File(args.getEdam()).getName());
-		writeVarVal(writer, "Query file", new File(args.getQuery()).getName());
+		if (Input.isProtocol(args.getQuery())) {
+			writeVarVal(writer, "Query file", "<a href=\"" + args.getQuery() + "\">" + args.getQuery() + "</a>");
+		} else {
+			writeVarVal(writer, "Query file", new File(args.getQuery()).getName());
+		}
 		writeVarVal(writer, "Type", args.getType().toString());
 		String outputFile = new File(args.getOutput()).getName();
 		writeVarVal(writer, "Output file", (outputFile.isEmpty() ? "&nbsp;" : outputFile));
@@ -641,7 +661,7 @@ class Report {
 
 			String webpageUrl = null;
 			if (query.getWebpageUrls() != null && !query.getWebpageUrls().isEmpty()) {
-				webpageUrl = query.getWebpageUrls().get(0);
+				webpageUrl = query.getWebpageUrls().get(0).getUrl();
 			}
 
 			if (webpageUrl != null) {
@@ -662,10 +682,12 @@ class Report {
 
 			if (query.getWebpageUrls() != null) {
 				for (int i = 1; i < query.getWebpageUrls().size(); ++i) {
-					webpageUrl = query.getWebpageUrls().get(i);
-					if (webpageUrl != null) {
-						writer.write(getLinkHtml(webpageUrl) + "<br>\n");
+					Link webpageLink = query.getWebpageUrls().get(i);
+					writer.write(getLinkHtml(webpageLink.getUrl()));
+					if (webpageLink.getType() != null) {
+						writer.write(" (" + webpageLink.getType() + ")");
 					}
+					writer.write("<br>\n");
 				}
 			}
 
@@ -704,6 +726,9 @@ class Report {
 
 			writer.write("<h4>Publication ");
 			writer.write(getPublicationLinkHtml(query.getPublicationIds().get(i))); // TODO why can't be out of bounds ?
+			if (query.getPublicationIds().get(i) != null && query.getPublicationIds().get(i).getType() != null) {
+				writer.write(" (" + query.getPublicationIds().get(i).getType() + ")");
+			}
 			writer.write("</h4>\n");
 
 			writer.write("<p><strong>Title:</strong> " + publication.getTitle() + "<p>\n");
@@ -749,8 +774,12 @@ class Report {
 
 		if (query.getDocUrls() != null && !query.getDocUrls().isEmpty()) {
 			writer.write("<h4>Docs</h4>\n");
-			for (String docUrl : query.getDocUrls()) {
-				writer.write(getLinkHtml(docUrl) + "<br>\n");
+			for (Link docLink : query.getDocUrls()) {
+				writer.write(getLinkHtml(docLink.getUrl()));
+				if (docLink.getType() != null) {
+					writer.write(" (" + docLink.getType() + ")");
+				}
+				writer.write("<br>\n");
 			}
 		}
 
@@ -810,9 +839,13 @@ class Report {
 		String link = null;
 		if (match.getQueryMatch().getType() == QueryMatchType.webpage || match.getQueryMatch().getType() == QueryMatchType.doc) {
 			if (match.getQueryMatch().getType() == QueryMatchType.webpage) {
-				link = query.getWebpageUrls().get(index);
+				if (query.getWebpageUrls().get(index) != null) {
+					link = query.getWebpageUrls().get(index).getUrl();
+				}
 			} else if (match.getQueryMatch().getType() == QueryMatchType.doc) {
-				link = query.getDocUrls().get(index);
+				if (query.getDocUrls().get(index) != null) {
+					link = query.getDocUrls().get(index).getUrl();
+				}
 			}
 			if (link != null && !link.isEmpty()) {
 				writer.write("<a href=\"" + link + "\">");
@@ -941,12 +974,12 @@ class Report {
 
 		boolean publicationPresent = false;
 		boolean descriptionPresent = false;
-		for (Query query : queries) {
-			if (query.getPublicationIds() != null) {
-				for (String publicationId : query.getPublicationIds()) {
-					if (!publicationId.trim().isEmpty()) {
-						publicationPresent = true;
-					}
+		for (int i = 0; i < queries.size(); ++i) {
+			Query query = queries.get(i);
+			List<Publication> publication = publications.get(i);
+			for (Publication p : publication) {
+				if (p != null) {
+					publicationPresent = true;
 				}
 			}
 			if (publicationPresent) break;

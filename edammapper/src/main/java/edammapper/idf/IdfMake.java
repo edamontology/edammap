@@ -1,20 +1,18 @@
 package edammapper.idf;
 
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.AccessDeniedException;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+
+import edammapper.output.Output;
 
 public class IdfMake {
 
@@ -35,18 +33,7 @@ public class IdfMake {
 	public IdfMake(String outputPath) throws IOException {
 		this();
 
-		if (outputPath == null || outputPath.isEmpty()) {
-			throw new FileNotFoundException("Empty path given!");
-		}
-		Path path = Paths.get(outputPath);
-		Path parent = (path.getParent() != null ? path.getParent() : Paths.get("."));
-		if (!Files.isDirectory(parent) || !Files.isWritable(parent)) {
-			throw new AccessDeniedException(parent.toAbsolutePath().normalize() + " is not a writeable directory!");
-		}
-		if (Files.isDirectory(path)) {
-			throw new FileAlreadyExistsException(path.toAbsolutePath().normalize() + " is an existing directory!");
-		}
-		this.output = path;
+		this.output = Output.check(outputPath, false);
 	}
 
 	public void addTerms(List<String> terms) {

@@ -2,69 +2,68 @@ package edammapper.input.csv;
 
 import java.text.ParseException;
 
-import com.opencsv.bean.CsvBind;
+import com.univocity.parsers.annotations.Parsed;
 
-import edammapper.input.Input;
+import edammapper.input.InputType;
 
-public class Msutils implements Input {
+public class Msutils implements InputType {
 
-	@CsvBind(required = true)
+	@Parsed
 	private String name;
 
-	@CsvBind
+	@Parsed
 	private String email;
 
-	@CsvBind
+	@Parsed
 	private String weblink;
 
-	@CsvBind
+	@Parsed
 	private String paper;
 
-	@CsvBind
+	@Parsed
 	private String source;
 
-	@CsvBind
+	@Parsed
 	private String category;
 
-	@CsvBind
+	@Parsed
 	private String link;
 
-	@CsvBind(required = true)
+	@Parsed
 	private String description;
 
-	@CsvBind
+	@Parsed
 	private String lang;
 
-	@CsvBind
+	@Parsed
 	private String interfaces;
 
-	@CsvBind
+	@Parsed
 	private String license;
 
-	@CsvBind
+	@Parsed
 	private String topic;
 
-	@CsvBind
+	@Parsed
 	private String operation;
 
-	@CsvBind
+	@Parsed
 	private String format_in;
 
-	@CsvBind
+	@Parsed
 	private String format_out;
 
-	@CsvBind
+	@Parsed
 	private String comment;
 
 	@Override
 	public void check(int i) throws ParseException {
 		if (name == null || name.equals("")) {
-			throw new ParseException("\"Name\" column missing or some entry in that column missing! (" + i + ")", i);
+			parseException("name", i);
 		}
 		if (description == null || description.equals("")) {
-			throw new ParseException("\"Description\" column missing or some entry in that column missing! (" + i + ")", i);
+			parseException("description", i);
 		}
-		// TODO isEdamUri ?
 	}
 
 	public String getName() {

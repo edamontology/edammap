@@ -209,6 +209,9 @@ public class ProcessorMainArgs {
 	@Parameter(names = { "--print-query-idf-top" }, arity = 2, description = "String inputPath, int n")
 	List<String> printQueryIdfTop = null;
 
+	@Parameter(names = { "--biotools-full" }, description = "String outputPath")
+	String biotoolsFull = null;
+
 	@ParametersDelegate
 	PreProcessorArgs preProcessorArgs = new PreProcessorArgs();
 }

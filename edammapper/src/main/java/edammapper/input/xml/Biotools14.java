@@ -4,9 +4,9 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-import edammapper.input.Input;
+import edammapper.input.InputType;
 
-public class Biotools implements Input {
+public class Biotools14 implements InputType {
 
 	private String name;
 
@@ -32,7 +32,7 @@ public class Biotools implements Input {
 
 	private List<String> publicationsOtherIDs;
 
-	public Biotools() {
+	public Biotools14() {
 		this.mirrors = new ArrayList<>();
 		this.topics = new ArrayList<>();
 		this.functionNames = new ArrayList<>();
@@ -43,11 +43,7 @@ public class Biotools implements Input {
 
 	@Override
 	public void check(int i) throws ParseException {
-		// TODO
-		// check that elements not null
-		// check that mandatory not missing
-		// check that pattern matches
-		// isEdamUri
+		// We could check mandatory attributes here
 	}
 
 	public String getName() {

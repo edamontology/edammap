@@ -1,15 +1,10 @@
 package edammapper;
 
 import java.io.IOException;
-import java.nio.file.AccessDeniedException;
-import java.nio.file.FileAlreadyExistsException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLStreamException;
 
 import org.mapdb.DBException;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -127,7 +122,7 @@ public class Main implements Runnable {
 		Output output = null;
 		try {
 			output = new Output(args);
-		} catch (AccessDeniedException | FileAlreadyExistsException e) {
+		} catch (IOException e) {
 			System.err.println(e);
 			System.exit(1);
 		}
@@ -154,7 +149,7 @@ public class Main implements Runnable {
 		System.err.println("Loading queries");
 		try {
 			queries = QueryLoader.get(args.getQuery(), args.getType(), concepts);
-		} catch (IOException | ParseException | XMLStreamException | FactoryConfigurationError e) {
+		} catch (IOException | ParseException e) {
 			System.err.println(e);
 			System.exit(1);
 		}

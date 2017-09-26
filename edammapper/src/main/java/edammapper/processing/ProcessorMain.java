@@ -2,7 +2,9 @@ package edammapper.processing;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.Set;
 import java.util.TreeSet;
@@ -10,19 +12,22 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLStreamException;
-
 import org.mapdb.DBException;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import edammapper.fetching.Database;
 import edammapper.fetching.Fetcher;
 import edammapper.fetching.Publication;
 import edammapper.idf.Idf;
+import edammapper.input.Input;
+import edammapper.input.json.Biotools;
+import edammapper.output.Output;
+import edammapper.query.PublicationIds;
 import edammapper.query.QueryLoader;
 import edammapper.query.QueryType;
 
@@ -34,7 +39,7 @@ public class ProcessorMain {
 	}
 
 	private static void printFetchPublication(String publicationId) throws IOException {
-		Publication publication = new Fetcher().getPublication(publicationId);
+		Publication publication = new Fetcher().getPublication(QueryLoader.onePublicationId(publicationId));
 		if (publication != null) System.out.println(publication);
 	}
 
@@ -60,73 +65,97 @@ public class ProcessorMain {
 		}
 	}
 
-	private static void printPublicationIdsHtml(Set<String> set) {
+	private static String getPublicationLinkHtml(PublicationIds publicationIds) {
+		if (publicationIds == null) return "";
+		String s = "";
+		if (publicationIds.getPmid() != null && !publicationIds.getPmid().isEmpty()) {
+			s += getPublicationLinkHtml(publicationIds.getPmid());
+		}
+		if (publicationIds.getPmcid() != null && !publicationIds.getPmcid().isEmpty()) {
+			if (!s.isEmpty()) s += ", ";
+			s += getPublicationLinkHtml(publicationIds.getPmcid());
+		}
+		if (publicationIds.getDoi() != null && !publicationIds.getDoi().isEmpty()) {
+			if (!s.isEmpty()) s += ", ";
+			s += getPublicationLinkHtml(publicationIds.getDoi());
+		}
+		return s;
+	}
+
+	private static void printPublicationIdHtml(Set<String> set) {
 		System.out.println("<ul>");
-		for (String publicationId : set) {
-			System.out.println("<li>" + getPublicationLinkHtml(publicationId) + "</li>");
+		for (String id : set) {
+			System.out.println("<li>" + getPublicationLinkHtml(id) + "</li>");
 		}
 		System.out.println("</ul>");
 	}
 
-	private static Set<String> getWebpageUrlsFromFile(String queryPath, QueryType type) throws IOException, ParseException, XMLStreamException, FactoryConfigurationError {
+	private static void printPublicationIdsHtml(Set<PublicationIds> set) {
+		System.out.println("<ul>");
+		for (PublicationIds ids : set) {
+			System.out.println("<li>" + getPublicationLinkHtml(ids) + "</li>");
+		}
+		System.out.println("</ul>");
+	}
+
+	private static Set<String> getWebpageUrlsFromFile(String queryPath, QueryType type) throws IOException, ParseException {
 		return QueryLoader.get(queryPath, type).stream()
-			.flatMap(q -> q.getWebpageUrls().stream())
+			.flatMap(q -> q.getWebpageUrls().stream().map(l -> l.getUrl()))
 			.collect(Collectors.toCollection(TreeSet::new));
 	}
 
-	private static Set<String> getPublicationIdsFromFile(String queryPath, QueryType type) throws IOException, ParseException, XMLStreamException, FactoryConfigurationError {
+	private static Set<PublicationIds> getPublicationIdsFromFile(String queryPath, QueryType type) throws IOException, ParseException {
 		return QueryLoader.get(queryPath, type).stream()
 			.flatMap(q -> q.getPublicationIds().stream())
-			.map(id -> (Fetcher.isDoi(id) ? Fetcher.normalizeDoi(id) : id))
 			.collect(Collectors.toCollection(TreeSet::new));
 	}
 
-	private static Set<String> getDocUrlsFromFile(String queryPath, QueryType type) throws IOException, ParseException, XMLStreamException, FactoryConfigurationError {
+	private static Set<String> getDocUrlsFromFile(String queryPath, QueryType type) throws IOException, ParseException {
 		return QueryLoader.get(queryPath, type).stream()
-			.flatMap(q -> q.getDocUrls().stream())
+			.flatMap(q -> q.getDocUrls().stream().map(l -> l.getUrl()))
 			.collect(Collectors.toCollection(TreeSet::new));
 	}
 
-	private static void printWebpageUrlsFromFile(String queryPath, QueryType type) throws IOException, ParseException, XMLStreamException, FactoryConfigurationError {
+	private static void printWebpageUrlsFromFile(String queryPath, QueryType type) throws IOException, ParseException {
 		getWebpageUrlsFromFile(queryPath, type).forEach(System.out::println);
 	}
 
-	private static void printWebpageUrlsFromFileHtml(String queryPath, QueryType type) throws IOException, ParseException, XMLStreamException, FactoryConfigurationError {
+	private static void printWebpageUrlsFromFileHtml(String queryPath, QueryType type) throws IOException, ParseException {
 		printUrlsHtml(getWebpageUrlsFromFile(queryPath, type));
 	}
 
-	private static void printPublicationIdsFromFile(String queryPath, QueryType type) throws IOException, ParseException, XMLStreamException, FactoryConfigurationError {
+	private static void printPublicationIdsFromFile(String queryPath, QueryType type) throws IOException, ParseException {
 		getPublicationIdsFromFile(queryPath, type).forEach(System.out::println);
 	}
 
-	private static void printPublicationIdsFromFileHtml(String queryPath, QueryType type) throws IOException, ParseException, XMLStreamException, FactoryConfigurationError {
+	private static void printPublicationIdsFromFileHtml(String queryPath, QueryType type) throws IOException, ParseException {
 		printPublicationIdsHtml(getPublicationIdsFromFile(queryPath, type));
 	}
 
-	private static void printAllDoiFromFile(String queryPath, QueryType type, boolean html) throws IOException, ParseException, XMLStreamException, FactoryConfigurationError {
+	private static void printAllDoiFromFile(String queryPath, QueryType type, boolean html) throws IOException, ParseException {
 		Set<String> set = getPublicationIdsFromFile(queryPath, type).stream()
-			.map(Fetcher::getDoi)
+			.map(p -> Fetcher.getDoi(p.getDoi()))
 			.filter(Fetcher::isDoi)
 			.collect(Collectors.toCollection(TreeSet::new));
-		if (html) printPublicationIdsHtml(set);
+		if (html) printPublicationIdHtml(set);
 		else set.forEach(System.out::println);
 	}
 
-	private static void printUnknownDoiFromFile(String queryPath, QueryType type, boolean html) throws IOException, ParseException, XMLStreamException, FactoryConfigurationError {
+	private static void printUnknownDoiFromFile(String queryPath, QueryType type, boolean html) throws IOException, ParseException {
 		Fetcher fetcher = new Fetcher();
 		Set<String> set = getPublicationIdsFromFile(queryPath, type).stream()
-			.map(Fetcher::getDoi)
+			.map(p -> Fetcher.getDoi(p.getDoi()))
 			.filter(id -> Fetcher.isDoi(id) && !fetcher.isKnownDoi(id))
 			.collect(Collectors.toCollection(TreeSet::new));
-		if (html) printPublicationIdsHtml(set);
+		if (html) printPublicationIdHtml(set);
 		else set.forEach(System.out::println);
 	}
 
-	private static void printDocUrlsFromFile(String queryPath, QueryType type) throws IOException, ParseException, XMLStreamException, FactoryConfigurationError {
+	private static void printDocUrlsFromFile(String queryPath, QueryType type) throws IOException, ParseException {
 		getDocUrlsFromFile(queryPath, type).forEach(System.out::println);
 	}
 
-	private static void printDocUrlsFromFileHtml(String queryPath, QueryType type) throws IOException, ParseException, XMLStreamException, FactoryConfigurationError {
+	private static void printDocUrlsFromFileHtml(String queryPath, QueryType type) throws IOException, ParseException {
 		printUrlsHtml(getDocUrlsFromFile(queryPath, type));
 	}
 
@@ -134,34 +163,39 @@ public class ProcessorMain {
 		Database.init(database);
 	}
 
-	private static void addWebpagesFromFile(String database, String queryPath, QueryType type) throws IOException, ParseException, XMLStreamException, FactoryConfigurationError {
+	private static void addWebpagesFromFile(String database, String queryPath, QueryType type) throws IOException, ParseException {
 		Database db = new Database(database);
 		Fetcher fetcher = new Fetcher();
 		getWebpageUrlsFromFile(queryPath, type).stream()
 			.forEach(url -> db.putWebpageCommit(url, fetcher.getWebpage(url)));
 	}
 
-	private static void addPublicationsFromFile(String database, String queryPath, QueryType type) throws IOException, ParseException, XMLStreamException, FactoryConfigurationError {
+	private static void addPublicationsFromFile(String database, String queryPath, QueryType type) throws IOException, ParseException {
 		Database db = new Database(database);
 		Fetcher fetcher = new Fetcher();
 		getPublicationIdsFromFile(queryPath, type).stream()
-			.forEach(id -> db.putPublicationCommit(id, fetcher.getPublication(id)));
+			.forEach(ids -> {
+				String id = Processor.choosePublicationId(ids);
+				if (id != null) {
+					db.putPublicationCommit(id, fetcher.getPublication(ids));
+				}
+			});
 	}
 
-	private static void addDocsFromFile(String database, String queryPath, QueryType type) throws IOException, ParseException, XMLStreamException, FactoryConfigurationError {
+	private static void addDocsFromFile(String database, String queryPath, QueryType type) throws IOException, ParseException {
 		Database db = new Database(database);
 		Fetcher fetcher = new Fetcher();
 		getDocUrlsFromFile(queryPath, type).stream()
 			.forEach(url -> db.putDocCommit(url, fetcher.getWebpage(url)));
 	}
 
-	private static void addAllFromFile(String database, String queryPath, QueryType type) throws IOException, ParseException, XMLStreamException, FactoryConfigurationError {
+	private static void addAllFromFile(String database, String queryPath, QueryType type) throws IOException, ParseException {
 		addWebpagesFromFile(database, queryPath, type);
 		addPublicationsFromFile(database, queryPath, type);
 		addDocsFromFile(database, queryPath, type);
 	}
 
-	private static void addMissingWebpagesFromFile(String database, String queryPath, QueryType type) throws IOException, ParseException, XMLStreamException, FactoryConfigurationError {
+	private static void addMissingWebpagesFromFile(String database, String queryPath, QueryType type) throws IOException, ParseException {
 		Database db = new Database(database);
 		Fetcher fetcher = new Fetcher();
 		getWebpageUrlsFromFile(queryPath, type).stream()
@@ -169,15 +203,19 @@ public class ProcessorMain {
 			.forEach(url -> db.putWebpageCommit(url, fetcher.getWebpage(url)));
 	}
 
-	private static void addMissingPublicationsFromFile(String database, String queryPath, QueryType type) throws IOException, ParseException, XMLStreamException, FactoryConfigurationError {
+	private static void addMissingPublicationsFromFile(String database, String queryPath, QueryType type) throws IOException, ParseException {
 		Database db = new Database(database);
 		Fetcher fetcher = new Fetcher();
 		getPublicationIdsFromFile(queryPath, type).stream()
-			.filter(id -> !db.containsPublication(id))
-			.forEach(id -> db.putPublicationCommit(id, fetcher.getPublication(id)));
+			.forEach(ids -> {
+				String id = Processor.choosePublicationId(ids);
+				if (id != null && !db.containsPublication(id)) {
+					db.putPublicationCommit(id, fetcher.getPublication(ids));
+				}
+			});
 	}
 
-	private static void addMissingDocsFromFile(String database, String queryPath, QueryType type) throws IOException, ParseException, XMLStreamException, FactoryConfigurationError {
+	private static void addMissingDocsFromFile(String database, String queryPath, QueryType type) throws IOException, ParseException {
 		Database db = new Database(database);
 		Fetcher fetcher = new Fetcher();
 		getDocUrlsFromFile(queryPath, type).stream()
@@ -185,7 +223,7 @@ public class ProcessorMain {
 			.forEach(url -> db.putDocCommit(url, fetcher.getWebpage(url)));
 	}
 
-	private static void addAllMissingFromFile(String database, String queryPath, QueryType type) throws IOException, ParseException, XMLStreamException, FactoryConfigurationError {
+	private static void addAllMissingFromFile(String database, String queryPath, QueryType type) throws IOException, ParseException {
 		addMissingWebpagesFromFile(database, queryPath, type);
 		addMissingPublicationsFromFile(database, queryPath, type);
 		addMissingDocsFromFile(database, queryPath, type);
@@ -196,7 +234,7 @@ public class ProcessorMain {
 	}
 
 	private static boolean putPublication(String database, String publicationId) throws IOException, DBException {
-		return new Database(database).putPublicationCommit(publicationId, new Fetcher().getPublication(publicationId));
+		return new Database(database).putPublicationCommit(publicationId, new Fetcher().getPublication(QueryLoader.onePublicationId(publicationId)));
 	}
 
 	private static boolean putDoc(String database, String docUrl) throws IOException, DBException {
@@ -216,7 +254,7 @@ public class ProcessorMain {
 	}
 
 	private static void printPublicationIdsHtml(String database) throws FileNotFoundException, DBException {
-		printPublicationIdsHtml(new TreeSet<String>(new Database(database).getPublicationIds()));
+		printPublicationIdHtml(new TreeSet<String>(new Database(database).getPublicationIds()));
 	}
 
 	private static void printDocUrls(String database) throws FileNotFoundException, DBException {
@@ -319,7 +357,7 @@ public class ProcessorMain {
 		Database db = new Database(database);
 		Fetcher fetcher = new Fetcher();
 		if (db.containsPublication(publicationId)) {
-			return db.putPublicationCommit(publicationId, fetcher.getPublication(publicationId));
+			return db.putPublicationCommit(publicationId, fetcher.getPublication(QueryLoader.onePublicationId(publicationId)));
 		} else {
 			return false;
 		}
@@ -354,7 +392,7 @@ public class ProcessorMain {
 		Database db = new Database(database);
 		Fetcher fetcher = new Fetcher();
 		db.getPublicationIds().stream()
-			.forEach(id -> db.putPublicationCommit(id, fetcher.getPublication(id)));
+			.forEach(id -> db.putPublicationCommit(id, fetcher.getPublication(QueryLoader.onePublicationId(id))));
 	}
 
 	private static void refreshPublicationsRegex(String database, String regex) throws IOException, DBException {
@@ -362,7 +400,7 @@ public class ProcessorMain {
 		Fetcher fetcher = new Fetcher();
 		db.getPublicationIds().stream()
 			.filter(Pattern.compile(regex).asPredicate())
-			.forEach(id -> db.putPublicationCommit(id, fetcher.getPublication(id)));
+			.forEach(id -> db.putPublicationCommit(id, fetcher.getPublication(QueryLoader.onePublicationId(id))));
 	}
 
 	private static void refreshPublications(String database, Predicate<String> filter) throws IOException, DBException {
@@ -370,7 +408,7 @@ public class ProcessorMain {
 		Fetcher fetcher = new Fetcher();
 		db.getPublicationIds().stream()
 			.filter(filter)
-			.forEach(id -> db.putPublicationCommit(id, fetcher.getPublication(id)));
+			.forEach(id -> db.putPublicationCommit(id, fetcher.getPublication(QueryLoader.onePublicationId(id))));
 	}
 
 	private static void refreshAllPmid(String database) throws IOException, DBException {
@@ -409,7 +447,7 @@ public class ProcessorMain {
 		Set<String> set = db.getPublicationIds().stream()
 			.filter(id -> !db.getPublication(id).isFulltextFinal())
 			.collect(Collectors.toCollection(TreeSet::new));
-		if (html) printPublicationIdsHtml(set);
+		if (html) printPublicationIdHtml(set);
 		else set.forEach(System.out::println);
 	}
 
@@ -418,7 +456,7 @@ public class ProcessorMain {
 		Fetcher fetcher = new Fetcher();
 		db.getPublicationIds().stream()
 			.filter(id -> !db.getPublication(id).isFulltextFinal())
-			.forEach(id -> db.putPublicationCommit(id, fetcher.getPublication(id)));
+			.forEach(id -> db.putPublicationCommit(id, fetcher.getPublication(QueryLoader.onePublicationId(id))));
 	}
 
 	private static void commitDatabase(String database) throws FileNotFoundException, DBException {
@@ -428,7 +466,7 @@ public class ProcessorMain {
 		new Database(database).compact();
 	}
 
-	private static void makeQueryIdf(String queryPath, QueryType type, String database, String outputPath, ProcessorMainArgs args) throws IOException, ParseException, XMLStreamException, FactoryConfigurationError {
+	private static void makeQueryIdf(String queryPath, QueryType type, String database, String outputPath, ProcessorMainArgs args) throws IOException, ParseException {
 		ProcessorArgs processorArgs = new ProcessorArgs();
 		processorArgs.setFetchingDisabled(true);
 		processorArgs.setDatabase(database);
@@ -442,6 +480,33 @@ public class ProcessorMain {
 	private static void printQueryIdfTop(String inputPath, long n) throws IOException {
 		new Idf(inputPath, true).getTop().entrySet().stream()
 			.limit(n).forEach(e -> System.out.println(e.getKey() + "\t" + e.getValue()));
+	}
+
+	private static void biotoolsFull(String outputPath) throws IOException {
+		Path output = Output.check(outputPath, false);
+
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.enable(SerializationFeature.INDENT_OUTPUT);
+		mapper.enable(SerializationFeature.CLOSE_CLOSEABLE);
+
+		Biotools biotoolsFull = new Biotools();
+
+		String next = "?page=1";
+		while (next != null) {
+			Input input = new Input("https://bio.tools/api/tool" + next + "&format=json", false);
+
+			try (InputStream is = input.newInputStream()) {
+				Biotools biotools = mapper.readValue(is, Biotools.class);
+				System.err.println(input.getURL());
+
+				biotoolsFull.addTools(biotools.getList());
+				biotoolsFull.setCount(biotools.getCount());
+
+				next = biotools.getNext();
+			}
+		}
+
+		mapper.writeValue(output.toFile(), biotoolsFull);
 	}
 
 	private static ProcessorMainArgs parseArgs(String[] argv) {
@@ -461,7 +526,7 @@ public class ProcessorMain {
 		return args;
 	}
 
-	public static void main(String argv[]) throws IOException, ParseException, XMLStreamException, FactoryConfigurationError, DBException, OWLOntologyCreationException {
+	public static void main(String argv[]) throws IOException, ParseException, DBException, OWLOntologyCreationException {
 		ProcessorMainArgs args = parseArgs(argv);
 
 		if (args.printFetchWebpage != null) {
@@ -678,6 +743,10 @@ public class ProcessorMain {
 
 		if (args.printQueryIdfTop != null) {
 			printQueryIdfTop(args.printQueryIdfTop.get(0), Long.parseLong(args.printQueryIdfTop.get(1)));
+		}
+
+		if (args.biotoolsFull != null) {
+			biotoolsFull(args.biotoolsFull);
 		}
 	}
 }

@@ -6,8 +6,6 @@ import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -29,11 +27,14 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import edammapper.input.Input;
+import edammapper.query.PublicationIds;
+
 public class Fetcher {
 
 	private static final String DOIprefixes = "http://doi.org/|https://doi.org/|http://dx.doi.org/|https://dx.doi.org/|doi:";
 	private static final Pattern DOIprefix = Pattern.compile("^(" + DOIprefixes + ")");
-	private static final Pattern DOI = Pattern.compile("^(" + DOIprefixes + "|)10\\..+/.*");
+	private static final Pattern DOI = Pattern.compile("(?U)^(" + DOIprefixes + "|)10\\..+/\\p{Print}*");
 	private static final String DOIlink = "http://doi.org/";
 
 	private static final Pattern PMID = Pattern.compile("^[1-9][0-9]*$");
@@ -53,9 +54,6 @@ public class Fetcher {
 	private static final Pattern KEYWORDS_BEGIN = Pattern.compile("(?i)^[\\p{Z}\\p{Cc}]*keywords?[\\p{Z}\\p{Cc}]*:*[\\p{Z}\\p{Cc}]*");
 	private static final Pattern SEPARATOR_COMMA = Pattern.compile(",");
 	private static final Pattern SEPARATOR_SEMICOLON = Pattern.compile(";");
-
-	private static final String USER_AGENT = "Mozilla";
-	private static final int TIMEOUT = 10000; // ms
 
 	private final DoiParse doiParse;
 
@@ -161,8 +159,8 @@ public class Fetcher {
 
 		try {
 			doc = Jsoup.connect(url)
-				.userAgent(USER_AGENT)
-				.timeout(TIMEOUT)
+				.userAgent(Input.USER_AGENT)
+				.timeout(Input.TIMEOUT)
 				.validateTLSCertificates(false)
 				.get();
 		} catch (MalformedURLException e) {
@@ -213,13 +211,10 @@ public class Fetcher {
 
 		System.out.println("Try PDF " + url);
 		try {
-			URLConnection con = new URL(url).openConnection();
-			con.setRequestProperty("User-Agent", USER_AGENT);
-			con.setConnectTimeout(TIMEOUT);
-			con.setReadTimeout(TIMEOUT);
+			Input input = new Input(url, false);
 
-			try (PDDocument doc = PDDocument.load(con.getInputStream())) {
-				System.out.println("Fetched PDF " + con.getURL());
+			try (PDDocument doc = PDDocument.load(input.newInputStream())) {
+				System.out.println("Fetched PDF " + input.getURL());
 
 				if (!publication.isTitleFinal() || !publication.isKeywordsFinal() || !publication.isAbstractFinal()) {
 					PDDocumentInformation info = doc.getDocumentInformation();
@@ -297,13 +292,10 @@ public class Fetcher {
 
 		String pdfText = "";
 		try {
-			URLConnection con = new URL(url).openConnection();
-			con.setRequestProperty("User-Agent", USER_AGENT);
-			con.setConnectTimeout(TIMEOUT);
-			con.setReadTimeout(TIMEOUT);
+			Input input = new Input(url, false);
 
-			try (PDDocument doc = PDDocument.load(con.getInputStream())) {
-				System.out.println("Fetched PDF " + con.getURL());
+			try (PDDocument doc = PDDocument.load(input.newInputStream())) {
+				System.out.println("Fetched PDF " + input.getURL());
 
 				PDFTextStripper stripper = new PDFTextStripper();
 				pdfText = stripper.getText(doc);
@@ -834,34 +826,37 @@ public class Fetcher {
 		}
 	}
 
-	public Publication getPublication(String id) {
+	public Publication getPublication(PublicationIds id) {
+		if (id == null) return null;
+
 		Publication publication = new Publication();
 
-		if (isPmid(id)) {
-			publication.setPmid(id);
-		} else if (isPmcid(id)) {
-			publication.setPmcid(id);
-		} else if (isDoi(id)) {
-			publication.setDoi(normalizeDoi(id));
+		if (isPmid(id.getPmid())) publication.setPmid(id.getPmid());
+		else if (id.getPmid() != null && !id.getPmid().isEmpty()) System.err.println("Unknown publication ID: " + id.getPmid());
+
+		if (isPmcid(id.getPmcid())) publication.setPmcid(id.getPmcid());
+		else if (id.getPmcid() != null && !id.getPmcid().isEmpty()) System.err.println("Unknown publication ID: " + id.getPmcid());
+
+		if (isDoi(id.getDoi())) publication.setDoi(normalizeDoi(id.getDoi()));
+		else if (id.getDoi() != null && !id.getDoi().isEmpty()) System.err.println("Unknown publication ID: " + id.getDoi());
+
+		if (!publication.getPmid().isEmpty()) {
+			fetchEuropepmc(publication);
+			fetchPmid(publication);
+			fetchPmcid(publication);
+			fetchDoi(publication);
+		} else if (!publication.getPmcid().isEmpty()) {
+			fetchEuropepmc(publication);
+			fetchPmcid(publication);
+			fetchPmid(publication);
+			fetchDoi(publication);
+		} else if (!publication.getDoi().isEmpty()) {
+			fetchEuropepmc(publication);
+			fetchDoi(publication);
+			fetchPmid(publication);
+			fetchPmcid(publication);
 		} else {
-			System.err.println("Unknown publication ID: " + id);
-			return null;
-		}
-
-		fetchEuropepmc(publication);
-
-		if (isPmid(id)) {
-			fetchPmid(publication);
-			fetchPmcid(publication);
-			fetchDoi(publication);
-		} else if (isPmcid(id)) {
-			fetchPmcid(publication);
-			fetchPmid(publication);
-			fetchDoi(publication);
-		} else if (isDoi(id)) {
-			fetchDoi(publication);
-			fetchPmid(publication);
-			fetchPmcid(publication);
+			System.err.println("No valid publication IDs in " + id);
 		}
 
 		if (publication.isEmpty()) {

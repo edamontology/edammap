@@ -1,5 +1,6 @@
 package edammapper.output;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.FileAlreadyExistsException;
@@ -24,28 +25,32 @@ public class Output {
 
 	private Path report;
 
-	public Output(MainArgs args) throws AccessDeniedException, FileAlreadyExistsException {
+	public Output(MainArgs args) throws IOException {
 		this.args = args;
 
-		this.output = check(args.getOutput());
+		this.output = check(args.getOutput(), true);
 
-		this.report = check(args.getReport());
+		this.report = check(args.getReport(), true);
 	}
 
-	private Path check(String file) throws AccessDeniedException, FileAlreadyExistsException {
-		if (file != null && !file.isEmpty()) {
-			Path path = Paths.get(file);
-			Path parent = (path.getParent() != null ? path.getParent() : Paths.get("."));
-			if (!Files.isDirectory(parent) || !Files.isWritable(parent)) {
-				throw new AccessDeniedException(parent.toAbsolutePath().normalize() + " is not a writeable directory!");
+	public static Path check(String file, boolean allowEmptyPath) throws IOException {
+		if (file == null || file.isEmpty()) {
+			if (allowEmptyPath) {
+				return null;
+			} else {
+				throw new FileNotFoundException("Empty path given!");
 			}
-			if (Files.isDirectory(path)) {
-				throw new FileAlreadyExistsException(path.toAbsolutePath().normalize() + " is an existing directory!");
-			}
-			return path;
-		} else {
-			return null;
 		}
+
+		Path path = Paths.get(file);
+		Path parent = (path.getParent() != null ? path.getParent() : Paths.get("."));
+		if (!Files.isDirectory(parent) || !Files.isWritable(parent)) {
+			throw new AccessDeniedException(parent.toAbsolutePath().normalize() + " is not a writeable directory!");
+		}
+		if (Files.isDirectory(path)) {
+			throw new FileAlreadyExistsException(path.toAbsolutePath().normalize() + " is an existing directory!");
+		}
+		return path;
 	}
 
 	public void output(Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publications, List<Mapping> mappings) throws IOException {
