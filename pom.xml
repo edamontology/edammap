@@ -18,7 +18,6 @@
   </properties>
 
   <modules>
-    <module>mapper</module>
     <module>edammapper</module>
   </modules>
 
