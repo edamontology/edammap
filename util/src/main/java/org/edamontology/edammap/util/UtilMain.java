@@ -31,6 +31,7 @@ import org.edamontology.pubfetcher.Fetcher;
 import org.edamontology.pubfetcher.FetcherArgs;
 import org.edamontology.pubfetcher.FetcherUtil;
 import org.edamontology.pubfetcher.PublicationIds;
+import org.edamontology.pubfetcher.Version;
 
 public final class UtilMain {
 
@@ -74,7 +75,7 @@ public final class UtilMain {
 	}
 
 	public static void main(String[] argv) throws IOException, ParseException, ReflectiveOperationException {
-		UtilArgs args = FetcherUtil.parseArgs(argv, UtilArgs.class);
+		UtilArgs args = FetcherUtil.parseArgs(argv, UtilArgs.class, new Version(UtilMain.class));
 
 		List<PublicationIds> publicationIds = null;
 		List<String> webpageUrls = null;

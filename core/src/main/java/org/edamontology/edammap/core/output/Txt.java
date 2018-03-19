@@ -27,10 +27,11 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+import org.edamontology.edammap.core.benchmarking.MappingTest;
+import org.edamontology.edammap.core.benchmarking.MatchTest;
 import org.edamontology.edammap.core.edam.Branch;
 import org.edamontology.edammap.core.edam.Concept;
 import org.edamontology.edammap.core.edam.EdamUri;
-import org.edamontology.edammap.core.mapping.Mapping;
 import org.edamontology.edammap.core.mapping.Match;
 import org.edamontology.edammap.core.query.Query;
 import org.edamontology.edammap.core.query.QueryType;
@@ -38,69 +39,81 @@ import org.edamontology.pubfetcher.Publication;
 
 class Txt {
 
-	private static final String SEP = " | ";
+	private static final String SEP = "\t";
 
-	// TODO publications needed ?
-	private static void out(QueryType type, PrintStream ps, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publications, List<Mapping> mappings) throws IOException {
+	static void out(QueryType type, PrintStream ps, Map<EdamUri, Concept> concepts, List<Query> queries, List<MappingTest> mappings) throws IOException {
+		ps.print("query_id");
+		ps.print(SEP);
+		ps.print("query_name");
+		ps.print(SEP);
+		ps.print("edam_branch");
+		ps.print(SEP);
+		ps.print("edam_uri");
+		ps.print(SEP);
+		ps.print("edam_label");
+		ps.print(SEP);
+		ps.print("edam_obsolete");
+		ps.print(SEP);
+		ps.print("best_one_query");
+		ps.print(SEP);
+		ps.print("best_one_edam");
+		ps.print(SEP);
+		ps.print("best_one_score");
+		ps.print(SEP);
+		ps.print("without_path_score");
+		ps.print(SEP);
+		ps.print("score");
+		ps.print(SEP);
+		ps.print("test");
+		ps.println();
+
 		for (int i = 0; i < queries.size(); ++i) {
 			Query query = queries.get(i);
-			Mapping mapping = mappings.get(i);
+			MappingTest mapping = mappings.get(i);
 
-			if (type == QueryType.SEQwikiTags || type == QueryType.SEQwikiTool) {
-				if (type == QueryType.SEQwikiTool) {
-					ps.print(query.getName() + SEP);
-				}
-				ps.print(query.getKeywords().iterator().next().getValue());
-				ps.print(SEP + query.getKeywords().iterator().next().getType());
-				for (Branch branch : mapping.getBranches()) {
-					for (int j = 0; j < mapping.getMatches(branch).size(); ++j) {
-						Match match = mapping.getMatches(branch).get(j);
-						Concept concept = concepts.get(match.getEdamUri());
-						ps.print(SEP + concept.getLabel());
-						ps.print(" (" + match.getEdamUri().getBranch() + "_" + match.getEdamUri().getNrString() + ")");
-					}
-				}
-				ps.println();
-			} else {
-				for (Branch branch : mapping.getBranches()) {
-					for (int j = 0; j < mapping.getMatches(branch).size(); ++j) {
-						Match match = mapping.getMatches(branch).get(j);
-						Concept concept = concepts.get(match.getEdamUri());
+			for (Branch branch : Branch.values()) {
+				for (MatchTest matchTest : mapping.getMatches(branch)) {
+					Match match = matchTest.getMatch();
+					Concept concept = concepts.get(match.getEdamUri());
 
-						if (query.getName() != null) {
-							ps.print(query.getName());
-						} else {
-							ps.print("NA");
-						}
-
-						// TODO
-						ps.println(SEP + concept.getLabel()
-							//+ SEP + Common.conceptMatchString(match, concept)
-							+ SEP + match.getEdamUri()
-							+ SEP + concept.isObsolete()
-							//+ SEP + match.getMatchConfidence()
-							+ SEP + match.getEdamUri().getBranch()
-							+ SEP + match.getConceptMatch().getType()
-							+ SEP + match.getQueryMatch().getType()
-							//+ SEP + Common.queryMatchString(match, query, publications)
-							+ SEP + match.getScore()
-							+ SEP + match.getWithoutPathScore()
-							+ SEP + match.getBestOneScore());
-					}
+					ps.print(query.getId() != null ? query.getId() : "");
+					ps.print(SEP);
+					ps.print(query.getName() != null ? query.getName() : "");
+					ps.print(SEP);
+					ps.print(branch);
+					ps.print(SEP);
+					ps.print(match.getEdamUri());
+					ps.print(SEP);
+					ps.print(concept.getLabel());
+					ps.print(SEP);
+					ps.print(concept.isObsolete());
+					ps.print(SEP);
+					ps.print(match.getQueryMatch().getType().name());
+					ps.print(SEP);
+					ps.print(match.getConceptMatch().getType().name());
+					ps.print(SEP);
+					ps.print(match.getBestOneScore() > -1 ? match.getBestOneScore() : "");
+					ps.print(SEP);
+					ps.print(match.getWithoutPathScore() > - 1 ? match.getWithoutPathScore() : "");
+					ps.print(SEP);
+					ps.print(match.getScore());
+					ps.print(SEP);
+					ps.print(matchTest.getTest().name());
+					ps.println();
 				}
 			}
 		}
 	}
 
-	static void output(QueryType type, Path output, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publications, List<Mapping> mappings) throws IOException {
-		if (output == null) {
-			out(type, System.out, concepts, queries, publications, mappings);
-		} else {
+	static void output(QueryType type, Path output, Path report, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publications, List<MappingTest> mappings) throws IOException {
+		if (output == null && report == null) {
+			out(type, System.out, concepts, queries, mappings);
+		} else if (output != null) {
 			try (PrintStream ps = new PrintStream(new BufferedOutputStream(Files.newOutputStream(output)), true, "UTF-8")) {
-				out(type, ps, concepts, queries, publications, mappings);
+				out(type, ps, concepts, queries, mappings);
 			} catch (IOException e) {
 				try {
-					out(type, System.out, concepts, queries, publications, mappings);
+					out(type, System.out, concepts, queries, mappings);
 				} catch (Exception e2) {
 					throw e;
 				}

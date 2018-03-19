@@ -17,15 +17,16 @@
  * along with EDAMmap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.edamontology.edammap.core.mapping;
+package org.edamontology.edammap.core.mapping.args;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.validators.PositiveInteger;
 
 import org.edamontology.edammap.core.args.PositiveDouble;
 import org.edamontology.edammap.core.args.ZeroToOneDouble;
+import org.edamontology.edammap.core.mapping.MapperStrategy;
 
-public class MapperAlgorithmArgs {
+public class AlgorithmArgs {
 	@Parameter(names = { "--compound-words" }, validateWith = PositiveInteger.class, description = "Try to match words that have accidentally been made compound (given number is maximum number of words in an accidental compound minus one)")
 	private int compoundWords = 0;
 
@@ -55,6 +56,9 @@ public class MapperAlgorithmArgs {
 
 	@Parameter(names = { "--query-weight" }, validateWith = PositiveDouble.class, description = "Weight of matching a query (with a concept). Set to 0 to disable matching of queries.")
 	private double queryWeight = 1;
+
+	@Parameter(names = { "--mapping-strategy" }, description = "Choose the best or take the average of query parts matches")
+	private MapperStrategy mappingStrategy = MapperStrategy.average;
 
 	@Parameter(names = { "--parent-weight" }, validateWith = PositiveDouble.class, description = "Weight of concept's parent when computing path enrichment. Weight of grand-parent is parent-weight times parent-weight, etc. Set to 0 to disable path enrichment.")
 	private double parentWeight = 0.5;
@@ -100,6 +104,10 @@ public class MapperAlgorithmArgs {
 
 	public double getQueryWeight() {
 		return queryWeight;
+	}
+
+	public MapperStrategy getMappingStrategy() {
+		return mappingStrategy;
 	}
 
 	public double getParentWeight() {

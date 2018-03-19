@@ -21,12 +21,13 @@ package org.edamontology.edammap.core.args;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParametersDelegate;
+import com.beust.jcommander.validators.PositiveInteger;
 
-import org.edamontology.edammap.core.mapping.MapperArgs;
+import org.edamontology.edammap.core.mapping.args.MapperArgs;
 import org.edamontology.edammap.core.processing.ProcessorArgs;
 import org.edamontology.edammap.core.query.QueryType;
 
-public class MainArgs {
+public class MainArgs implements org.edamontology.pubfetcher.MainArgs {
 	@Parameter(names = { "-e", "--edam" }, required = true, description = "Path of the EDAM ontology file")
 	private String edam;
 
@@ -36,14 +37,20 @@ public class MainArgs {
 	@Parameter(names = { "-h", "--help" }, help = true, description = "Print this help")
 	private boolean help;
 
-	@Parameter(names = { "-t", "--type" }, description = "Specifies the type of the query and how to output the results")
+	@Parameter(names = { "-t", "--type", "--query-type" }, description = "Specifies the type of the query and how to output the results")
 	private QueryType type = QueryType.generic;
 
-	@Parameter(names = { "-o", "--output" }, description = "File to write results to. If not specified or invalid, will be written to standard output.")
+	@Parameter(names = { "-o", "--output" }, description = "File to write results to, one per line. If missing (and HTML report also not specified), then results will be written to standard output.")
 	private String output = "";
 
-	@Parameter(names = { "-r", "--report" }, description = "File to write a HTML report to. In addition to results, it will contain metrics, comparisons to manual mapping, extended information about queries and nice formatting.")
+	@Parameter(names = { "-r", "--report", "--results" }, description = "File to write a HTML report to. In addition to detailed results, it will contain used parameters, metrics, comparisons to manual mapping, extended information about queries and nice formatting.")
 	private String report = "";
+
+	@Parameter(names = { "--report-page-size" }, validateWith = PositiveInteger.class, description = "Number of results in a HTML report page. Setting to 0 will output all results to a single HTML page.")
+	private int reportPageSize = 100;
+
+	@Parameter(names = { "--report-pagination-size" }, validateWith = PositiveInteger.class, description = "Number of pagination links visible before/after the current page link in a HTML report page. Setting to 0 will make all pagination links visible.")
+	private int reportPaginationSize = 11;
 
 	@Parameter(names = { "--threads" }, description = "How many threads to use for mapping (one query is processed by one thread)")
 	private int threads = 4;
@@ -76,6 +83,14 @@ public class MainArgs {
 
 	public String getReport() {
 		return report;
+	}
+
+	public int getReportPageSize() {
+		return reportPageSize;
+	}
+
+	public int getReportPaginationSize() {
+		return reportPaginationSize;
 	}
 
 	public int getThreads() {

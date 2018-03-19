@@ -23,23 +23,23 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.validators.PositiveInteger;
 
 public class PreProcessorArgs {
-	@Parameter(names = { "--remove-numbers" }, description = "Remove free-standing numbers (i.e., that not part of a word) as part of pre-processing")
-	private boolean numberRemove = false;
+	@Parameter(names = { "--numbers" }, arity = 1, description = "Include/exclude freestanding numbers (i.e., that are not part of a word) in pre-processing")
+	private boolean numbers = true;
 
-	@Parameter(names = { "-s", "--stopwords" }, description = "Do stopwords removal as part of pre-processing, using the chosen stopwords list")
+	@Parameter(names = { "--stopwords" }, description = "Do stopwords removal as part of pre-processing, using the chosen stopwords list")
 	private Stopwords stopwords = Stopwords.lucene;
 
-	@Parameter(names = { "--no-stemming" }, description = "Don't do stemming as part of pre-processing")
-	private boolean noStemming = false;
+	@Parameter(names = { "--stemming" }, arity = 1, description = "Do stemming as part of pre-processing")
+	private boolean stemming = true;
 
-	@Parameter(names = { "--short-word" }, validateWith = PositiveInteger.class, description = "When all pre-processing steps are done, tokens with length less or equal to this length are removed")
-	private int shortWord = 0;
+	@Parameter(names = { "--min-length" }, validateWith = PositiveInteger.class, description = "When all pre-processing steps are done, tokens with length less to this length are removed")
+	private int minLength = 1;
 
-	public boolean isNumberRemove() {
-		return numberRemove;
+	public boolean isNumbers() {
+		return numbers;
 	}
-	public void setNumberRemove(boolean numberRemove) {
-		this.numberRemove = numberRemove;
+	public void setNumbers(boolean numbers) {
+		this.numbers = numbers;
 	}
 
 	public Stopwords getStopwords() {
@@ -49,17 +49,17 @@ public class PreProcessorArgs {
 		this.stopwords = stopwords;
 	}
 
-	public boolean isNoStemming() {
-		return noStemming;
+	public boolean isStemming() {
+		return stemming;
 	}
-	public void setNoStemming(boolean noStemming) {
-		this.noStemming = noStemming;
+	public void setStemming(boolean stemming) {
+		this.stemming = stemming;
 	}
 
-	public int getShortWord() {
-		return shortWord;
+	public int getMinLength() {
+		return minLength;
 	}
-	public void setShortWord(int shortWord) {
-		this.shortWord = shortWord;
+	public void setMinLength(int minLength) {
+		this.minLength = minLength;
 	}
 }

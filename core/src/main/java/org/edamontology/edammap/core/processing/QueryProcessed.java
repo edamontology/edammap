@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016 Erik Jaaniso
+ * Copyright © 2016, 2018 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -23,12 +23,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.edamontology.pubfetcher.Publication;
+import org.edamontology.pubfetcher.Webpage;
 
 public class QueryProcessed {
 
 	private List<String> nameTokens = null;
 	private List<Double> nameIdfs = null;
 
+	private List<Webpage> webpages = new ArrayList<>();
 	private List<List<String>> webpagesTokens = new ArrayList<>();
 	private List<List<Double>> webpagesIdfs = new ArrayList<>();
 
@@ -41,6 +43,7 @@ public class QueryProcessed {
 	private List<Publication> publications = new ArrayList<>();
 	private List<PublicationProcessed> processedPublications = new ArrayList<>();
 
+	private List<Webpage> docs = new ArrayList<>();
 	private List<List<String>> docsTokens = new ArrayList<>();
 	private List<List<Double>> docsIdfs = new ArrayList<>();
 
@@ -57,6 +60,12 @@ public class QueryProcessed {
 		this.nameIdfs = nameIdfs;
 	}
 
+	public List<Webpage> getWebpages() {
+		return webpages;
+	}
+	public void addWebpage(Webpage webpage) {
+		this.webpages.add(webpage);
+	}
 	public List<List<String>> getWebpagesTokens() {
 		return webpagesTokens;
 	}
@@ -109,6 +118,12 @@ public class QueryProcessed {
 		this.processedPublications.add(processedPublication);
 	}
 
+	public List<Webpage> getDocs() {
+		return docs;
+	}
+	public void addDoc(Webpage doc) {
+		this.docs.add(doc);
+	}
 	public List<List<String>> getDocsTokens() {
 		return docsTokens;
 	}

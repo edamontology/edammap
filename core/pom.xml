@@ -31,7 +31,7 @@
   <packaging>jar</packaging>
 
   <name>EDAMmap-Core</name>
-  <url>https://github.com/edamontology/edammap/core</url>
+  <url>https://github.com/edamontology/edammap/tree/master/core</url>
   <description></description>
 
   <dependencies>

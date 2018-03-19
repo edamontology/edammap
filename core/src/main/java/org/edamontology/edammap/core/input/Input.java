@@ -47,9 +47,9 @@ public final class Input {
 			System.out.println("Opened URL " + con.getURL().toString());
 		} else if (allowFile) {
 			is = new FileInputStream(path);
-			System.out.println("Opened file " + path);
+			System.out.println("Opened file " + path); // TODO new File(path).getName()
 		} else {
-			throw new IOException("Unsupported protocol or opening of local files not allowed: " + path);
+			throw new IOException("Unsupported protocol or opening of local files not allowed: " + path); // TODO new File(path).getName()
 		}
 		return is;
 	}

@@ -55,7 +55,7 @@ public class IdfMake {
 	public IdfMake(String outputPath) throws IOException {
 		this();
 
-		this.output = FetcherCommon.outputPath(outputPath, false);
+		this.output = FetcherCommon.outputPath(outputPath);
 	}
 
 	public void addTerms(List<String> terms) {

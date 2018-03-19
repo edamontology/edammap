@@ -28,9 +28,9 @@ public class Match implements Comparable<Match> {
 
 	private double score;
 
-	private double bestOneScore = 0;
+	private double bestOneScore = -1;
 
-	private double withoutPathScore = 0;
+	private double withoutPathScore = -1;
 
 	private final ConceptMatch conceptMatch;
 

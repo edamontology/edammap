@@ -69,6 +69,7 @@ import org.edamontology.pubfetcher.FetcherCommon;
 import org.edamontology.pubfetcher.FetcherUtil;
 import org.edamontology.pubfetcher.Publication;
 import org.edamontology.pubfetcher.PublicationIds;
+import org.edamontology.pubfetcher.Version;
 
 public final class PubMedApps {
 
@@ -1512,8 +1513,8 @@ public final class PubMedApps {
 	}
 
 	private static void writeWebDoc(PreProcessorArgs preProcessorArgs, String queryIdf, String database, List<String> pubFile, String queryPath, QueryType queryType, String webFile, String docFile, FetcherArgs fetcherArgs) throws IOException, ParseException {
-		Path webPath = FetcherCommon.outputPath(webFile, false);
-		Path docPath = FetcherCommon.outputPath(docFile, false);
+		Path webPath = FetcherCommon.outputPath(webFile);
+		Path docPath = FetcherCommon.outputPath(docFile);
 
 		List<Publication> publications = getPublications(database, pubFile);
 
@@ -1692,9 +1693,9 @@ public final class PubMedApps {
 	}
 
 	public static void main(String[] argv) throws IOException, ParseException, ReflectiveOperationException, URISyntaxException {
-		PubMedAppsArgs args = FetcherUtil.parseArgs(argv, PubMedAppsArgs.class);
+		PubMedAppsArgs args = FetcherUtil.parseArgs(argv, PubMedAppsArgs.class, new Version(PubMedApps.class));
 
-		args.preProcessorArgs.setNoStemming(true);
+		args.preProcessorArgs.setStemming(false);
 
 		if (args.meshQuery) {
 			meshQuery(args.fetcherArgs);

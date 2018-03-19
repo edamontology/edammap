@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016 Erik Jaaniso
+ * Copyright © 2016, 2018 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -26,9 +26,9 @@ import org.edamontology.edammap.core.edam.EdamUri;
 
 public class Query {
 
-	private final String name;
-
 	private final String id;
+
+	private final String name;
 
 	private final List<Link> webpageUrls;
 
@@ -42,10 +42,10 @@ public class Query {
 
 	private final Set<EdamUri> annotations;
 
-	public Query(String name, String id, List<Link> webpageUrls, String description, List<Keyword> keywords,
+	public Query(String id, String name, List<Link> webpageUrls, String description, List<Keyword> keywords,
 			List<PublicationIdsQuery> publicationIds, List<Link> docUrls, Set<EdamUri> annotations) {
-		this.name = name;
 		this.id = id;
+		this.name = name;
 		this.webpageUrls = webpageUrls;
 		this.description = description;
 		this.keywords = keywords;
@@ -54,12 +54,12 @@ public class Query {
 		this.annotations = annotations;
 	}
 
-	public String getName() {
-		return name;
-	}
-
 	public String getId() {
 		return id;
+	}
+
+	public String getName() {
+		return name;
 	}
 
 	public List<Link> getWebpageUrls() {

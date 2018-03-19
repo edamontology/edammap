@@ -59,7 +59,7 @@ public class QueryLoader {
 	private static final String GENERIC = "https://localhost/";
 	private static final String SEQWIKI = "http://seqanswers.com/wiki/";
 	private static final String MSUTILS = "http://www.ms-utils.org/";
-	private static final String BIOTOOLS = "https://bio.tools/";
+	public static final String BIOTOOLS = "https://bio.tools/";
 	private static final String BIOC_VIEWS = "https://bioconductor.org/packages/release/BiocViews.html#___";
 
 	private static final Pattern INTERNAL_SEPARATOR_BAR = Pattern.compile("\\|");
@@ -172,8 +172,8 @@ public class QueryLoader {
 		annotations.addAll(edamUris(generic.getAnnotations(), concepts));
 
 		return new Query(
+			generic.getId() != null ? generic.getId().trim() : null,
 			generic.getName().trim(),
-			null,
 			splitLink(generic.getWebpageUrls(), INTERNAL_SEPARATOR_BAR),
 			generic.getDescription() != null ? generic.getDescription().trim() : null,
 			keywords,
@@ -209,7 +209,7 @@ public class QueryLoader {
 			if (annotation != null) annotations.add(annotation);
 		}
 
-		return new Query(SEQwiki.getName().trim(), null, webpageUrls, SEQwiki.getSummary().trim(), keywords,
+		return new Query(null, SEQwiki.getName().trim(), webpageUrls, SEQwiki.getSummary().trim(), keywords,
 			splitPublicationIds(SEQwiki.getPublications(), INTERNAL_SEPARATOR_COMMA, SEQWIKI),
 			splitLink(SEQwiki.getDocs(), INTERNAL_SEPARATOR_COMMA),
 			annotations);
@@ -256,7 +256,7 @@ public class QueryLoader {
 				Set<EdamUri> annotations = new LinkedHashSet<>();
 				EdamUri annotation = getSEQwikiAnnotation(keyword, concepts);
 				if (annotation != null) annotations.add(annotation);
-				return new Query(SEQwiki.getName().trim(), null, webpageUrls, null, keywords, null, null, annotations);
+				return new Query(null, SEQwiki.getName().trim(), webpageUrls, null, keywords, null, null, annotations);
 			}).collect(Collectors.toList()));
 		queries.addAll(INTERNAL_SEPARATOR_COMMA.splitAsStream(SEQwiki.getMethods())
 			.map(s -> {
@@ -266,7 +266,7 @@ public class QueryLoader {
 				Set<EdamUri> annotations = new LinkedHashSet<>();
 				EdamUri annotation = getSEQwikiAnnotation(keyword, concepts);
 				if (annotation != null) annotations.add(annotation);
-				return new Query(SEQwiki.getName().trim(), null, webpageUrls, null, keywords, null, null, annotations);
+				return new Query(null, SEQwiki.getName().trim(), webpageUrls, null, keywords, null, null, annotations);
 			}).collect(Collectors.toList()));
 
 		return queries;
@@ -287,7 +287,7 @@ public class QueryLoader {
 		annotations.addAll(edamUris(msutils.getFormat_in(), concepts));
 		annotations.addAll(edamUris(msutils.getFormat_out(), concepts));
 
-		return new Query(msutils.getName().trim(), null, webpageUrls, msutils.getDescription().trim(), null,
+		return new Query(null, msutils.getName().trim(), webpageUrls, msutils.getDescription().trim(), null,
 			splitPublicationIds(msutils.getPaper(), INTERNAL_SEPARATOR_BAR, MSUTILS), null, annotations);
 	}
 
@@ -316,13 +316,12 @@ public class QueryLoader {
 		annotations.addAll(edamUris(biotools.getDataTypes(), concepts));
 		annotations.addAll(edamUris(biotools.getDataFormats(), concepts));
 
-		return new Query(biotools.getName().trim(), null, webpageUrls, biotools.getDescription().trim(), null,
+		return new Query(null, biotools.getName().trim(), webpageUrls, biotools.getDescription().trim(), null,
 			publicationIds, docUrls, annotations);
 	}
 
 	private static Query getBiotools(ToolInput tool, Map<EdamUri, Concept> concepts) {
 		List<Link> webpageUrls = new ArrayList<>();
-		webpageUrls.add(new Link(BIOTOOLS + tool.getId().trim(), "ID"));
 		webpageUrls.add(new Link(tool.getHomepage().trim(), "Homepage"));
 		webpageUrls.addAll(tool.getLink().stream()
 			.filter(s -> s.getType().trim().equalsIgnoreCase("Browser")
@@ -383,7 +382,7 @@ public class QueryLoader {
 			}
 		}
 
-		return new Query(tool.getName().trim(), tool.getId().trim(), webpageUrls, tool.getDescription().trim(), null,
+		return new Query(tool.getId().trim(), tool.getName().trim(), webpageUrls, tool.getDescription().trim(), null,
 			publicationIds, docUrls, annotations);
 	}
 
@@ -410,8 +409,8 @@ public class QueryLoader {
 		annotations.addAll(edamUris(bioConductor.getOperation_URI(), concepts));
 
 		return new Query(
-			name,
 			null,
+			name,
 			webpageUrls,
 			bioConductor.getDescription().trim(),
 			keywordsCamelCase(bioConductor.getBiocViews(), "biocViews", BIOC_VIEWS, INTERNAL_SEPARATOR_BAR),

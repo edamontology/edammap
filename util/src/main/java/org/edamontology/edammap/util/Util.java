@@ -43,9 +43,9 @@ public final class Util {
 		System.out.println("Make query IDF from file " + queryPath + " of type " + type + " to " + outputPath + (database != null ? " using database " + database : ""));
 
 		ProcessorArgs processorArgs = new ProcessorArgs();
-		processorArgs.setFetchingDisabled(true);
+		processorArgs.setFetcher(false);
 		processorArgs.setDatabase(database);
-		processorArgs.setQueryIdf(null);
+		processorArgs.setIdf(null);
 		processorArgs.setPreProcessorArgs(args.preProcessorArgs);
 
 		Processor processor = new Processor(processorArgs);
@@ -63,7 +63,7 @@ public final class Util {
 		System.out.println("Make full " + (dev ? "dev." : "") + "bio.tools JSON to " + outputPath);
 		String api = "https://" + (dev ? "dev." : "") + "bio.tools/api/tool";
 
-		Path output = FetcherCommon.outputPath(outputPath, false);
+		Path output = FetcherCommon.outputPath(outputPath);
 
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);

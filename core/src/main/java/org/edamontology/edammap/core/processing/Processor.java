@@ -31,7 +31,8 @@ import org.edamontology.edammap.core.edam.Concept;
 import org.edamontology.edammap.core.edam.EdamUri;
 import org.edamontology.edammap.core.idf.Idf;
 import org.edamontology.edammap.core.idf.IdfMake;
-import org.edamontology.edammap.core.mapping.MapperIdfMultiplierArgs;
+import org.edamontology.edammap.core.mapping.args.IdfArgs;
+import org.edamontology.edammap.core.mapping.args.MultiplierArgs;
 import org.edamontology.edammap.core.preprocessing.PreProcessor;
 import org.edamontology.edammap.core.query.Keyword;
 import org.edamontology.edammap.core.query.Link;
@@ -59,7 +60,7 @@ public class Processor {
 	public Processor(ProcessorArgs args) throws IOException, ParseException {
 		this.preProcessor = new PreProcessor(args.getPreProcessorArgs());
 
-		if (args.isFetchingDisabled()) {
+		if (!args.isFetcher()) {
 			this.fetcher = null;
 		} else {
 			this.fetcher = new Fetcher(args.getFetcherArgs());
@@ -71,10 +72,10 @@ public class Processor {
 			this.database = new Database(args.getDatabase());
 		}
 
-		if (args.getQueryIdf() == null || args.getQueryIdf().isEmpty()) {
+		if (args.getIdf() == null || args.getIdf().isEmpty()) {
 			this.queryIdf = null;
 		} else {
-			this.queryIdf = new Idf(args.getQueryIdf());
+			this.queryIdf = new Idf(args.getIdf());
 		}
 	}
 
@@ -153,52 +154,52 @@ public class Processor {
 		}
 	}
 
-	private void anonymizeProcessedConcept(ConceptProcessed processedConcept, MapperIdfMultiplierArgs args) {
-		if (processedConcept.getLabelTokens() != null && args.getLabelMultiplier() > 0) {
+	private void anonymizeProcessedConcept(ConceptProcessed processedConcept, IdfArgs idfArgs, MultiplierArgs multiplierArgs) {
+		if (processedConcept.getLabelTokens() != null && multiplierArgs.getLabelMultiplier() > 0) {
 			processedConcept.addTokens(processedConcept.getLabelTokens());
 			processedConcept.addIdfs(processedConcept.getLabelIdfs());
-			processedConcept.addScaling(args.isEnableLabelSynonymsIdf() ? args.getConceptIdfScaling() : 0);
-			processedConcept.addMultiplier(args.getLabelMultiplier());
+			processedConcept.addScaling(idfArgs.isLabelSynonymsIdf() ? idfArgs.getConceptIdfScaling() : 0);
+			processedConcept.addMultiplier(multiplierArgs.getLabelMultiplier());
 		}
-		if (args.getExactSynonymMultiplier() > 0) {
+		if (multiplierArgs.getExactSynonymMultiplier() > 0) {
 			for (int i = 0; i < processedConcept.getExactSynonymsTokens().size(); ++i) {
 				processedConcept.addTokens(processedConcept.getExactSynonymsTokens().get(i));
 				processedConcept.addIdfs(processedConcept.getExactSynonymsIdfs().get(i));
-				processedConcept.addScaling(args.isEnableLabelSynonymsIdf() ? args.getConceptIdfScaling() : 0);
-				processedConcept.addMultiplier(args.getExactSynonymMultiplier());
+				processedConcept.addScaling(idfArgs.isLabelSynonymsIdf() ? idfArgs.getConceptIdfScaling() : 0);
+				processedConcept.addMultiplier(multiplierArgs.getExactSynonymMultiplier());
 			}
 		}
-		if (args.getNarrowBroadMultiplier() > 0) {
+		if (multiplierArgs.getNarrowBroadMultiplier() > 0) {
 			for (int i = 0; i < processedConcept.getNarrowSynonymsTokens().size(); ++i) {
 				processedConcept.addTokens(processedConcept.getNarrowSynonymsTokens().get(i));
 				processedConcept.addIdfs(processedConcept.getNarrowSynonymsIdfs().get(i));
-				processedConcept.addScaling(args.isEnableLabelSynonymsIdf() ? args.getConceptIdfScaling() : 0);
-				processedConcept.addMultiplier(args.getNarrowBroadMultiplier());
+				processedConcept.addScaling(idfArgs.isLabelSynonymsIdf() ? idfArgs.getConceptIdfScaling() : 0);
+				processedConcept.addMultiplier(multiplierArgs.getNarrowBroadMultiplier());
 			}
 		}
-		if (args.getNarrowBroadMultiplier() > 0) {
+		if (multiplierArgs.getNarrowBroadMultiplier() > 0) {
 			for (int i = 0; i < processedConcept.getBroadSynonymsTokens().size(); ++i) {
 				processedConcept.addTokens(processedConcept.getBroadSynonymsTokens().get(i));
 				processedConcept.addIdfs(processedConcept.getBroadSynonymsIdfs().get(i));
-				processedConcept.addScaling(args.isEnableLabelSynonymsIdf() ? args.getConceptIdfScaling() : 0);
-				processedConcept.addMultiplier(args.getNarrowBroadMultiplier());
+				processedConcept.addScaling(idfArgs.isLabelSynonymsIdf() ? idfArgs.getConceptIdfScaling() : 0);
+				processedConcept.addMultiplier(multiplierArgs.getNarrowBroadMultiplier());
 			}
 		}
-		if (processedConcept.getDefinitionTokens() != null && args.getDefinitionMultiplier() > 0) {
+		if (processedConcept.getDefinitionTokens() != null && multiplierArgs.getDefinitionMultiplier() > 0) {
 			processedConcept.addTokens(processedConcept.getDefinitionTokens());
 			processedConcept.addIdfs(processedConcept.getDefinitionIdfs());
-			processedConcept.addScaling(args.getConceptIdfScaling());
-			processedConcept.addMultiplier(args.getDefinitionMultiplier());
+			processedConcept.addScaling(idfArgs.getConceptIdfScaling());
+			processedConcept.addMultiplier(multiplierArgs.getDefinitionMultiplier());
 		}
-		if (processedConcept.getCommentTokens() != null && args.getCommentMultiplier() > 0) {
+		if (processedConcept.getCommentTokens() != null && multiplierArgs.getCommentMultiplier() > 0) {
 			processedConcept.addTokens(processedConcept.getCommentTokens());
 			processedConcept.addIdfs(processedConcept.getCommentIdfs());
-			processedConcept.addScaling(args.getConceptIdfScaling());
-			processedConcept.addMultiplier(args.getCommentMultiplier());
+			processedConcept.addScaling(idfArgs.getConceptIdfScaling());
+			processedConcept.addMultiplier(multiplierArgs.getCommentMultiplier());
 		}
 	}
 
-	public Map<EdamUri, ConceptProcessed> getProcessedConcepts(Map<EdamUri, Concept> concepts, MapperIdfMultiplierArgs args) {
+	public Map<EdamUri, ConceptProcessed> getProcessedConcepts(Map<EdamUri, Concept> concepts, IdfArgs idfArgs, MultiplierArgs multiplierArgs) {
 		Map<EdamUri, ConceptProcessed> processedConcepts = new LinkedHashMap<>();
 
 		IdfMake idfMake = new IdfMake();
@@ -212,7 +213,7 @@ public class Processor {
 		}
 
 		for (ConceptProcessed processedConcept : processedConcepts.values()) {
-			anonymizeProcessedConcept(processedConcept, args);
+			anonymizeProcessedConcept(processedConcept, idfArgs, multiplierArgs);
 		}
 
 		return processedConcepts;
@@ -330,13 +331,8 @@ public class Processor {
 		}
 
 		if (query.getWebpageUrls() != null) {
-			boolean skipFirst = (type == QueryType.biotools);
 			for (Iterator<Link> it = query.getWebpageUrls().iterator(); it.hasNext(); ) {
 				String webpageUrl = it.next().getUrl();
-				if (skipFirst) {
-					skipFirst = false;
-					continue;
-				}
 				Webpage webpage = FetcherCommon.getWebpage(webpageUrl, database, fetcher);
 				List<String> webpageTokens = null;
 				List<Double> webpageIdfs = null;
@@ -351,6 +347,7 @@ public class Processor {
 				if (webpageTokens == null && removeBroken) {
 					it.remove();
 				} else {
+					queryProcessed.addWebpage(webpage);
 					queryProcessed.addWebpageTokens(webpageTokens);
 					queryProcessed.addWebpageIdfs(webpageIdfs);
 				}
@@ -415,6 +412,7 @@ public class Processor {
 				if (docTokens == null && removeBroken) {
 					it.remove();
 				} else {
+					queryProcessed.addDoc(doc);
 					queryProcessed.addDocTokens(docTokens);
 					queryProcessed.addDocIdfs(docIdfs);
 				}

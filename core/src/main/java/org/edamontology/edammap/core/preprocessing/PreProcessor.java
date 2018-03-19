@@ -112,39 +112,45 @@ public class PreProcessor {
 	// Freestanding number (not part of a word)
 	private final Pattern NUMBER = Pattern.compile("^[\\p{N}]+$");
 
-	private final boolean numberRemove;
+	private final boolean numbers;
 
 	private final List<String> stopwords;
 
 	private final Stemmer stemmer;
 
-	private final int shortWord;
+	private final int minLength;
 
 	public PreProcessor(PreProcessorArgs args) throws IOException {
-		this.numberRemove = args.isNumberRemove();
+		this.numbers = args.isNumbers();
 
-		if (args.getStopwords() != Stopwords.off) {
-			String resourceName = "stopwords/" + args.getStopwords() + ".txt";
-			InputStream resource = this.getClass().getResourceAsStream("/" + resourceName);
+		this.stopwords = (args.getStopwords() != Stopwords.off ? getStopwords(args) : null);
 
-			if (resource != null) {
-				try (BufferedReader br = new BufferedReader(new InputStreamReader(resource, StandardCharsets.UTF_8))) {
-					this.stopwords = br.lines().filter(s -> !s.startsWith("#")).collect(Collectors.toList());
-				}
-			} else {
-				throw new MissingResourceException("Can't find stopword list " + resourceName, this.getClass().getSimpleName(), resourceName);
+		this.stemmer = (args.isStemming() ? new Stemmer() : null);
+
+		this.minLength = args.getMinLength();
+	}
+
+	public PreProcessor(PreProcessorArgs args, List<String> stopwords) {
+		this.numbers = args.isNumbers();
+
+		this.stopwords = stopwords;
+
+		this.stemmer = (args.isStemming() ? new Stemmer() : null);
+
+		this.minLength = args.getMinLength();
+	}
+
+	public static List<String> getStopwords(PreProcessorArgs args) throws IOException {
+		String resourceName = "stopwords/" + args.getStopwords() + ".txt";
+		InputStream resource = PreProcessor.class.getResourceAsStream("/" + resourceName);
+
+		if (resource != null) {
+			try (BufferedReader br = new BufferedReader(new InputStreamReader(resource, StandardCharsets.UTF_8))) {
+				return br.lines().filter(s -> !s.startsWith("#")).collect(Collectors.toList());
 			}
 		} else {
-			this.stopwords = null;
+			throw new MissingResourceException("Can't find stopword list " + resourceName, PreProcessor.class.getSimpleName(), resourceName);
 		}
-
-		if (args.isNoStemming()) {
-			this.stemmer = null;
-		} else {
-			this.stemmer = new Stemmer();
-		}
-
-		this.shortWord = args.getShortWord();
 	}
 
 	private String periodFix(String input) {
@@ -192,7 +198,7 @@ public class PreProcessor {
 
 		List<String> output = Arrays.stream(input.split(" ")).collect(Collectors.toList());
 
-		if (numberRemove) {
+		if (!numbers) {
 			if (extracted == null) {
 				output.removeIf(s -> NUMBER.matcher(s).matches());
 			} else {
@@ -228,12 +234,12 @@ public class PreProcessor {
 			}
 		}
 
-		if (shortWord > 0) {
+		if (minLength > 1) {
 			if (extracted == null) {
-				output.removeIf(s -> s.length() <= shortWord);
+				output.removeIf(s -> s.length() < minLength);
 			} else {
 				for (int i = 0; i < output.size(); ++i) {
-					if (output.get(i).length() <= shortWord) {
+					if (output.get(i).length() < minLength) {
 						output.remove(i);
 						extracted.remove(i);
 						--i;

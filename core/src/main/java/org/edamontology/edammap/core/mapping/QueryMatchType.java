@@ -23,14 +23,34 @@ public enum QueryMatchType {
 	name,
 	keyword,
 	description,
-	publication_title,
-	publication_keyword,
-	publication_mesh,
-	publication_efo,
-	publication_go,
-	publication_abstract,
-	publication_fulltext,
+	publication_title("publication title"),
+	publication_keyword("publication keyword"),
+	publication_mesh("publication mesh"),
+	publication_efo("publication efo"),
+	publication_go("publication go"),
+	publication_abstract("publication abstract"),
+	publication_fulltext("publication fulltext"),
 	doc,
 	webpage,
-	none
+	none;
+
+	private String type;
+
+	private QueryMatchType() {
+		this.type = name();
+	}
+	private QueryMatchType(String type) {
+		this.type = type;
+	}
+
+	public boolean isPublication() {
+		return this == publication_title
+			|| this == publication_keyword || this == publication_mesh || this == publication_efo || this == publication_go
+			|| this == publication_abstract || this == publication_fulltext;
+	}
+
+	@Override
+	public String toString() {
+		return type;
+	}
 }

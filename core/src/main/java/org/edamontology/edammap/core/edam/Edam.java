@@ -20,6 +20,7 @@
 package org.edamontology.edammap.core.edam;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -32,10 +33,15 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.search.EntitySearcher;
 
 public class Edam {
-	public static Map<EdamUri, Concept> load(String edamPath) throws OWLOntologyCreationException {
+	public static Map<EdamUri, Concept> load(String edamPath) throws IOException {
 
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		OWLOntology ontology = manager.loadOntologyFromOntologyDocument(new File(edamPath));
+		OWLOntology ontology;
+		try {
+			ontology = manager.loadOntologyFromOntologyDocument(new File(edamPath));
+		} catch (OWLOntologyCreationException e) {
+			throw new IOException(e);
+		}
 
 		String prefix = ontology.getOntologyID().getOntologyIRI().get().toString();
 

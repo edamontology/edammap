@@ -28,6 +28,9 @@ import com.univocity.parsers.annotations.Parsed;
 public class Generic implements InputType {
 
 	@Parsed
+	private String id;
+
+	@Parsed
 	private String name;
 
 	@Parsed
@@ -53,6 +56,13 @@ public class Generic implements InputType {
 		if (name == null || name.equals("")) {
 			parseException("name", i);
 		}
+	}
+
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public String getName() {

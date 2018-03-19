@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016 Erik Jaaniso
+ * Copyright © 2018 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -17,28 +17,28 @@
  * along with EDAMmap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.edamontology.edammap.core.mapping;
+package org.edamontology.edammap.core.benchmarking;
 
-public enum ConceptMatchType {
-	label,
-	exact_synonym("exact synonym"),
-	narrow_synonym("narrow synonym"),
-	broad_synonym("broad synonym"),
-	definition,
-	comment,
-	none;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 
-	private String type;
+import org.edamontology.edammap.core.edam.Branch;
 
-	private ConceptMatchType() {
-		this.type = name();
+public class MappingTest {
+
+	final Map<Branch, List<MatchTest>> matches;
+
+	public MappingTest() {
+		matches = new EnumMap<>(Branch.class);
+
+		for (Branch branch : Branch.values()) {
+			matches.put(branch, new ArrayList<MatchTest>());
+		}
 	}
-	private ConceptMatchType(String type) {
-		this.type = type;
-	}
 
-	@Override
-	public String toString() {
-		return type;
+	public List<MatchTest> getMatches(Branch branch) {
+		return matches.get(branch);
 	}
 }

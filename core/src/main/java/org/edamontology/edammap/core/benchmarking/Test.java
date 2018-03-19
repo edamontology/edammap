@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016 Erik Jaaniso
+ * Copyright © 2016, 2018 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -17,28 +17,32 @@
  * along with EDAMmap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.edamontology.edammap.core.mapping;
+package org.edamontology.edammap.core.benchmarking;
 
-public enum ConceptMatchType {
-	label,
-	exact_synonym("exact synonym"),
-	narrow_synonym("narrow synonym"),
-	broad_synonym("broad synonym"),
-	definition,
-	comment,
-	none;
+public enum Test {
+	tp("True Positive (TP)", "https://en.wikipedia.org/wiki/Type_I_and_type_II_errors"),
+	fp("False Positive (FP)", "https://en.wikipedia.org/wiki/Type_I_and_type_II_errors"),
+	fn("False Negative (FN)", "https://en.wikipedia.org/wiki/Type_I_and_type_II_errors");
 
-	private String type;
+	private String name;
 
-	private ConceptMatchType() {
-		this.type = name();
+	private String url;
+
+	private Test(String name, String url) {
+		this.name = name;
+		this.url = url;
 	}
-	private ConceptMatchType(String type) {
-		this.type = type;
+
+	public String getName() {
+		return name;
+	}
+
+	public String getUrl() {
+		return url;
 	}
 
 	@Override
 	public String toString() {
-		return type;
+		return name;
 	}
 }

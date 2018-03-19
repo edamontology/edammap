@@ -28,8 +28,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.edamontology.edammap.core.edam.Branch;
 import org.edamontology.edammap.core.edam.EdamUri;
+import org.edamontology.edammap.core.mapping.args.AlgorithmArgs;
+import org.edamontology.edammap.core.mapping.args.IdfArgs;
+import org.edamontology.edammap.core.mapping.args.MapperArgs;
+import org.edamontology.edammap.core.mapping.args.MultiplierArgs;
+import org.edamontology.edammap.core.mapping.args.NormaliserArgs;
 import org.edamontology.edammap.core.processing.ConceptProcessed;
 import org.edamontology.edammap.core.processing.PublicationProcessed;
 import org.edamontology.edammap.core.processing.QueryProcessed;
@@ -189,7 +193,7 @@ public class Mapper {
 		}
 	}
 
-	private void calculateScores(double[] bestScores, List<String> tos, List<String> froms, List<Double> fromIdfs, double fromIdfScaling, double fromMultiplier, MapperAlgorithmArgs args) {
+	private void calculateScores(double[] bestScores, List<String> tos, List<String> froms, List<Double> fromIdfs, double fromIdfScaling, double fromMultiplier, AlgorithmArgs args) {
 		double[] positionOffScores = { 1, args.getPositionOffBy1(), args.getPositionOffBy2() };
 
 		List<M> matches = getTokenMatches(tos, froms, args.getCompoundWords(), args.getMismatchMultiplier(), args.getMatchMinimum());
@@ -255,7 +259,7 @@ public class Mapper {
 		}
 	}
 
-	private double getScore(List<String> toTokens, List<Double> toIdfs, double toIdfScaling, double toMultiplier, List<List<String>> fromsTokens, List<List<Double>> fromsIdfs, List<Double> fromIdfScalings, List<Double> fromMultipliers, MapperAlgorithmArgs args) {
+	private double getScore(List<String> toTokens, List<Double> toIdfs, double toIdfScaling, double toMultiplier, List<List<String>> fromsTokens, List<List<Double>> fromsIdfs, List<Double> fromIdfScalings, List<Double> fromMultipliers, AlgorithmArgs args) {
 		double[] bestScores = new double[toTokens.size()];
 		Arrays.fill(bestScores, 0);
 
@@ -287,49 +291,47 @@ public class Mapper {
 	}
 
 	// TODO try to make less copy-pasty
-	private ConceptMatch toConceptFromQuery(ConceptProcessed processedConcept, QueryProcessed processedQuery, QueryMatchType type, MapperAlgorithmArgs algorithmArgs, MapperIdfMultiplierArgs idfMultiplierArgs, Branch branch) {
+	private ConceptMatch toConceptFromQuery(ConceptProcessed processedConcept, QueryProcessed processedQuery, QueryMatchType type, AlgorithmArgs algorithmArgs, IdfArgs idfArgs, MultiplierArgs multiplierArgs, NormaliserArgs normaliserArgs) {
 		List<List<String>> fromsTokens = new ArrayList<>();
 		List<List<Double>> fromsIdfs = new ArrayList<>();
 		List<Double> fromIdfScalings = new ArrayList<>();
 		List<Double> fromMultipliers = new ArrayList<>();
 
-		boolean queryIdfDisabled = idfMultiplierArgs.getDisableQueryIdfBranches().contains(branch);
-
 		switch (type) {
 		case name:
-			if (processedQuery.getNameTokens() != null && idfMultiplierArgs.getNameNormalizer() > 0) {
+			if (processedQuery.getNameTokens() != null && normaliserArgs.getNameNormaliser() > 0) {
 				fromsTokens.add(processedQuery.getNameTokens());
 				fromsIdfs.add(processedQuery.getNameIdfs());
-				fromIdfScalings.add((queryIdfDisabled || processedQuery.getNameIdfs() == null || idfMultiplierArgs.isDisableNameKeywordsIdf()) ? 0 : idfMultiplierArgs.getQueryIdfScaling());
+				fromIdfScalings.add((processedQuery.getNameIdfs() == null || !idfArgs.isNameKeywordsIdf()) ? 0 : idfArgs.getQueryIdfScaling());
 				fromMultipliers.add(Double.valueOf(1));
 			}
 			break;
 		case keyword:
-			if (idfMultiplierArgs.getKeywordNormalizer() > 0) {
+			if (normaliserArgs.getKeywordNormaliser() > 0) {
 				for (int i = 0; i < processedQuery.getKeywordsTokens().size(); ++i) {
 					if (processedQuery.getKeywordsTokens().get(i) == null) continue;
 					fromsTokens.add(processedQuery.getKeywordsTokens().get(i));
 					fromsIdfs.add(processedQuery.getKeywordsIdfs().get(i));
-					fromIdfScalings.add((queryIdfDisabled || processedQuery.getKeywordsIdfs().get(i) == null || idfMultiplierArgs.isDisableNameKeywordsIdf()) ? 0 : idfMultiplierArgs.getQueryIdfScaling());
+					fromIdfScalings.add((processedQuery.getKeywordsIdfs().get(i) == null || !idfArgs.isNameKeywordsIdf()) ? 0 : idfArgs.getQueryIdfScaling());
 					fromMultipliers.add(Double.valueOf(1));
 				}
 			}
 			break;
 		case description:
-			if (processedQuery.getDescriptionTokens() != null && idfMultiplierArgs.getDescriptionNormalizer() > 0) {
+			if (processedQuery.getDescriptionTokens() != null && normaliserArgs.getDescriptionNormaliser() > 0) {
 				fromsTokens.add(processedQuery.getDescriptionTokens());
 				fromsIdfs.add(processedQuery.getDescriptionIdfs());
-				fromIdfScalings.add((queryIdfDisabled || processedQuery.getDescriptionIdfs() == null || idfMultiplierArgs.isDisableDescriptionIdf()) ? 0 : idfMultiplierArgs.getQueryIdfScaling());
+				fromIdfScalings.add((processedQuery.getDescriptionIdfs() == null || !idfArgs.isDescriptionIdf()) ? 0 : idfArgs.getQueryIdfScaling());
 				fromMultipliers.add(Double.valueOf(1));
 			}
 			break;
 		case publication_title:
 			for (PublicationProcessed processedPublication : processedQuery.getProcessedPublications()) {
 				if (processedPublication == null) continue;
-				if (processedPublication.getTitleTokens() != null && idfMultiplierArgs.getPublicationTitleNormalizer() > 0) {
+				if (processedPublication.getTitleTokens() != null && normaliserArgs.getPublicationTitleNormaliser() > 0) {
 					fromsTokens.add(processedPublication.getTitleTokens());
 					fromsIdfs.add(processedPublication.getTitleIdfs());
-					fromIdfScalings.add((queryIdfDisabled || processedPublication.getTitleIdfs() == null || idfMultiplierArgs.isDisableTitleKeywordsIdf()) ? 0 : idfMultiplierArgs.getQueryIdfScaling());
+					fromIdfScalings.add((processedPublication.getTitleIdfs() == null || !idfArgs.isTitleKeywordsIdf()) ? 0 : idfArgs.getQueryIdfScaling());
 					fromMultipliers.add(Double.valueOf(1));
 				}
 			}
@@ -337,12 +339,12 @@ public class Mapper {
 		case publication_keyword:
 			for (PublicationProcessed processedPublication : processedQuery.getProcessedPublications()) {
 				if (processedPublication == null) continue;
-				if (idfMultiplierArgs.getPublicationKeywordNormalizer() > 0) {
+				if (normaliserArgs.getPublicationKeywordNormaliser() > 0) {
 					for (int i = 0; i < processedPublication.getKeywordsTokens().size(); ++i) {
 						if (processedPublication.getKeywordsTokens().get(i) == null) continue;
 						fromsTokens.add(processedPublication.getKeywordsTokens().get(i));
 						fromsIdfs.add(processedPublication.getKeywordsIdfs().get(i));
-						fromIdfScalings.add((queryIdfDisabled || processedPublication.getKeywordsIdfs().get(i) == null || idfMultiplierArgs.isDisableTitleKeywordsIdf()) ? 0 : idfMultiplierArgs.getQueryIdfScaling());
+						fromIdfScalings.add((processedPublication.getKeywordsIdfs().get(i) == null || !idfArgs.isTitleKeywordsIdf()) ? 0 : idfArgs.getQueryIdfScaling());
 						fromMultipliers.add(Double.valueOf(1));
 					}
 				}
@@ -351,12 +353,12 @@ public class Mapper {
 		case publication_mesh:
 			for (PublicationProcessed processedPublication : processedQuery.getProcessedPublications()) {
 				if (processedPublication == null) continue;
-				if (idfMultiplierArgs.getPublicationMeshNormalizer() > 0) {
+				if (normaliserArgs.getPublicationMeshNormaliser() > 0) {
 					for (int i = 0; i < processedPublication.getMeshTermsTokens().size(); ++i) {
 						if (processedPublication.getMeshTermsTokens().get(i) == null) continue;
 						fromsTokens.add(processedPublication.getMeshTermsTokens().get(i));
 						fromsIdfs.add(processedPublication.getMeshTermsIdfs().get(i));
-						fromIdfScalings.add((queryIdfDisabled || processedPublication.getMeshTermsIdfs().get(i) == null || idfMultiplierArgs.isDisableTitleKeywordsIdf()) ? 0 : idfMultiplierArgs.getQueryIdfScaling());
+						fromIdfScalings.add((processedPublication.getMeshTermsIdfs().get(i) == null || !idfArgs.isTitleKeywordsIdf()) ? 0 : idfArgs.getQueryIdfScaling());
 						fromMultipliers.add(Double.valueOf(1));
 					}
 				}
@@ -366,21 +368,21 @@ public class Mapper {
 		case publication_go:
 			for (PublicationProcessed processedPublication : processedQuery.getProcessedPublications()) {
 				if (processedPublication == null) continue;
-				if (idfMultiplierArgs.getPublicationMinedNormalizer() > 0) {
+				if (normaliserArgs.getPublicationMinedNormaliser() > 0) {
 					for (int i = 0; i < processedPublication.getEfoTermsTokens().size(); ++i) {
 						if (processedPublication.getEfoTermsTokens().get(i) == null) continue;
 						fromsTokens.add(processedPublication.getEfoTermsTokens().get(i));
 						fromsIdfs.add(processedPublication.getEfoTermsIdfs().get(i));
-						fromIdfScalings.add((queryIdfDisabled || processedPublication.getEfoTermsIdfs().get(i) == null || idfMultiplierArgs.isDisableTitleKeywordsIdf()) ? 0 : idfMultiplierArgs.getQueryIdfScaling());
+						fromIdfScalings.add((processedPublication.getEfoTermsIdfs().get(i) == null || !idfArgs.isTitleKeywordsIdf()) ? 0 : idfArgs.getQueryIdfScaling());
 						fromMultipliers.add(Double.valueOf(1));
 					}
 				}
-				if (idfMultiplierArgs.getPublicationMinedNormalizer() > 0) {
+				if (normaliserArgs.getPublicationMinedNormaliser() > 0) {
 					for (int i = 0; i < processedPublication.getGoTermsTokens().size(); ++i) {
 						if (processedPublication.getGoTermsTokens().get(i) == null) continue;
 						fromsTokens.add(processedPublication.getGoTermsTokens().get(i));
 						fromsIdfs.add(processedPublication.getGoTermsIdfs().get(i));
-						fromIdfScalings.add((queryIdfDisabled || processedPublication.getGoTermsIdfs().get(i) == null || idfMultiplierArgs.isDisableTitleKeywordsIdf()) ? 0 : idfMultiplierArgs.getQueryIdfScaling());
+						fromIdfScalings.add((processedPublication.getGoTermsIdfs().get(i) == null || !idfArgs.isTitleKeywordsIdf()) ? 0 : idfArgs.getQueryIdfScaling());
 						fromMultipliers.add(Double.valueOf(1));
 					}
 				}
@@ -389,10 +391,10 @@ public class Mapper {
 		case publication_abstract:
 			for (PublicationProcessed processedPublication : processedQuery.getProcessedPublications()) {
 				if (processedPublication == null) continue;
-				if (processedPublication.getAbstractTokens() != null && idfMultiplierArgs.getPublicationAbstractNormalizer() > 0) {
+				if (processedPublication.getAbstractTokens() != null && normaliserArgs.getPublicationAbstractNormaliser() > 0) {
 					fromsTokens.add(processedPublication.getAbstractTokens());
 					fromsIdfs.add(processedPublication.getAbstractIdfs());
-					fromIdfScalings.add((queryIdfDisabled || processedPublication.getAbstractIdfs() == null || idfMultiplierArgs.isDisableAbstractIdf()) ? 0 : idfMultiplierArgs.getQueryIdfScaling());
+					fromIdfScalings.add((processedPublication.getAbstractIdfs() == null || !idfArgs.isAbstractIdf()) ? 0 : idfArgs.getQueryIdfScaling());
 					fromMultipliers.add(Double.valueOf(1));
 				}
 			}
@@ -400,32 +402,32 @@ public class Mapper {
 		case publication_fulltext:
 			for (PublicationProcessed processedPublication : processedQuery.getProcessedPublications()) {
 				if (processedPublication == null) continue;
-				if (processedPublication.getFulltextTokens() != null && idfMultiplierArgs.getPublicationFulltextNormalizer() > 0) {
+				if (processedPublication.getFulltextTokens() != null && normaliserArgs.getPublicationFulltextNormaliser() > 0) {
 					fromsTokens.add(processedPublication.getFulltextTokens());
 					fromsIdfs.add(processedPublication.getFulltextIdfs());
-					fromIdfScalings.add((queryIdfDisabled || processedPublication.getFulltextIdfs() == null) ? 0 : idfMultiplierArgs.getQueryIdfScaling());
+					fromIdfScalings.add((processedPublication.getFulltextIdfs() == null) ? 0 : idfArgs.getQueryIdfScaling());
 					fromMultipliers.add(Double.valueOf(1));
 				}
 			}
 			break;
 		case doc:
-			if (idfMultiplierArgs.getDocNormalizer() > 0) {
+			if (normaliserArgs.getDocNormaliser() > 0) {
 				for (int i = 0; i < processedQuery.getDocsTokens().size(); ++i) {
 					if (processedQuery.getDocsTokens().get(i) == null) continue;
 					fromsTokens.add(processedQuery.getDocsTokens().get(i));
 					fromsIdfs.add(processedQuery.getDocsIdfs().get(i));
-					fromIdfScalings.add((queryIdfDisabled || processedQuery.getDocsIdfs().get(i) == null) ? 0 : idfMultiplierArgs.getQueryIdfScaling());
+					fromIdfScalings.add((processedQuery.getDocsIdfs().get(i) == null) ? 0 : idfArgs.getQueryIdfScaling());
 					fromMultipliers.add(Double.valueOf(1));
 				}
 			}
 			break;
 		case webpage:
-			if (idfMultiplierArgs.getWebpageNormalizer() > 0) {
+			if (normaliserArgs.getWebpageNormaliser() > 0) {
 				for (int i = 0; i < processedQuery.getWebpagesTokens().size(); ++i) {
 					if (processedQuery.getWebpagesTokens().get(i) == null) continue;
 					fromsTokens.add(processedQuery.getWebpagesTokens().get(i));
 					fromsIdfs.add(processedQuery.getWebpagesIdfs().get(i));
-					fromIdfScalings.add((queryIdfDisabled || processedQuery.getWebpagesIdfs().get(i) == null) ? 0 : idfMultiplierArgs.getQueryIdfScaling());
+					fromIdfScalings.add((processedQuery.getWebpagesIdfs().get(i) == null) ? 0 : idfArgs.getQueryIdfScaling());
 					fromMultipliers.add(Double.valueOf(1));
 				}
 			}
@@ -438,18 +440,18 @@ public class Mapper {
 		ConceptMatchType matchType = ConceptMatchType.none;
 		int synonymIndex = -1;
 
-		if (processedConcept.getLabelTokens() != null && idfMultiplierArgs.getLabelMultiplier() > 0) {
-			double idfScaling = idfMultiplierArgs.isEnableLabelSynonymsIdf() ? idfMultiplierArgs.getConceptIdfScaling() : 0;
-			double score = getScore(processedConcept.getLabelTokens(), processedConcept.getLabelIdfs(), idfScaling, idfMultiplierArgs.getLabelMultiplier(), fromsTokens, fromsIdfs, fromIdfScalings, fromMultipliers, algorithmArgs);
+		if (processedConcept.getLabelTokens() != null && multiplierArgs.getLabelMultiplier() > 0) {
+			double idfScaling = idfArgs.isLabelSynonymsIdf() ? idfArgs.getConceptIdfScaling() : 0;
+			double score = getScore(processedConcept.getLabelTokens(), processedConcept.getLabelIdfs(), idfScaling, multiplierArgs.getLabelMultiplier(), fromsTokens, fromsIdfs, fromIdfScalings, fromMultipliers, algorithmArgs);
 			if (score > bestScore) {
 				bestScore = score;
 				matchType = ConceptMatchType.label;
 			}
 		}
-		if (idfMultiplierArgs.getExactSynonymMultiplier() > 0) {
+		if (multiplierArgs.getExactSynonymMultiplier() > 0) {
 			for (int i = 0; i < processedConcept.getExactSynonymsTokens().size(); ++i) {
-				double idfScaling = idfMultiplierArgs.isEnableLabelSynonymsIdf() ? idfMultiplierArgs.getConceptIdfScaling() : 0;
-				double score = getScore(processedConcept.getExactSynonymsTokens().get(i), processedConcept.getExactSynonymsIdfs().get(i), idfScaling, idfMultiplierArgs.getExactSynonymMultiplier(), fromsTokens, fromsIdfs, fromIdfScalings, fromMultipliers, algorithmArgs);
+				double idfScaling = idfArgs.isLabelSynonymsIdf() ? idfArgs.getConceptIdfScaling() : 0;
+				double score = getScore(processedConcept.getExactSynonymsTokens().get(i), processedConcept.getExactSynonymsIdfs().get(i), idfScaling, multiplierArgs.getExactSynonymMultiplier(), fromsTokens, fromsIdfs, fromIdfScalings, fromMultipliers, algorithmArgs);
 				if (score > bestScore) {
 					bestScore = score;
 					matchType = ConceptMatchType.exact_synonym;
@@ -457,10 +459,10 @@ public class Mapper {
 				}
 			}
 		}
-		if (idfMultiplierArgs.getNarrowBroadMultiplier() > 0) {
+		if (multiplierArgs.getNarrowBroadMultiplier() > 0) {
 			for (int i = 0; i < processedConcept.getNarrowSynonymsTokens().size(); ++i) {
-				double idfScaling = idfMultiplierArgs.isEnableLabelSynonymsIdf() ? idfMultiplierArgs.getConceptIdfScaling() : 0;
-				double score = getScore(processedConcept.getNarrowSynonymsTokens().get(i), processedConcept.getNarrowSynonymsIdfs().get(i), idfScaling, idfMultiplierArgs.getNarrowBroadMultiplier(), fromsTokens, fromsIdfs, fromIdfScalings, fromMultipliers, algorithmArgs);
+				double idfScaling = idfArgs.isLabelSynonymsIdf() ? idfArgs.getConceptIdfScaling() : 0;
+				double score = getScore(processedConcept.getNarrowSynonymsTokens().get(i), processedConcept.getNarrowSynonymsIdfs().get(i), idfScaling, multiplierArgs.getNarrowBroadMultiplier(), fromsTokens, fromsIdfs, fromIdfScalings, fromMultipliers, algorithmArgs);
 				if (score > bestScore) {
 					bestScore = score;
 					matchType = ConceptMatchType.narrow_synonym;
@@ -468,10 +470,10 @@ public class Mapper {
 				}
 			}
 		}
-		if (idfMultiplierArgs.getNarrowBroadMultiplier() > 0) {
+		if (multiplierArgs.getNarrowBroadMultiplier() > 0) {
 			for (int i = 0; i < processedConcept.getBroadSynonymsTokens().size(); ++i) {
-				double idfScaling = idfMultiplierArgs.isEnableLabelSynonymsIdf() ? idfMultiplierArgs.getConceptIdfScaling() : 0;
-				double score = getScore(processedConcept.getBroadSynonymsTokens().get(i), processedConcept.getBroadSynonymsIdfs().get(i), idfScaling, idfMultiplierArgs.getNarrowBroadMultiplier(), fromsTokens, fromsIdfs, fromIdfScalings, fromMultipliers, algorithmArgs);
+				double idfScaling = idfArgs.isLabelSynonymsIdf() ? idfArgs.getConceptIdfScaling() : 0;
+				double score = getScore(processedConcept.getBroadSynonymsTokens().get(i), processedConcept.getBroadSynonymsIdfs().get(i), idfScaling, multiplierArgs.getNarrowBroadMultiplier(), fromsTokens, fromsIdfs, fromIdfScalings, fromMultipliers, algorithmArgs);
 				if (score > bestScore) {
 					bestScore = score;
 					matchType = ConceptMatchType.broad_synonym;
@@ -479,17 +481,17 @@ public class Mapper {
 				}
 			}
 		}
-		if (processedConcept.getDefinitionTokens() != null && idfMultiplierArgs.getDefinitionMultiplier() > 0) {
-			double idfScaling = idfMultiplierArgs.getConceptIdfScaling();
-			double score = getScore(processedConcept.getDefinitionTokens(), processedConcept.getDefinitionIdfs(), idfScaling, idfMultiplierArgs.getDefinitionMultiplier(), fromsTokens, fromsIdfs, fromIdfScalings, fromMultipliers, algorithmArgs);
+		if (processedConcept.getDefinitionTokens() != null && multiplierArgs.getDefinitionMultiplier() > 0) {
+			double idfScaling = idfArgs.getConceptIdfScaling();
+			double score = getScore(processedConcept.getDefinitionTokens(), processedConcept.getDefinitionIdfs(), idfScaling, multiplierArgs.getDefinitionMultiplier(), fromsTokens, fromsIdfs, fromIdfScalings, fromMultipliers, algorithmArgs);
 			if (score > bestScore) {
 				bestScore = score;
 				matchType = ConceptMatchType.definition;
 			}
 		}
-		if (processedConcept.getCommentTokens() != null && idfMultiplierArgs.getCommentMultiplier() > 0) {
-			double idfScaling = idfMultiplierArgs.getConceptIdfScaling();
-			double score = getScore(processedConcept.getCommentTokens(), processedConcept.getCommentIdfs(), idfScaling, idfMultiplierArgs.getCommentMultiplier(), fromsTokens, fromsIdfs, fromIdfScalings, fromMultipliers, algorithmArgs);
+		if (processedConcept.getCommentTokens() != null && multiplierArgs.getCommentMultiplier() > 0) {
+			double idfScaling = idfArgs.getConceptIdfScaling();
+			double score = getScore(processedConcept.getCommentTokens(), processedConcept.getCommentIdfs(), idfScaling, multiplierArgs.getCommentMultiplier(), fromsTokens, fromsIdfs, fromIdfScalings, fromMultipliers, algorithmArgs);
 			if (score > bestScore) {
 				bestScore = score;
 				matchType = ConceptMatchType.comment;
@@ -500,13 +502,11 @@ public class Mapper {
 	}
 
 	// TODO try to make less copy-pasty
-	private QueryMatch toQueryFromConcept(QueryProcessed processedQuery, ConceptProcessed processedConcept, QueryMatchType type, MapperAlgorithmArgs algorithmArgs, MapperIdfMultiplierArgs idfMultiplierArgs, Branch branch) {
+	private QueryMatch toQueryFromConcept(QueryProcessed processedQuery, ConceptProcessed processedConcept, QueryMatchType type, AlgorithmArgs algorithmArgs, IdfArgs idfArgs, NormaliserArgs normaliserArgs) {
 		List<List<String>> fromsTokens = processedConcept.getTokens();
 		List<List<Double>> fromsIdfs = processedConcept.getIdfs();
 		List<Double> fromIdfScalings = processedConcept.getIdfScalings();
 		List<Double> fromMultipliers = processedConcept.getMultipliers();
-
-		boolean queryIdfDisabled = idfMultiplierArgs.getDisableQueryIdfBranches().contains(branch);
 
 		double bestScore = 0;
 		QueryMatchType matchType = QueryMatchType.none;
@@ -515,9 +515,9 @@ public class Mapper {
 
 		switch (type) {
 		case name:
-			if (processedQuery.getNameTokens() != null && idfMultiplierArgs.getNameNormalizer() > 0) {
+			if (processedQuery.getNameTokens() != null && normaliserArgs.getNameNormaliser() > 0) {
 				List<Double> idfs = processedQuery.getNameIdfs();
-				double idfScaling = ((idfs == null || queryIdfDisabled || idfMultiplierArgs.isDisableNameKeywordsIdf()) ? 0 : idfMultiplierArgs.getQueryIdfScaling());
+				double idfScaling = ((idfs == null || !idfArgs.isNameKeywordsIdf()) ? 0 : idfArgs.getQueryIdfScaling());
 				double score = getScore(processedQuery.getNameTokens(), idfs, idfScaling, Double.valueOf(1), fromsTokens, fromsIdfs, fromIdfScalings, fromMultipliers, algorithmArgs);
 				if (score > bestScore) {
 					bestScore = score;
@@ -526,11 +526,11 @@ public class Mapper {
 			}
 			break;
 		case keyword:
-			if (idfMultiplierArgs.getKeywordNormalizer() > 0) {
+			if (normaliserArgs.getKeywordNormaliser() > 0) {
 				for (int i = 0; i < processedQuery.getKeywordsTokens().size(); ++i) {
 					if (processedQuery.getKeywordsTokens().get(i) == null) continue;
 					List<Double> idfs = processedQuery.getKeywordsIdfs().get(i);
-					double idfScaling = ((idfs == null || queryIdfDisabled || idfMultiplierArgs.isDisableNameKeywordsIdf()) ? 0 : idfMultiplierArgs.getQueryIdfScaling());
+					double idfScaling = ((idfs == null || !idfArgs.isNameKeywordsIdf()) ? 0 : idfArgs.getQueryIdfScaling());
 					double score = getScore(processedQuery.getKeywordsTokens().get(i), idfs, idfScaling, Double.valueOf(1), fromsTokens, fromsIdfs, fromIdfScalings, fromMultipliers, algorithmArgs);
 					if (score > bestScore) {
 						bestScore = score;
@@ -541,9 +541,9 @@ public class Mapper {
 			}
 			break;
 		case description:
-			if (processedQuery.getDescriptionTokens() != null && idfMultiplierArgs.getDescriptionNormalizer() > 0) {
+			if (processedQuery.getDescriptionTokens() != null && normaliserArgs.getDescriptionNormaliser() > 0) {
 				List<Double> idfs = processedQuery.getDescriptionIdfs();
-				double idfScaling = ((idfs == null || queryIdfDisabled || idfMultiplierArgs.isDisableDescriptionIdf()) ? 0 : idfMultiplierArgs.getQueryIdfScaling());
+				double idfScaling = ((idfs == null || !idfArgs.isDescriptionIdf()) ? 0 : idfArgs.getQueryIdfScaling());
 				double score = getScore(processedQuery.getDescriptionTokens(), idfs, idfScaling, Double.valueOf(1), fromsTokens, fromsIdfs, fromIdfScalings, fromMultipliers, algorithmArgs);
 				if (score > bestScore) {
 					bestScore = score;
@@ -555,9 +555,9 @@ public class Mapper {
 			for (int i = 0; i < processedQuery.getProcessedPublications().size(); ++i) {
 				PublicationProcessed processedPublication = processedQuery.getProcessedPublications().get(i);
 				if (processedPublication == null) continue;
-				if (processedPublication.getTitleTokens() != null && idfMultiplierArgs.getPublicationTitleNormalizer() > 0) {
+				if (processedPublication.getTitleTokens() != null && normaliserArgs.getPublicationTitleNormaliser() > 0) {
 					List<Double> idfs = processedPublication.getTitleIdfs();
-					double idfScaling = ((idfs == null || queryIdfDisabled || idfMultiplierArgs.isDisableTitleKeywordsIdf()) ? 0 : idfMultiplierArgs.getQueryIdfScaling());
+					double idfScaling = ((idfs == null || !idfArgs.isTitleKeywordsIdf()) ? 0 : idfArgs.getQueryIdfScaling());
 					double score = getScore(processedPublication.getTitleTokens(), idfs, idfScaling, Double.valueOf(1), fromsTokens, fromsIdfs, fromIdfScalings, fromMultipliers, algorithmArgs);
 					if (score > bestScore) {
 						bestScore = score;
@@ -571,11 +571,11 @@ public class Mapper {
 			for (int i = 0; i < processedQuery.getProcessedPublications().size(); ++i) {
 				PublicationProcessed processedPublication = processedQuery.getProcessedPublications().get(i);
 				if (processedPublication == null) continue;
-				if (idfMultiplierArgs.getPublicationKeywordNormalizer() > 0) {
+				if (normaliserArgs.getPublicationKeywordNormaliser() > 0) {
 					for (int j = 0; j < processedPublication.getKeywordsTokens().size(); ++j) {
 						if (processedPublication.getKeywordsTokens().get(j) == null) continue;
 						List<Double> idfs = processedPublication.getKeywordsIdfs().get(j);
-						double idfScaling = ((idfs == null || queryIdfDisabled || idfMultiplierArgs.isDisableTitleKeywordsIdf()) ? 0 : idfMultiplierArgs.getQueryIdfScaling());
+						double idfScaling = ((idfs == null || !idfArgs.isTitleKeywordsIdf()) ? 0 : idfArgs.getQueryIdfScaling());
 						double score = getScore(processedPublication.getKeywordsTokens().get(j), idfs, idfScaling, Double.valueOf(1), fromsTokens, fromsIdfs, fromIdfScalings, fromMultipliers, algorithmArgs);
 						if (score > bestScore) {
 							bestScore = score;
@@ -591,11 +591,11 @@ public class Mapper {
 			for (int i = 0; i < processedQuery.getProcessedPublications().size(); ++i) {
 				PublicationProcessed processedPublication = processedQuery.getProcessedPublications().get(i);
 				if (processedPublication == null) continue;
-				if (idfMultiplierArgs.getPublicationMeshNormalizer() > 0) {
+				if (normaliserArgs.getPublicationMeshNormaliser() > 0) {
 					for (int j = 0; j < processedPublication.getMeshTermsTokens().size(); ++j) {
 						if (processedPublication.getMeshTermsTokens().get(j) == null) continue;
 						List<Double> idfs = processedPublication.getMeshTermsIdfs().get(j);
-						double idfScaling = ((idfs == null || queryIdfDisabled || idfMultiplierArgs.isDisableTitleKeywordsIdf()) ? 0 : idfMultiplierArgs.getQueryIdfScaling());
+						double idfScaling = ((idfs == null || !idfArgs.isTitleKeywordsIdf()) ? 0 : idfArgs.getQueryIdfScaling());
 						double score = getScore(processedPublication.getMeshTermsTokens().get(j), idfs, idfScaling, Double.valueOf(1), fromsTokens, fromsIdfs, fromIdfScalings, fromMultipliers, algorithmArgs);
 						if (score > bestScore) {
 							bestScore = score;
@@ -611,11 +611,11 @@ public class Mapper {
 			for (int i = 0; i < processedQuery.getProcessedPublications().size(); ++i) {
 				PublicationProcessed processedPublication = processedQuery.getProcessedPublications().get(i);
 				if (processedPublication == null) continue;
-				if (idfMultiplierArgs.getPublicationMinedNormalizer() > 0) {
+				if (normaliserArgs.getPublicationMinedNormaliser() > 0) {
 					for (int j = 0; j < processedPublication.getEfoTermsTokens().size(); ++j) {
 						if (processedPublication.getEfoTermsTokens().get(j) == null) continue;
 						List<Double> idfs = processedPublication.getEfoTermsIdfs().get(j);
-						double idfScaling = ((idfs == null || queryIdfDisabled || idfMultiplierArgs.isDisableTitleKeywordsIdf()) ? 0 : idfMultiplierArgs.getQueryIdfScaling());
+						double idfScaling = ((idfs == null || !idfArgs.isTitleKeywordsIdf()) ? 0 : idfArgs.getQueryIdfScaling());
 						double score = getScore(processedPublication.getEfoTermsTokens().get(j), idfs, idfScaling, Double.valueOf(1), fromsTokens, fromsIdfs, fromIdfScalings, fromMultipliers, algorithmArgs);
 						// simulate fulltext
 						score *= Math.pow(processedPublication.getEfoTermFrequencies().get(j), algorithmArgs.getScoreScaling());
@@ -633,11 +633,11 @@ public class Mapper {
 			for (int i = 0; i < processedQuery.getProcessedPublications().size(); ++i) {
 				PublicationProcessed processedPublication = processedQuery.getProcessedPublications().get(i);
 				if (processedPublication == null) continue;
-				if (idfMultiplierArgs.getPublicationMinedNormalizer() > 0) {
+				if (normaliserArgs.getPublicationMinedNormaliser() > 0) {
 					for (int j = 0; j < processedPublication.getGoTermsTokens().size(); ++j) {
 						if (processedPublication.getGoTermsTokens().get(j) == null) continue;
 						List<Double> idfs = processedPublication.getGoTermsIdfs().get(j);
-						double idfScaling = ((idfs == null || queryIdfDisabled || idfMultiplierArgs.isDisableTitleKeywordsIdf()) ? 0 : idfMultiplierArgs.getQueryIdfScaling());
+						double idfScaling = ((idfs == null || !idfArgs.isTitleKeywordsIdf()) ? 0 : idfArgs.getQueryIdfScaling());
 						double score = getScore(processedPublication.getGoTermsTokens().get(j), idfs, idfScaling, Double.valueOf(1), fromsTokens, fromsIdfs, fromIdfScalings, fromMultipliers, algorithmArgs);
 						// simulate fulltext
 						score *= Math.pow(processedPublication.getGoTermFrequencies().get(j), algorithmArgs.getScoreScaling());
@@ -655,9 +655,9 @@ public class Mapper {
 			for (int i = 0; i < processedQuery.getProcessedPublications().size(); ++i) {
 				PublicationProcessed processedPublication = processedQuery.getProcessedPublications().get(i);
 				if (processedPublication == null) continue;
-				if (processedPublication.getAbstractTokens() != null && idfMultiplierArgs.getPublicationAbstractNormalizer() > 0) {
+				if (processedPublication.getAbstractTokens() != null && normaliserArgs.getPublicationAbstractNormaliser() > 0) {
 					List<Double> idfs = processedPublication.getAbstractIdfs();
-					double idfScaling = ((idfs == null || queryIdfDisabled || idfMultiplierArgs.isDisableAbstractIdf()) ? 0 : idfMultiplierArgs.getQueryIdfScaling());
+					double idfScaling = ((idfs == null || !idfArgs.isAbstractIdf()) ? 0 : idfArgs.getQueryIdfScaling());
 					double score = getScore(processedPublication.getAbstractTokens(), idfs, idfScaling, Double.valueOf(1), fromsTokens, fromsIdfs, fromIdfScalings, fromMultipliers, algorithmArgs);
 					if (score > bestScore) {
 						bestScore = score;
@@ -671,9 +671,9 @@ public class Mapper {
 			for (int i = 0; i < processedQuery.getProcessedPublications().size(); ++i) {
 				PublicationProcessed processedPublication = processedQuery.getProcessedPublications().get(i);
 				if (processedPublication == null) continue;
-				if (processedPublication.getFulltextTokens() != null && idfMultiplierArgs.getPublicationFulltextNormalizer() > 0) {
+				if (processedPublication.getFulltextTokens() != null && normaliserArgs.getPublicationFulltextNormaliser() > 0) {
 					List<Double> idfs = processedPublication.getFulltextIdfs();
-					double idfScaling = ((idfs == null || queryIdfDisabled) ? 0 : idfMultiplierArgs.getQueryIdfScaling());
+					double idfScaling = ((idfs == null) ? 0 : idfArgs.getQueryIdfScaling());
 					double score = getScore(processedPublication.getFulltextTokens(), idfs, idfScaling, Double.valueOf(1), fromsTokens, fromsIdfs, fromIdfScalings, fromMultipliers, algorithmArgs);
 					if (score > bestScore) {
 						bestScore = score;
@@ -684,11 +684,11 @@ public class Mapper {
 			}
 			break;
 		case doc:
-			if (idfMultiplierArgs.getDocNormalizer() > 0) {
+			if (normaliserArgs.getDocNormaliser() > 0) {
 				for (int i = 0; i < processedQuery.getDocsTokens().size(); ++i) {
 					if (processedQuery.getDocsTokens().get(i) == null) continue;
 					List<Double> idfs = processedQuery.getDocsIdfs().get(i);
-					double idfScaling = ((idfs == null || queryIdfDisabled) ? 0 : idfMultiplierArgs.getQueryIdfScaling());
+					double idfScaling = ((idfs == null) ? 0 : idfArgs.getQueryIdfScaling());
 					double score = getScore(processedQuery.getDocsTokens().get(i), idfs, idfScaling, Double.valueOf(1), fromsTokens, fromsIdfs, fromIdfScalings, fromMultipliers, algorithmArgs);
 					if (score > bestScore) {
 						bestScore = score;
@@ -699,11 +699,11 @@ public class Mapper {
 			}
 			break;
 		case webpage:
-			if (idfMultiplierArgs.getWebpageNormalizer() > 0) {
+			if (normaliserArgs.getWebpageNormaliser() > 0) {
 				for (int i = 0; i < processedQuery.getWebpagesTokens().size(); ++i) {
 					if (processedQuery.getWebpagesTokens().get(i) == null) continue;
 					List<Double> idfs = processedQuery.getWebpagesIdfs().get(i);
-					double idfScaling = ((idfs == null || queryIdfDisabled) ? 0 : idfMultiplierArgs.getQueryIdfScaling());
+					double idfScaling = ((idfs == null) ? 0 : idfArgs.getQueryIdfScaling());
 					double score = getScore(processedQuery.getWebpagesTokens().get(i), idfs, idfScaling, Double.valueOf(1), fromsTokens, fromsIdfs, fromIdfScalings, fromMultipliers, algorithmArgs);
 					if (score > bestScore) {
 						bestScore = score;
@@ -720,18 +720,18 @@ public class Mapper {
 		return new QueryMatch(bestScore, matchType, index, indexInPublication);
 	}
 
-	private Match getMatch(ConceptProcessed processedConcept, QueryProcessed processedQuery, QueryMatchType type, MapperAlgorithmArgs algorithmArgs, MapperIdfMultiplierArgs idfMultiplierArgs, Branch branch) {
+	private Match getMatch(ConceptProcessed processedConcept, QueryProcessed processedQuery, QueryMatchType type, AlgorithmArgs algorithmArgs, IdfArgs idfArgs, MultiplierArgs multiplierArgs, NormaliserArgs normaliserArgs) {
 
 		ConceptMatch conceptMatch;
 		if (algorithmArgs.getConceptWeight() > 0) {
-			conceptMatch = toConceptFromQuery(processedConcept, processedQuery, type, algorithmArgs, idfMultiplierArgs, branch);
+			conceptMatch = toConceptFromQuery(processedConcept, processedQuery, type, algorithmArgs, idfArgs, multiplierArgs, normaliserArgs);
 		} else {
 			conceptMatch = new ConceptMatch(0, ConceptMatchType.none, -1);
 		}
 
 		QueryMatch queryMatch;
 		if (algorithmArgs.getQueryWeight() > 0) {
-			queryMatch = toQueryFromConcept(processedQuery, processedConcept, type, algorithmArgs, idfMultiplierArgs, branch);
+			queryMatch = toQueryFromConcept(processedQuery, processedConcept, type, algorithmArgs, idfArgs, normaliserArgs);
 		} else {
 			queryMatch = new QueryMatch(0, QueryMatchType.none, -1, -1);
 		}
@@ -777,158 +777,158 @@ public class Mapper {
 		return false;
 	}
 
-	private Match getBestMatch(ConceptProcessed processedConcept, QueryProcessed processedQuery, MapperAlgorithmArgs algorithmArgs, MapperIdfMultiplierArgs idfMultiplierArgs, Branch branch) {
+	private Match getBestMatch(ConceptProcessed processedConcept, QueryProcessed processedQuery, MapperArgs args) {
 		Match bestMatch = new Match(0, new ConceptMatch(0, ConceptMatchType.none, -1), new QueryMatch(0, QueryMatchType.none, -1, -1));
 		double numerator = 0;
 		double denominator = 0;
 
-		boolean average = (idfMultiplierArgs.getMappingStrategy() == MapperStrategy.average);
-		double scaling = idfMultiplierArgs.getAverageScaling();
+		boolean average = (args.getAlgorithmArgs().getMappingStrategy() == MapperStrategy.average);
+		double scaling = args.getWeightArgs().getAverageScaling();
 
 		List<MatchAverageStats> matchAverageStats = new ArrayList<>();
 
-		if (idfMultiplierArgs.getNameNormalizer() > 0
-				&& (!average || idfMultiplierArgs.getNameWeight() > 0)
+		if (args.getNormaliserArgs().getNameNormaliser() > 0
+				&& (!average || args.getWeightArgs().getNameWeight() > 0)
 				&& hasTokens(processedQuery.getNameTokens())) {
-			Match match = getMatch(processedConcept, processedQuery, QueryMatchType.name, algorithmArgs, idfMultiplierArgs, branch);
-			match.setScore(match.getScore() * idfMultiplierArgs.getNameNormalizer());
+			Match match = getMatch(processedConcept, processedQuery, QueryMatchType.name, args.getAlgorithmArgs(), args.getIdfArgs(), args.getMultiplierArgs(), args.getNormaliserArgs());
+			match.setScore(match.getScore() * args.getNormaliserArgs().getNameNormaliser());
 			if (match.compareTo(bestMatch) > 0) bestMatch = match;
 			if (average) {
-				double numeratorPart = idfMultiplierArgs.getNameWeight() * Math.pow(match.getScore(), scaling);
+				double numeratorPart = args.getWeightArgs().getNameWeight() * Math.pow(match.getScore(), scaling);
 				numerator += numeratorPart;
-				denominator += idfMultiplierArgs.getNameWeight();
+				denominator += args.getWeightArgs().getNameWeight();
 				matchAverageStats.add(new MatchAverageStats(match.getQueryMatch(), match.getConceptMatch(), numeratorPart));
 			}
 		}
-		if (idfMultiplierArgs.getKeywordNormalizer() > 0
-				&& (!average || idfMultiplierArgs.getKeywordWeight() > 0)
+		if (args.getNormaliserArgs().getKeywordNormaliser() > 0
+				&& (!average || args.getWeightArgs().getKeywordWeight() > 0)
 				&& hasListTokens(processedQuery.getKeywordsTokens())) {
-			Match match = getMatch(processedConcept, processedQuery, QueryMatchType.keyword, algorithmArgs, idfMultiplierArgs, branch);
-			match.setScore(match.getScore() * idfMultiplierArgs.getKeywordNormalizer());
+			Match match = getMatch(processedConcept, processedQuery, QueryMatchType.keyword, args.getAlgorithmArgs(), args.getIdfArgs(), args.getMultiplierArgs(), args.getNormaliserArgs());
+			match.setScore(match.getScore() * args.getNormaliserArgs().getKeywordNormaliser());
 			if (match.compareTo(bestMatch) > 0) bestMatch = match;
 			if (average) {
-				double numeratorPart = idfMultiplierArgs.getKeywordWeight() * Math.pow(match.getScore(), scaling);
+				double numeratorPart = args.getWeightArgs().getKeywordWeight() * Math.pow(match.getScore(), scaling);
 				numerator += numeratorPart;
-				denominator += idfMultiplierArgs.getKeywordWeight();
+				denominator += args.getWeightArgs().getKeywordWeight();
 				matchAverageStats.add(new MatchAverageStats(match.getQueryMatch(), match.getConceptMatch(), numeratorPart));
 			}
 		}
-		if (idfMultiplierArgs.getDescriptionNormalizer() > 0
-				&& (!average || idfMultiplierArgs.getDescriptionWeight() > 0)
+		if (args.getNormaliserArgs().getDescriptionNormaliser() > 0
+				&& (!average || args.getWeightArgs().getDescriptionWeight() > 0)
 				&& hasTokens(processedQuery.getDescriptionTokens())) {
-			Match match = getMatch(processedConcept, processedQuery, QueryMatchType.description, algorithmArgs, idfMultiplierArgs, branch);
-			match.setScore(match.getScore() * idfMultiplierArgs.getDescriptionNormalizer());
+			Match match = getMatch(processedConcept, processedQuery, QueryMatchType.description, args.getAlgorithmArgs(), args.getIdfArgs(), args.getMultiplierArgs(), args.getNormaliserArgs());
+			match.setScore(match.getScore() * args.getNormaliserArgs().getDescriptionNormaliser());
 			if (match.compareTo(bestMatch) > 0) bestMatch = match;
 			if (average) {
-				double numeratorPart = idfMultiplierArgs.getDescriptionWeight() * Math.pow(match.getScore(), scaling);
+				double numeratorPart = args.getWeightArgs().getDescriptionWeight() * Math.pow(match.getScore(), scaling);
 				numerator += numeratorPart;
-				denominator += idfMultiplierArgs.getDescriptionWeight();
+				denominator += args.getWeightArgs().getDescriptionWeight();
 				matchAverageStats.add(new MatchAverageStats(match.getQueryMatch(), match.getConceptMatch(), numeratorPart));
 			}
 		}
-		if (idfMultiplierArgs.getPublicationTitleNormalizer() > 0
-				&& (!average || idfMultiplierArgs.getPublicationTitleWeight() > 0)
+		if (args.getNormaliserArgs().getPublicationTitleNormaliser() > 0
+				&& (!average || args.getWeightArgs().getPublicationTitleWeight() > 0)
 				&& hasPublicationTokens(processedQuery.getProcessedPublications(), QueryMatchType.publication_title)) {
-			Match match = getMatch(processedConcept, processedQuery, QueryMatchType.publication_title, algorithmArgs, idfMultiplierArgs, branch);
-			match.setScore(match.getScore() * idfMultiplierArgs.getPublicationTitleNormalizer());
+			Match match = getMatch(processedConcept, processedQuery, QueryMatchType.publication_title, args.getAlgorithmArgs(), args.getIdfArgs(), args.getMultiplierArgs(), args.getNormaliserArgs());
+			match.setScore(match.getScore() * args.getNormaliserArgs().getPublicationTitleNormaliser());
 			if (match.compareTo(bestMatch) > 0) bestMatch = match;
 			if (average) {
-				double numeratorPart = idfMultiplierArgs.getPublicationTitleWeight() * Math.pow(match.getScore(), scaling);
+				double numeratorPart = args.getWeightArgs().getPublicationTitleWeight() * Math.pow(match.getScore(), scaling);
 				numerator += numeratorPart;
-				denominator += idfMultiplierArgs.getPublicationTitleWeight();
+				denominator += args.getWeightArgs().getPublicationTitleWeight();
 				matchAverageStats.add(new MatchAverageStats(match.getQueryMatch(), match.getConceptMatch(), numeratorPart));
 			}
 		}
-		if (idfMultiplierArgs.getPublicationKeywordNormalizer() > 0
-				&& (!average || idfMultiplierArgs.getPublicationKeywordWeight() > 0)
+		if (args.getNormaliserArgs().getPublicationKeywordNormaliser() > 0
+				&& (!average || args.getWeightArgs().getPublicationKeywordWeight() > 0)
 				&& hasPublicationTokens(processedQuery.getProcessedPublications(), QueryMatchType.publication_keyword)) {
-			Match match = getMatch(processedConcept, processedQuery, QueryMatchType.publication_keyword, algorithmArgs, idfMultiplierArgs, branch);
-			match.setScore(match.getScore() * idfMultiplierArgs.getPublicationKeywordNormalizer());
+			Match match = getMatch(processedConcept, processedQuery, QueryMatchType.publication_keyword, args.getAlgorithmArgs(), args.getIdfArgs(), args.getMultiplierArgs(), args.getNormaliserArgs());
+			match.setScore(match.getScore() * args.getNormaliserArgs().getPublicationKeywordNormaliser());
 			if (match.compareTo(bestMatch) > 0) bestMatch = match;
 			if (average) {
-				double numeratorPart = idfMultiplierArgs.getPublicationKeywordWeight() * Math.pow(match.getScore(), scaling);
+				double numeratorPart = args.getWeightArgs().getPublicationKeywordWeight() * Math.pow(match.getScore(), scaling);
 				numerator += numeratorPart;
-				denominator += idfMultiplierArgs.getPublicationKeywordWeight();
+				denominator += args.getWeightArgs().getPublicationKeywordWeight();
 				matchAverageStats.add(new MatchAverageStats(match.getQueryMatch(), match.getConceptMatch(), numeratorPart));
 			}
 		}
-		if (idfMultiplierArgs.getPublicationMeshNormalizer() > 0
-				&& (!average || idfMultiplierArgs.getPublicationMeshWeight() > 0)
+		if (args.getNormaliserArgs().getPublicationMeshNormaliser() > 0
+				&& (!average || args.getWeightArgs().getPublicationMeshWeight() > 0)
 				&& hasPublicationTokens(processedQuery.getProcessedPublications(), QueryMatchType.publication_mesh)) {
-			Match match = getMatch(processedConcept, processedQuery, QueryMatchType.publication_mesh, algorithmArgs, idfMultiplierArgs, branch);
-			match.setScore(match.getScore() * idfMultiplierArgs.getPublicationMeshNormalizer());
+			Match match = getMatch(processedConcept, processedQuery, QueryMatchType.publication_mesh, args.getAlgorithmArgs(), args.getIdfArgs(), args.getMultiplierArgs(), args.getNormaliserArgs());
+			match.setScore(match.getScore() * args.getNormaliserArgs().getPublicationMeshNormaliser());
 			if (match.compareTo(bestMatch) > 0) bestMatch = match;
 			if (average) {
-				double numeratorPart = idfMultiplierArgs.getPublicationMeshWeight() * Math.pow(match.getScore(), scaling);
+				double numeratorPart = args.getWeightArgs().getPublicationMeshWeight() * Math.pow(match.getScore(), scaling);
 				numerator += numeratorPart;
-				denominator += idfMultiplierArgs.getPublicationMeshWeight();
+				denominator += args.getWeightArgs().getPublicationMeshWeight();
 				matchAverageStats.add(new MatchAverageStats(match.getQueryMatch(), match.getConceptMatch(), numeratorPart));
 			}
 		}
-		if (idfMultiplierArgs.getPublicationMinedNormalizer() > 0
-				&& (!average || idfMultiplierArgs.getPublicationMinedWeight() > 0)
+		if (args.getNormaliserArgs().getPublicationMinedNormaliser() > 0
+				&& (!average || args.getWeightArgs().getPublicationMinedWeight() > 0)
 				&& (hasPublicationTokens(processedQuery.getProcessedPublications(), QueryMatchType.publication_efo) || hasPublicationTokens(processedQuery.getProcessedPublications(), QueryMatchType.publication_go))) {
-			Match match = getMatch(processedConcept, processedQuery, QueryMatchType.publication_efo, algorithmArgs, idfMultiplierArgs, branch);
-			Match otherMatch = getMatch(processedConcept, processedQuery, QueryMatchType.publication_go, algorithmArgs, idfMultiplierArgs, branch);
+			Match match = getMatch(processedConcept, processedQuery, QueryMatchType.publication_efo, args.getAlgorithmArgs(), args.getIdfArgs(), args.getMultiplierArgs(), args.getNormaliserArgs());
+			Match otherMatch = getMatch(processedConcept, processedQuery, QueryMatchType.publication_go, args.getAlgorithmArgs(), args.getIdfArgs(), args.getMultiplierArgs(), args.getNormaliserArgs());
 			if (otherMatch.compareTo(match) > 0) match = otherMatch;
-			match.setScore(match.getScore() * idfMultiplierArgs.getPublicationMinedNormalizer());
+			match.setScore(match.getScore() * args.getNormaliserArgs().getPublicationMinedNormaliser());
 			if (match.compareTo(bestMatch) > 0) bestMatch = match;
 			if (average) {
-				double numeratorPart = idfMultiplierArgs.getPublicationMinedWeight() * Math.pow(match.getScore(), scaling);
+				double numeratorPart = args.getWeightArgs().getPublicationMinedWeight() * Math.pow(match.getScore(), scaling);
 				numerator += numeratorPart;
-				denominator += idfMultiplierArgs.getPublicationMinedWeight();
+				denominator += args.getWeightArgs().getPublicationMinedWeight();
 				matchAverageStats.add(new MatchAverageStats(match.getQueryMatch(), match.getConceptMatch(), numeratorPart));
 			}
 		}
-		if (idfMultiplierArgs.getPublicationAbstractNormalizer() > 0
-				&& (!average || idfMultiplierArgs.getPublicationAbstractWeight() > 0)
+		if (args.getNormaliserArgs().getPublicationAbstractNormaliser() > 0
+				&& (!average || args.getWeightArgs().getPublicationAbstractWeight() > 0)
 				&& hasPublicationTokens(processedQuery.getProcessedPublications(), QueryMatchType.publication_abstract)) {
-			Match match = getMatch(processedConcept, processedQuery, QueryMatchType.publication_abstract, algorithmArgs, idfMultiplierArgs, branch);
-			match.setScore(match.getScore() * idfMultiplierArgs.getPublicationAbstractNormalizer());
+			Match match = getMatch(processedConcept, processedQuery, QueryMatchType.publication_abstract, args.getAlgorithmArgs(), args.getIdfArgs(), args.getMultiplierArgs(), args.getNormaliserArgs());
+			match.setScore(match.getScore() * args.getNormaliserArgs().getPublicationAbstractNormaliser());
 			if (match.compareTo(bestMatch) > 0) bestMatch = match;
 			if (average) {
-				double numeratorPart = idfMultiplierArgs.getPublicationAbstractWeight() * Math.pow(match.getScore(), scaling);
+				double numeratorPart = args.getWeightArgs().getPublicationAbstractWeight() * Math.pow(match.getScore(), scaling);
 				numerator += numeratorPart;
-				denominator += idfMultiplierArgs.getPublicationAbstractWeight();
+				denominator += args.getWeightArgs().getPublicationAbstractWeight();
 				matchAverageStats.add(new MatchAverageStats(match.getQueryMatch(), match.getConceptMatch(), numeratorPart));
 			}
 		}
-		if (idfMultiplierArgs.getPublicationFulltextNormalizer() > 0
-				&& (!average || idfMultiplierArgs.getPublicationFulltextWeight() > 0)
+		if (args.getNormaliserArgs().getPublicationFulltextNormaliser() > 0
+				&& (!average || args.getWeightArgs().getPublicationFulltextWeight() > 0)
 				&& hasPublicationTokens(processedQuery.getProcessedPublications(), QueryMatchType.publication_fulltext)) {
-			Match match = getMatch(processedConcept, processedQuery, QueryMatchType.publication_fulltext, algorithmArgs, idfMultiplierArgs, branch);
-			match.setScore(match.getScore() * idfMultiplierArgs.getPublicationFulltextNormalizer());
+			Match match = getMatch(processedConcept, processedQuery, QueryMatchType.publication_fulltext, args.getAlgorithmArgs(), args.getIdfArgs(), args.getMultiplierArgs(), args.getNormaliserArgs());
+			match.setScore(match.getScore() * args.getNormaliserArgs().getPublicationFulltextNormaliser());
 			if (match.compareTo(bestMatch) > 0) bestMatch = match;
 			if (average) {
-				double numeratorPart = idfMultiplierArgs.getPublicationFulltextWeight() * Math.pow(match.getScore(), scaling);
+				double numeratorPart = args.getWeightArgs().getPublicationFulltextWeight() * Math.pow(match.getScore(), scaling);
 				numerator += numeratorPart;
-				denominator += idfMultiplierArgs.getPublicationFulltextWeight();
+				denominator += args.getWeightArgs().getPublicationFulltextWeight();
 				matchAverageStats.add(new MatchAverageStats(match.getQueryMatch(), match.getConceptMatch(), numeratorPart));
 			}
 		}
-		if (idfMultiplierArgs.getDocNormalizer() > 0
-				&& (!average || idfMultiplierArgs.getDocWeight() > 0)
+		if (args.getNormaliserArgs().getDocNormaliser() > 0
+				&& (!average || args.getWeightArgs().getDocWeight() > 0)
 				&& hasListTokens(processedQuery.getDocsTokens())) {
-			Match match = getMatch(processedConcept, processedQuery, QueryMatchType.doc, algorithmArgs, idfMultiplierArgs, branch);
-			match.setScore(match.getScore() * idfMultiplierArgs.getDocNormalizer());
+			Match match = getMatch(processedConcept, processedQuery, QueryMatchType.doc, args.getAlgorithmArgs(), args.getIdfArgs(), args.getMultiplierArgs(), args.getNormaliserArgs());
+			match.setScore(match.getScore() * args.getNormaliserArgs().getDocNormaliser());
 			if (match.compareTo(bestMatch) > 0) bestMatch = match;
 			if (average) {
-				double numeratorPart = idfMultiplierArgs.getDocWeight() * Math.pow(match.getScore(), scaling);
+				double numeratorPart = args.getWeightArgs().getDocWeight() * Math.pow(match.getScore(), scaling);
 				numerator += numeratorPart;
-				denominator += idfMultiplierArgs.getDocWeight();
+				denominator += args.getWeightArgs().getDocWeight();
 				matchAverageStats.add(new MatchAverageStats(match.getQueryMatch(), match.getConceptMatch(), numeratorPart));
 			}
 		}
-		if (idfMultiplierArgs.getWebpageNormalizer() > 0
-				&& (!average || idfMultiplierArgs.getWebpageWeight() > 0)
+		if (args.getNormaliserArgs().getWebpageNormaliser() > 0
+				&& (!average || args.getWeightArgs().getWebpageWeight() > 0)
 				&& hasListTokens(processedQuery.getWebpagesTokens())) {
-			Match match = getMatch(processedConcept, processedQuery, QueryMatchType.webpage, algorithmArgs, idfMultiplierArgs, branch);
-			match.setScore(match.getScore() * idfMultiplierArgs.getWebpageNormalizer());
+			Match match = getMatch(processedConcept, processedQuery, QueryMatchType.webpage, args.getAlgorithmArgs(), args.getIdfArgs(), args.getMultiplierArgs(), args.getNormaliserArgs());
+			match.setScore(match.getScore() * args.getNormaliserArgs().getWebpageNormaliser());
 			if (match.compareTo(bestMatch) > 0) bestMatch = match;
 			if (average) {
-				double numeratorPart = idfMultiplierArgs.getWebpageWeight() * Math.pow(match.getScore(), scaling);
+				double numeratorPart = args.getWeightArgs().getWebpageWeight() * Math.pow(match.getScore(), scaling);
 				numerator += numeratorPart;
-				denominator += idfMultiplierArgs.getWebpageWeight();
+				denominator += args.getWeightArgs().getWebpageWeight();
 				matchAverageStats.add(new MatchAverageStats(match.getQueryMatch(), match.getConceptMatch(), numeratorPart));
 			}
 		}
@@ -1036,7 +1036,7 @@ public class Mapper {
 	}
 
 	public Mapping map(Query query, QueryProcessed processedQuery, MapperArgs args) {
-		Mapping mapping = new Mapping(args.getMatch(), args.getBranches());
+		Mapping mapping = new Mapping(args.getMatches(), args.getBranches());
 
 		Map<EdamUri, Match> matches = new HashMap<>();
 
@@ -1046,15 +1046,15 @@ public class Mapper {
 
 			if (!args.getBranches().contains(edamUri.getBranch())) continue;
 
-			if ((processedConcept.isObsolete() && !args.getObsolete())
-				|| (processedConcept.getDirectParents().isEmpty() && !args.isNoRemoveTopLevel())) {
+			if ((processedConcept.isObsolete() && !args.isObsolete())
+				|| (processedConcept.getDirectParents().isEmpty() && !args.isTopLevel())) {
 				Match zeroMatch = new Match(0, new ConceptMatch(0, ConceptMatchType.none, -1), new QueryMatch(0, QueryMatchType.none, -1, -1));
 				zeroMatch.setEdamUri(edamUri);
 				matches.put(edamUri, zeroMatch);
 				continue;
 			}
 
-			Match match = getBestMatch(processedConcept, processedQuery, args.getAlgorithmArgs(), args.getIdfMultiplierArgs(), edamUri.getBranch());
+			Match match = getBestMatch(processedConcept, processedQuery, args);
 			match.setEdamUri(edamUri);
 			matches.put(edamUri, match);
 		}
@@ -1067,7 +1067,7 @@ public class Mapper {
 			}
 		}
 
-		if (!args.isNoRemoveInferiorParentChild() && args.isExcludeAnnotations()) {
+		if (!args.isInferiorParentsChildren() && !args.isAnnotations()) {
 			for (EdamUri annotation : annotations) {
 				removeParents(annotation, matches);
 				removeChildren(annotation, matches);
@@ -1083,11 +1083,11 @@ public class Mapper {
 				EdamUri edamUri = matchEntry.getKey();
 				Match match = matchEntry.getValue();
 
-				if (processedConcepts.get(edamUri).getDirectParents().isEmpty() && !args.isNoRemoveTopLevel()) {
+				if (processedConcepts.get(edamUri).getDirectParents().isEmpty() && !args.isTopLevel()) {
 					match.setRemoved(true);
 					continue;
 				}
-				if (processedConcepts.get(edamUri).isObsolete() && !args.getObsolete()) {
+				if (processedConcepts.get(edamUri).isObsolete() && !args.isObsolete()) {
 					continue;
 				}
 
@@ -1108,32 +1108,32 @@ public class Mapper {
 			if (mapping.isFull(match.getEdamUri().getBranch())) continue;
 
 			if (match.isRemoved()) continue;
-			if (processedConcepts.get(match.getEdamUri()).isObsolete() && !args.getObsolete()) continue;
-			if (args.isExcludeAnnotations() && match.isExistingAnnotation()) continue;
+			if (processedConcepts.get(match.getEdamUri()).isObsolete() && !args.isObsolete()) continue;
+			if (!args.isAnnotations() && match.isExistingAnnotation()) continue;
 
 			double goodScore = 0;
 			double badScore = 0;
 			switch (match.getEdamUri().getBranch()) {
 			case topic:
-				goodScore = args.getGoodScoreTopic();
-				badScore = args.getBadScoreTopic();
+				goodScore = args.getScoreArgs().getGoodScoreTopic();
+				badScore = args.getScoreArgs().getBadScoreTopic();
 				break;
 			case operation:
-				goodScore = args.getGoodScoreOperation();
-				badScore = args.getBadScoreOperation();
+				goodScore = args.getScoreArgs().getGoodScoreOperation();
+				badScore = args.getScoreArgs().getBadScoreOperation();
 				break;
 			case data:
-				goodScore = args.getGoodScoreData();
-				badScore = args.getBadScoreData();
+				goodScore = args.getScoreArgs().getGoodScoreData();
+				badScore = args.getScoreArgs().getBadScoreData();
 				break;
 			case format:
-				goodScore = args.getGoodScoreFormat();
-				badScore = args.getBadScoreFormat();
+				goodScore = args.getScoreArgs().getGoodScoreFormat();
+				badScore = args.getScoreArgs().getBadScoreFormat();
 				break;
 			}
 
 			double score = 0;
-			if (args.getIdfMultiplierArgs().getMappingStrategy() == MapperStrategy.average) {
+			if (args.getAlgorithmArgs().getMappingStrategy() == MapperStrategy.average) {
 				score = match.getBestOneScore();
 			} else if (args.getAlgorithmArgs().getPathWeight() > 0 && args.getAlgorithmArgs().getParentWeight() > 0) {
 				score = match.getWithoutPathScore();
@@ -1142,14 +1142,14 @@ public class Mapper {
 			}
 
 			if (score > goodScore) {
-				if (args.isNoOutputGoodScores()) continue;
+				if (!args.getScoreArgs().isOutputGoodScores()) continue;
 			} else if (score >= badScore && score <= goodScore) {
-				if (args.isNoOutputMediumScores()) continue;
+				if (!args.getScoreArgs().isOutputMediumScores()) continue;
 			} else if (score < badScore) {
-				if (!args.isOutputBadScores()) continue;
+				if (!args.getScoreArgs().isOutputBadScores()) continue;
 			}
 
-			if (!args.isNoRemoveInferiorParentChild()) {
+			if (!args.isInferiorParentsChildren()) {
 				removeParents(match.getEdamUri(), matches);
 				removeChildren(match.getEdamUri(), matches);
 			}
@@ -1158,7 +1158,7 @@ public class Mapper {
 			mapping.addMatch(match);
 		}
 
-		if (!args.isExcludeAnnotations() && annotations.size() > 0) {
+		if (args.isAnnotations() && annotations.size() > 0) {
 			int annotationsSeen = 0;
 			for (Match match : sortedMatches) {
 				if (annotations.contains(match.getEdamUri())) {

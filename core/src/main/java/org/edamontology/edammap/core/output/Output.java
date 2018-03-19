@@ -25,12 +25,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.edamontology.edammap.core.args.MainArgs;
+import org.edamontology.edammap.core.benchmarking.Results;
 import org.edamontology.edammap.core.edam.Concept;
 import org.edamontology.edammap.core.edam.EdamUri;
-import org.edamontology.edammap.core.mapping.Mapping;
 import org.edamontology.edammap.core.query.Query;
 import org.edamontology.pubfetcher.FetcherCommon;
 import org.edamontology.pubfetcher.Publication;
+import org.edamontology.pubfetcher.Version;
+import org.edamontology.pubfetcher.Webpage;
 
 public class Output {
 
@@ -43,13 +45,13 @@ public class Output {
 	public Output(MainArgs args) throws IOException {
 		this.args = args;
 
-		this.output = FetcherCommon.outputPath(args.getOutput(), true);
+		this.output = args.getOutput().isEmpty() ? null : FetcherCommon.outputPath(args.getOutput());
 
-		this.report = FetcherCommon.outputPath(args.getReport(), true);
+		this.report = args.getReport().isEmpty() ? null : FetcherCommon.outputPath(args.getReport(), true);
 	}
 
-	public void output(Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publications, List<Mapping> mappings) throws IOException {
-		Txt.output(args.getType(), output, concepts, queries, publications, mappings);
-		Report.output(args, report, concepts, queries, publications, mappings);
+	public void output(Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publications, List<List<Webpage>> webpages, List<List<Webpage>> docs, Results results, long start, long stop, Version version) throws IOException {
+		Txt.output(args.getType(), output, report, concepts, queries, publications, results.getMappings());
+		Report.output(args, report, concepts, queries, publications, webpages, docs, results, start, stop, version);
 	}
 }

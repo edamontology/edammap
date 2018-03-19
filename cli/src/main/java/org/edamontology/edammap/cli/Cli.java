@@ -21,17 +21,15 @@ package org.edamontology.edammap.cli;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-// TODO remove OWL dependency, as not defined in POM
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.ParameterException;
-
 import org.edamontology.edammap.core.args.MainArgs;
+import org.edamontology.edammap.core.benchmarking.Benchmark;
+import org.edamontology.edammap.core.benchmarking.Measure;
+import org.edamontology.edammap.core.benchmarking.Results;
 import org.edamontology.edammap.core.edam.Concept;
 import org.edamontology.edammap.core.edam.Edam;
 import org.edamontology.edammap.core.edam.EdamUri;
@@ -44,7 +42,10 @@ import org.edamontology.edammap.core.processing.Processor;
 import org.edamontology.edammap.core.processing.QueryProcessed;
 import org.edamontology.edammap.core.query.Query;
 import org.edamontology.edammap.core.query.QueryLoader;
+import org.edamontology.pubfetcher.FetcherUtil;
 import org.edamontology.pubfetcher.Publication;
+import org.edamontology.pubfetcher.Version;
+import org.edamontology.pubfetcher.Webpage;
 
 public class Cli implements Runnable {
 
@@ -56,6 +57,12 @@ public class Cli implements Runnable {
 
 	private static int index = 0;
 
+	private static long start;
+
+	private static MainArgs args;
+
+	private static List<String> stopwords;
+
 	private static Processor processor;
 
 	private static Map<EdamUri, ConceptProcessed> processedConcepts;
@@ -63,8 +70,8 @@ public class Cli implements Runnable {
 	private static List<Query> queries;
 
 	private static List<List<Publication>> publications;
-
-	private static MainArgs args;
+	private static List<List<Webpage>> webpages;
+	private static List<List<Webpage>> docs;
 
 	private static List<Mapping> mappings;
 
@@ -75,14 +82,7 @@ public class Cli implements Runnable {
 			lockDone = true;
 		}
 
-		PreProcessor pp = null;
-		try {
-			pp = new PreProcessor(args.getProcessorArgs().getPreProcessorArgs());
-		} catch (IOException e) {
-			// TODO
-			System.err.println(e);
-			System.exit(1);
-		}
+		PreProcessor pp = new PreProcessor(args.getProcessorArgs().getPreProcessorArgs(), stopwords);
 		Mapper mapper = new Mapper(processedConcepts);
 
 		while (true) {
@@ -97,8 +97,7 @@ public class Cli implements Runnable {
 				++index;
 			}
 
-			// TODO temp
-			System.err.println(localIndex + " " + System.currentTimeMillis());
+			System.out.println((localIndex + 1) + "/" + queries.size() + " @ " + ((System.currentTimeMillis() - start) / 1000.0) + "s");
 
 			QueryProcessed processedQuery = processor.getProcessedQuery(query, pp, args.getType());
 
@@ -106,6 +105,8 @@ public class Cli implements Runnable {
 
 			synchronized (mappings) {
 				publications.set(localIndex, processedQuery.getPublications());
+				webpages.set(localIndex, processedQuery.getWebpages());
+				docs.set(localIndex, processedQuery.getDocs());
 				mappings.set(localIndex, mapping);
 			}
 		}
@@ -116,71 +117,41 @@ public class Cli implements Runnable {
 		}
 	}
 
-	private static MainArgs parseArgs(String[] argv) {
-		MainArgs args = new MainArgs();
-		JCommander jcommander = new JCommander(args);
-		try {
-			jcommander.parse(argv);
-		} catch (ParameterException e) {
-			jcommander.usage();
-			System.err.println(e);
-			System.exit(1);
-		}
-		if (args.isHelp()) {
-			jcommander.usage();
-			System.exit(0);
-		}
-		return args;
-	}
+	public static void main(String[] argv) throws IOException, ParseException, ReflectiveOperationException {
+		Version version = new Version(Cli.class);
+		args = FetcherUtil.parseArgs(argv, MainArgs.class, version);
+		System.out.println("This is " + version.getName() + " " + version.getVersion());
 
-	public static void main(String[] argv) {
-		System.err.println("Start");
+		Output output = new Output(args);
 
-		args = parseArgs(argv);
+		stopwords = PreProcessor.getStopwords(args.getProcessorArgs().getPreProcessorArgs());
 
-		Output output = null;
-		try {
-			output = new Output(args);
-		} catch (IOException e) {
-			System.err.println(e);
-			System.exit(1);
-		}
+		processor = new Processor(args.getProcessorArgs());
 
-		try {
-			processor = new Processor(args.getProcessorArgs());
-		} catch (IOException | ParseException e) {
-			System.err.println(e);
-			System.exit(1);
-		}
+		System.out.println("Loading concepts");
+		Map<EdamUri, Concept> concepts = Edam.load(args.getEdam());
 
-		System.err.println("Loading concepts");
-		Map<EdamUri, Concept> concepts = null;
-		try {
-			concepts = Edam.load(args.getEdam());
-		} catch (OWLOntologyCreationException e) {
-			System.err.println(e);
-			System.exit(1);
-		}
+		System.out.println("Processing " + concepts.size()  + " concepts");
+		processedConcepts = processor.getProcessedConcepts(concepts, args.getMapperArgs().getIdfArgs(), args.getMapperArgs().getMultiplierArgs());
 
-		System.err.println("Processing concepts");
-		processedConcepts = processor.getProcessedConcepts(concepts, args.getMapperArgs().getIdfMultiplierArgs());
+		start = System.currentTimeMillis();
+		System.out.println("Start: " + Instant.ofEpochMilli(start));
 
-		System.err.println("Loading queries");
-		try {
-			queries = QueryLoader.get(args.getQuery(), args.getType(), concepts, args.getProcessorArgs().getFetcherArgs());
-		} catch (IOException | ParseException e) {
-			System.err.println(e);
-			System.exit(1);
-		}
+		System.out.println("Loading queries");
+		queries = QueryLoader.get(args.getQuery(), args.getType(), concepts, args.getProcessorArgs().getFetcherArgs());
 
 		publications = new ArrayList<>(queries.size());
+		webpages = new ArrayList<>(queries.size());
+		docs = new ArrayList<>(queries.size());
 		mappings = new ArrayList<>(queries.size());
 		for (int i = 0; i < queries.size(); ++i) {
 			publications.add(null);
+			webpages.add(null);
+			docs.add(null);
 			mappings.add(null);
 		}
 
-		System.err.println("Starting threads");
+		System.out.println("Starting mapper threads");
 		for (int i = 0; i < args.getThreads(); ++i) {
 			Thread t = new Thread(new Cli());
 			t.setDaemon(true);
@@ -192,20 +163,23 @@ public class Cli implements Runnable {
 				try {
 					lock.wait();
 				} catch (InterruptedException e) {
-					// TODO exit threads cleanly ?
+					// TODO exit threads cleanly? give timeout for threads to exit? close db? print that exiting and waiting for threads to terminate?
 					System.err.println(e);
 					System.exit(1);
 				}
 			}
 		}
 
-		// TODO postprocessing ?
+		Results results = Benchmark.calculate(queries, mappings);
 
-		try {
-			output.output(concepts, queries, publications, mappings);
-		} catch (IOException e) {
-			System.err.println(e);
-			System.exit(1);
-		}
+		long stop = System.currentTimeMillis();
+		System.out.println("Stop: " + Instant.ofEpochMilli(stop));
+		System.out.println("Mapping took " + ((stop - start) / 1000.0) + "s");
+
+		System.out.println("Outputting results");
+		output.output(concepts, queries, publications, webpages, docs, results, start, stop, version);
+
+		System.out.println(results.toStringMeasure(Measure.recall) + " : " + Measure.recall);
+		System.out.println(results.toStringMeasure(Measure.AveP) + " : " + Measure.AveP);
 	}
 }

@@ -26,14 +26,14 @@ import org.edamontology.edammap.core.preprocessing.PreProcessorArgs;
 import org.edamontology.pubfetcher.FetcherArgs;
 
 public class ProcessorArgs {
-	@Parameter(names = { "--fetching-disabled" }, description = "Disable fetching of webpages, publications and docs")
-	private boolean fetchingDisabled = false;
+	@Parameter(names = { "-f", "--fetch", "--fetcher", "--fetching" }, arity = 1, description = "Fetch publications, webpages and docs")
+	private boolean fetcher = true;
 
-	@Parameter(names = { "-d", "--db", "--database" }, description = "Use the given database for getting and storing webpages, publications and docs")
+	@Parameter(names = { "-d", "--db", "--database" }, description = "Use the given database for getting and storing publications, webpages and docs")
 	private String database = "";
 
-	@Parameter(names = { "--query-idf" }, description = "Use the given query IDF file; if not specified, weighting of queries with IDF scores will be disabled")
-	private String queryIdf = "";
+	@Parameter(names = { "--idf", "--query-idf" }, description = "Use the given query IDF file; if not specified, weighting of queries with IDF scores will be disabled")
+	private String idf = "";
 
 	@ParametersDelegate
 	private PreProcessorArgs preProcessorArgs = new PreProcessorArgs();
@@ -41,34 +41,30 @@ public class ProcessorArgs {
 	@ParametersDelegate
 	private FetcherArgs fetcherArgs = new FetcherArgs();
 
-	public boolean isFetchingDisabled() {
-		return fetchingDisabled;
+	public boolean isFetcher() {
+		return fetcher;
 	}
-
-	public void setFetchingDisabled(boolean fetchingDisabled) {
-		this.fetchingDisabled = fetchingDisabled;
+	public void setFetcher(boolean fetcher) {
+		this.fetcher = fetcher;
 	}
 
 	public String getDatabase() {
 		return database;
 	}
-
 	public void setDatabase(String database) {
 		this.database = database;
 	}
 
-	public String getQueryIdf() {
-		return queryIdf;
+	public String getIdf() {
+		return idf;
 	}
-
-	public void setQueryIdf(String queryIdf) {
-		this.queryIdf = queryIdf;
+	public void setIdf(String idf) {
+		this.idf = idf;
 	}
 
 	public PreProcessorArgs getPreProcessorArgs() {
 		return preProcessorArgs;
 	}
-
 	public void setPreProcessorArgs(PreProcessorArgs preProcessorArgs) {
 		this.preProcessorArgs = preProcessorArgs;
 	}
@@ -76,7 +72,6 @@ public class ProcessorArgs {
 	public FetcherArgs getFetcherArgs() {
 		return fetcherArgs;
 	}
-
 	public void setFetcherArgs(FetcherArgs fetcherArgs) {
 		this.fetcherArgs = fetcherArgs;
 	}
