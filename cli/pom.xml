@@ -45,11 +45,6 @@
       <artifactId>edammap-core</artifactId>
       <version>${edammap.version}</version>
     </dependency>
-    <dependency>
-      <groupId>com.beust</groupId>
-      <artifactId>jcommander</artifactId>
-      <version>${jcommander.version}</version>
-    </dependency>
   </dependencies>
 
   <build>
@@ -69,6 +64,10 @@
             </manifestEntries>
           </archive>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

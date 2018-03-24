@@ -33,6 +33,8 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.edamontology.edammap.core.edam.Branch;
 import org.edamontology.edammap.core.edam.Concept;
 import org.edamontology.edammap.core.edam.EdamUri;
@@ -54,6 +56,8 @@ import org.edamontology.pubfetcher.FetcherArgs;
 import org.edamontology.pubfetcher.FetcherCommon;
 
 public class QueryLoader {
+
+	private static final Logger logger = LogManager.getLogger();
 
 	private static final String EDAM_PREFIX = "http://edamontology.org";
 	private static final String GENERIC = "https://localhost/";
@@ -81,7 +85,7 @@ public class QueryLoader {
 			FetcherCommon.isDoi(publicationId) ? new PublicationIdsQuery(null, null, publicationId, null, null, url, type) : (
 			null)));
 		if (publicationIds == null) {
-			System.err.println("Unknown publication ID: " + publicationId);
+			logger.error("Unknown publication ID: {}", publicationId);
 		}
 		return publicationIds;
 	}
@@ -334,21 +338,21 @@ public class QueryLoader {
 			String pmid = publication.getPmid();
 			if (pmid == null || pmid.trim().isEmpty()) pmid = null;
 			else if (!FetcherCommon.isPmid(pmid)) {
-				System.err.println("Unknown PMID: " + pmid);
+				logger.error("Unknown PMID: {}", pmid);
 				pmid = null;
 			}
 
 			String pmcid = publication.getPmcid();
 			if (pmcid == null || pmcid.trim().isEmpty()) pmcid = null;
 			else if (!FetcherCommon.isPmcid(pmcid)) {
-				System.err.println("Unknown PMCID: " + pmcid);
+				logger.error("Unknown PMCID: {}", pmcid);
 				pmcid = null;
 			}
 
 			String doi = publication.getDoi();
 			if (doi == null || doi.trim().isEmpty()) doi = null;
 			else if (!FetcherCommon.isDoi(doi)) {
-				System.err.println("Unknown DOI: " + doi);
+				logger.error("Unknown DOI: {}", doi);
 				doi = null;
 			}
 

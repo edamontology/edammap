@@ -25,8 +25,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.edamontology.edammap.core.query.QueryLoader;
 import org.edamontology.edammap.core.query.QueryType;
+import org.edamontology.pubfetcher.BasicArgs;
 import org.edamontology.pubfetcher.Fetcher;
 import org.edamontology.pubfetcher.FetcherArgs;
 import org.edamontology.pubfetcher.FetcherUtil;
@@ -35,48 +38,48 @@ import org.edamontology.pubfetcher.Version;
 
 public final class UtilMain {
 
+	private static Logger logger;
+
 	private static List<PublicationIds> pubQuery(List<String> queryPaths, QueryType type, FetcherArgs fetcherArgs) throws IOException, ParseException {
 		List<PublicationIds> publicationIds = new ArrayList<>();
-		System.out.println("Load publication IDs from file " + queryPaths + " of type " + type);
+		logger.info("Load publication IDs from file {} of type {}", queryPaths, type);
 		for (String queryPath : queryPaths) {
 			publicationIds.addAll(QueryLoader.get(queryPath, type, fetcherArgs).stream()
 				.flatMap(q -> q.getPublicationIds().stream()
 					.map(id -> new PublicationIds(id.getPmid(), id.getPmcid(), id.getDoi(), id.getPmidUrl(), id.getPmcidUrl(), id.getDoiUrl())))
 				.collect(Collectors.toList()));
 		}
-		System.out.println("Loaded " + publicationIds.size() + " publication IDs");
+		logger.info("Loaded {} publication IDs", publicationIds.size());
 		return publicationIds;
 	}
 
 	private static List<String> webQuery(List<String> queryPaths, QueryType type, FetcherArgs fetcherArgs) throws IOException, ParseException {
 		List<String> webpageUrls = new ArrayList<>();
-		System.out.println("Load webpage URLs from file " + queryPaths + " of type " + type);
+		logger.info("Load webpage URLs from file {} of type {}", queryPaths, type);
 		for (String queryPath : queryPaths) {
 			webpageUrls.addAll(QueryLoader.get(queryPath, type, fetcherArgs).stream()
 				.flatMap(q -> q.getWebpageUrls().stream()
 					.map(url -> url.getUrl()))
 				.collect(Collectors.toList()));
 		}
-		System.out.println("Loaded " + webpageUrls.size() + " webpage URLs");
+		logger.info("Loaded {} webpage URLs", webpageUrls.size());
 		return webpageUrls;
 	}
 
 	private static List<String> docQuery(List<String> queryPaths, QueryType type, FetcherArgs fetcherArgs) throws IOException, ParseException {
 		List<String> docUrls = new ArrayList<>();
-		System.out.println("Load doc URLs from file " + queryPaths + " of type " + type);
+		logger.info("Load doc URLs from file {} of type {}", queryPaths, type);
 		for (String queryPath : queryPaths) {
 			docUrls.addAll(QueryLoader.get(queryPath, type, fetcherArgs).stream()
 				.flatMap(q -> q.getDocUrls().stream()
 					.map(url -> url.getUrl()))
 				.collect(Collectors.toList()));
 		}
-		System.out.println("Loaded " + docUrls.size() + " doc URLs");
+		logger.info("Loaded {} doc URLs", docUrls.size());
 		return docUrls;
 	}
 
-	public static void main(String[] argv) throws IOException, ParseException, ReflectiveOperationException {
-		UtilArgs args = FetcherUtil.parseArgs(argv, UtilArgs.class, new Version(UtilMain.class));
-
+	private static void run(UtilArgs args) throws IOException, ParseException, ReflectiveOperationException {
 		List<PublicationIds> publicationIds = null;
 		List<String> webpageUrls = null;
 		List<String> docUrls = null;
@@ -96,5 +99,23 @@ public final class UtilMain {
 		FetcherUtil.run(args.fetcherUtilArgs, new Fetcher(args.fetcherArgs), publicationIds, webpageUrls, docUrls);
 
 		Util.run(args);
+	}
+
+	public static void main(String[] argv) throws IOException, ReflectiveOperationException {
+		Version version = new Version(UtilMain.class);
+
+		UtilArgs args = BasicArgs.parseArgs(argv, UtilArgs.class, version);
+
+		// logger must be called only after configuration changes have been made in BasicArgs.parseArgs()
+		// otherwise invalid.log will be created if arg --log is null
+		logger = LogManager.getLogger();
+		logger.debug(String.join(" ", argv));
+		logger.info("This is {} {}", version.getName(), version.getVersion());
+
+		try {
+			run(args);
+		} catch (Throwable e) {
+			logger.error("Exception!", e);
+		}
 	}
 }

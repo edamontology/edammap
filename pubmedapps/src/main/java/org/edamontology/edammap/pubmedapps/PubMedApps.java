@@ -55,6 +55,8 @@ import org.jsoup.nodes.Element;
 
 import com.beust.jcommander.Parameter;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.edamontology.edammap.core.idf.Idf;
 import org.edamontology.edammap.core.preprocessing.PreProcessor;
 import org.edamontology.edammap.core.preprocessing.PreProcessorArgs;
@@ -62,6 +64,7 @@ import org.edamontology.edammap.core.query.Link;
 import org.edamontology.edammap.core.query.Query;
 import org.edamontology.edammap.core.query.QueryLoader;
 import org.edamontology.edammap.core.query.QueryType;
+import org.edamontology.pubfetcher.BasicArgs;
 import org.edamontology.pubfetcher.Database;
 import org.edamontology.pubfetcher.Fetcher;
 import org.edamontology.pubfetcher.FetcherArgs;
@@ -72,6 +75,8 @@ import org.edamontology.pubfetcher.PublicationIds;
 import org.edamontology.pubfetcher.Version;
 
 public final class PubMedApps {
+
+	private static Logger logger;
 
 	// TODO
 	//private static final String MESH_QUERY = "(Software[MeSH Terms]) AND (genetics[MeSH Subheading] OR Genetics[MeSH Terms] OR Genomics[MeSH Terms] OR Genetic Phenomena[MeSH Terms] OR Biochemical Phenomena[MeSH Terms] OR Genetic Techniques[MeSH Terms] OR Molecular Probe Techniques[MeSH Terms] OR Nucleic Acids, Nucleotides, and Nucleosides[MeSH Terms] OR Amino Acids, Peptides, and Proteins[MeSH Terms]) AND (\"2013/01/01\"[PDat] : \"2100/01/01\"[PDat])";
@@ -827,7 +832,7 @@ public final class PubMedApps {
 		for (int publicationIndex = 0; publicationIndex < publications.size(); ++publicationIndex) {
 			double percentage = (publicationIndex + 1) / (double) publications.size() * 100;
 			percentage = Math.round(percentage * 10) / 10.0;
-			System.err.print("\rMaking results: " + percentage + "%");
+			System.err.print("\rMaking results: " + percentage + "%"); // TODO
 
 			Publication publication = publications.get(publicationIndex);
 
@@ -1452,7 +1457,7 @@ public final class PubMedApps {
 			}
 		}
 
-		System.err.println();
+		System.err.println(); // TODO
 
 		results = results.stream().sorted(Comparator.comparing(Result::getScore).reversed()).collect(Collectors.toList());
 
@@ -1540,7 +1545,7 @@ public final class PubMedApps {
 
 		extractDocs(results);
 
-		System.out.println("Removed " + (publications.size() - results.size()) + " existing");
+		logger.info("Removed {} existing", publications.size() - results.size());
 
 		System.out.println("pmid\tpmcid\tdoi\tscore\tsuggestion\tlinks\tdocs\tsame_suggestions\tother_suggestions\tother_links\tleftover_links\texisting_names\tnew_links\tpossibly_existing");
 		for (Result result : results) {
@@ -1684,17 +1689,15 @@ public final class PubMedApps {
 		for (String requiredArg : requiredArgs) {
 			Field requiredArgField = PubMedAppsArgs.class.getDeclaredField(requiredArg);
 			if (requiredArgField.get(args) == null) {
-				System.err.println(Arrays.toString(requiredArgField.getAnnotation(Parameter.class).names()) + " is required for "
-					+ Arrays.toString(PubMedAppsArgs.class.getDeclaredField(arg).getAnnotation(Parameter.class).names()));
+				logger.error("{} is required for {}", Arrays.toString(requiredArgField.getAnnotation(Parameter.class).names()),
+					Arrays.toString(PubMedAppsArgs.class.getDeclaredField(arg).getAnnotation(Parameter.class).names()));
 				return false;
 			}
 		}
 		return true;
 	}
 
-	public static void main(String[] argv) throws IOException, ParseException, ReflectiveOperationException, URISyntaxException {
-		PubMedAppsArgs args = FetcherUtil.parseArgs(argv, PubMedAppsArgs.class, new Version(PubMedApps.class));
-
+	private static void run(PubMedAppsArgs args) throws IOException, ParseException, ReflectiveOperationException, URISyntaxException {
 		args.preProcessorArgs.setStemming(false);
 
 		if (args.meshQuery) {
@@ -1711,6 +1714,24 @@ public final class PubMedApps {
 
 		if (args.beforeAfter && requiredArgs(new String[] { "idf", "db", "pub" }, "beforeAfter", args)) {
 			beforeAfter(args.preProcessorArgs, args.idf, args.db, args.pub);
+		}
+	}
+
+	public static void main(String[] argv) throws IOException, ReflectiveOperationException {
+		Version version = new Version(PubMedApps.class);
+
+		PubMedAppsArgs args = BasicArgs.parseArgs(argv, PubMedAppsArgs.class, version);
+
+		// logger must be called only after configuration changes have been made in BasicArgs.parseArgs()
+		// otherwise invalid.log will be created if arg --log is null
+		logger = LogManager.getLogger();
+		logger.debug(String.join(" ", argv));
+		logger.info("This is {} {}", version.getName(), version.getVersion());
+
+		try {
+			run(args);
+		} catch (Throwable e) {
+			logger.error("Exception!", e);
 		}
 	}
 }

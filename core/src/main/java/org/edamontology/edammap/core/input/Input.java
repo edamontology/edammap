@@ -25,10 +25,14 @@ import java.io.InputStream;
 import java.net.URLConnection;
 import java.util.Locale;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.edamontology.pubfetcher.FetcherArgs;
 import org.edamontology.pubfetcher.FetcherCommon;
 
 public final class Input {
+
+	private static Logger logger = LogManager.getLogger();
 
 	public static boolean isProtocol(String path) {
 		String pathLower = path.toLowerCase(Locale.ROOT);
@@ -44,10 +48,10 @@ public final class Input {
 		if (isProtocol(path)) {
 			URLConnection con = FetcherCommon.newConnection(path, fetcherArgs);
 			is = con.getInputStream();
-			System.out.println("Opened URL " + con.getURL().toString());
+			logger.info("Opened URL {}", con.getURL().toString());
 		} else if (allowFile) {
 			is = new FileInputStream(path);
-			System.out.println("Opened file " + path); // TODO new File(path).getName()
+			logger.info("Opened file {}", path); // TODO new File(path).getName()
 		} else {
 			throw new IOException("Unsupported protocol or opening of local files not allowed: " + path); // TODO new File(path).getName()
 		}

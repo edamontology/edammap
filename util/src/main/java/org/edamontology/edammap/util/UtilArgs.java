@@ -26,13 +26,11 @@ import com.beust.jcommander.ParametersDelegate;
 
 import org.edamontology.edammap.core.preprocessing.PreProcessorArgs;
 import org.edamontology.edammap.core.query.QueryType;
+import org.edamontology.pubfetcher.BasicArgs;
 import org.edamontology.pubfetcher.FetcherArgs;
 import org.edamontology.pubfetcher.FetcherUtilArgs;
-import org.edamontology.pubfetcher.MainArgs;
 
-public class UtilArgs implements MainArgs {
-	@Parameter(names = { "-h", "--help" }, help = true, description = "Print this help")
-	boolean help;
+public class UtilArgs extends BasicArgs {
 
 	@Parameter(names = { "-pub-query" }, variableArity = true, description = "TODO")
 	List<String> pubQuery = null;
@@ -78,9 +76,4 @@ public class UtilArgs implements MainArgs {
 
 	@ParametersDelegate
 	PreProcessorArgs preProcessorArgs = new PreProcessorArgs();
-
-	@Override
-	public boolean isHelp() {
-		return help;
-	}
 }

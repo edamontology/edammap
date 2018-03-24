@@ -26,6 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.edamontology.edammap.core.args.MainArgs;
 import org.edamontology.edammap.core.benchmarking.Benchmark;
 import org.edamontology.edammap.core.benchmarking.Measure;
@@ -42,12 +45,14 @@ import org.edamontology.edammap.core.processing.Processor;
 import org.edamontology.edammap.core.processing.QueryProcessed;
 import org.edamontology.edammap.core.query.Query;
 import org.edamontology.edammap.core.query.QueryLoader;
-import org.edamontology.pubfetcher.FetcherUtil;
+import org.edamontology.pubfetcher.BasicArgs;
 import org.edamontology.pubfetcher.Publication;
 import org.edamontology.pubfetcher.Version;
 import org.edamontology.pubfetcher.Webpage;
 
 public class Cli implements Runnable {
+
+	private static Logger logger;
 
 	private static Object lock = new Object();
 
@@ -97,7 +102,7 @@ public class Cli implements Runnable {
 				++index;
 			}
 
-			System.out.println((localIndex + 1) + "/" + queries.size() + " @ " + ((System.currentTimeMillis() - start) / 1000.0) + "s");
+			logger.info("{}/{} @ {}s", localIndex + 1, queries.size(), (System.currentTimeMillis() - start) / 1000.0);
 
 			QueryProcessed processedQuery = processor.getProcessedQuery(query, pp, args.getType());
 
@@ -117,27 +122,23 @@ public class Cli implements Runnable {
 		}
 	}
 
-	public static void main(String[] argv) throws IOException, ParseException, ReflectiveOperationException {
-		Version version = new Version(Cli.class);
-		args = FetcherUtil.parseArgs(argv, MainArgs.class, version);
-		System.out.println("This is " + version.getName() + " " + version.getVersion());
-
+	private static void run(Version version) throws IOException, ParseException, ReflectiveOperationException {
 		Output output = new Output(args);
 
 		stopwords = PreProcessor.getStopwords(args.getProcessorArgs().getPreProcessorArgs());
 
 		processor = new Processor(args.getProcessorArgs());
 
-		System.out.println("Loading concepts");
+		logger.info("Loading concepts");
 		Map<EdamUri, Concept> concepts = Edam.load(args.getEdam());
 
-		System.out.println("Processing " + concepts.size()  + " concepts");
+		logger.info("Processing {} concepts", concepts.size());
 		processedConcepts = processor.getProcessedConcepts(concepts, args.getMapperArgs().getIdfArgs(), args.getMapperArgs().getMultiplierArgs());
 
 		start = System.currentTimeMillis();
-		System.out.println("Start: " + Instant.ofEpochMilli(start));
+		logger.info("Start: {}", Instant.ofEpochMilli(start));
 
-		System.out.println("Loading queries");
+		logger.info("Loading queries");
 		queries = QueryLoader.get(args.getQuery(), args.getType(), concepts, args.getProcessorArgs().getFetcherArgs());
 
 		publications = new ArrayList<>(queries.size());
@@ -151,7 +152,7 @@ public class Cli implements Runnable {
 			mappings.add(null);
 		}
 
-		System.out.println("Starting mapper threads");
+		logger.info("Starting mapper threads");
 		for (int i = 0; i < args.getThreads(); ++i) {
 			Thread t = new Thread(new Cli());
 			t.setDaemon(true);
@@ -164,7 +165,7 @@ public class Cli implements Runnable {
 					lock.wait();
 				} catch (InterruptedException e) {
 					// TODO exit threads cleanly? give timeout for threads to exit? close db? print that exiting and waiting for threads to terminate?
-					System.err.println(e);
+					logger.error("Exception!", e);
 					System.exit(1);
 				}
 			}
@@ -173,13 +174,31 @@ public class Cli implements Runnable {
 		Results results = Benchmark.calculate(queries, mappings);
 
 		long stop = System.currentTimeMillis();
-		System.out.println("Stop: " + Instant.ofEpochMilli(stop));
-		System.out.println("Mapping took " + ((stop - start) / 1000.0) + "s");
+		logger.info("Stop: {}", Instant.ofEpochMilli(stop));
+		logger.info("Mapping took {}s", (stop - start) / 1000.0);
 
-		System.out.println("Outputting results");
+		logger.info("Outputting results");
 		output.output(concepts, queries, publications, webpages, docs, results, start, stop, version);
 
-		System.out.println(results.toStringMeasure(Measure.recall) + " : " + Measure.recall);
-		System.out.println(results.toStringMeasure(Measure.AveP) + " : " + Measure.AveP);
+		logger.info("{} : {}", results.toStringMeasure(Measure.recall), Measure.recall);
+		logger.info("{} : {}", results.toStringMeasure(Measure.AveP), Measure.AveP);
+	}
+
+	public static void main(String[] argv) throws IOException, ReflectiveOperationException {
+		Version version = new Version(Cli.class);
+
+		args = BasicArgs.parseArgs(argv, MainArgs.class, version);
+
+		// logger must be called only after configuration changes have been made in BasicArgs.parseArgs()
+		// otherwise invalid.log will be created if arg --log is null
+		logger = LogManager.getLogger();
+		logger.debug(String.join(" ", argv));
+		logger.info("This is {} {}", version.getName(), version.getVersion());
+
+		try {
+			run(version);
+		} catch (Throwable e) {
+			logger.error("Exception!", e);
+		}
 	}
 }

@@ -27,6 +27,8 @@ import java.text.ParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.edamontology.edammap.core.idf.Idf;
 import org.edamontology.edammap.core.input.Input;
 import org.edamontology.edammap.core.input.json.Biotools;
@@ -39,8 +41,10 @@ import org.edamontology.pubfetcher.FetcherCommon;
 
 public final class Util {
 
+	private static final Logger logger = LogManager.getLogger();
+
 	private static void makeQueryIdf(String queryPath, QueryType type, String outputPath, String database, UtilArgs args) throws IOException, ParseException {
-		System.out.println("Make query IDF from file " + queryPath + " of type " + type + " to " + outputPath + (database != null ? " using database " + database : ""));
+		logger.info("Make query IDF from file {} of type {} to {}{}", queryPath, type, outputPath, database != null ? " using database " + database : "");
 
 		ProcessorArgs processorArgs = new ProcessorArgs();
 		processorArgs.setFetcher(false);
@@ -51,7 +55,7 @@ public final class Util {
 		Processor processor = new Processor(processorArgs);
 		processor.makeQueryIdf(QueryLoader.get(queryPath, type, args.fetcherArgs), type, outputPath, args.makeQueryIdfNoWebpagesDocs, args.makeQueryIdfNoFulltext);
 
-		System.out.println("Make query IDF: success"); // TODO output number of IDF terms made
+		logger.info("Make query IDF: success"); // TODO output number of IDF terms made
 	}
 
 	private static void printQueryIdfTop(String inputPath, long n) throws IOException {
@@ -60,7 +64,7 @@ public final class Util {
 	}
 
 	private static void biotoolsFull(String outputPath, FetcherArgs fetcherArgs, boolean dev) throws IOException {
-		System.out.println("Make full " + (dev ? "dev." : "") + "bio.tools JSON to " + outputPath);
+		logger.info("Make full {}bio.tools JSON to {}", dev ? "dev." : "", outputPath);
 		String api = "https://" + (dev ? "dev." : "") + "bio.tools/api/tool";
 
 		Path output = FetcherCommon.outputPath(outputPath);
@@ -83,7 +87,7 @@ public final class Util {
 
 				next = biotools.getNext();
 			} catch (Exception e) {
-				System.err.println(e);
+				logger.error("Exception!", e);
 				break;
 			}
 		}
@@ -91,9 +95,9 @@ public final class Util {
 		mapper.writeValue(output.toFile(), biotoolsFull);
 
 		if (count != biotoolsFull.getCount()) {
-			System.err.println("Got " + count + " entries instead of advertised " + biotoolsFull.getCount());
+			logger.error("Got {} entries instead of advertised {}", count, biotoolsFull.getCount());
 		}
-		System.out.println("Made bio.tools JSON with " + count + " entries");
+		logger.info("Made bio.tools JSON with {} entries", count);
 	}
 
 	public static void run(UtilArgs args) throws IOException, ParseException {

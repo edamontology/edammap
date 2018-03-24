@@ -26,16 +26,14 @@ import com.beust.jcommander.validators.PositiveInteger;
 import org.edamontology.edammap.core.mapping.args.MapperArgs;
 import org.edamontology.edammap.core.processing.ProcessorArgs;
 import org.edamontology.edammap.core.query.QueryType;
+import org.edamontology.pubfetcher.BasicArgs;
 
-public class MainArgs implements org.edamontology.pubfetcher.MainArgs {
+public class MainArgs extends BasicArgs {
 	@Parameter(names = { "-e", "--edam" }, required = true, description = "Path of the EDAM ontology file")
 	private String edam;
 
 	@Parameter(names = { "-q", "--query" }, required = true, description = "Path of file containing queries")
 	private String query;
-
-	@Parameter(names = { "-h", "--help" }, help = true, description = "Print this help")
-	private boolean help;
 
 	@Parameter(names = { "-t", "--type", "--query-type" }, description = "Specifies the type of the query and how to output the results")
 	private QueryType type = QueryType.generic;
@@ -67,10 +65,6 @@ public class MainArgs implements org.edamontology.pubfetcher.MainArgs {
 
 	public String getQuery() {
 		return query;
-	}
-
-	public boolean isHelp() {
-		return help;
 	}
 
 	public QueryType getType() {
