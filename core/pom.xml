@@ -65,6 +65,11 @@
       <artifactId>jackson-core</artifactId>
       <version>${jackson.version}</version>
     </dependency>
+    <dependency>
+      <groupId>com.carrotsearch</groupId>
+      <artifactId>hppc</artifactId>
+      <version>${hppc.version}</version>
+    </dependency>
   </dependencies>
 
   <build>

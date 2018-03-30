@@ -30,22 +30,22 @@ public class QueryProcessed {
 	private List<String> nameTokens = null;
 	private List<Double> nameIdfs = null;
 
-	private List<Webpage> webpages = new ArrayList<>();
-	private List<List<String>> webpagesTokens = new ArrayList<>();
-	private List<List<Double>> webpagesIdfs = new ArrayList<>();
+	private List<List<String>> keywordsTokens = new ArrayList<>();
+	private List<List<Double>> keywordsIdfs = new ArrayList<>();
 
 	private List<String> descriptionTokens = null;
 	private List<Double> descriptionIdfs = null;
 
-	private List<List<String>> keywordsTokens = new ArrayList<>();
-	private List<List<Double>> keywordsIdfs = new ArrayList<>();
-
-	private List<Publication> publications = new ArrayList<>();
-	private List<PublicationProcessed> processedPublications = new ArrayList<>();
+	private List<Webpage> webpages = new ArrayList<>();
+	private List<List<String>> webpagesTokens = new ArrayList<>();
+	private List<List<Double>> webpagesIdfs = new ArrayList<>();
 
 	private List<Webpage> docs = new ArrayList<>();
 	private List<List<String>> docsTokens = new ArrayList<>();
 	private List<List<Double>> docsIdfs = new ArrayList<>();
+
+	private List<Publication> publications = new ArrayList<>();
+	private List<PublicationProcessed> processedPublications = new ArrayList<>();
 
 	public List<String> getNameTokens() {
 		return nameTokens;
@@ -58,6 +58,32 @@ public class QueryProcessed {
 	}
 	public void setNameIdfs(List<Double> nameIdfs) {
 		this.nameIdfs = nameIdfs;
+	}
+
+	public List<List<String>> getKeywordsTokens() {
+		return keywordsTokens;
+	}
+	public void addKeywordTokens(List<String> keywordTokens) {
+		this.keywordsTokens.add(keywordTokens);
+	}
+	public List<List<Double>> getKeywordsIdfs() {
+		return keywordsIdfs;
+	}
+	public void addKeywordIdfs(List<Double> keywordIdfs) {
+		this.keywordsIdfs.add(keywordIdfs);
+	}
+
+	public List<String> getDescriptionTokens() {
+		return descriptionTokens;
+	}
+	public void setDescriptionTokens(List<String> descriptionTokens) {
+		this.descriptionTokens = descriptionTokens;
+	}
+	public List<Double> getDescriptionIdfs() {
+		return descriptionIdfs;
+	}
+	public void setDescriptionIdfs(List<Double> descriptionIdfs) {
+		this.descriptionIdfs = descriptionIdfs;
 	}
 
 	public List<Webpage> getWebpages() {
@@ -79,45 +105,6 @@ public class QueryProcessed {
 		this.webpagesIdfs.add(webpageIdfs);
 	}
 
-	public List<String> getDescriptionTokens() {
-		return descriptionTokens;
-	}
-	public void setDescriptionTokens(List<String> descriptionTokens) {
-		this.descriptionTokens = descriptionTokens;
-	}
-	public List<Double> getDescriptionIdfs() {
-		return descriptionIdfs;
-	}
-	public void setDescriptionIdfs(List<Double> descriptionIdfs) {
-		this.descriptionIdfs = descriptionIdfs;
-	}
-
-	public List<List<String>> getKeywordsTokens() {
-		return keywordsTokens;
-	}
-	public void addKeywordTokens(List<String> keywordTokens) {
-		this.keywordsTokens.add(keywordTokens);
-	}
-	public List<List<Double>> getKeywordsIdfs() {
-		return keywordsIdfs;
-	}
-	public void addKeywordIdfs(List<Double> keywordIdfs) {
-		this.keywordsIdfs.add(keywordIdfs);
-	}
-
-	public List<Publication> getPublications() {
-		return publications;
-	}
-	public void addPublication(Publication publication) {
-		this.publications.add(publication);
-	}
-	public List<PublicationProcessed> getProcessedPublications() {
-		return processedPublications;
-	}
-	public void addProcessedPublication(PublicationProcessed processedPublication) {
-		this.processedPublications.add(processedPublication);
-	}
-
 	public List<Webpage> getDocs() {
 		return docs;
 	}
@@ -135,5 +122,18 @@ public class QueryProcessed {
 	}
 	public void addDocIdfs(List<Double> docIdfs) {
 		this.docsIdfs.add(docIdfs);
+	}
+
+	public List<Publication> getPublications() {
+		return publications;
+	}
+	public void addPublication(Publication publication) {
+		this.publications.add(publication);
+	}
+	public List<PublicationProcessed> getProcessedPublications() {
+		return processedPublications;
+	}
+	public void addProcessedPublication(PublicationProcessed processedPublication) {
+		this.processedPublications.add(processedPublication);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016 Erik Jaaniso
+ * Copyright © 2016, 2018 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -20,39 +20,36 @@
 package org.edamontology.edammap.core.processing;
 
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.ParametersDelegate;
-
-import org.edamontology.edammap.core.preprocessing.PreProcessorArgs;
-import org.edamontology.pubfetcher.FetcherArgs;
 
 public class ProcessorArgs {
-	@Parameter(names = { "-f", "--fetch", "--fetcher", "--fetching" }, arity = 1, description = "Fetch publications, webpages and docs")
-	private boolean fetcher = true;
+	public static final String FETCHING = "fetching";
+	@Parameter(names = { "--fetch", "--fetcher", "--" + FETCHING }, arity = 1, description = "Fetch publications, webpages and docs")
+	private boolean fetching = true;
 
-	@Parameter(names = { "-d", "--db", "--database" }, description = "Use the given database for getting and storing publications, webpages and docs")
-	private String database = "";
+	public static final String DB = "db";
+	@Parameter(names = { "--" + DB, "--database" }, description = "Use the given database for getting and storing publications, webpages and docs")
+	private String db = "";
 
-	@Parameter(names = { "--idf", "--query-idf" }, description = "Use the given query IDF file; if not specified, weighting of queries with IDF scores will be disabled")
+	public static final String IDF = "idf";
+	@Parameter(names = { "--" + IDF, "--query-" + IDF }, description = "Use the given query IDF file (when stemming is not enabled); if not specified, weighting of queries with IDF scores will be disabled (when stemming is not enabled)")
 	private String idf = "";
 
-	@ParametersDelegate
-	private PreProcessorArgs preProcessorArgs = new PreProcessorArgs();
+	public static final String IDF_STEMMED = "idf-stemmed";
+	@Parameter(names = { "--" + IDF_STEMMED, "--query-" + IDF_STEMMED }, description = "Use the given query IDF file (when stemming is enabled); if not specified, weighting of queries with IDF scores will be disabled (when stemming is enabled)")
+	private String idfStemmed = "";
 
-	@ParametersDelegate
-	private FetcherArgs fetcherArgs = new FetcherArgs();
-
-	public boolean isFetcher() {
-		return fetcher;
+	public boolean isFetching() {
+		return fetching;
 	}
-	public void setFetcher(boolean fetcher) {
-		this.fetcher = fetcher;
+	public void setFetching(boolean fetching) {
+		this.fetching = fetching;
 	}
 
-	public String getDatabase() {
-		return database;
+	public String getDb() {
+		return db;
 	}
-	public void setDatabase(String database) {
-		this.database = database;
+	public void setDb(String db) {
+		this.db = db;
 	}
 
 	public String getIdf() {
@@ -62,17 +59,10 @@ public class ProcessorArgs {
 		this.idf = idf;
 	}
 
-	public PreProcessorArgs getPreProcessorArgs() {
-		return preProcessorArgs;
+	public String getIdfStemmed() {
+		return idfStemmed;
 	}
-	public void setPreProcessorArgs(PreProcessorArgs preProcessorArgs) {
-		this.preProcessorArgs = preProcessorArgs;
-	}
-
-	public FetcherArgs getFetcherArgs() {
-		return fetcherArgs;
-	}
-	public void setFetcherArgs(FetcherArgs fetcherArgs) {
-		this.fetcherArgs = fetcherArgs;
+	public void setIdfStemmed(String idfStemmed) {
+		this.idfStemmed = idfStemmed;
 	}
 }

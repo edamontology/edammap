@@ -30,23 +30,22 @@ import com.univocity.parsers.common.processor.BeanListProcessor;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 
-import org.edamontology.edammap.core.input.csv.BioConductor;
+import org.edamontology.edammap.core.input.csv.Bioconductor;
 import org.edamontology.edammap.core.input.csv.Generic;
 import org.edamontology.edammap.core.input.csv.Msutils;
 import org.edamontology.edammap.core.input.csv.SEQwiki;
 import org.edamontology.edammap.core.query.QueryType;
-import org.edamontology.pubfetcher.FetcherArgs;
 
 public class Csv {
 
-	public static List<InputType> load(String queryPath, QueryType type, FetcherArgs fetcherArgs) throws IOException, ParseException {
+	public static List<InputType> load(String queryPath, QueryType type, int timeout, String userAgent) throws IOException, ParseException {
 		List<InputType> inputs = new ArrayList<>();
 
 		BeanListProcessor<? extends InputType> rowProcessor;
 		switch (type) {
-			case SEQwiki: case SEQwikiTags: case SEQwikiTool: rowProcessor = new BeanListProcessor<SEQwiki>(SEQwiki.class); break;
+			case SEQwiki: rowProcessor = new BeanListProcessor<SEQwiki>(SEQwiki.class); break;
 			case msutils: rowProcessor = new BeanListProcessor<Msutils>(Msutils.class); break;
-			case BioConductor: rowProcessor = new BeanListProcessor<BioConductor>(BioConductor.class); break;
+			case Bioconductor: rowProcessor = new BeanListProcessor<Bioconductor>(Bioconductor.class); break;
 			default: rowProcessor = new BeanListProcessor<Generic>(Generic.class); break;
 		}
 		rowProcessor.setStrictHeaderValidationEnabled(false);
@@ -66,7 +65,7 @@ public class Csv {
 		settings.getFormat().setLineSeparator("\n");
 		settings.getFormat().setComment('#');
 
-		try (InputStreamReader reader = new InputStreamReader(Input.newInputStream(queryPath, true, fetcherArgs), StandardCharsets.UTF_8)) {
+		try (InputStreamReader reader = new InputStreamReader(Input.newInputStream(queryPath, true, timeout, userAgent), StandardCharsets.UTF_8)) {
 			CsvParser parser = new CsvParser(settings);
 			parser.parse(reader);
 		}

@@ -24,87 +24,136 @@ import org.edamontology.edammap.core.args.PositiveDouble;
 import com.beust.jcommander.Parameter;
 
 public class WeightArgs {
-	@Parameter(names = { "--average-scaling" }, validateWith = PositiveDouble.class, description = "Scaling for the average strategy")
+
+	public static final String AVERAGE_SCALING = "average-scaling";
+	@Parameter(names = { "--" + AVERAGE_SCALING }, validateWith = PositiveDouble.class, description = "Scaling for the average strategy")
 	private double averageScaling = 10;
 
-	@Parameter(names = { "--name-weight" }, validateWith = PositiveDouble.class, description = "Weight of query name in average strategy. Set to 0 to disable matching of names in average strategy.")
+	public static final String NAME_WEIGHT = "name-weight";
+	@Parameter(names = { "--" + NAME_WEIGHT }, validateWith = PositiveDouble.class, description = "Weight of query name in average strategy. Set to 0 to disable matching of names in average strategy.")
 	private double nameWeight = 1;
 
-	@Parameter(names = { "--keyword-weight" }, validateWith = PositiveDouble.class, description = "Weight of query keyword in average strategy. Set to 0 to disable matching of keywords in average strategy.")
+	public static final String KEYWORD_WEIGHT = "keyword-weight";
+	@Parameter(names = { "--" + KEYWORD_WEIGHT }, validateWith = PositiveDouble.class, description = "Weight of query keyword in average strategy. Set to 0 to disable matching of keywords in average strategy.")
 	private double keywordWeight = 1;
 
-	@Parameter(names = { "--description-weight" }, validateWith = PositiveDouble.class, description = "Weight of query description in average strategy. Set to 0 to disable matching of descriptions in average strategy.")
+	public static final String DESCRIPTION_WEIGHT = "description-weight";
+	@Parameter(names = { "--" + DESCRIPTION_WEIGHT }, validateWith = PositiveDouble.class, description = "Weight of query description in average strategy. Set to 0 to disable matching of descriptions in average strategy.")
 	private double descriptionWeight = 1;
 
-	@Parameter(names = { "--publication-title-weight" }, validateWith = PositiveDouble.class, description = "Weight of publication title in average strategy. Set to 0 to disable matching of titles in average strategy.")
+	public static final String PUBLICATION_TITLE_WEIGHT = "publication-title-weight";
+	@Parameter(names = { "--" + PUBLICATION_TITLE_WEIGHT }, validateWith = PositiveDouble.class, description = "Weight of publication title in average strategy. Set to 0 to disable matching of titles in average strategy.")
 	private double publicationTitleWeight = 0.25;
 
-	@Parameter(names = { "--publication-keyword-weight" }, validateWith = PositiveDouble.class, description = "Weight of publication keyword in average strategy. Set to 0 to disable matching of keywords in average strategy.")
+	public static final String PUBLICATION_KEYWORD_WEIGHT = "publication-keyword-weight";
+	@Parameter(names = { "--" + PUBLICATION_KEYWORD_WEIGHT }, validateWith = PositiveDouble.class, description = "Weight of publication keyword in average strategy. Set to 0 to disable matching of keywords in average strategy.")
 	private double publicationKeywordWeight = 0.75;
 
-	@Parameter(names = { "--publication-mesh-weight" }, validateWith = PositiveDouble.class, description = "Weight of publication MeSH term in average strategy. Set to 0 to disable matching of MeSH terms in average strategy.")
+	public static final String PUBLICATION_MESH_WEIGHT = "publication-mesh-weight";
+	@Parameter(names = { "--" + PUBLICATION_MESH_WEIGHT }, validateWith = PositiveDouble.class, description = "Weight of publication MeSH term in average strategy. Set to 0 to disable matching of MeSH terms in average strategy.")
 	private double publicationMeshWeight = 0.25;
 
-	@Parameter(names = { "--publication-mined-term-weight" }, validateWith = PositiveDouble.class, description = "Weight of publication mined term (EFO, GO) in average strategy. Set to 0 to disable matching of mined terms in average strategy.")
-	private double publicationMinedWeight = 0.25;
+	public static final String PUBLICATION_MINED_TERM_WEIGHT = "publication-mined-term-weight";
+	@Parameter(names = { "--" + PUBLICATION_MINED_TERM_WEIGHT }, validateWith = PositiveDouble.class, description = "Weight of publication mined term (EFO, GO) in average strategy. Set to 0 to disable matching of mined terms in average strategy.")
+	private double publicationMinedTermWeight = 0.25;
 
-	@Parameter(names = { "--publication-abstract-weight" }, validateWith = PositiveDouble.class, description = "Weight of publication abstract in average strategy. Set to 0 to disable matching of abstracts in average strategy.")
+	public static final String PUBLICATION_ABSTRACT_WEIGHT = "publication-abstract-weight";
+	@Parameter(names = { "--" + PUBLICATION_ABSTRACT_WEIGHT }, validateWith = PositiveDouble.class, description = "Weight of publication abstract in average strategy. Set to 0 to disable matching of abstracts in average strategy.")
 	private double publicationAbstractWeight = 0.75;
 
-	@Parameter(names = { "--publication-fulltext-weight" }, validateWith = PositiveDouble.class, description = "Weight of publication fulltext in average strategy. Set to 0 to disable matching of fulltexts in average strategy.")
+	public static final String PUBLICATION_FULLTEXT_WEIGHT = "publication-fulltext-weight";
+	@Parameter(names = { "--" + PUBLICATION_FULLTEXT_WEIGHT }, validateWith = PositiveDouble.class, description = "Weight of publication fulltext in average strategy. Set to 0 to disable matching of fulltexts in average strategy.")
 	private double publicationFulltextWeight = 0.5;
 
-	@Parameter(names = { "--doc-weight" }, validateWith = PositiveDouble.class, description = "Weight of query doc in average strategy. Set to 0 to disable matching of docs in average strategy.")
+	public static final String DOC_WEIGHT = "doc-weight";
+	@Parameter(names = { "--" + DOC_WEIGHT }, validateWith = PositiveDouble.class, description = "Weight of query doc in average strategy. Set to 0 to disable matching of docs in average strategy.")
 	private double docWeight = 0.5;
 
-	@Parameter(names = { "--webpage-weight" }, validateWith = PositiveDouble.class, description = "Weight of query webpage in average strategy. Set to 0 to disable matching of webpages in average strategy.")
+	public static final String WEBPAGE_WEIGHT = "webpage-weight";
+	@Parameter(names = { "--" + WEBPAGE_WEIGHT }, validateWith = PositiveDouble.class, description = "Weight of query webpage in average strategy. Set to 0 to disable matching of webpages in average strategy.")
 	private double webpageWeight = 0.5;
 
 	public double getAverageScaling() {
 		return averageScaling;
 	}
+	public void setAverageScaling(double averageScaling) {
+		this.averageScaling = averageScaling;
+	}
 
 	public double getNameWeight() {
 		return nameWeight;
+	}
+	public void setNameWeight(double nameWeight) {
+		this.nameWeight = nameWeight;
 	}
 
 	public double getKeywordWeight() {
 		return keywordWeight;
 	}
+	public void setKeywordWeight(double keywordWeight) {
+		this.keywordWeight = keywordWeight;
+	}
 
 	public double getDescriptionWeight() {
 		return descriptionWeight;
+	}
+	public void setDescriptionWeight(double descriptionWeight) {
+		this.descriptionWeight = descriptionWeight;
 	}
 
 	public double getPublicationTitleWeight() {
 		return publicationTitleWeight;
 	}
+	public void setPublicationTitleWeight(double publicationTitleWeight) {
+		this.publicationTitleWeight = publicationTitleWeight;
+	}
 
 	public double getPublicationKeywordWeight() {
 		return publicationKeywordWeight;
+	}
+	public void setPublicationKeywordWeight(double publicationKeywordWeight) {
+		this.publicationKeywordWeight = publicationKeywordWeight;
 	}
 
 	public double getPublicationMeshWeight() {
 		return publicationMeshWeight;
 	}
+	public void setPublicationMeshWeight(double publicationMeshWeight) {
+		this.publicationMeshWeight = publicationMeshWeight;
+	}
 
-	public double getPublicationMinedWeight() {
-		return publicationMinedWeight;
+	public double getPublicationMinedTermWeight() {
+		return publicationMinedTermWeight;
+	}
+	public void setPublicationMinedTermWeight(double publicationMinedTermWeight) {
+		this.publicationMinedTermWeight = publicationMinedTermWeight;
 	}
 
 	public double getPublicationAbstractWeight() {
 		return publicationAbstractWeight;
 	}
+	public void setPublicationAbstractWeight(double publicationAbstractWeight) {
+		this.publicationAbstractWeight = publicationAbstractWeight;
+	}
 
 	public double getPublicationFulltextWeight() {
 		return publicationFulltextWeight;
+	}
+	public void setPublicationFulltextWeight(double publicationFulltextWeight) {
+		this.publicationFulltextWeight = publicationFulltextWeight;
 	}
 
 	public double getDocWeight() {
 		return docWeight;
 	}
+	public void setDocWeight(double docWeight) {
+		this.docWeight = docWeight;
+	}
 
 	public double getWebpageWeight() {
 		return webpageWeight;
+	}
+	public void setWebpageWeight(double webpageWeight) {
+		this.webpageWeight = webpageWeight;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016, 2017 Erik Jaaniso
+ * Copyright © 2016, 2017, 2018 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -21,6 +21,7 @@ package org.edamontology.edammap.core.processing;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -40,46 +41,37 @@ import org.edamontology.edammap.core.query.PublicationIdsQuery;
 import org.edamontology.edammap.core.query.Query;
 import org.edamontology.edammap.core.query.QueryType;
 import org.edamontology.pubfetcher.Database;
+import org.edamontology.pubfetcher.DatabaseEntry;
 import org.edamontology.pubfetcher.Fetcher;
+import org.edamontology.pubfetcher.FetcherArgs;
 import org.edamontology.pubfetcher.FetcherCommon;
 import org.edamontology.pubfetcher.MeshTerm;
 import org.edamontology.pubfetcher.MinedTerm;
 import org.edamontology.pubfetcher.Publication;
+import org.edamontology.pubfetcher.PublicationIds;
 import org.edamontology.pubfetcher.Webpage;
 
 public class Processor {
-
-	private final PreProcessor preProcessor;
 
 	private final Fetcher fetcher;
 
 	private final Database database;
 
-	private final Idf queryIdf;
-
 	public Processor(ProcessorArgs args) throws IOException, ParseException {
-		this.preProcessor = new PreProcessor(args.getPreProcessorArgs());
-
-		if (!args.isFetcher()) {
+		if (!args.isFetching()) {
 			this.fetcher = null;
 		} else {
-			this.fetcher = new Fetcher(args.getFetcherArgs());
+			this.fetcher = new Fetcher();
 		}
 
-		if (args.getDatabase() == null || args.getDatabase().isEmpty()) {
+		if (args.getDb() == null || args.getDb().isEmpty()) {
 			this.database = null;
 		} else {
-			this.database = new Database(args.getDatabase());
-		}
-
-		if (args.getIdf() == null || args.getIdf().isEmpty()) {
-			this.queryIdf = null;
-		} else {
-			this.queryIdf = new Idf(args.getIdf());
+			this.database = new Database(args.getDb());
 		}
 	}
 
-	private ConceptProcessed processConcept(Concept concept, IdfMake idfMake) {
+	private ConceptProcessed processConcept(Concept concept, IdfMake idfMake, PreProcessor preProcessor) {
 		ConceptProcessed processedConcept = new ConceptProcessed();
 
 		processedConcept.setObsolete(concept.isObsolete());
@@ -169,20 +161,20 @@ public class Processor {
 				processedConcept.addMultiplier(multiplierArgs.getExactSynonymMultiplier());
 			}
 		}
-		if (multiplierArgs.getNarrowBroadMultiplier() > 0) {
+		if (multiplierArgs.getNarrowBroadSynonymMultiplier() > 0) {
 			for (int i = 0; i < processedConcept.getNarrowSynonymsTokens().size(); ++i) {
 				processedConcept.addTokens(processedConcept.getNarrowSynonymsTokens().get(i));
 				processedConcept.addIdfs(processedConcept.getNarrowSynonymsIdfs().get(i));
 				processedConcept.addScaling(idfArgs.isLabelSynonymsIdf() ? idfArgs.getConceptIdfScaling() : 0);
-				processedConcept.addMultiplier(multiplierArgs.getNarrowBroadMultiplier());
+				processedConcept.addMultiplier(multiplierArgs.getNarrowBroadSynonymMultiplier());
 			}
 		}
-		if (multiplierArgs.getNarrowBroadMultiplier() > 0) {
+		if (multiplierArgs.getNarrowBroadSynonymMultiplier() > 0) {
 			for (int i = 0; i < processedConcept.getBroadSynonymsTokens().size(); ++i) {
 				processedConcept.addTokens(processedConcept.getBroadSynonymsTokens().get(i));
 				processedConcept.addIdfs(processedConcept.getBroadSynonymsIdfs().get(i));
 				processedConcept.addScaling(idfArgs.isLabelSynonymsIdf() ? idfArgs.getConceptIdfScaling() : 0);
-				processedConcept.addMultiplier(multiplierArgs.getNarrowBroadMultiplier());
+				processedConcept.addMultiplier(multiplierArgs.getNarrowBroadSynonymMultiplier());
 			}
 		}
 		if (processedConcept.getDefinitionTokens() != null && multiplierArgs.getDefinitionMultiplier() > 0) {
@@ -199,12 +191,12 @@ public class Processor {
 		}
 	}
 
-	public Map<EdamUri, ConceptProcessed> getProcessedConcepts(Map<EdamUri, Concept> concepts, IdfArgs idfArgs, MultiplierArgs multiplierArgs) {
+	public Map<EdamUri, ConceptProcessed> getProcessedConcepts(Map<EdamUri, Concept> concepts, IdfArgs idfArgs, MultiplierArgs multiplierArgs, PreProcessor preProcessor) {
 		Map<EdamUri, ConceptProcessed> processedConcepts = new LinkedHashMap<>();
 
 		IdfMake idfMake = new IdfMake();
 		for (Map.Entry<EdamUri, Concept> concept : concepts.entrySet()) {
-			processedConcepts.put(concept.getKey(), processConcept(concept.getValue(), idfMake));
+			processedConcepts.put(concept.getKey(), processConcept(concept.getValue(), idfMake, preProcessor));
 		}
 
 		Idf idf = new Idf(idfMake.getIdf());
@@ -219,10 +211,10 @@ public class Processor {
 		return processedConcepts;
 	}
 
-	private PublicationProcessed processPublication(Publication publication, PreProcessor pp) {
+	private PublicationProcessed processPublication(Publication publication, PreProcessor pp, Idf queryIdf, FetcherArgs fetcherArgs) {
 		PublicationProcessed publicationProcessed = new PublicationProcessed();
 
-		if (!publication.getTitle().isEmpty()) {
+		if (publication.isTitleUsable(fetcherArgs)) {
 			List<String> titleTokens = pp.process(publication.getTitle().getContent());
 			if (!titleTokens.isEmpty()) {
 				publicationProcessed.setTitleTokens(titleTokens);
@@ -232,31 +224,35 @@ public class Processor {
 			}
 		}
 
-		for (String keyword : publication.getKeywords().getList()) {
-			List<String> keywordTokens = pp.process(keyword);
-			List<Double> keywordIdfs = null;
-			if (keywordTokens.isEmpty()) {
-				keywordTokens = null;
-			} else if (queryIdf != null) {
-				keywordIdfs = queryIdf.getIdf(keywordTokens);
+		if (publication.isKeywordsUsable(fetcherArgs)) {
+			for (String keyword : publication.getKeywords().getList()) {
+				List<String> keywordTokens = pp.process(keyword);
+				List<Double> keywordIdfs = null;
+				if (keywordTokens.isEmpty()) {
+					keywordTokens = null;
+				} else if (queryIdf != null) {
+					keywordIdfs = queryIdf.getIdf(keywordTokens);
+				}
+				publicationProcessed.addKeywordTokens(keywordTokens);
+				publicationProcessed.addKeywordIdfs(keywordIdfs);
 			}
-			publicationProcessed.addKeywordTokens(keywordTokens);
-			publicationProcessed.addKeywordIdfs(keywordIdfs);
 		}
 
-		for (MeshTerm meshTerm : publication.getMeshTerms().getList()) {
-			List<String> meshTermTokens = pp.process(meshTerm.getTerm());
-			List<Double> meshTermIdfs = null;
-			if (meshTermTokens.isEmpty()) {
-				meshTermTokens = null;
-			} else if (queryIdf != null) {
-				meshTermIdfs = queryIdf.getIdf(meshTermTokens);
+		if (publication.isMeshTermsUsable(fetcherArgs)) {
+			for (MeshTerm meshTerm : publication.getMeshTerms().getList()) {
+				List<String> meshTermTokens = pp.process(meshTerm.getTerm());
+				List<Double> meshTermIdfs = null;
+				if (meshTermTokens.isEmpty()) {
+					meshTermTokens = null;
+				} else if (queryIdf != null) {
+					meshTermIdfs = queryIdf.getIdf(meshTermTokens);
+				}
+				publicationProcessed.addMeshTermTokens(meshTermTokens);
+				publicationProcessed.addMeshTermIdfs(meshTermIdfs);
 			}
-			publicationProcessed.addMeshTermTokens(meshTermTokens);
-			publicationProcessed.addMeshTermIdfs(meshTermIdfs);
 		}
 
-		if (!publication.getAbstract().isEmpty()) {
+		if (publication.isAbstractUsable(fetcherArgs)) {
 			List<String> abstractTokens = pp.process(publication.getAbstract().getContent());
 			if (!abstractTokens.isEmpty()) {
 				publicationProcessed.setAbstractTokens(abstractTokens);
@@ -267,7 +263,7 @@ public class Processor {
 		}
 
 		int fulltextWordCount = 0;
-		if (!publication.getFulltext().isEmpty()) {
+		if (publication.isFulltextUsable(fetcherArgs)) {
 			List<String> fulltextTokens = pp.process(publication.getFulltext().getContent());
 			if (!fulltextTokens.isEmpty()) {
 				publicationProcessed.setFulltextTokens(fulltextTokens);
@@ -278,47 +274,51 @@ public class Processor {
 			}
 		}
 
-		for (MinedTerm efoTerm : publication.getEfoTerms().getList()) {
-			List<String> efoTermTokens = pp.process(efoTerm.getTerm());
-			List<Double> efoTermIdfs = null;
-			Double efoTermFrequency = null;
-			if (efoTermTokens.isEmpty()) {
-				efoTermTokens = null;
-			} else {
-				if (queryIdf != null) {
-					efoTermIdfs = queryIdf.getIdf(efoTermTokens);
+		if (publication.isEfoTermsUsable(fetcherArgs)) {
+			for (MinedTerm efoTerm : publication.getEfoTerms().getList()) {
+				List<String> efoTermTokens = pp.process(efoTerm.getTerm());
+				List<Double> efoTermIdfs = null;
+				Double efoTermFrequency = null;
+				if (efoTermTokens.isEmpty()) {
+					efoTermTokens = null;
+				} else {
+					if (queryIdf != null) {
+						efoTermIdfs = queryIdf.getIdf(efoTermTokens);
+					}
+					efoTermFrequency = efoTerm.getFrequency(fulltextWordCount);
 				}
-				efoTermFrequency = efoTerm.getFrequency(fulltextWordCount);
+				publicationProcessed.addEfoTermTokens(efoTermTokens);
+				publicationProcessed.addEfoTermIdfs(efoTermIdfs);
+				publicationProcessed.addEfoTermFrequency(efoTermFrequency);
 			}
-			publicationProcessed.addEfoTermTokens(efoTermTokens);
-			publicationProcessed.addEfoTermIdfs(efoTermIdfs);
-			publicationProcessed.addEfoTermFrequency(efoTermFrequency);
 		}
 
-		for (MinedTerm goTerm : publication.getGoTerms().getList()) {
-			List<String> goTermTokens = pp.process(goTerm.getTerm());
-			List<Double> goTermIdfs = null;
-			Double goTermFrequency = null;
-			if (goTermTokens.isEmpty()) {
-				goTermTokens = null;
-			} else {
-				if (queryIdf != null) {
-					goTermIdfs = queryIdf.getIdf(goTermTokens);
+		if (publication.isGoTermsUsable(fetcherArgs)) {
+			for (MinedTerm goTerm : publication.getGoTerms().getList()) {
+				List<String> goTermTokens = pp.process(goTerm.getTerm());
+				List<Double> goTermIdfs = null;
+				Double goTermFrequency = null;
+				if (goTermTokens.isEmpty()) {
+					goTermTokens = null;
+				} else {
+					if (queryIdf != null) {
+						goTermIdfs = queryIdf.getIdf(goTermTokens);
+					}
+					goTermFrequency = goTerm.getFrequency(fulltextWordCount);
 				}
-				goTermFrequency = goTerm.getFrequency(fulltextWordCount);
+				publicationProcessed.addGoTermTokens(goTermTokens);
+				publicationProcessed.addGoTermIdfs(goTermIdfs);
+				publicationProcessed.addGoTermFrequency(goTermFrequency);
 			}
-			publicationProcessed.addGoTermTokens(goTermTokens);
-			publicationProcessed.addGoTermIdfs(goTermIdfs);
-			publicationProcessed.addGoTermFrequency(goTermFrequency);
 		}
 
 		return publicationProcessed;
 	}
 
-	public QueryProcessed getProcessedQuery(Query query, PreProcessor pp, QueryType type) {
+	public QueryProcessed getProcessedQuery(Query query, QueryType type, PreProcessor pp, Idf queryIdf, FetcherArgs fetcherArgs) {
 		QueryProcessed queryProcessed = new QueryProcessed();
 
-		boolean removeBroken = (type == QueryType.BioConductor);
+		boolean removeBroken = (type == QueryType.Bioconductor);
 
 		if (query.getName() != null) {
 			List<String> nameTokens = pp.process(query.getName());
@@ -326,40 +326,6 @@ public class Processor {
 				queryProcessed.setNameTokens(nameTokens);
 				if (queryIdf != null) {
 					queryProcessed.setNameIdfs(queryIdf.getIdf(nameTokens));
-				}
-			}
-		}
-
-		if (query.getWebpageUrls() != null) {
-			for (Iterator<Link> it = query.getWebpageUrls().iterator(); it.hasNext(); ) {
-				String webpageUrl = it.next().getUrl();
-				Webpage webpage = FetcherCommon.getWebpage(webpageUrl, database, fetcher);
-				List<String> webpageTokens = null;
-				List<Double> webpageIdfs = null;
-				if (webpage != null) {
-					webpageTokens = pp.process(webpage.getTitle() + " " + webpage.getContent());
-					if (webpageTokens.isEmpty()) {
-						webpageTokens = null;
-					} else if (queryIdf != null) {
-						webpageIdfs = queryIdf.getIdf(webpageTokens);
-					}
-				}
-				if (webpageTokens == null && removeBroken) {
-					it.remove();
-				} else {
-					queryProcessed.addWebpage(webpage);
-					queryProcessed.addWebpageTokens(webpageTokens);
-					queryProcessed.addWebpageIdfs(webpageIdfs);
-				}
-			}
-		}
-
-		if (query.getDescription() != null) {
-			List<String> descriptionTokens = pp.process(query.getDescription());
-			if (!descriptionTokens.isEmpty()) {
-				queryProcessed.setDescriptionTokens(descriptionTokens);
-				if (queryIdf != null) {
-					queryProcessed.setDescriptionIdfs(queryIdf.getIdf(descriptionTokens));
 				}
 			}
 		}
@@ -382,15 +348,36 @@ public class Processor {
 			}
 		}
 
-		if (query.getPublicationIds() != null) {
-			for (PublicationIdsQuery publicationIds : query.getPublicationIds()) {
-				Publication publication = FetcherCommon.getPublication(publicationIds, database, fetcher, null);
-				if (publication != null) {
-					queryProcessed.addPublication(publication);
-					queryProcessed.addProcessedPublication(processPublication(publication, pp));
+		if (query.getDescription() != null) {
+			List<String> descriptionTokens = pp.process(query.getDescription());
+			if (!descriptionTokens.isEmpty()) {
+				queryProcessed.setDescriptionTokens(descriptionTokens);
+				if (queryIdf != null) {
+					queryProcessed.setDescriptionIdfs(queryIdf.getIdf(descriptionTokens));
+				}
+			}
+		}
+
+		if (query.getWebpageUrls() != null) {
+			for (Iterator<Link> it = query.getWebpageUrls().iterator(); it.hasNext(); ) {
+				String webpageUrl = it.next().getUrl();
+				Webpage webpage = FetcherCommon.getWebpage(webpageUrl, database, fetcher, fetcherArgs);
+				List<String> webpageTokens = null;
+				List<Double> webpageIdfs = null;
+				if (webpage != null && webpage.isUsable(fetcherArgs)) {
+					webpageTokens = pp.process(webpage.getTitle() + " " + webpage.getContent());
+					if (webpageTokens.isEmpty()) {
+						webpageTokens = null;
+					} else if (queryIdf != null) {
+						webpageIdfs = queryIdf.getIdf(webpageTokens);
+					}
+				}
+				if (webpageTokens == null && removeBroken) {
+					it.remove();
 				} else {
-					queryProcessed.addPublication(null);
-					queryProcessed.addProcessedPublication(null);
+					queryProcessed.addWebpage(webpage);
+					queryProcessed.addWebpageTokens(webpageTokens);
+					queryProcessed.addWebpageIdfs(webpageIdfs);
 				}
 			}
 		}
@@ -398,10 +385,10 @@ public class Processor {
 		if (query.getDocUrls() != null) {
 			for (Iterator<Link> it = query.getDocUrls().iterator(); it.hasNext(); ) {
 				String docUrl = it.next().getUrl();
-				Webpage doc = FetcherCommon.getDoc(docUrl, database, fetcher);
+				Webpage doc = FetcherCommon.getDoc(docUrl, database, fetcher, fetcherArgs);
 				List<String> docTokens = null;
 				List<Double> docIdfs = null;
-				if (doc != null) {
+				if (doc != null && doc.isUsable(fetcherArgs)) {
 					docTokens = pp.process(doc.getTitle() + " " + doc.getContent());
 					if (docTokens.isEmpty()) {
 						docTokens = null;
@@ -419,30 +406,53 @@ public class Processor {
 			}
 		}
 
+		if (query.getPublicationIds() != null) {
+			for (PublicationIdsQuery publicationIds : query.getPublicationIds()) {
+				Publication publication = FetcherCommon.getPublication(publicationIds, database, fetcher, null, fetcherArgs);
+				if (publication != null) {
+					queryProcessed.addPublication(publication);
+					queryProcessed.addProcessedPublication(processPublication(publication, pp, queryIdf, fetcherArgs));
+				} else {
+					queryProcessed.addPublication(null);
+					queryProcessed.addProcessedPublication(null);
+				}
+			}
+		}
+
 		return queryProcessed;
 	}
 
-	private List<QueryProcessed> getProcessedQueries(List<Query> queries, QueryType type) {
-		return queries.stream().map(q -> getProcessedQuery(q, preProcessor, type)).collect(Collectors.toList());
+	public List<? extends DatabaseEntry<?>> getDatabaseEntries(List<Object> ids, FetcherArgs fetcherArgs, Class<?> clazz, boolean doc) {
+		if (ids.isEmpty()) return Collections.emptyList();
+		if (clazz.getName().equals(Webpage.class.getName()) && ids.get(0) instanceof String) {
+			if (doc) {
+				return ids.stream().map(s -> FetcherCommon.getDoc((String) s, database, fetcher, fetcherArgs)).collect(Collectors.toList());
+			} else {
+				return ids.stream().map(s -> FetcherCommon.getWebpage((String) s, database, fetcher, fetcherArgs)).collect(Collectors.toList());
+			}
+		} else if (clazz.getName().equals(Publication.class.getName()) && ids.get(0) instanceof PublicationIds) {
+			return ids.stream().map(pubId -> FetcherCommon.getPublication((PublicationIds) pubId, database, fetcher, null, fetcherArgs)).collect(Collectors.toList());
+		}
+		return Collections.emptyList();
 	}
 
-	public void makeQueryIdf(List<Query> queries, QueryType type, String outputPath, boolean noWebpagesDocs, boolean noFulltext) throws IOException {
-		List<QueryProcessed> processedQueries = getProcessedQueries(queries, type);
-
+	public int makeQueryIdf(List<Query> queries, QueryType type, String outputPath, boolean webpagesDocs, boolean fulltext, PreProcessor preProcessor, Idf queryIdf, FetcherArgs fetcherArgs) throws IOException {
 		IdfMake idfMake = new IdfMake(outputPath);
 
-		for (QueryProcessed processedQuery : processedQueries) {
+		for (Query query : queries) {
+			QueryProcessed processedQuery = getProcessedQuery(query, type, preProcessor, queryIdf, fetcherArgs);
+
 			if (processedQuery.getNameTokens() != null) {
 				idfMake.addTerms(processedQuery.getNameTokens());
-			}
-			if (processedQuery.getDescriptionTokens() != null) {
-				idfMake.addTerms(processedQuery.getDescriptionTokens());
 			}
 			for (List<String> keywordTokens : processedQuery.getKeywordsTokens()) {
 				if (keywordTokens != null) idfMake.addTerms(keywordTokens);
 			}
+			if (processedQuery.getDescriptionTokens() != null) {
+				idfMake.addTerms(processedQuery.getDescriptionTokens());
+			}
 
-			if (!noWebpagesDocs) {
+			if (webpagesDocs) {
 				for (List<String> webpageTokens : processedQuery.getWebpagesTokens()) {
 					if (webpageTokens != null) idfMake.addTerms(webpageTokens);
 				}
@@ -473,7 +483,7 @@ public class Processor {
 					idfMake.addTerms(processedPublication.getAbstractTokens());
 				}
 
-				if (!noFulltext) {
+				if (fulltext) {
 					if (processedPublication.getFulltextTokens() != null) {
 						idfMake.addTerms(processedPublication.getFulltextTokens());
 					}
@@ -483,6 +493,6 @@ public class Processor {
 			idfMake.endDocument();
 		}
 
-		idfMake.writeOutput();
+		return idfMake.writeOutput();
 	}
 }

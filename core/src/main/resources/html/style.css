@@ -185,23 +185,23 @@ article > h2 {
 	flex-basis: 100%;
 }
 article > .query {
-	flex: 1.25 1 31rem;
+	flex: 1.25 1 32rem;
 	display: flex;
 	flex-wrap: wrap;
 	align-content: flex-start;
 }
 article > .query-no-publications {
-	flex: 1 1 21rem;
+	flex: 1 1 22rem;
 	max-width: 62rem;
 }
 article > .mapping {
-	flex: 1 1 31rem;
+	flex: 1 1 32rem;
 }
 .query > .misc {
-	flex: 1 1 21rem;
+	flex: 1 1 22rem;
 }
 .query > .publications {
-	flex: 1 1 41rem;
+	flex: 1 1 42rem;
 }
 
 article h3, .pub-head {
@@ -586,15 +586,15 @@ article > h2:target .current::before {
 	color: gray;
 	content: " false";
 }
-.param > div > input[type=checkbox]:checked + label::before, .param > div > input[type=checkbox].checked + label::before {
+.param > div > input[type=checkbox].checked + label::before {
 	color: var(--good);
 	content: "\f205";
 }
-.param > div > input[type=checkbox]:checked + label::after, .param > div > input[type=checkbox].checked + label::after {
+.param > div > input[type=checkbox].checked + label::after {
 	content: " true";
 }
 
-button, input, select, textarea {
+input {
 	font-family: inherit;
 	font-size: 100%;
 	margin: 0;
@@ -707,7 +707,7 @@ button, input, select, textarea {
 	color: rgba(0,0,0,1);
 }
 .info:hover, .info-warning:hover, .warning:hover, .details:hover {
-	z-index: 2;
+	z-index: 3;
 }
 .info:hover, .info-warning:hover, .warning:hover {
 	box-shadow: 2px 2px 3px rgba(0,0,0,0.12), 1px 1px 2px rgba(0,0,0,0.24);
@@ -722,7 +722,7 @@ button, input, select, textarea {
 	box-shadow: 0 -2px 3px rgba(0,0,0,0.12), 0 -1px 2px rgba(0,0,0,0.24);
 }
 .info:focus, .info-warning:focus, .warning:focus, .details:focus {
-	z-index: 4;
+	z-index: 5;
 }
 .info:focus, .info-warning:focus, .warning:focus {
 	box-shadow: 2px 2px 0 rgba(0,0,0,0.12), 1px 1px 0 rgba(0,0,0,0.24);
@@ -795,20 +795,20 @@ button, input, select, textarea {
 	border-left: 0.5rem solid var(--red);
 }
 .info:focus ~ .info-box, .info-warning:focus ~ .info-box, .warning:focus ~ .warning-box, .info-box:focus, .warning-box:focus {
-	z-index: 2;
+	z-index: 3;
 	display: block;
 }
 .pub-info:focus > .pub-info-box, .pub-info-warning:focus > .pub-info-box, .pub-warning:focus > .pub-warning-box, .pub-info-box:focus, .pub-warning-box:focus, .details:focus ~ .details-box, .details ~ .details-box:focus {
-	z-index: 2;
+	z-index: 3;
 	visibility: visible;
 	opacity: 1;
 }
 .info:hover ~ .info-box, .info-warning:hover ~ .info-box, .warning:hover ~ .warning-box, .info-box:hover, .warning-box:hover {
-	z-index: 3;
+	z-index: 4;
 	display: block;
 }
 .pub-info:hover > .pub-info-box, .pub-info-warning:hover > .pub-info-box, .pub-warning:hover > .pub-warning-box, .pub-info-box:hover, .pub-warning-box:hover, .details:hover ~ .details-box, .details ~ .details-box:hover {
-	z-index: 3;
+	z-index: 4;
 	visibility: visible;
 	opacity: 1;
 }

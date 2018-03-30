@@ -30,22 +30,28 @@ import com.beust.jcommander.validators.PositiveInteger;
 import org.edamontology.edammap.core.edam.Branch;
 
 public class MapperArgs {
-	@Parameter(names = { "-b", "--branches" }, variableArity = true, description = "Branches to include. Space separated from list [topic, operation, data, format].")
+	public static final String BRANCHES = "branches";
+	@Parameter(names = { "--" + BRANCHES }, variableArity = true, description = "Branches to include. Space separated from list [topic, operation, data, format].")
 	private List<Branch> branches = new ArrayList<>(Arrays.asList(Branch.topic, Branch.operation));
 
-	@Parameter(names = { "-m", "--matches" }, validateWith = PositiveInteger.class, description = "Number of best matches per branch to output")
+	public static final String MATCHES = "matches";
+	@Parameter(names = { "--" + MATCHES }, validateWith = PositiveInteger.class, description = "Number of best matches per branch to output")
 	private int matches = 3;
 
-	@Parameter(names = { "--obsolete" }, arity = 1, description = "Include/exclude obsolete concepts")
+	public static final String OBSOLETE = "obsolete";
+	@Parameter(names = { "--" + OBSOLETE }, arity = 1, description = "Include/exclude obsolete concepts")
 	private boolean obsolete = false;
 
-	@Parameter(names = { "--annotations" }, arity = 1, description = "Do/don't suggest concepts already used for annotating query. Then parents and children of these concepts are not suggested either (unless --inferior-parent-child is set to true).")
-	private boolean annotations = true;
+	public static final String DONE_ANNOTATIONS = "done-annotations";
+	@Parameter(names = { "--" + DONE_ANNOTATIONS }, arity = 1, description = "Do/don't suggest concepts already used for annotating query. Then parents and children of these concepts are not suggested either (unless --inferior-parent-child is set to true).")
+	private boolean doneAnnotations = true;
 
-	@Parameter(names = { "--inferior-parents-children" }, arity = 1, description = "Include/exclude parents and children of a better matched concept in suggestion results")
+	public static final String INFERIOR_PARENTS_CHILDREN = "inferior-parents-children";
+	@Parameter(names = { "--" + INFERIOR_PARENTS_CHILDREN }, arity = 1, description = "Include/exclude parents and children of a better matched concept in suggestion results")
 	private boolean inferiorParentsChildren = false;
 
-	@Parameter(names = { "--top-level" }, arity = 1, description = "Include/exclude top level concepts (topic, operation, data, format) in suggestion results")
+	public static final String TOP_LEVEL = "top-level";
+	@Parameter(names = { "--" + TOP_LEVEL }, arity = 1, description = "Include/exclude top level concepts (topic, operation, data, format) in suggestion results")
 	private boolean topLevel = false;
 
 	@ParametersDelegate
@@ -66,51 +72,87 @@ public class MapperArgs {
 	@ParametersDelegate
 	private ScoreArgs scoreArgs = new ScoreArgs();
 
+	public List<Branch> getBranches() {
+		return branches;
+	}
+	public void setBranches(List<Branch> branches) {
+		this.branches = branches;
+	}
+
 	public int getMatches() {
 		return matches;
 	}
-
-	public List<Branch> getBranches() {
-		return branches;
+	public void setMatches(int matches) {
+		this.matches = matches;
 	}
 
 	public boolean isObsolete() {
 		return obsolete;
 	}
+	public void setObsolete(boolean obsolete) {
+		this.obsolete = obsolete;
+	}
 
-	public boolean isAnnotations() {
-		return annotations;
+	public boolean isDoneAnnotations() {
+		return doneAnnotations;
+	}
+	public void setDoneAnnotations(boolean doneAnnotations) {
+		this.doneAnnotations = doneAnnotations;
 	}
 
 	public boolean isInferiorParentsChildren() {
 		return inferiorParentsChildren;
 	}
+	public void setInferiorParentsChildren(boolean inferiorParentsChildren) {
+		this.inferiorParentsChildren = inferiorParentsChildren;
+	}
 
 	public boolean isTopLevel() {
 		return topLevel;
+	}
+	public void setTopLevel(boolean topLevel) {
+		this.topLevel = topLevel;
 	}
 
 	public AlgorithmArgs getAlgorithmArgs() {
 		return algorithmArgs;
 	}
+	public void setAlgorithmArgs(AlgorithmArgs algorithmArgs) {
+		this.algorithmArgs = algorithmArgs;
+	}
 
 	public IdfArgs getIdfArgs() {
 		return idfArgs;
+	}
+	public void setIdfArgs(IdfArgs idfArgs) {
+		this.idfArgs = idfArgs;
 	}
 
 	public MultiplierArgs getMultiplierArgs() {
 		return multiplierArgs;
 	}
+	public void setMultiplierArgs(MultiplierArgs multiplierArgs) {
+		this.multiplierArgs = multiplierArgs;
+	}
 
 	public NormaliserArgs getNormaliserArgs() {
 		return normaliserArgs;
+	}
+	public void setNormaliserArgs(NormaliserArgs normaliserArgs) {
+		this.normaliserArgs = normaliserArgs;
 	}
 
 	public WeightArgs getWeightArgs() {
 		return weightArgs;
 	}
+	public void setWeightArgs(WeightArgs weightArgs) {
+		this.weightArgs = weightArgs;
+	}
 
 	public ScoreArgs getScoreArgs() {
 		return scoreArgs;
+	}
+	public void setScoreArgs(ScoreArgs scoreArgs) {
+		this.scoreArgs = scoreArgs;
 	}
 }

@@ -25,7 +25,7 @@ import org.edamontology.edammap.core.input.InputType;
 
 import com.univocity.parsers.annotations.Parsed;
 
-public class BioConductor implements InputType {
+public class Bioconductor implements InputType {
 
 	@Parsed
 	private String name;

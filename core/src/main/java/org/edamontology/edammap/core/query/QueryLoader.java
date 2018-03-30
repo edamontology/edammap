@@ -22,7 +22,10 @@ package org.edamontology.edammap.core.query;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -32,6 +35,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,8 +45,9 @@ import org.edamontology.edammap.core.edam.EdamUri;
 import org.edamontology.edammap.core.input.Csv;
 import org.edamontology.edammap.core.input.InputType;
 import org.edamontology.edammap.core.input.Json;
+import org.edamontology.edammap.core.input.ServerInput;
 import org.edamontology.edammap.core.input.Xml;
-import org.edamontology.edammap.core.input.csv.BioConductor;
+import org.edamontology.edammap.core.input.csv.Bioconductor;
 import org.edamontology.edammap.core.input.csv.Generic;
 import org.edamontology.edammap.core.input.csv.Msutils;
 import org.edamontology.edammap.core.input.csv.SEQwiki;
@@ -52,66 +57,134 @@ import org.edamontology.edammap.core.input.json.InputOutput;
 import org.edamontology.edammap.core.input.json.Publication;
 import org.edamontology.edammap.core.input.json.ToolInput;
 import org.edamontology.edammap.core.input.xml.Biotools14;
-import org.edamontology.pubfetcher.FetcherArgs;
 import org.edamontology.pubfetcher.FetcherCommon;
+import org.edamontology.pubfetcher.PublicationIds;
+import org.edamontology.pubfetcher.Webpage;
 
 public class QueryLoader {
 
 	private static final Logger logger = LogManager.getLogger();
 
 	private static final String EDAM_PREFIX = "http://edamontology.org";
-	private static final String GENERIC = "https://localhost/";
+	private static final String GENERIC = QueryType.generic.name(); // TODO something better, like file name
 	private static final String SEQWIKI = "http://seqanswers.com/wiki/";
 	private static final String MSUTILS = "http://www.ms-utils.org/";
-	public static final String BIOTOOLS = "https://bio.tools/";
 	private static final String BIOC_VIEWS = "https://bioconductor.org/packages/release/BiocViews.html#___";
+	public static final String BIOTOOLS = "https://bio.tools/";
+	private static final String SERVER = QueryType.server.name(); // TODO maybe add version
 
 	private static final Pattern INTERNAL_SEPARATOR_BAR = Pattern.compile("\\|");
 	private static final Pattern INTERNAL_SEPARATOR_COMMA = Pattern.compile(",");
+	private static final Pattern INTERNAL_SEPARATOR_NEWLINE = Pattern.compile("\n");
 
-	private static List<Link> splitLink(String toSplit, Pattern pattern) {
-		if (toSplit == null || toSplit.trim().isEmpty()) return Collections.emptyList();
-		return pattern.splitAsStream(toSplit)
-			.map(s -> s.trim())
-			.map(s -> new Link(s, null))
+	private static Stream<String> split(String toSplit) {
+		if (toSplit == null || toSplit.trim().isEmpty()) return Stream.empty();
+		return INTERNAL_SEPARATOR_BAR.splitAsStream(toSplit);
+	}
+	private static Stream<String> split(String toSplit, Pattern pattern) {
+		if (toSplit == null || toSplit.trim().isEmpty()) return Stream.empty();
+		return pattern.splitAsStream(toSplit);
+	}
+
+	private static List<Keyword> keywords(Stream<String> keywords, String type, String url, int max) {
+		List<Keyword> keywordsList = keywords
+			.filter(Objects::nonNull)
+			.map(String::trim)
+			.filter(s -> !s.isEmpty())
+			.map(s -> new Keyword(type, s, url != null ? url + s.replaceAll(" ", "_") : null))
+			.collect(Collectors.toList());
+		if (max > 0 && keywordsList.size() > max) {
+			throw new IllegalArgumentException("Number of keywords (" + keywordsList.size() + ") is greater than maximum allowed (" + max + ")");
+		}
+		return keywordsList;
+	}
+	private static List<Keyword> keywordsCamelCase(Stream<String> keywords, String type, String url) {
+		return keywords
+			.filter(Objects::nonNull)
+			.map(String::trim)
+			.filter(s -> !s.isEmpty())
+			.map(s -> s.replaceAll("(?<=[^A-Z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|(?<=[A-Za-z])(?=[^A-Za-z])", " "))
+			.map(s -> new Keyword(type, s, url != null ? url + s.replaceAll(" ", "") : null))
 			.collect(Collectors.toList());
 	}
 
-	private static PublicationIdsQuery onePublicationId(String publicationId, String url, String type) {
-		if (publicationId == null || publicationId.trim().isEmpty()) return null;
-		PublicationIdsQuery publicationIds =
-			FetcherCommon.isPmid(publicationId) ? new PublicationIdsQuery(publicationId, null, null, url, null, null, type) : (
-			FetcherCommon.isPmcid(publicationId) ? new PublicationIdsQuery(null, publicationId, null, null, url, null, type) : (
-			FetcherCommon.isDoi(publicationId) ? new PublicationIdsQuery(null, null, publicationId, null, null, url, type) : (
-			null)));
-		if (publicationIds == null) {
-			logger.error("Unknown publication ID: {}", publicationId);
+	private static Link link(String link, String type, boolean throwException) {
+		String url = FetcherCommon.getUrl(link, throwException);
+		if (url != null) {
+			return new Link(url, type);
+		} else {
+			return null;
 		}
-		return publicationIds;
+	}
+	private static List<Link> links(Stream<String> links, String type, boolean throwException, int max) {
+		List<Link> linksList = links
+			.map(s -> link(s, type, throwException))
+			.filter(Objects::nonNull)
+			.collect(Collectors.toList());
+		if (max > 0 && linksList.size() > max) {
+			throw new IllegalArgumentException("Number of links (" + linksList.size() + ") is greater than maximum allowed (" + max + ")");
+		}
+		return linksList;
 	}
 
-	private static List<PublicationIdsQuery> splitPublicationIds(String toSplit, Pattern pattern, String url) {
-		if (toSplit == null || toSplit.trim().isEmpty()) return Collections.emptyList();
-		return pattern.splitAsStream(toSplit)
-			.map(String::trim)
-			.map(s -> onePublicationId(s, url, null))
+	private static Collection<Link> addLink(String link, String type, boolean throwException, Collection<Link> collection) {
+		Link newLink = link(link, type, throwException);
+		if (newLink != null) {
+			collection.add(newLink);
+		}
+		return collection;
+	}
+
+	private static List<Link> linksJson(Stream<org.edamontology.edammap.core.input.json.Link> links, List<String> types, boolean throwException) {
+		return links
+			.filter(l -> types.contains(l.getType().trim().toLowerCase(Locale.ROOT)))
+			.map(l -> link(l.getUrl(), l.getType(), throwException))
 			.filter(Objects::nonNull)
 			.collect(Collectors.toList());
 	}
 
-	private static List<Keyword> keywords(String keywords, String type, String url, Pattern separator) {
-		if (keywords == null) return Collections.emptyList();
-		return separator.splitAsStream(keywords)
-			.map(s -> new Keyword(type, s.trim(), url + s.trim().replaceAll(" ", "_")))
+	private static PublicationIdsQuery publicationId(String publicationId, String url, String type, boolean throwException) {
+		PublicationIds publicationIds = FetcherCommon.getPublicationIds(publicationId, url, throwException);
+		if (publicationIds != null) {
+			return new PublicationIdsQuery(publicationIds, type);
+		} else {
+			return null;
+		}
+	}
+	private static List<PublicationIdsQuery> publicationIds(Stream<String> publicationIds, String url, String type, boolean throwException, int max) {
+		List<PublicationIdsQuery> publicationIdsList = publicationIds
+			.map(s -> publicationId(s, url, type, throwException))
+			.filter(Objects::nonNull)
 			.collect(Collectors.toList());
+		if (max > 0 && publicationIdsList.size() > max) {
+			throw new IllegalArgumentException("Number of publication IDs (" + publicationIdsList.size() + ") is greater than maximum allowed (" + max + ")");
+		}
+		return publicationIdsList;
 	}
 
-	private static List<Keyword> keywordsCamelCase(String keywords, String type, String url, Pattern separator) {
-		if (keywords == null) return Collections.emptyList();
-		return separator.splitAsStream(keywords)
-			.map(s -> s.replaceAll("(?<=[^A-Z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|(?<=[A-Za-z])(?=[^A-Za-z])", " "))
-			.map(s -> new Keyword(type, s.trim(), url + s.trim().replaceAll(" ", "")))
-			.collect(Collectors.toList());
+	private static Collection<PublicationIdsQuery> addPublicationId(String publicationId, String url, String type, boolean throwException, Collection<PublicationIdsQuery> collection) {
+		PublicationIdsQuery newPublicationId = publicationId(publicationId, url, type, throwException);
+		if (newPublicationId != null) {
+			collection.add(newPublicationId);
+		}
+		return collection;
+	}
+
+	private static PublicationIdsQuery publicationId(String pmid, String pmcid, String doi, String url, String type, boolean logEmpty) {
+		PublicationIds publicationIds = FetcherCommon.getPublicationIds(pmid, pmcid, doi, url, logEmpty);
+		if (publicationIds != null) {
+			return new PublicationIdsQuery(publicationIds, type);
+		} else {
+			return null;
+		}
+	}
+
+	private static Collection<PublicationIdsQuery> addPublicationId(String pmid, String pmcid, String doi, String url, String type, boolean logEmpty, Collection<PublicationIdsQuery> collection) {
+		PublicationIdsQuery newPublicationId = publicationId(pmid, pmcid, doi, url, type, logEmpty);
+		if (newPublicationId != null) {
+			collection.add(newPublicationId);
+		}
+		return collection;
 	}
 
 	private static boolean checkEdamUri(EdamUri edamUri, Map<EdamUri, Concept> concepts) {
@@ -121,69 +194,61 @@ public class QueryLoader {
 		return true;
 	}
 
-	private static List<EdamUri> edamUris(String annotations, Map<EdamUri, Concept> concepts) {
-		if (annotations == null) return Collections.emptyList();
-		return INTERNAL_SEPARATOR_BAR.splitAsStream(annotations)
-			.filter(s -> !s.trim().isEmpty() && !s.trim().equalsIgnoreCase("NA"))
-			.map(s -> (s.contains("/") ? s.trim() : EDAM_PREFIX + "/" + s.trim()))
+	private static Set<EdamUri> edamUris(Stream<String> annotations, Map<EdamUri, Concept> concepts) {
+		return annotations
+			.filter(Objects::nonNull)
+			.map(String::trim)
+			.filter(s -> !s.isEmpty())
+			.map(s -> (s.contains("/") ? s : EDAM_PREFIX + "/" + s))
 			.map(s -> new EdamUri(s.toLowerCase(Locale.ROOT), EDAM_PREFIX))
 			.filter(e -> checkEdamUri(e, concepts))
-			.collect(Collectors.toList());
+			.collect(Collectors.toCollection(LinkedHashSet::new));
 	}
 
-	private static List<EdamUri> edamUris(List<String> annotations, Map<EdamUri, Concept> concepts) {
-		if (annotations == null) return Collections.emptyList();
-		return annotations.stream()
-			.map(s -> new EdamUri(s.trim().toLowerCase(Locale.ROOT), EDAM_PREFIX))
-			.filter(e -> checkEdamUri(e, concepts))
-			.collect(Collectors.toList());
-	}
-
-	private static List<EdamUri> edamUrisJson(List<Edam> annotations, Map<EdamUri, Concept> concepts) {
-		if (annotations == null) return Collections.emptyList();
-		return annotations.stream()
-			.map(e -> getEdamUri(e, concepts))
-			.filter(Objects::nonNull)
-			.collect(Collectors.toList());
-	}
-
-	private static EdamUri getEdamUri(Edam edam, Map<EdamUri, Concept> concepts) {
-		if (edam.getUri() != null && !edam.getUri().isEmpty()) {
+	private static EdamUri edamUriJson(Edam edam, Map<EdamUri, Concept> concepts) {
+		if (edam.getUri() != null && !edam.getUri().trim().isEmpty()) {
 			EdamUri edamUri = new EdamUri(edam.getUri().trim().toLowerCase(Locale.ROOT), EDAM_PREFIX);
 			if (!checkEdamUri(edamUri, concepts)) return null;
 			return edamUri;
 		}
-		if (edam.getTerm() != null && !edam.getTerm().isEmpty() && concepts != null) {
-			for (Entry<EdamUri, Concept> e : concepts.entrySet()) {
-				if (e.getValue().getLabel().equals(edam.getTerm())) return e.getKey();
+		if (edam.getTerm() != null && !edam.getTerm().trim().isEmpty()) {
+			String term = edam.getTerm().trim();
+			if (concepts != null) {
+				for (Entry<EdamUri, Concept> e : concepts.entrySet()) {
+					if (e.getValue().getLabel().equals(term)) return e.getKey();
+				}
+				for (Entry<EdamUri, Concept> e : concepts.entrySet()) {
+					if (e.getValue().getExactSynonyms().contains(term)) return e.getKey();
+				}
+				for (Entry<EdamUri, Concept> e : concepts.entrySet()) {
+					if (e.getValue().getNarrowSynonyms().contains(term)) return e.getKey();
+					if (e.getValue().getBroadSynonyms().contains(term)) return e.getKey();
+				}
 			}
-			for (Entry<EdamUri, Concept> e : concepts.entrySet()) {
-				if (e.getValue().getExactSynonyms().contains(edam.getTerm())) return e.getKey();
-			}
-			for (Entry<EdamUri, Concept> e : concepts.entrySet()) {
-				if (e.getValue().getNarrowSynonyms().contains(edam.getTerm())) return e.getKey();
-				if (e.getValue().getBroadSynonyms().contains(edam.getTerm())) return e.getKey();
-			}
+			logger.warn("Can't find EDAM URI for term {} in JSON", term);
+			return null;
+		} else {
+			logger.warn("An EDAM object is empty in JSON");
+			return null;
 		}
-		return null;
+	}
+	private static Set<EdamUri> edamUrisJson(Stream<Edam> annotations, Map<EdamUri, Concept> concepts) {
+		return annotations
+			.map(e -> edamUriJson(e, concepts))
+			.filter(Objects::nonNull)
+			.collect(Collectors.toCollection(LinkedHashSet::new));
 	}
 
 	private static Query getGeneric(Generic generic, Map<EdamUri, Concept> concepts) {
-		List<Keyword> keywords = new ArrayList<>();
-		keywords.addAll(keywords(generic.getKeywords(), "Keywords", null, INTERNAL_SEPARATOR_BAR));
-
-		Set<EdamUri> annotations = new LinkedHashSet<>();
-		annotations.addAll(edamUris(generic.getAnnotations(), concepts));
-
 		return new Query(
 			generic.getId() != null ? generic.getId().trim() : null,
 			generic.getName().trim(),
-			splitLink(generic.getWebpageUrls(), INTERNAL_SEPARATOR_BAR),
+			keywords(split(generic.getKeywords()), "Keywords", null, 0),
 			generic.getDescription() != null ? generic.getDescription().trim() : null,
-			keywords,
-			splitPublicationIds(generic.getPublicationIds(), INTERNAL_SEPARATOR_BAR, GENERIC),
-			splitLink(generic.getDocUrls(), INTERNAL_SEPARATOR_BAR),
-			annotations);
+			links(split(generic.getWebpageUrls()), null, false, 0),
+			links(split(generic.getDocUrls()), null, false, 0),
+			publicationIds(split(generic.getPublicationIds()), GENERIC, null, false, 0),
+			edamUris(split(generic.getAnnotations()), concepts));
 	}
 
 	private static EdamUri getSEQwikiAnnotation(Keyword keyword, Map<EdamUri, Concept> concepts) {
@@ -197,15 +262,14 @@ public class QueryLoader {
 		}
 		return null;
 	}
-
 	private static Query getSEQwiki(SEQwiki SEQwiki, Map<EdamUri, Concept> concepts) {
-		List<Link> webpageUrls = new ArrayList<>();
-		webpageUrls.add(new Link(SEQWIKI + SEQwiki.getName().trim().replace(" ", "_"), null));
-		webpageUrls.addAll(splitLink(SEQwiki.getWebpages(), INTERNAL_SEPARATOR_COMMA));
-
 		List<Keyword> keywords = new ArrayList<>();
-		keywords.addAll(keywords(SEQwiki.getDomains(), "Domain", SEQWIKI, INTERNAL_SEPARATOR_COMMA));
-		keywords.addAll(keywords(SEQwiki.getMethods(), "Method", SEQWIKI, INTERNAL_SEPARATOR_COMMA));
+		keywords.addAll(keywords(split(SEQwiki.getDomains(), INTERNAL_SEPARATOR_COMMA), "Domain", SEQWIKI, 0));
+		keywords.addAll(keywords(split(SEQwiki.getMethods(), INTERNAL_SEPARATOR_COMMA), "Method", SEQWIKI, 0));
+
+		List<Link> webpageUrls = new ArrayList<>();
+		addLink(SEQWIKI + SEQwiki.getName().trim().replace(" ", "_"), null, false, webpageUrls);
+		webpageUrls.addAll(links(split(SEQwiki.getWebpages(), INTERNAL_SEPARATOR_COMMA), null, false, 0));
 
 		Set<EdamUri> annotations = new LinkedHashSet<>();
 		for (Keyword keyword : keywords) {
@@ -213,224 +277,155 @@ public class QueryLoader {
 			if (annotation != null) annotations.add(annotation);
 		}
 
-		return new Query(null, SEQwiki.getName().trim(), webpageUrls, SEQwiki.getSummary().trim(), keywords,
-			splitPublicationIds(SEQwiki.getPublications(), INTERNAL_SEPARATOR_COMMA, SEQWIKI),
-			splitLink(SEQwiki.getDocs(), INTERNAL_SEPARATOR_COMMA),
+		return new Query(
+			null,
+			SEQwiki.getName().trim(),
+			keywords,
+			SEQwiki.getSummary().trim(),
+			webpageUrls,
+			links(split(SEQwiki.getDocs(), INTERNAL_SEPARATOR_COMMA), null, false, 0),
+			publicationIds(split(SEQwiki.getPublications(), INTERNAL_SEPARATOR_COMMA), SEQWIKI, null, false, 0),
 			annotations);
-	}
-
-	private static List<Query> getSEQwikiTags(SEQwiki SEQwiki, Map<EdamUri, Concept> concepts) {
-		List<Query> queries = new ArrayList<>();
-
-		queries.addAll(INTERNAL_SEPARATOR_COMMA.splitAsStream(SEQwiki.getDomains())
-			.map(s -> {
-				List<Keyword> keywords = new ArrayList<>();
-				Keyword keyword = new Keyword("Domain", s.trim(), SEQWIKI);
-				keywords.add(keyword);
-				Set<EdamUri> annotations = new LinkedHashSet<>();
-				EdamUri annotation = getSEQwikiAnnotation(keyword, concepts);
-				if (annotation != null) annotations.add(annotation);
-				return new Query(null, null, null, null, keywords, null, null, annotations);
-			}).collect(Collectors.toList()));
-		queries.addAll(INTERNAL_SEPARATOR_COMMA.splitAsStream(SEQwiki.getMethods())
-			.map(s -> {
-				List<Keyword> keywords = new ArrayList<>();
-				Keyword keyword = new Keyword("Method", s.trim(), SEQWIKI);
-				keywords.add(keyword);
-				Set<EdamUri> annotations = new LinkedHashSet<>();
-				EdamUri annotation = getSEQwikiAnnotation(keyword, concepts);
-				if (annotation != null) annotations.add(annotation);
-				return new Query(null, null, null, null, keywords, null, null, annotations);
-			}).collect(Collectors.toList()));
-
-		return queries;
-	}
-
-	private static List<Query> getSEQwikiTool(SEQwiki SEQwiki, Map<EdamUri, Concept> concepts) {
-		List<Query> queries = new ArrayList<>();
-
-		List<Link> webpageUrls = new ArrayList<>();
-		webpageUrls.add(new Link(SEQWIKI + SEQwiki.getName().trim().replace(" ", "_"), null));
-
-		queries.addAll(INTERNAL_SEPARATOR_COMMA.splitAsStream(SEQwiki.getDomains())
-			.map(s -> {
-				List<Keyword> keywords = new ArrayList<>();
-				Keyword keyword = new Keyword("Domain", s.trim(), SEQWIKI);
-				keywords.add(keyword);
-				Set<EdamUri> annotations = new LinkedHashSet<>();
-				EdamUri annotation = getSEQwikiAnnotation(keyword, concepts);
-				if (annotation != null) annotations.add(annotation);
-				return new Query(null, SEQwiki.getName().trim(), webpageUrls, null, keywords, null, null, annotations);
-			}).collect(Collectors.toList()));
-		queries.addAll(INTERNAL_SEPARATOR_COMMA.splitAsStream(SEQwiki.getMethods())
-			.map(s -> {
-				List<Keyword> keywords = new ArrayList<>();
-				Keyword keyword = new Keyword("Method", s.trim(), SEQWIKI);
-				keywords.add(keyword);
-				Set<EdamUri> annotations = new LinkedHashSet<>();
-				EdamUri annotation = getSEQwikiAnnotation(keyword, concepts);
-				if (annotation != null) annotations.add(annotation);
-				return new Query(null, SEQwiki.getName().trim(), webpageUrls, null, keywords, null, null, annotations);
-			}).collect(Collectors.toList()));
-
-		return queries;
 	}
 
 	private static Query getMsutils(Msutils msutils, Map<EdamUri, Concept> concepts) {
 		List<Link> webpageUrls = new ArrayList<>();
-		if (msutils.getWeblink() != null && !msutils.getWeblink().trim().isEmpty()) {
-			webpageUrls.add(new Link(msutils.getWeblink().trim(), "Weblink"));
+		addLink(msutils.getWeblink(), "Weblink", false, webpageUrls);
+		addLink(msutils.getLink(), "Link", false, webpageUrls);
+
+		Set<EdamUri> annotations = new LinkedHashSet<>();
+		annotations.addAll(edamUris(split(msutils.getTopic()), concepts));
+		annotations.addAll(edamUris(split(msutils.getOperation()), concepts));
+		annotations.addAll(edamUris(split(msutils.getFormat_in()), concepts));
+		annotations.addAll(edamUris(split(msutils.getFormat_out()), concepts));
+
+		return new Query(
+			null,
+			msutils.getName().trim(),
+			null,
+			msutils.getDescription().trim(),
+			webpageUrls,
+			null,
+			publicationIds(split(msutils.getPaper()), MSUTILS, null, false, 0),
+			annotations);
+	}
+
+	private static Query getBioconductor(Bioconductor bioconductor, Map<EdamUri, Concept> concepts) {
+		List<Link> webpageUrls = null;
+		if (bioconductor.getReposFullUrl() != null && !bioconductor.getReposFullUrl().trim().isEmpty()) {
+			webpageUrls = new ArrayList<>();
+			addLink(bioconductor.getReposFullUrl(), null, false, webpageUrls);
 		}
-		if (msutils.getLink() != null && !msutils.getLink().trim().isEmpty()) {
-			webpageUrls.add(new Link(msutils.getLink().trim(), "Link"));
+
+		List<Link> docUrls = null;
+		if (bioconductor.getReposFullUrl() != null && !bioconductor.getReposFullUrl().trim().isEmpty()) {
+			docUrls = new ArrayList<>();
+			addLink(bioconductor.getReposFullUrl().replaceFirst("/bioc/html/(.+)\\.html", "/bioc/manuals/$1/man/$1.pdf"), null, false, webpageUrls);
+			addLink(bioconductor.getReposFullUrl().replaceFirst("/bioc/html/(.+)\\.html", "/bioc/vignettes/$1/inst/doc/$1.pdf"), null, false, webpageUrls);
+			addLink(bioconductor.getReposFullUrl().replaceFirst("/bioc/html/(.+)\\.html", "/bioc/vignettes/$1/inst/doc/$1.html"), null, false, webpageUrls);
+			addLink(bioconductor.getReposFullUrl().replaceFirst("/bioc/html/(.+)\\.html", "/bioc/vignettes/$1/inst/doc/$1-vignette.pdf"), null, false, webpageUrls);
 		}
 
 		Set<EdamUri> annotations = new LinkedHashSet<>();
-		annotations.addAll(edamUris(msutils.getTopic(), concepts));
-		annotations.addAll(edamUris(msutils.getOperation(), concepts));
-		annotations.addAll(edamUris(msutils.getFormat_in(), concepts));
-		annotations.addAll(edamUris(msutils.getFormat_out(), concepts));
+		annotations.addAll(edamUris(split(bioconductor.getTopic_URI()), concepts));
+		annotations.addAll(edamUris(split(bioconductor.getOperation_URI()), concepts));
 
-		return new Query(null, msutils.getName().trim(), webpageUrls, msutils.getDescription().trim(), null,
-			splitPublicationIds(msutils.getPaper(), INTERNAL_SEPARATOR_BAR, MSUTILS), null, annotations);
+		return new Query(
+			null,
+			bioconductor.getName().trim() + " : " + bioconductor.getTitle().trim().replaceAll("\n", " "),
+			keywordsCamelCase(split(bioconductor.getBiocViews()), "biocViews", BIOC_VIEWS),
+			bioconductor.getDescription().trim(),
+			webpageUrls,
+			docUrls,
+			null,
+			annotations);
 	}
 
 	private static Query getBiotools14(Biotools14 biotools, Map<EdamUri, Concept> concepts) {
 		List<Link> webpageUrls = new ArrayList<>();
-		webpageUrls.add(new Link(biotools.getHomepage().trim(), "Homepage"));
-		webpageUrls.addAll(biotools.getMirrors().stream().map(s -> new Link(s.trim(), "Mirror")).collect(Collectors.toList()));
-
-		List<PublicationIdsQuery> publicationIds = new ArrayList<>();
-		if (biotools.getPublicationsPrimaryID() != null) {
-			publicationIds.add(onePublicationId(biotools.getPublicationsPrimaryID().trim(), BIOTOOLS, "Primary"));
-		}
-		publicationIds.addAll(biotools.getPublicationsOtherIDs().stream().map(s -> onePublicationId(s.trim(), BIOTOOLS, "Other")).collect(Collectors.toList()));
+		addLink(biotools.getHomepage(), "Homepage", false, webpageUrls);
+		webpageUrls.addAll(links(biotools.getMirrors().stream(), "Mirror", false, 0));
 
 		List<Link> docUrls = new ArrayList<>();
-		if (biotools.getDocsHome() != null) {
-			docUrls.add(new Link(biotools.getDocsHome().trim(), "Home"));
-		}
-		if (biotools.getDocsGithub() != null) {
-			docUrls.add(new Link(biotools.getDocsGithub().trim(), "Github"));
-		}
+		addLink(biotools.getDocsHome(), "Home", false, docUrls);
+		addLink(biotools.getDocsGithub(), "Github", false, docUrls);
+
+		List<PublicationIdsQuery> publicationIds = new ArrayList<>();
+		addPublicationId(biotools.getPublicationsPrimaryID(), BIOTOOLS, "Primary", false, publicationIds);
+		publicationIds.addAll(publicationIds(biotools.getPublicationsOtherIDs().stream(), BIOTOOLS, "Other", false, 0));
 
 		Set<EdamUri> annotations = new LinkedHashSet<>();
-		annotations.addAll(edamUris(biotools.getTopics(), concepts));
-		annotations.addAll(edamUris(biotools.getFunctionNames(), concepts));
-		annotations.addAll(edamUris(biotools.getDataTypes(), concepts));
-		annotations.addAll(edamUris(biotools.getDataFormats(), concepts));
+		annotations.addAll(edamUris(biotools.getTopics().stream(), concepts));
+		annotations.addAll(edamUris(biotools.getFunctionNames().stream(), concepts));
+		annotations.addAll(edamUris(biotools.getDataTypes().stream(), concepts));
+		annotations.addAll(edamUris(biotools.getDataFormats().stream(), concepts));
 
-		return new Query(null, biotools.getName().trim(), webpageUrls, biotools.getDescription().trim(), null,
-			publicationIds, docUrls, annotations);
+		return new Query(
+			null,
+			biotools.getName().trim(),
+			null,
+			biotools.getDescription().trim(),
+			webpageUrls,
+			docUrls,
+			publicationIds,
+			annotations);
 	}
 
 	private static Query getBiotools(ToolInput tool, Map<EdamUri, Concept> concepts) {
 		List<Link> webpageUrls = new ArrayList<>();
-		webpageUrls.add(new Link(tool.getHomepage().trim(), "Homepage"));
-		webpageUrls.addAll(tool.getLink().stream()
-			.filter(s -> s.getType().trim().equalsIgnoreCase("Browser")
-				|| s.getType().trim().equalsIgnoreCase("Mirror")
-				|| s.getType().trim().equalsIgnoreCase("Repository"))
-			.map(s -> new Link(s.getUrl().trim(), s.getType().trim())).collect(Collectors.toList()));
+		addLink(tool.getHomepage(), "Homepage", false, webpageUrls);
+		webpageUrls.addAll(linksJson(tool.getLink().stream(),
+			Arrays.asList("mirror", "repository", "browser"), false));
+
+		List<Link> docUrls = linksJson(tool.getDocumentation().stream(),
+			Arrays.asList("general", "manual", "api documentation", "training material"), false);
 
 		List<PublicationIdsQuery> publicationIds = new ArrayList<>();
 		for (Publication publication : tool.getPublication()) {
-			String pmid = publication.getPmid();
-			if (pmid == null || pmid.trim().isEmpty()) pmid = null;
-			else if (!FetcherCommon.isPmid(pmid)) {
-				logger.error("Unknown PMID: {}", pmid);
-				pmid = null;
-			}
-
-			String pmcid = publication.getPmcid();
-			if (pmcid == null || pmcid.trim().isEmpty()) pmcid = null;
-			else if (!FetcherCommon.isPmcid(pmcid)) {
-				logger.error("Unknown PMCID: {}", pmcid);
-				pmcid = null;
-			}
-
-			String doi = publication.getDoi();
-			if (doi == null || doi.trim().isEmpty()) doi = null;
-			else if (!FetcherCommon.isDoi(doi)) {
-				logger.error("Unknown DOI: {}", doi);
-				doi = null;
-			}
-
-			String type = publication.getType() != null ? publication.getType().trim() : null;
-			publicationIds.add(new PublicationIdsQuery(pmid, pmcid, doi,
-				pmid == null ? null : BIOTOOLS, pmcid == null ? null : BIOTOOLS, doi == null ? null : BIOTOOLS, type));
+			addPublicationId(publication.getPmid(), publication.getPmcid(), publication.getDoi(), BIOTOOLS, publication.getType(), false, publicationIds);
 		}
 
-		List<Link> docUrls = tool.getDocumentation().stream()
-			.filter(s -> s.getType().trim().equalsIgnoreCase("API documentation")
-				|| s.getType().trim().equalsIgnoreCase("General")
-				|| s.getType().trim().equalsIgnoreCase("Manual")
-				|| s.getType().trim().equalsIgnoreCase("Training material"))
-			.map(s -> new Link(s.getUrl().trim(), s.getType().trim())).collect(Collectors.toList());
-
 		Set<EdamUri> annotations = new LinkedHashSet<>();
-		annotations.addAll(edamUrisJson(tool.getTopic(), concepts));
+		annotations.addAll(edamUrisJson(tool.getTopic().stream(), concepts));
 		for (Function function : tool.getFunction()) {
-			annotations.addAll(edamUrisJson(function.getOperation(), concepts));
+			annotations.addAll(edamUrisJson(function.getOperation().stream(), concepts));
 			for (InputOutput input : function.getInput()) {
-				annotations.addAll(edamUrisJson(Collections.singletonList(input.getData()), concepts));
+				annotations.addAll(edamUrisJson(Collections.singletonList(input.getData()).stream(), concepts));
 				if (input.getFormat() != null) {
-					annotations.addAll(edamUrisJson(input.getFormat(), concepts));
+					annotations.addAll(edamUrisJson(input.getFormat().stream(), concepts));
 				}
 			}
 			for (InputOutput output : function.getOutput()) {
-				annotations.addAll(edamUrisJson(Collections.singletonList(output.getData()), concepts));
+				annotations.addAll(edamUrisJson(Collections.singletonList(output.getData()).stream(), concepts));
 				if (output.getFormat() != null) {
-					annotations.addAll(edamUrisJson(output.getFormat(), concepts));
+					annotations.addAll(edamUrisJson(output.getFormat().stream(), concepts));
 				}
 			}
 		}
 
-		return new Query(tool.getId().trim(), tool.getName().trim(), webpageUrls, tool.getDescription().trim(), null,
-			publicationIds, docUrls, annotations);
-	}
-
-	private static Query getBioConductor(BioConductor bioConductor, Map<EdamUri, Concept> concepts) {
-		String name = bioConductor.getName().trim() + " : " + bioConductor.getTitle().trim().replaceAll("\n", " ");
-
-		List<Link> webpageUrls = null;
-		if (bioConductor.getReposFullUrl() != null && !bioConductor.getReposFullUrl().trim().isEmpty()) {
-			webpageUrls = new ArrayList<>();
-			webpageUrls.add(new Link(bioConductor.getReposFullUrl().trim(), null));
-		}
-
-		List<Link> docUrls = null;
-		if (bioConductor.getReposFullUrl() != null && !bioConductor.getReposFullUrl().trim().isEmpty()) {
-			docUrls = new ArrayList<>();
-			docUrls.add(new Link(bioConductor.getReposFullUrl().replaceFirst("/bioc/html/(.+)\\.html", "/bioc/manuals/$1/man/$1.pdf").trim(), null));
-			docUrls.add(new Link(bioConductor.getReposFullUrl().replaceFirst("/bioc/html/(.+)\\.html", "/bioc/vignettes/$1/inst/doc/$1.pdf").trim(), null));
-			docUrls.add(new Link(bioConductor.getReposFullUrl().replaceFirst("/bioc/html/(.+)\\.html", "/bioc/vignettes/$1/inst/doc/$1.html").trim(), null));
-			docUrls.add(new Link(bioConductor.getReposFullUrl().replaceFirst("/bioc/html/(.+)\\.html", "/bioc/vignettes/$1/inst/doc/$1-vignette.pdf").trim(), null));
-		}
-
-		Set<EdamUri> annotations = new LinkedHashSet<>();
-		annotations.addAll(edamUris(bioConductor.getTopic_URI(), concepts));
-		annotations.addAll(edamUris(bioConductor.getOperation_URI(), concepts));
-
 		return new Query(
+			tool.getId().trim(),
+			tool.getName().trim(),
 			null,
-			name,
+			tool.getDescription().trim(),
 			webpageUrls,
-			bioConductor.getDescription().trim(),
-			keywordsCamelCase(bioConductor.getBiocViews(), "biocViews", BIOC_VIEWS, INTERNAL_SEPARATOR_BAR),
-			null,
 			docUrls,
+			publicationIds,
 			annotations);
 	}
 
-	public static List<Query> get(String queryPath, QueryType type, Map<EdamUri, Concept> concepts, FetcherArgs fetcherArgs) throws IOException, ParseException {
+	public static List<Query> get(String queryPath, QueryType type, Map<EdamUri, Concept> concepts, int timeout, String userAgent) throws IOException, ParseException {
+		if (type == QueryType.server) {
+			throw new IllegalArgumentException("Query of type \"" + QueryType.server.name() + "\" is not loadable from path, but has to be provided");
+		}
+
 		List<? extends InputType> inputs;
 		if (type == QueryType.biotools) {
-			inputs = Json.load(queryPath, type, fetcherArgs);
+			inputs = Json.load(queryPath, type, timeout, userAgent);
 		} else if (type == QueryType.biotools14) {
-			inputs = Xml.load(queryPath, type, fetcherArgs);
+			inputs = Xml.load(queryPath, type, timeout, userAgent);
 		} else {
-			inputs = Csv.load(queryPath, type, fetcherArgs);
+			inputs = Csv.load(queryPath, type, timeout, userAgent);
 		}
 
 		Set<Query> queries = new LinkedHashSet<>();
@@ -439,20 +434,56 @@ public class QueryLoader {
 			switch (type) {
 				case generic: queries.add(getGeneric((Generic) input, concepts)); break;
 				case SEQwiki: queries.add(getSEQwiki((SEQwiki) input, concepts)); break;
-				case SEQwikiTags: queries.addAll(getSEQwikiTags((SEQwiki) input, concepts)); break;
-				case SEQwikiTool: queries.addAll(getSEQwikiTool((SEQwiki) input, concepts)); break;
 				case msutils: queries.add(getMsutils((Msutils) input, concepts)); break;
+				case Bioconductor: queries.add(getBioconductor((Bioconductor) input, concepts)); break;
 				case biotools14: queries.add(getBiotools14((Biotools14) input, concepts)); break;
 				case biotools: queries.add(getBiotools((ToolInput) input, concepts)); break;
-				case BioConductor: queries.add(getBioConductor((BioConductor) input, concepts)); break;
+				case server: break;
 			}
 		}
 
 		return new ArrayList<>(queries);
 	}
 
+	public static List<Query> get(String queryPath, QueryType type, int timeout, String userAgent) throws IOException, ParseException {
+		return get(queryPath, type, null, timeout, userAgent);
+	}
 
-	public static List<Query> get(String queryPath, QueryType type, FetcherArgs fetcherArgs) throws IOException, ParseException {
-		return get(queryPath, type, null, fetcherArgs);
+	private static Stream<String> parseServer(String string) {
+		if (string == null || string.trim().isEmpty()) return Stream.empty();
+		return INTERNAL_SEPARATOR_NEWLINE.splitAsStream(string)
+			.map(String::trim)
+			.filter(s -> !s.isEmpty() && s.charAt(0) != '#');
+	}
+
+	public static Query fromServer(ServerInput input, Map<EdamUri, Concept> concepts, int maxKeywords, int maxLinks, int maxPublicationIds) throws ParseException {
+		input.check(0);
+		return new Query(
+			input.getId() != null ? input.getId().trim() : null,
+			input.getName().trim(),
+			keywords(parseServer(input.getKeywords()), "Keywords", null, maxKeywords),
+			input.getDescription() != null ? input.getDescription().trim() : null,
+			links(parseServer(input.getWebpageUrls()), null, true, maxLinks),
+			links(parseServer(input.getDocUrls()), null, true, maxLinks),
+			publicationIds(parseServer(input.getPublicationIds()), SERVER, null, true, maxPublicationIds),
+			edamUris(parseServer(input.getAnnotations()), concepts));
+	}
+
+	public static List<Object> fromServerEntry(String input, Class<?> clazz, int max) {
+		List<Object> list = Collections.emptyList();
+		if (clazz.getName().equals(Webpage.class.getName())) {
+			list = parseServer(input).map(s -> FetcherCommon.getUrl(s, true)).collect(Collectors.toList());
+		} else if (clazz.getName().equals(org.edamontology.pubfetcher.Publication.class.getName())) {
+			list = parseServer(input).map(s -> FetcherCommon.getPublicationIds(s, SERVER, true)).collect(Collectors.toList());
+		}
+		if (max > 0 && list.size() > max) {
+			throw new IllegalArgumentException("Number of entries (" + list.size() + ") is greater than maximum allowed (" + max + ")");
+		}
+		return list;
+	}
+
+	public static Map<EdamUri, Concept> fromServerEdam(String input, Map<EdamUri, Concept> concepts) {
+		return edamUris(parseServer(input), concepts).stream()
+			.collect(Collectors.toMap(e -> e, e -> concepts.get(e), (k, v) -> { throw new AssertionError(); }, LinkedHashMap::new));
 	}
 }

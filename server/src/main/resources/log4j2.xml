@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn" dest="err" name="EDAMmap-Server">
+  <Appenders>
+    <Console name="Console" target="SYSTEM_ERR">
+      <PatternLayout pattern="%d{DEFAULT} %style{%highlight{%-5p}}{bright} %style{%enc{%m{nolookups}}{CRLF}}{bright} %style{%c{-2}}{blue} %style{%t}{magenta}%n%notEmpty{%style{%xEx}{bright,red}}%ex{0}"/>
+    </Console>
+    <RollingFile name="Log" fileName="${main:0:-.}/edammap.log" filePattern="${main:0:-invalid.log}/$${date:yyyy-MM}/edammap-%d{yyyy-MM-dd}.log" createOnDemand="true">
+      <PatternLayout pattern="%d{DEFAULT} %-5p %enc{%m{nolookups}}{CRLF} @%c{-2} [%t]%n%notEmpty{%xEx}%ex{0}"/>
+      <Policies>
+        <TimeBasedTriggeringPolicy/>
+      </Policies>
+      <DefaultRolloverStrategy fileIndex="nomax"/>
+    </RollingFile>
+  </Appenders>
+  <Loggers>
+    <Root level="info">
+      <AppenderRef ref="Console" level="info"/>
+    </Root>
+    <Logger name="org.edamontology" level="debug">
+      <AppenderRef ref="Log"/>
+    </Logger>
+  </Loggers>
+</Configuration>

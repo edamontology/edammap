@@ -30,27 +30,27 @@ public class Query {
 
 	private final String name;
 
-	private final List<Link> webpageUrls;
+	private final List<Keyword> keywords;
 
 	private final String description;
 
-	private final List<Keyword> keywords;
-
-	private final List<PublicationIdsQuery> publicationIds;
+	private final List<Link> webpageUrls;
 
 	private final List<Link> docUrls;
 
+	private final List<PublicationIdsQuery> publicationIds;
+
 	private final Set<EdamUri> annotations;
 
-	public Query(String id, String name, List<Link> webpageUrls, String description, List<Keyword> keywords,
-			List<PublicationIdsQuery> publicationIds, List<Link> docUrls, Set<EdamUri> annotations) {
+	public Query(String id, String name, List<Keyword> keywords, String description,
+			List<Link> webpageUrls, List<Link> docUrls, List<PublicationIdsQuery> publicationIds, Set<EdamUri> annotations) {
 		this.id = id;
 		this.name = name;
-		this.webpageUrls = webpageUrls;
-		this.description = description;
 		this.keywords = keywords;
-		this.publicationIds = publicationIds;
+		this.description = description;
+		this.webpageUrls = webpageUrls;
 		this.docUrls = docUrls;
+		this.publicationIds = publicationIds;
 		this.annotations = annotations;
 	}
 
@@ -62,24 +62,24 @@ public class Query {
 		return name;
 	}
 
-	public List<Link> getWebpageUrls() {
-		return webpageUrls;
+	public List<Keyword> getKeywords() {
+		return keywords;
 	}
 
 	public String getDescription() {
 		return description;
 	}
 
-	public List<Keyword> getKeywords() {
-		return keywords;
-	}
-
-	public List<PublicationIdsQuery> getPublicationIds() {
-		return publicationIds;
+	public List<Link> getWebpageUrls() {
+		return webpageUrls;
 	}
 
 	public List<Link> getDocUrls() {
 		return docUrls;
+	}
+
+	public List<PublicationIdsQuery> getPublicationIds() {
+		return publicationIds;
 	}
 
 	public Set<EdamUri> getAnnotations() {

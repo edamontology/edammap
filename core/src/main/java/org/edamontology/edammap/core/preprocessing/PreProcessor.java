@@ -26,6 +26,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
@@ -123,7 +124,7 @@ public class PreProcessor {
 	public PreProcessor(PreProcessorArgs args) throws IOException {
 		this.numbers = args.isNumbers();
 
-		this.stopwords = (args.getStopwords() != Stopwords.off ? getStopwords(args) : null);
+		this.stopwords = getStopwords(args.getStopwords());
 
 		this.stemmer = (args.isStemming() ? new Stemmer() : null);
 
@@ -140,8 +141,19 @@ public class PreProcessor {
 		this.minLength = args.getMinLength();
 	}
 
-	public static List<String> getStopwords(PreProcessorArgs args) throws IOException {
-		String resourceName = "stopwords/" + args.getStopwords() + ".txt";
+	public PreProcessor(boolean stemming) throws IOException {
+		this.numbers = true;
+
+		this.stopwords = getStopwords(Stopwords.off);
+
+		this.stemmer = (stemming ? new Stemmer() : null);
+
+		this.minLength = 1;
+	}
+
+	public static List<String> getStopwords(Stopwords stopwords) throws IOException {
+		if (stopwords == Stopwords.off) return Collections.emptyList();
+		String resourceName = "stopwords/" + stopwords + ".txt";
 		InputStream resource = PreProcessor.class.getResourceAsStream("/" + resourceName);
 
 		if (resource != null) {
@@ -212,7 +224,7 @@ public class PreProcessor {
 			}
 		}
 
-		if (stopwords != null) {
+		if (stopwords != null && !stopwords.isEmpty()) {
 			if (extracted == null) {
 				output.removeIf(s -> stopwords.contains(s));
 			} else {

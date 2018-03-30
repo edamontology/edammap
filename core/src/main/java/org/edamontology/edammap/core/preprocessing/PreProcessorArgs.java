@@ -23,16 +23,21 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.validators.PositiveInteger;
 
 public class PreProcessorArgs {
-	@Parameter(names = { "--numbers" }, arity = 1, description = "Include/exclude freestanding numbers (i.e., that are not part of a word) in pre-processing")
+
+	public static final String NUMBERS = "numbers";
+	@Parameter(names = { "--" + NUMBERS }, arity = 1, description = "Include/exclude freestanding numbers (i.e., that are not part of a word) in pre-processing")
 	private boolean numbers = true;
 
-	@Parameter(names = { "--stopwords" }, description = "Do stopwords removal as part of pre-processing, using the chosen stopwords list")
+	public static final String STOPWORDS = "stopwords";
+	@Parameter(names = { "--" + STOPWORDS }, description = "Do stopwords removal as part of pre-processing, using the chosen stopwords list")
 	private Stopwords stopwords = Stopwords.lucene;
 
-	@Parameter(names = { "--stemming" }, arity = 1, description = "Do stemming as part of pre-processing")
+	public static final String STEMMING = "stemming";
+	@Parameter(names = { "--" + STEMMING }, arity = 1, description = "Do stemming as part of pre-processing")
 	private boolean stemming = true;
 
-	@Parameter(names = { "--min-length" }, validateWith = PositiveInteger.class, description = "When all pre-processing steps are done, tokens with length less to this length are removed")
+	public static final String MIN_LENGTH = "min-length";
+	@Parameter(names = { "--" + MIN_LENGTH }, validateWith = PositiveInteger.class, description = "When all pre-processing steps are done, tokens with length less to this length are removed")
 	private int minLength = 1;
 
 	public boolean isNumbers() {

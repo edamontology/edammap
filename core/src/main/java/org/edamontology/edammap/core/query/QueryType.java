@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016, 2017 Erik Jaaniso
+ * Copyright © 2016, 2017, 2018 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -22,10 +22,9 @@ package org.edamontology.edammap.core.query;
 public enum QueryType {
 	generic,
 	SEQwiki,
-	SEQwikiTags,
-	SEQwikiTool,
 	msutils,
+	Bioconductor,
 	biotools14, // biotools-1.4.xsd
 	biotools,
-	BioConductor
+	server
 }

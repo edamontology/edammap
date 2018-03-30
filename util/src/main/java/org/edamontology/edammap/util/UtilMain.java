@@ -44,7 +44,7 @@ public final class UtilMain {
 		List<PublicationIds> publicationIds = new ArrayList<>();
 		logger.info("Load publication IDs from file {} of type {}", queryPaths, type);
 		for (String queryPath : queryPaths) {
-			publicationIds.addAll(QueryLoader.get(queryPath, type, fetcherArgs).stream()
+			publicationIds.addAll(QueryLoader.get(queryPath, type, fetcherArgs.getTimeout(), fetcherArgs.getPrivateArgs().getUserAgent()).stream()
 				.flatMap(q -> q.getPublicationIds().stream()
 					.map(id -> new PublicationIds(id.getPmid(), id.getPmcid(), id.getDoi(), id.getPmidUrl(), id.getPmcidUrl(), id.getDoiUrl())))
 				.collect(Collectors.toList()));
@@ -57,7 +57,7 @@ public final class UtilMain {
 		List<String> webpageUrls = new ArrayList<>();
 		logger.info("Load webpage URLs from file {} of type {}", queryPaths, type);
 		for (String queryPath : queryPaths) {
-			webpageUrls.addAll(QueryLoader.get(queryPath, type, fetcherArgs).stream()
+			webpageUrls.addAll(QueryLoader.get(queryPath, type, fetcherArgs.getTimeout(), fetcherArgs.getPrivateArgs().getUserAgent()).stream()
 				.flatMap(q -> q.getWebpageUrls().stream()
 					.map(url -> url.getUrl()))
 				.collect(Collectors.toList()));
@@ -70,7 +70,7 @@ public final class UtilMain {
 		List<String> docUrls = new ArrayList<>();
 		logger.info("Load doc URLs from file {} of type {}", queryPaths, type);
 		for (String queryPath : queryPaths) {
-			docUrls.addAll(QueryLoader.get(queryPath, type, fetcherArgs).stream()
+			docUrls.addAll(QueryLoader.get(queryPath, type, fetcherArgs.getTimeout(), fetcherArgs.getPrivateArgs().getUserAgent()).stream()
 				.flatMap(q -> q.getDocUrls().stream()
 					.map(url -> url.getUrl()))
 				.collect(Collectors.toList()));
@@ -79,7 +79,7 @@ public final class UtilMain {
 		return docUrls;
 	}
 
-	private static void run(UtilArgs args) throws IOException, ParseException, ReflectiveOperationException {
+	private static void run(UtilArgs args, Version version) throws IOException, ParseException, ReflectiveOperationException {
 		List<PublicationIds> publicationIds = null;
 		List<String> webpageUrls = null;
 		List<String> docUrls = null;
@@ -96,9 +96,9 @@ public final class UtilMain {
 			else docUrls.addAll(docQuery(args.allQuery, args.queryType, args.fetcherArgs));
 		}
 
-		FetcherUtil.run(args.fetcherUtilArgs, new Fetcher(args.fetcherArgs), publicationIds, webpageUrls, docUrls);
+		FetcherUtil.run(args.fetcherUtilArgs, new Fetcher(), args.fetcherArgs, publicationIds, webpageUrls, docUrls, version);
 
-		Util.run(args);
+		Util.run(args, version);
 	}
 
 	public static void main(String[] argv) throws IOException, ReflectiveOperationException {
@@ -113,7 +113,7 @@ public final class UtilMain {
 		logger.info("This is {} {}", version.getName(), version.getVersion());
 
 		try {
-			run(args);
+			run(args, version);
 		} catch (Throwable e) {
 			logger.error("Exception!", e);
 		}

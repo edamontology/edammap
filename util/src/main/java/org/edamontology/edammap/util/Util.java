@@ -21,6 +21,7 @@ package org.edamontology.edammap.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.ParseException;
 
@@ -32,35 +33,43 @@ import org.apache.logging.log4j.Logger;
 import org.edamontology.edammap.core.idf.Idf;
 import org.edamontology.edammap.core.input.Input;
 import org.edamontology.edammap.core.input.json.Biotools;
+import org.edamontology.edammap.core.output.Report;
+import org.edamontology.edammap.core.preprocessing.PreProcessor;
 import org.edamontology.edammap.core.processing.Processor;
 import org.edamontology.edammap.core.processing.ProcessorArgs;
 import org.edamontology.edammap.core.query.QueryLoader;
-import org.edamontology.edammap.core.query.QueryType;
+import org.edamontology.edammap.server.Server;
 import org.edamontology.pubfetcher.FetcherArgs;
 import org.edamontology.pubfetcher.FetcherCommon;
+import org.edamontology.pubfetcher.Version;
 
 public final class Util {
 
 	private static final Logger logger = LogManager.getLogger();
 
-	private static void makeQueryIdf(String queryPath, QueryType type, String outputPath, String database, UtilArgs args) throws IOException, ParseException {
-		logger.info("Make query IDF from file {} of type {} to {}{}", queryPath, type, outputPath, database != null ? " using database " + database : "");
+	private static void makeIdf(String queryPath, String database, String idfPath, UtilArgs args, boolean stemming) throws IOException, ParseException {
+		logger.info("Make query IDF from file {} of type {} to {}{}", queryPath, args.makeIdfType, idfPath, database != null ? " using database " + database : "");
 
 		ProcessorArgs processorArgs = new ProcessorArgs();
-		processorArgs.setFetcher(false);
-		processorArgs.setDatabase(database);
+		processorArgs.setFetching(false);
+		processorArgs.setDb(database);
 		processorArgs.setIdf(null);
-		processorArgs.setPreProcessorArgs(args.preProcessorArgs);
-
+		processorArgs.setIdfStemmed(null);
 		Processor processor = new Processor(processorArgs);
-		processor.makeQueryIdf(QueryLoader.get(queryPath, type, args.fetcherArgs), type, outputPath, args.makeQueryIdfNoWebpagesDocs, args.makeQueryIdfNoFulltext);
 
-		logger.info("Make query IDF: success"); // TODO output number of IDF terms made
+		int idfs = processor.makeQueryIdf(QueryLoader.get(queryPath, args.makeIdfType, args.fetcherArgs.getTimeout(), args.fetcherArgs.getPrivateArgs().getUserAgent()),
+			args.makeIdfType, idfPath, args.makeIdfWebpagesDocs, args.makeIdfFulltext,
+			new PreProcessor(stemming), null, args.fetcherArgs);
+		logger.info("Wrote {} IDFs to {}", idfs, idfPath);
 	}
 
-	private static void printQueryIdfTop(String inputPath, long n) throws IOException {
-		new Idf(inputPath, true).getTop().entrySet().stream()
-			.limit(n).forEach(e -> System.out.println(e.getKey() + "\t" + e.getValue()));
+	private static void printIdfTop(String inputPath, long n) throws IOException {
+		new Idf(inputPath, true).getTop().stream()
+			.limit(n).forEach(e -> System.out.println(e.getTerm() + "\t" + e.getCount()));
+	}
+
+	private static void printIdf(String inputPath, String term) throws IOException {
+		System.out.println(new Idf(inputPath).getIdf(term));
 	}
 
 	private static void biotoolsFull(String outputPath, FetcherArgs fetcherArgs, boolean dev) throws IOException {
@@ -78,7 +87,7 @@ public final class Util {
 
 		String next = "?page=1";
 		while (next != null) {
-			try (InputStream is = Input.newInputStream(api + next + "&format=json", false, fetcherArgs)) {
+			try (InputStream is = Input.newInputStream(api + next + "&format=json", false, fetcherArgs.getTimeout(), fetcherArgs.getPrivateArgs().getUserAgent())) {
 				Biotools biotools = mapper.readValue(is, Biotools.class);
 
 				biotoolsFull.addTools(biotools.getList());
@@ -100,20 +109,42 @@ public final class Util {
 		logger.info("Made bio.tools JSON with {} entries", count);
 	}
 
-	public static void run(UtilArgs args) throws IOException, ParseException {
+	private static void makeServerFiles(String outputPath, Version version) throws IOException {
+		logger.info("Copying server CSS, JS and fonts to {}", outputPath);
+		Path path = FetcherCommon.outputPath(outputPath, true, false);
+		Files.createDirectory(path);
+		Server.copyHtmlResources(path);
+		Report.copyFontResources(path);
+		logger.info("Copying output CSS and fonts to {}", outputPath);
+		Path versionPath = FetcherCommon.outputPath(outputPath + "/" + version.getVersion(), true, false);
+		Files.createDirectory(versionPath);
+		Report.copyHtmlResources(versionPath, version);
+		Report.copyFontResources(versionPath);
+	}
+
+	public static void run(UtilArgs args, Version version) throws IOException, ParseException {
 		if (args == null) {
 			throw new IllegalArgumentException("UtilArgs required!");
 		}
 
-		if (args.makeQueryIdf != null) {
-			makeQueryIdf(args.makeQueryIdf.get(0), QueryType.valueOf(args.makeQueryIdf.get(1)), args.makeQueryIdf.get(2), args.makeQueryIdf.get(3), args);
+		if (args.makeIdf != null) {
+			makeIdf(args.makeIdf.get(0), args.makeIdf.get(1), args.makeIdf.get(2), args, false);
 		}
-		if (args.makeQueryIdfWithoutDatabase != null) {
-			makeQueryIdf(args.makeQueryIdfWithoutDatabase.get(0), QueryType.valueOf(args.makeQueryIdfWithoutDatabase.get(1)), args.makeQueryIdfWithoutDatabase.get(2), null, args);
+		if (args.makeIdfNoDb != null) {
+			makeIdf(args.makeIdfNoDb.get(0), null, args.makeIdfNoDb.get(1), args, false);
+		}
+		if (args.makeIdfStemmed != null) {
+			makeIdf(args.makeIdfStemmed.get(0), args.makeIdfStemmed.get(1), args.makeIdfStemmed.get(2), args, true);
+		}
+		if (args.makeIdfStemmedNoDb != null) {
+			makeIdf(args.makeIdfStemmedNoDb.get(0), null, args.makeIdfStemmedNoDb.get(1), args, true);
 		}
 
-		if (args.printQueryIdfTop != null) {
-			printQueryIdfTop(args.printQueryIdfTop.get(0), Long.parseLong(args.printQueryIdfTop.get(1)));
+		if (args.printIdfTop != null) {
+			printIdfTop(args.printIdfTop.get(0), Long.parseLong(args.printIdfTop.get(1)));
+		}
+		if (args.printIdf != null) {
+			printIdf(args.printIdf.get(0), args.printIdf.get(1));
 		}
 
 		if (args.biotoolsFull != null) {
@@ -121,6 +152,10 @@ public final class Util {
 		}
 		if (args.biotoolsDevFull != null) {
 			biotoolsFull(args.biotoolsDevFull, args.fetcherArgs, true);
+		}
+
+		if (args.makeServerFiles != null) {
+			makeServerFiles(args.makeServerFiles, version);
 		}
 	}
 }

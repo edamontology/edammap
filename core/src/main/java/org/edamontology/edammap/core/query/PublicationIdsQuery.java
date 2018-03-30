@@ -27,8 +27,9 @@ public class PublicationIdsQuery extends PublicationIds {
 
 	private final String type;
 
-	public PublicationIdsQuery(String pmid, String pmcid, String doi, String pmidUrl, String pmcidUrl, String doiUrl, String type) {
-		super(pmid, pmcid, doi, pmidUrl, pmcidUrl, doiUrl);
+	public PublicationIdsQuery(PublicationIds publicationIds, String type) {
+		super(publicationIds.getPmid(), publicationIds.getPmcid(), publicationIds.getDoi(),
+			publicationIds.getPmidUrl(), publicationIds.getPmcidUrl(), publicationIds.getDoiUrl());
 		this.type = type;
 	}
 

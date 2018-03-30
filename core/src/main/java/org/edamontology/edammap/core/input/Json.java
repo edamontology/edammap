@@ -30,14 +30,13 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import org.edamontology.edammap.core.input.json.Biotools;
 import org.edamontology.edammap.core.query.QueryType;
-import org.edamontology.pubfetcher.FetcherArgs;
 
 public class Json {
 
-	public static List<? extends InputType> load(String queryPath, QueryType type, FetcherArgs fetcherArgs) throws IOException, ParseException {
+	public static List<? extends InputType> load(String queryPath, QueryType type, int timeout, String userAgent) throws IOException, ParseException {
 		List<? extends InputType> inputs = new ArrayList<>();
 
-		try (InputStream is = Input.newInputStream(queryPath, true, fetcherArgs)) {
+		try (InputStream is = Input.newInputStream(queryPath, true, timeout, userAgent)) {
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.enable(SerializationFeature.CLOSE_CLOSEABLE);
 

@@ -34,19 +34,19 @@ public class Generic implements InputType {
 	private String name;
 
 	@Parsed
-	private String webpageUrls;
+	private String keywords;
 
 	@Parsed
 	private String description;
 
 	@Parsed
-	private String keywords;
-
-	@Parsed
-	private String publicationIds;
+	private String webpageUrls;
 
 	@Parsed
 	private String docUrls;
+
+	@Parsed
+	private String publicationIds;
 
 	@Parsed
 	private String annotations;
@@ -72,11 +72,11 @@ public class Generic implements InputType {
 		this.name = name;
 	}
 
-	public String getWebpageUrls() {
-		return webpageUrls;
+	public String getKeywords() {
+		return keywords;
 	}
-	public void setWebpageUrls(String webpageUrls) {
-		this.webpageUrls = webpageUrls;
+	public void setKeywords(String keywords) {
+		this.keywords = keywords;
 	}
 
 	public String getDescription() {
@@ -86,18 +86,11 @@ public class Generic implements InputType {
 		this.description = description;
 	}
 
-	public String getKeywords() {
-		return keywords;
+	public String getWebpageUrls() {
+		return webpageUrls;
 	}
-	public void setKeywords(String keywords) {
-		this.keywords = keywords;
-	}
-
-	public String getPublicationIds() {
-		return publicationIds;
-	}
-	public void setPublicationIds(String publicationIds) {
-		this.publicationIds = publicationIds;
+	public void setWebpageUrls(String webpageUrls) {
+		this.webpageUrls = webpageUrls;
 	}
 
 	public String getDocUrls() {
@@ -105,6 +98,13 @@ public class Generic implements InputType {
 	}
 	public void setDocUrls(String docUrls) {
 		this.docUrls = docUrls;
+	}
+
+	public String getPublicationIds() {
+		return publicationIds;
+	}
+	public void setPublicationIds(String publicationIds) {
+		this.publicationIds = publicationIds;
 	}
 
 	public String getAnnotations() {

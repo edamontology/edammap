@@ -1,0 +1,393 @@
+@charset "utf-8";
+/*
+ * Copyright © 2018 Erik Jaaniso
+ *
+ * This file is part of EDAMmap.
+ *
+ * EDAMmap is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * EDAMmap is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with EDAMmap.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* https://fonts.googleapis.com/css?family=Spectral+SC:400,700|Spectral:400,700&amp;subset=latin-ext */
+/* latin-ext */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Spectral Regular'), local('Spectral-Regular'), url(Spectral-Regular-ext.woff2) format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Spectral Regular'), local('Spectral-Regular'), url(Spectral-Regular.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2212, U+2215;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Spectral Bold'), local('Spectral-Bold'), url(Spectral-Bold-ext.woff2) format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Spectral Bold'), local('Spectral-Bold'), url(Spectral-Bold.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2212, U+2215;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Spectral SC';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Spectral SC Regular'), local('SpectralSC-Regular'), url(SpectralSC-Regular-ext.woff2) format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Spectral SC';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Spectral SC Regular'), local('SpectralSC-Regular'), url(SpectralSC-Regular.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2212, U+2215;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Spectral SC';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Spectral SC Bold'), local('SpectralSC-Bold'), url(SpectralSC-Bold-ext.woff2) format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Spectral SC';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Spectral SC Bold'), local('SpectralSC-Bold'), url(SpectralSC-Bold.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2212, U+2215;
+}
+/* https://github.com/FortAwesome/Font-Awesome/blob/master/web-fonts-with-css/css/fa-regular.css */
+@font-face {
+  font-family: 'Font Awesome 5 Free';
+  font-style: normal;
+  font-weight: 400;
+  src: url("fa-regular-400.woff2") format("woff2");
+}
+/* https://github.com/FortAwesome/Font-Awesome/blob/master/web-fonts-with-css/css/fa-solid.css */
+@font-face {
+  font-family: 'Font Awesome 5 Free';
+  font-style: normal;
+  font-weight: 900;
+  src: url("fa-solid-900.woff2") format("woff2");
+}
+
+:root {
+	font-size: 112.5%;
+	--publication: rgba(211,211,211,1); /* LightGray */
+	--link: rgba(0,0,255,1);
+	--good: rgba(0,128,0,1);
+	--red: rgba(255,0,0,1);
+	--medium: rgba(128,128,0,1);
+	--black: rgba(0,0,0,1);
+	--background: rgba(239,239,239,1);
+}
+html {
+	box-sizing: border-box;
+}
+*, *:before, *:after {
+	box-sizing: inherit;
+}
+body {
+	font-size: 1em;
+	font-family: "Spectral", serif;
+	background-color: var(--background);
+	color: black;
+	margin: 0;
+	padding: 0.5rem 0;
+	line-height: 1.5;
+}
+
+a {
+	text-decoration: underline;
+}
+a:hover {
+	text-decoration: none;
+}
+a:active {
+	color: rgba(0,0,128,1);
+}
+
+/* title */
+
+header > h1, footer > h2 {
+	margin: 0.5rem;
+	padding: 0.5rem 1rem;
+	min-width: 31rem;
+	text-align: center;
+	font-family: "Spectral SC";
+	background-color: var(--black);
+	color: rgba(255,255,255,1);
+	border-radius: 3px;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+footer > h2 {
+	margin-top: 1rem;
+	text-align: left;
+}
+header > p {
+	margin: 0.5rem;
+	min-width: 31rem;
+	text-align: center;
+}
+header > p > span {
+	display: inline-block;
+}
+
+/* main */
+
+article {
+	display: flex;
+	flex-wrap: wrap;
+	min-width: 32rem;
+}
+
+article > section {
+	flex: 1 1 32rem;
+	padding: 0.5rem;
+}
+
+article > section > h3 {
+	display: inline-block;
+	margin: 0 0 1px 0;
+	padding: 0.25rem 0.5rem;
+	font-family: "Spectral SC";
+	font-weight: normal;
+	font-size: 1rem;
+	background-image: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.125));
+	background-color: rgba(255,255,255,1);
+	box-shadow: 0 0 3px rgba(0,0,0,0.12), 0 0 2px rgba(0,0,0,0.24);
+}
+
+#name-section > h3 {
+	background-color: var(--black);
+	color: rgba(255,255,255,1);
+}
+#webpage-urls-section > h3, #doc-urls-section > h3 {
+	background-color: var(--link);
+	color: rgba(255,255,255,1);
+}
+#publication-ids-section > h3 {
+	background-color: var(--publication);
+}
+#annotations-section > h3 {
+	background-color: #EF7500;
+	color: rgba(255,255,255,1);
+}
+
+article > section > div {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	padding: 0.5rem 0.5rem 0 0;
+	background-color: rgba(255,255,255,1);
+	box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.label, .input, .output {
+	margin: 0 0 0.5rem 0.5rem;
+}
+
+.label {
+	width: 18rem;
+	padding: 0.1rem;
+	background-color: rgba(255,255,204,1);
+	border: 1px dashed rgba(0,0,0,0.5);
+}
+
+.ex, .example {
+	color: rgba(63,63,63,1);
+}
+.ex {
+	vertical-align: top;
+}
+.example {
+	display: inline-block;
+	font-style: italic;
+}
+
+.io, .input, .output {
+	flex: 1 1 27rem;
+}
+.io {
+	align-self: center;
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.input > input, .input > textarea {
+	width: 100%;
+}
+
+.input-medium {
+	color: var(--medium);
+	border-color: var(--medium);
+}
+.input-good {
+	color: var(--good);
+	border-color: var(--good);
+}
+.input-bad {
+	color: var(--red);
+	border-color: var(--red);
+}
+
+.output-medium {
+	color: var(--medium);
+}
+.output-good {
+	color: var(--good);
+}
+.output-bad {
+	color: var(--red);
+}
+
+.output > span::before {
+	content: "> ";
+}
+
+#map {
+	min-width: 32rem;
+	margin-top: 0.5rem;
+	text-align: center;
+}
+#map > span > input {
+	font-family: "Spectral SC";
+	font-weight: 700;
+	font-size: 1.5rem;
+}
+
+/* param tabs */
+
+#tabs {
+	position: relative;
+	min-width: 31rem;
+	margin: 0.5rem;
+}
+
+.tab > input {
+	display: none;
+}
+.tab > label {
+	position: relative;
+	display: block;
+	width: 14rem;
+	padding: 1rem;
+	border-left: 0.2rem solid var(--background);
+	background-color: rgba(191,191,191,1);
+	font-family: "Spectral SC";
+	font-weight: 700;
+	cursor: pointer;
+	transition: border 250ms, background-color 250ms, box-shadow 250ms;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+.tab > label:hover {
+	border-left: 0.2rem solid rgba(0,255,255,1);
+	background-color: rgba(223,223,223,1);
+}
+.tab > input:checked ~ label {
+	border-left: 0.2rem solid rgba(0,0,255,1);
+	background-color: rgba(255,255,255,1);
+	box-shadow: 0 2px 0 rgba(0,0,0,0.12), 0 1px 0 rgba(0,0,0,0.24);
+	z-index: 2;
+}
+
+.tab-content {
+	display: none;
+	position: absolute;
+	top: 0;
+	left: 14rem;
+	width: calc(100% - 14rem);
+	height: 100%;
+	padding: 0 1rem;
+	background-color: rgba(255,255,255,1);
+	box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+	z-index: 1;
+}
+.tab > input:checked ~ .tab-content {
+	display: block;
+}
+
+.param {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	height: 3rem;
+}
+.param-multiple {
+	height: auto;
+	padding: 0.75rem 0;
+}
+.param > label, .param > span {
+	width: 15rem;
+	padding-right: 0.4rem;
+	text-align: right;
+	line-height: 1;
+}
+.param > label::after, .param > span::after {
+	content: " :";
+}
+.param > input, .param > output, .param > div {
+	width: calc(100% - 15rem);
+	min-width: 15rem;
+}
+
+.param > div > input[type=checkbox] {
+	display: none;
+}
+.param > div > input[type=checkbox] + label::before {
+	font-family: 'Font Awesome 5 Free';
+	font-weight: 900;
+	font-size: 1.5rem;
+	vertical-align: middle;
+	transition: color 250ms;
+	color: var(--red);
+	content: "\f204";
+}
+.param > div > input[type=checkbox]:not(:disabled) + label::before {
+	cursor: pointer;
+}
+.param > div > input[type=checkbox] + label::after {
+	vertical-align: middle;
+	color: gray;
+	content: " false";
+}
+.param > div > input[type=checkbox]:checked + label::before, .param > div > input[type=checkbox].checked + label::before {
+	color: var(--good);
+	content: "\f205";
+}
+.param > div > input[type=checkbox]:checked + label::after, .param > div > input[type=checkbox].checked + label::after {
+	content: " true";
+}
+
+button, input, select, textarea {
+	font-family: inherit;
+	font-size: 100%;
+	margin: 0;
+}

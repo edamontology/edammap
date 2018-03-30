@@ -27,7 +27,6 @@ import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +34,8 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.edamontology.pubfetcher.FetcherCommon;
+
+import com.carrotsearch.hppc.ObjectDoubleScatterMap;
 
 public class IdfMake {
 
@@ -74,8 +75,8 @@ public class IdfMake {
 	}
 
 	// no +1, as for concepts, where all words will be in IDF
-	public Map<String, Double> getIdf() {
-		Map<String, Double> idfMap = new HashMap<>();
+	public ObjectDoubleScatterMap<String> getIdf() {
+		ObjectDoubleScatterMap<String> idfMap = new ObjectDoubleScatterMap<>();
 		double idf_max = Math.log10(documentCount);
 		for (Map.Entry<String, Integer> termCount : termCounts.entrySet()) {
 			double idf = Math.log10(documentCount / (double)(termCount.getValue())) / idf_max;
@@ -85,7 +86,7 @@ public class IdfMake {
 	}
 
 	// +1, as for queries, where unknown words might be queried
-	public void writeOutput() throws IOException {
+	public int writeOutput() throws IOException {
 		CharsetEncoder encoder = StandardCharsets.UTF_8.newEncoder();
 		encoder.onMalformedInput(CodingErrorAction.REPLACE);
 		encoder.onUnmappableCharacter(CodingErrorAction.REPLACE);
@@ -102,5 +103,6 @@ public class IdfMake {
 				writer.write("\n");
 			}
 		}
+		return termCounts.size();
 	}
 }

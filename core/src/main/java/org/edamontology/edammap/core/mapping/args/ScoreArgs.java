@@ -24,80 +24,125 @@ import org.edamontology.edammap.core.args.ZeroToOneDouble;
 import com.beust.jcommander.Parameter;
 
 public class ScoreArgs {
-	@Parameter(names = { "--good-score-topic" }, validateWith = ZeroToOneDouble.class, description = "Final scores over this are considered good (in topic branch)")
+
+	public static final String GOOD_SCORE_TOPIC = "good-score-topic";
+	@Parameter(names = { "--" + GOOD_SCORE_TOPIC }, validateWith = ZeroToOneDouble.class, description = "Final scores over this are considered good (in topic branch)")
 	private double goodScoreTopic = 0.63;
 
-	@Parameter(names = { "--good-score-operation" }, validateWith = ZeroToOneDouble.class, description = "Final scores over this are considered good (in operation branch)")
+	public static final String GOOD_SCORE_OPERATION = "good-score-operation";
+	@Parameter(names = { "--" + GOOD_SCORE_OPERATION }, validateWith = ZeroToOneDouble.class, description = "Final scores over this are considered good (in operation branch)")
 	private double goodScoreOperation = 0.63;
 
-	@Parameter(names = { "--good-score-data" }, validateWith = ZeroToOneDouble.class, description = "Final scores over this are considered good (in data branch)")
+	public static final String GOOD_SCORE_DATA = "good-score-data";
+	@Parameter(names = { "--" + GOOD_SCORE_DATA }, validateWith = ZeroToOneDouble.class, description = "Final scores over this are considered good (in data branch)")
 	private double goodScoreData = 0.63;
 
-	@Parameter(names = { "--good-score-format" }, validateWith = ZeroToOneDouble.class, description = "Final scores over this are considered good (in format branch)")
+	public static final String GOOD_SCORE_FORMAT = "good-score-format";
+	@Parameter(names = { "--" + GOOD_SCORE_FORMAT }, validateWith = ZeroToOneDouble.class, description = "Final scores over this are considered good (in format branch)")
 	private double goodScoreFormat = 0.63;
 
-	@Parameter(names = { "--bad-score-topic" }, validateWith = ZeroToOneDouble.class, description = "Final scores under this are considered bad (in topic branch)")
+	public static final String BAD_SCORE_TOPIC = "bad-score-topic";
+	@Parameter(names = { "--" + BAD_SCORE_TOPIC }, validateWith = ZeroToOneDouble.class, description = "Final scores under this are considered bad (in topic branch)")
 	private double badScoreTopic = 0.57;
 
-	@Parameter(names = { "--bad-score-operation" }, validateWith = ZeroToOneDouble.class, description = "Final scores under this are considered bad (in operation branch)")
+	public static final String BAD_SCORE_OPERATION = "bad-score-operation";
+	@Parameter(names = { "--" + BAD_SCORE_OPERATION }, validateWith = ZeroToOneDouble.class, description = "Final scores under this are considered bad (in operation branch)")
 	private double badScoreOperation = 0.57;
 
-	@Parameter(names = { "--bad-score-data" }, validateWith = ZeroToOneDouble.class, description = "Final scores under this are considered bad (in data branch)")
+	public static final String BAD_SCORE_DATA = "bad-score-data";
+	@Parameter(names = { "--" + BAD_SCORE_DATA }, validateWith = ZeroToOneDouble.class, description = "Final scores under this are considered bad (in data branch)")
 	private double badScoreData = 0.57;
 
-	@Parameter(names = { "--bad-score-format" }, validateWith = ZeroToOneDouble.class, description = "Final scores under this are considered bad (in format branch)")
+	public static final String BAD_SCORE_FORMAT = "bad-score-format";
+	@Parameter(names = { "--" + BAD_SCORE_FORMAT }, validateWith = ZeroToOneDouble.class, description = "Final scores under this are considered bad (in format branch)")
 	private double badScoreFormat = 0.57;
 
-	@Parameter(names = { "--output-good-scores" }, arity = 1, description = "Output matches with good scores")
+	public static final String OUTPUT_GOOD_SCORES = "output-good-scores";
+	@Parameter(names = { "--" + OUTPUT_GOOD_SCORES }, arity = 1, description = "Output matches with good scores")
 	private boolean outputGoodScores = true;
 
-	@Parameter(names = { "--output-medium-scores" }, arity = 1, description = "Output matches with medium scores")
+	public static final String OUTPUT_MEDIUM_SCORES = "output-medium-scores";
+	@Parameter(names = { "--" + OUTPUT_MEDIUM_SCORES }, arity = 1, description = "Output matches with medium scores")
 	private boolean outputMediumScores = true;
 
-	@Parameter(names = { "--output-bad-scores" }, arity = 1, description = "Output matches with bad scores")
+	public static final String OUTPUT_BAD_SCORES = "output-bad-scores";
+	@Parameter(names = { "--" + OUTPUT_BAD_SCORES }, arity = 1, description = "Output matches with bad scores")
 	private boolean outputBadScores = false;
 
 	public double getGoodScoreTopic() {
 		return goodScoreTopic;
 	}
+	public void setGoodScoreTopic(double goodScoreTopic) {
+		this.goodScoreTopic = goodScoreTopic;
+	}
 
 	public double getGoodScoreOperation() {
 		return goodScoreOperation;
+	}
+	public void setGoodScoreOperation(double goodScoreOperation) {
+		this.goodScoreOperation = goodScoreOperation;
 	}
 
 	public double getGoodScoreData() {
 		return goodScoreData;
 	}
+	public void setGoodScoreData(double goodScoreData) {
+		this.goodScoreData = goodScoreData;
+	}
 
 	public double getGoodScoreFormat() {
 		return goodScoreFormat;
+	}
+	public void setGoodScoreFormat(double goodScoreFormat) {
+		this.goodScoreFormat = goodScoreFormat;
 	}
 
 	public double getBadScoreTopic() {
 		return badScoreTopic;
 	}
+	public void setBadScoreTopic(double badScoreTopic) {
+		this.badScoreTopic = badScoreTopic;
+	}
 
 	public double getBadScoreOperation() {
 		return badScoreOperation;
+	}
+	public void setBadScoreOperation(double badScoreOperation) {
+		this.badScoreOperation = badScoreOperation;
 	}
 
 	public double getBadScoreData() {
 		return badScoreData;
 	}
+	public void setBadScoreData(double badScoreData) {
+		this.badScoreData = badScoreData;
+	}
 
 	public double getBadScoreFormat() {
 		return badScoreFormat;
+	}
+	public void setBadScoreFormat(double badScoreFormat) {
+		this.badScoreFormat = badScoreFormat;
 	}
 
 	public boolean isOutputGoodScores() {
 		return outputGoodScores;
 	}
+	public void setOutputGoodScores(boolean outputGoodScores) {
+		this.outputGoodScores = outputGoodScores;
+	}
 
 	public boolean isOutputMediumScores() {
 		return outputMediumScores;
 	}
+	public void setOutputMediumScores(boolean outputMediumScores) {
+		this.outputMediumScores = outputMediumScores;
+	}
 
 	public boolean isOutputBadScores() {
 		return outputBadScores;
+	}
+	public void setOutputBadScores(boolean outputBadScores) {
+		this.outputBadScores = outputBadScores;
 	}
 }

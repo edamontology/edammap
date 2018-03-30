@@ -20,7 +20,6 @@
 package org.edamontology.edammap.core.output;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
@@ -32,20 +31,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.edamontology.edammap.core.args.MainArgs;
+import org.edamontology.edammap.core.args.CoreArgs;
 import org.edamontology.edammap.core.benchmarking.MappingTest;
 import org.edamontology.edammap.core.benchmarking.MatchTest;
-import org.edamontology.edammap.core.benchmarking.Measure;
 import org.edamontology.edammap.core.benchmarking.Results;
-import org.edamontology.edammap.core.benchmarking.Test;
 import org.edamontology.edammap.core.edam.Branch;
 import org.edamontology.edammap.core.edam.Concept;
-import org.edamontology.edammap.core.edam.Edam;
 import org.edamontology.edammap.core.edam.EdamUri;
-import org.edamontology.edammap.core.input.Input;
 import org.edamontology.edammap.core.mapping.ConceptMatch;
 import org.edamontology.edammap.core.mapping.ConceptMatchType;
 import org.edamontology.edammap.core.mapping.Match;
@@ -67,12 +61,9 @@ import org.edamontology.pubfetcher.PublicationPartName;
 import org.edamontology.pubfetcher.Version;
 import org.edamontology.pubfetcher.Webpage;
 
-class Report {
+public class Report {
 
-	private static final Pattern ID_REMOVE = Pattern.compile("[^\\p{L}\\p{N}-]");
-
-	private static final String[] HTML_RESOURCES = new String[] {
-		"style.css",
+	private static final String[] FONT_RESOURCES = new String[] {
 		"Spectral-Regular-ext.woff2",
 		"Spectral-Regular.woff2",
 		"Spectral-Bold-ext.woff2",
@@ -368,7 +359,7 @@ class Report {
 			writer.write("<br>");
 			writer.write(publicationMatchString);
 		}
-		if (type == QueryMatchType.keyword && query.getKeywords().get(index) != null) {
+		if (type == QueryMatchType.keyword && index >= 0 && query.getKeywords().get(index) != null) {
 			writer.write("<br>");
 			writer.write(FetcherCommon.getLinkHtml(query.getKeywords().get(index).getUrl(), query.getKeywords().get(index).getValue()));
 		}
@@ -462,14 +453,18 @@ class Report {
 		}
 	}
 
-	private static void writeArticle(MainArgs args, Writer writer, Map<EdamUri, Concept> concepts, Query query, int queriesSize, List<Publication> publications, List<Webpage> webpages, List<Webpage> docs, MappingTest mapping, int page, int nr, int nrMin, int nrMax) throws IOException {
-		FetcherArgs fetcherArgs = args.getProcessorArgs().getFetcherArgs();
+	private static void writeArticle(CoreArgs args, QueryType type, Writer writer, Map<EdamUri, Concept> concepts, Query query, int queriesSize, List<Publication> publications, List<Webpage> webpages, List<Webpage> docs, MappingTest mapping, int page, int nr, int nrMin, int nrMax) throws IOException {
+		FetcherArgs fetcherArgs = args.getFetcherArgs();
 
 		writer.write("<article>\n");
 
-		writer.write("\t<h2 id=\"" + nr + "\"><span><span class=\"rank\">" + nr + ". </span><span>" + (query.getName() != null ? FetcherCommon.escapeHtml(query.getName()) : "") + "</span>");
+		writer.write("\t<h2 id=\"" + nr + "\"><span>");
+		if (queriesSize > 1) {
+			writer.write("<span class=\"rank\">" + nr + ". </span>");
+		}
+		writer.write("<span>" + (query.getName() != null ? FetcherCommon.escapeHtml(query.getName()) : "") + "</span>");
 		if (query.getId() != null) {
-			if (args.getType() == QueryType.biotools) {
+			if (type == QueryType.biotools) {
 				writer.write("<a href=\"" + FetcherCommon.escapeHtmlAttribute(QueryLoader.BIOTOOLS + query.getId()) + "\" class=\"biotools-link\"></a>");
 			} else {
 				writer.write("<span> (" + FetcherCommon.escapeHtml(query.getId()) + ")</span>");
@@ -519,7 +514,9 @@ class Report {
 				}
 			}
 		}
-		boolean miscPresent = (query.getDescription() != null && !query.getDescription().isEmpty()) || (query.getKeywords() != null && !query.getKeywords().isEmpty()) || webpagesPresent || docsPresent;
+		boolean miscPresent = (query.getKeywords() != null && !query.getKeywords().isEmpty())
+			|| (query.getDescription() != null && !query.getDescription().isEmpty())
+			|| webpagesPresent || docsPresent;
 		boolean publicationsPresent = false;
 		if (query.getPublicationIds() != null) {
 			for (PublicationIdsQuery publicationIds : query.getPublicationIds()) {
@@ -540,13 +537,6 @@ class Report {
 			if (miscPresent) {
 				writer.write("\t\t<section class=\"misc\">\n");
 
-				if (query.getDescription() != null && !query.getDescription().isEmpty()) {
-					writer.write("\t\t\t<div class=\"generic\">\n");
-					writer.write("\t\t\t\t<h3>Description</h3><br>\n");
-					writer.write("\t\t\t\t<div>" + FetcherCommon.getParagraphsHtml(query.getDescription()) + "</div>\n");
-					writer.write("\t\t\t</div>\n");
-				}
-
 				if (query.getKeywords() != null && !query.getKeywords().isEmpty()) {
 					Map<String, List<Keyword>> keywords = new LinkedHashMap<>();
 					for (Keyword keyword : query.getKeywords()) {
@@ -566,6 +556,13 @@ class Report {
 						writer.write("</div>\n");
 						writer.write("\t\t\t</div>\n");
 					}
+				}
+
+				if (query.getDescription() != null && !query.getDescription().isEmpty()) {
+					writer.write("\t\t\t<div class=\"generic\">\n");
+					writer.write("\t\t\t\t<h3>Description</h3><br>\n");
+					writer.write("\t\t\t\t<div>" + FetcherCommon.getParagraphsHtml(query.getDescription()) + "</div>\n");
+					writer.write("\t\t\t</div>\n");
 				}
 
 				if (webpagesPresent) {
@@ -605,11 +602,20 @@ class Report {
 		writer.write("</article>\n\n");
 	}
 
-	private static void writePagination(MainArgs args, Writer writer, int queriesSize, int page) throws IOException {
-		if (queriesSize <= args.getReportPageSize() || args.getReportPageSize() == 0) return;
+	private static void writeParams(CoreArgs args, List<Param> paramsMain, QueryType type, Writer writer, Map<EdamUri, Concept> concepts, List<Query> queries, Results results) throws IOException {
+		Params.writeMain(paramsMain, writer, false);
+		Params.writeProcessing(args.getProcessorArgs(), writer);
+		Params.writePreProcessing(args.getPreProcessorArgs(), writer, false);
+		Params.writeFetching(args.getFetcherArgs(), writer, type != QueryType.server, false);
+		Params.writeMapping(args.getMapperArgs(), writer, false);
+		Params.writeBenchmarking(writer, concepts, queries, results);
+	}
 
-		int pageMax = (queriesSize - 1) / args.getReportPageSize() + 1;
-		int paginationSize = args.getReportPaginationSize();
+	private static void writePagination(CoreArgs args, int reportPageSize, int reportPaginationSize, Writer writer, int queriesSize, int page) throws IOException {
+		if (queriesSize <= reportPageSize || reportPageSize == 0) return;
+
+		int pageMax = (queriesSize - 1) / reportPageSize + 1;
+		int paginationSize = reportPaginationSize;
 		if (paginationSize > pageMax) paginationSize = pageMax;
 
 		writer.write("<ul class=\"pagination\">\n");
@@ -653,279 +659,54 @@ class Report {
 		writer.write("</ul>\n\n");
 	}
 
-	private static String makeId(String id) {
-		return ID_REMOVE.matcher(id.toLowerCase(Locale.ROOT).replaceAll("[ /]", "-")).replaceAll("");
-	}
-
-	private static void writeParam(Writer writer, String label, String value) throws IOException {
-		writeParam(writer, label, value, null);
-	}
-
-	private static void writeParam(Writer writer, String label, int value) throws IOException {
-		writeParam(writer, label, Integer.toString(value), null);
-	}
-
-	private static void writeParam(Writer writer, String label, double value) throws IOException {
-		writeParam(writer, label, Double.toString(value), null);
-	}
-
-	private static void writeParam(Writer writer, String label, String value, String url) throws IOException {
-		String id = makeId(label);
-		writer.write("\t\t<div class=\"param\">\n");
-		writer.write("\t\t\t<label for=\"" + id + "\">");
-		writer.write(FetcherCommon.getLinkHtml(url, label));
-		writer.write("</label>\n");
-		writer.write("\t\t\t<input id=\"" + id + "\" value=\"" + FetcherCommon.escapeHtmlAttribute(value) + "\" readonly>\n");
-		writer.write("\t\t</div>\n");
-	}
-
-	private static void writeParam(Writer writer, String label, boolean value) throws IOException {
-		String id = makeId(label);
-		writer.write("\t\t<div class=\"param\">\n");
-		writer.write("\t\t\t<span>" + label + "</span>\n");
-		writer.write("\t\t\t<div>\n");
-		writer.write("\t\t\t\t<input id=\"" + id + "\" type=\"checkbox\" disabled");
-		if (value) writer.write(" class=\"checked\"");
-		writer.write(">\n");
-		writer.write("\t\t\t\t<label for=\"" + id + "\"></label>\n");
-		writer.write("\t\t\t</div>\n");
-		writer.write("\t\t</div>\n");
-	}
-
-	private static void writeParamOutput(Writer writer, String label, String value) throws IOException {
-		writeParamOutput(writer, label, value, null);
-	}
-
-	private static void writeParamOutput(Writer writer, String label, int value) throws IOException {
-		writeParamOutput(writer, label, Integer.toString(value), null);
-	}
-
-	private static void writeParamOutput(Writer writer, Test test, Results results) throws IOException {
-		writeParamOutput(writer, test.getName(), results.toStringTest(test), test.getUrl());
-	}
-
-	private static void writeParamOutput(Writer writer, Measure measure, Results results) throws IOException {
-		writeParamOutput(writer, measure.getName(), results.toStringMeasure(measure), measure.getUrl());
-	}
-
-	private static void writeParamOutput(Writer writer, String label, String value, String url) throws IOException {
-		String id = makeId(label);
-		writer.write("\t\t<div class=\"param\">\n");
-		writer.write("\t\t\t<label for=\"" + id + "\">");
-		writer.write(FetcherCommon.getLinkHtml(url, label));
-		writer.write("</label>\n");
-		writer.write("\t\t\t<output id=\"" + id + "\">" + FetcherCommon.escapeHtml(value) + "</output>\n");
-		writer.write("\t\t</div>\n");
-	}
-
-	private static void writeParamBegin(Writer writer, int nr, String title, boolean checked) throws IOException {
-		writer.write("<section class=\"tab\">\n");
-		writer.write("\t<input type=\"radio\" id=\"tab" + nr + "-title\" name=\"tab-group\"" + (checked ? " checked" : "") + ">\n");
-		writer.write("\t<label for=\"tab" + nr + "-title\">" + title + "</label>\n");
-		writer.write("\t<div class=\"tab-content\">\n");
-	}
-
-	private static void writeParamEnd(Writer writer) throws IOException {
-		writer.write("\t</div>\n");
-		writer.write("</section>\n\n");
-	}
-
-	private static void writeParams(MainArgs args, Writer writer, Map<EdamUri, Concept> concepts, List<Query> queries, Results results) throws IOException {
-		writeParamBegin(writer, 1, "IO", true);
-		writeParam(writer, "Ontology file", new File(args.getEdam()).getName(), "https://github.com/edamontology/edamontology/tree/master/releases");
-		if (Input.isProtocol(args.getQuery())) {
-			writeParam(writer, "Query file", args.getQuery(), args.getQuery());
-		} else {
-			writeParam(writer, "Query file", new File(args.getQuery()).getName());
-		}
-		writeParam(writer, "Type", args.getType().toString());
-		writeParam(writer, "Output file", new File(args.getOutput()).getName());
-		writeParam(writer, "Report file", new File(args.getReport()).getName());
-		writeParam(writer, "Report page size", args.getReportPageSize());
-		writeParam(writer, "Report pagination size", args.getReportPaginationSize());
-		writeParam(writer, "Number of threads", args.getThreads());
-		writeParamEnd(writer);
-
-		writeParamBegin(writer, 2, "Processing", false);
-		writeParam(writer, "Fetching", args.getProcessorArgs().isFetcher());
-		writeParam(writer, "Database file", new File(args.getProcessorArgs().getDatabase()).getName());
-		writeParam(writer, "Query IDF file", new File(args.getProcessorArgs().getIdf()).getName());
-		writeParamEnd(writer);
-
-		writeParamBegin(writer, 3, "Preprocessing", false);
-		writeParam(writer, "Freestanding numbers", args.getProcessorArgs().getPreProcessorArgs().isNumbers());
-		writeParam(writer, "Stopword list", args.getProcessorArgs().getPreProcessorArgs().getStopwords().toString());
-		writeParam(writer, "Stemming", args.getProcessorArgs().getPreProcessorArgs().isStemming());
-		writeParam(writer, "Remove shorter than", args.getProcessorArgs().getPreProcessorArgs().getMinLength());
-		writeParamEnd(writer);
-
-		writeParamBegin(writer, 4, "Fetching", false);
-		writeParam(writer, "Empty cooldown", args.getProcessorArgs().getFetcherArgs().getEmptyCooldown());
-		writeParam(writer, "Non-final cooldown", args.getProcessorArgs().getFetcherArgs().getNonFinalCooldown());
-		writeParam(writer, "Fetching exception cooldown", args.getProcessorArgs().getFetcherArgs().getFetchExceptionCooldown());
-		writeParam(writer, "Retry limit", args.getProcessorArgs().getFetcherArgs().getRetryLimit());
-		writeParam(writer, "Title min. length", args.getProcessorArgs().getFetcherArgs().getTitleMinLength());
-		writeParam(writer, "Keywords min. size", args.getProcessorArgs().getFetcherArgs().getKeywordsMinSize());
-		writeParam(writer, "Mined terms min. size", args.getProcessorArgs().getFetcherArgs().getMinedTermsMinSize());
-		writeParam(writer, "Abstract min. length", args.getProcessorArgs().getFetcherArgs().getAbstractMinLength());
-		writeParam(writer, "Fulltext min. length", args.getProcessorArgs().getFetcherArgs().getFulltextMinLength());
-		writeParam(writer, "Webpage min. length", args.getProcessorArgs().getFetcherArgs().getWebpageMinLength());
-		writeParam(writer, "Webpage min. length JS", args.getProcessorArgs().getFetcherArgs().getWebpageMinLengthJavascript());
-		writeParam(writer, "Europe PMC e-mail", args.getProcessorArgs().getFetcherArgs().getEuropepmcEmail());
-		writeParam(writer, "oaDOI e-mail", args.getProcessorArgs().getFetcherArgs().getOadoiEmail());
-		writeParam(writer, "User Agent", args.getProcessorArgs().getFetcherArgs().getUserAgent());
-		writeParam(writer, "Timeout", args.getProcessorArgs().getFetcherArgs().getTimeout());
-		writeParamEnd(writer);
-
-		writeParamBegin(writer, 5, "Mapping", false);
-		writeParam(writer, "Branches", args.getMapperArgs().getBranches().toString(), "http://edamontology.org/page#Scope");
-		writeParam(writer, "Top matches per branch", args.getMapperArgs().getMatches());
-		writeParam(writer, "Obsolete concepts", args.getMapperArgs().isObsolete());
-		writeParam(writer, "Done annotations", args.getMapperArgs().isAnnotations());
-		writeParam(writer, "Inferior parents &amp; children", args.getMapperArgs().isInferiorParentsChildren());
-		writeParam(writer, "Top level concepts", args.getMapperArgs().isTopLevel());
-		writeParamEnd(writer);
-
-		writeParamBegin(writer, 6, "Mapping algorithm", false);
-		writeParam(writer, "Compound words", args.getMapperArgs().getAlgorithmArgs().getCompoundWords());
-		writeParam(writer, "Mismatch multiplier", args.getMapperArgs().getAlgorithmArgs().getMismatchMultiplier());
-		writeParam(writer, "Match minimum", args.getMapperArgs().getAlgorithmArgs().getMatchMinimum());
-		writeParam(writer, "Position off by 1", args.getMapperArgs().getAlgorithmArgs().getPositionOffBy1());
-		writeParam(writer, "Position off by 2", args.getMapperArgs().getAlgorithmArgs().getPositionOffBy2());
-		writeParam(writer, "Position match scaling", args.getMapperArgs().getAlgorithmArgs().getPositionMatchScaling());
-		writeParam(writer, "Position loss", args.getMapperArgs().getAlgorithmArgs().getPositionLoss());
-		writeParam(writer, "Score scaling", args.getMapperArgs().getAlgorithmArgs().getScoreScaling());
-		writeParam(writer, "Concept weight", args.getMapperArgs().getAlgorithmArgs().getConceptWeight());
-		writeParam(writer, "Query weight", args.getMapperArgs().getAlgorithmArgs().getQueryWeight());
-		writeParam(writer, "Mapping strategy", args.getMapperArgs().getAlgorithmArgs().getMappingStrategy().toString());
-		writeParam(writer, "Parent weight", args.getMapperArgs().getAlgorithmArgs().getParentWeight());
-		writeParam(writer, "Path weight", args.getMapperArgs().getAlgorithmArgs().getPathWeight());
-		writeParamEnd(writer);
-
-		writeParamBegin(writer, 7, "IDF", false);
-		writeParam(writer, "Concept IDF scaling", args.getMapperArgs().getIdfArgs().getConceptIdfScaling());
-		writeParam(writer, "Query IDF scaling", args.getMapperArgs().getIdfArgs().getQueryIdfScaling());
-		writeParam(writer, "Label/Synonyms IDF", args.getMapperArgs().getIdfArgs().isLabelSynonymsIdf());
-		writeParam(writer, "Name/Keywords IDF", args.getMapperArgs().getIdfArgs().isNameKeywordsIdf());
-		writeParam(writer, "Description IDF", args.getMapperArgs().getIdfArgs().isDescriptionIdf());
-		writeParam(writer, "Title/Keywords IDF", args.getMapperArgs().getIdfArgs().isTitleKeywordsIdf());
-		writeParam(writer, "Abstract IDF", args.getMapperArgs().getIdfArgs().isAbstractIdf());
-		writeParamEnd(writer);
-
-		writeParamBegin(writer, 8, "Concept multipliers", false);
-		writeParam(writer, "Label multiplier", args.getMapperArgs().getMultiplierArgs().getLabelMultiplier());
-		writeParam(writer, "Exact synonym multiplier", args.getMapperArgs().getMultiplierArgs().getExactSynonymMultiplier());
-		writeParam(writer, "Narrow/Broad multiplier", args.getMapperArgs().getMultiplierArgs().getNarrowBroadMultiplier());
-		writeParam(writer, "Definition multiplier", args.getMapperArgs().getMultiplierArgs().getDefinitionMultiplier());
-		writeParam(writer, "Comment multiplier", args.getMapperArgs().getMultiplierArgs().getCommentMultiplier());
-		writeParamEnd(writer);
-
-		writeParamBegin(writer, 9, "Query normalisers", false);
-		writeParam(writer, "Name norm.", args.getMapperArgs().getNormaliserArgs().getNameNormaliser());
-		writeParam(writer, "Keyword norm.", args.getMapperArgs().getNormaliserArgs().getKeywordNormaliser());
-		writeParam(writer, "Description norm.", args.getMapperArgs().getNormaliserArgs().getDescriptionNormaliser());
-		writeParam(writer, "Publication title norm.", args.getMapperArgs().getNormaliserArgs().getPublicationTitleNormaliser());
-		writeParam(writer, "Publication keyword norm.", args.getMapperArgs().getNormaliserArgs().getPublicationKeywordNormaliser());
-		writeParam(writer, "Publication MeSH norm.", args.getMapperArgs().getNormaliserArgs().getPublicationMeshNormaliser());
-		writeParam(writer, "Publication EFO/GO norm.", args.getMapperArgs().getNormaliserArgs().getPublicationMinedNormaliser());
-		writeParam(writer, "Publication abstract norm.", args.getMapperArgs().getNormaliserArgs().getPublicationAbstractNormaliser());
-		writeParam(writer, "Publication fulltext norm.", args.getMapperArgs().getNormaliserArgs().getPublicationFulltextNormaliser());
-		writeParam(writer, "Doc norm.", args.getMapperArgs().getNormaliserArgs().getDocNormaliser());
-		writeParam(writer, "Webpage norm.", args.getMapperArgs().getNormaliserArgs().getWebpageNormaliser());
-		writeParamEnd(writer);
-
-		writeParamBegin(writer, 10, "Query weights", false);
-		writeParam(writer, "Average strategy scaling", args.getMapperArgs().getWeightArgs().getAverageScaling());
-		writeParam(writer, "Name weight", args.getMapperArgs().getWeightArgs().getNameWeight());
-		writeParam(writer, "Keyword weight", args.getMapperArgs().getWeightArgs().getKeywordWeight());
-		writeParam(writer, "Description weight", args.getMapperArgs().getWeightArgs().getDescriptionWeight());
-		writeParam(writer, "Publication title weight", args.getMapperArgs().getWeightArgs().getPublicationTitleWeight());
-		writeParam(writer, "Publication keyword weight", args.getMapperArgs().getWeightArgs().getPublicationKeywordWeight());
-		writeParam(writer, "Publication MeSH weight", args.getMapperArgs().getWeightArgs().getPublicationMeshWeight());
-		writeParam(writer, "Publication EFO/GO weight", args.getMapperArgs().getWeightArgs().getPublicationMinedWeight());
-		writeParam(writer, "Publication abstract weight", args.getMapperArgs().getWeightArgs().getPublicationAbstractWeight());
-		writeParam(writer, "Publication fulltext weight", args.getMapperArgs().getWeightArgs().getPublicationFulltextWeight());
-		writeParam(writer, "Doc weight", args.getMapperArgs().getWeightArgs().getDocWeight());
-		writeParam(writer, "Webpage weight", args.getMapperArgs().getWeightArgs().getWebpageWeight());
-		writeParamEnd(writer);
-
-		writeParamBegin(writer, 11, "Score limits", false);
-		writeParam(writer, "Good score for topic", args.getMapperArgs().getScoreArgs().getGoodScoreTopic());
-		writeParam(writer, "Good score for operation", args.getMapperArgs().getScoreArgs().getGoodScoreOperation());
-		writeParam(writer, "Good score for data", args.getMapperArgs().getScoreArgs().getGoodScoreData());
-		writeParam(writer, "Good score for format", args.getMapperArgs().getScoreArgs().getGoodScoreFormat());
-		writeParam(writer, "Bad score for topic", args.getMapperArgs().getScoreArgs().getBadScoreTopic());
-		writeParam(writer, "Bad score for operation", args.getMapperArgs().getScoreArgs().getBadScoreOperation());
-		writeParam(writer, "Bad score for data", args.getMapperArgs().getScoreArgs().getBadScoreData());
-		writeParam(writer, "Bad score for format", args.getMapperArgs().getScoreArgs().getBadScoreFormat());
-		writeParam(writer, "Matches with good scores", args.getMapperArgs().getScoreArgs().isOutputGoodScores());
-		writeParam(writer, "Matches with medium scores", args.getMapperArgs().getScoreArgs().isOutputMediumScores());
-		writeParam(writer, "Matches with bad scores", args.getMapperArgs().getScoreArgs().isOutputBadScores());
-		writeParamEnd(writer);
-
-		writeParamBegin(writer, 12, "Counts", false);
-		writeParamOutput(writer, "EDAM concepts", concepts.size());
-		Map<Branch, Integer> branchCounts = Edam.branchCounts(concepts);
-		writeParamOutput(writer, "Topic terms", branchCounts.get(Branch.topic).toString());
-		writeParamOutput(writer, "Operation terms", branchCounts.get(Branch.operation).toString());
-		writeParamOutput(writer, "Data terms", branchCounts.get(Branch.data).toString());
-		writeParamOutput(writer, "Format terms", branchCounts.get(Branch.format).toString());
-		writeParamOutput(writer, "Queries", queries.size());
-		writeParamOutput(writer, "Results", results.getMappings().size());
-		writeParamOutput(writer, Test.tp, results);
-		writeParamOutput(writer, Test.fp, results);
-		writeParamOutput(writer, Test.fn, results);
-
-		writeParamEnd(writer);
-
-		writeParamBegin(writer, 13, "Measures", false);
-		writeParamOutput(writer, Measure.precision, results);
-		writeParamOutput(writer, Measure.recall, results);
-		writeParamOutput(writer, Measure.f1, results);
-		writeParamOutput(writer, Measure.f2, results);
-		writeParamOutput(writer, Measure.Jaccard, results);
-		writeParamOutput(writer, Measure.AveP, results);
-		writeParamOutput(writer, Measure.RP, results);
-		writeParamOutput(writer, Measure.DCG, results);
-		writeParamOutput(writer, Measure.DCGa, results);
-		writeParamEnd(writer);
-	}
-
-	private static void out(MainArgs args, Writer writer, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publications, List<List<Webpage>> webpages, List<List<Webpage>> docs, Results results, long start, long stop, Version version, int page) throws IOException {
+	private static void out(CoreArgs args, List<Param> paramsMain, QueryType type, int reportPageSize, int reportPaginationSize, Writer writer, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publications, List<List<Webpage>> webpages, List<List<Webpage>> docs, Results results, long start, long stop, Version version, int page) throws IOException {
 		writer.write("<!DOCTYPE html>\n");
 		writer.write("<html lang=\"en\">\n\n");
 
 		writer.write("<head>\n");
 		writer.write("\t<meta charset=\"utf-8\">\n");
+		writer.write("\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n");
+		writer.write("\t<meta name=\"generator\" content=\"" + version.getName() + " " + version.getVersion() + "\">\n");
 		writer.write("\t<title>" + version.getName() + " " + version.getVersion() + " Report</title>\n");
-		writer.write("\t<link rel=\"stylesheet\" href=\"style.css\">\n");
+		if (type != QueryType.server) {
+			writer.write("\t<link rel=\"stylesheet\" href=\"edammap-" + version.getVersion() + ".css\">\n");
+		} else {
+			writer.write("\t<link rel=\"stylesheet\" href=\"../edammap-" + version.getVersion() + ".css\">\n");
+		}
 		writer.write("</head>\n\n");
 
 		writer.write("<body>\n\n");
 
 		writer.write("<header>\n\n");
 
-		int resultMin = (page - 1) * args.getReportPageSize() + 1;
-		int resultMax = page * args.getReportPageSize();
+		int resultMin = (page - 1) * reportPageSize + 1;
+		int resultMax = page * reportPageSize;
 		if (resultMax > queries.size()) resultMax = queries.size();
-		writer.write("<h1>" + version.getName() + " Results <span>(");
-		if (queries.size() > args.getReportPageSize() && args.getReportPageSize() > 0) {
-			writer.write(resultMin + "–" + resultMax + " ∕ ");
+		writer.write("<h1>" + version.getName() + " Results");
+		if (queries.size() > 1) {
+			writer.write(" <span>(");
+			if (queries.size() > reportPageSize && reportPageSize > 0) {
+				writer.write(resultMin + "–" + resultMax + " ∕ ");
+			}
+			writer.write(queries.size() + ")</span>");
 		}
-		writer.write(queries.size() + ")</span></h1>\n\n");
+		writer.write("</h1>\n\n");
 
 		String startInstant = Instant.ofEpochMilli(start).toString();
 		writer.write("<p>Generated by " + FetcherCommon.getLinkHtml(version.getUrl(), version.getName()) + " " + version.getVersion()
 			+ " in " + ((stop - start) / 1000.0) + " seconds <span>(start <time datetime=\"" + startInstant + "\">" + startInstant + "</time>)</span></p>\n\n");
+		if (type == QueryType.server) {
+			writer.write("<p>Results as <a href=\"results.txt\">plain text</a></p>\n\n");
+		}
 
-		writePagination(args, writer, queries.size(), page);
+		writePagination(args, reportPageSize, reportPaginationSize, writer, queries.size(), page);
 
 		writer.write("</header>\n\n");
 
 		writer.write("<main>\n\n");
 
 		for (int i = resultMin; i <= resultMax; ++i) {
-			writeArticle(args, writer, concepts, queries.get(i - 1), queries.size(), publications.get(i - 1), webpages.get(i - 1), docs.get(i - 1), results.getMappings().get(i - 1), page, i, resultMin, resultMax);
+			writeArticle(args, type, writer, concepts, queries.get(i - 1), queries.size(), publications.get(i - 1), webpages.get(i - 1), docs.get(i - 1), results.getMappings().get(i - 1), page, i, resultMin, resultMax);
 		}
 
 		writer.write("</main>\n\n");
@@ -936,10 +717,10 @@ class Report {
 
 		writer.write("<section id=\"tabs\">\n");
 		writer.write("\n");
-		writeParams(args, writer, concepts, queries, results);
+		writeParams(args, paramsMain, type, writer, concepts, queries, results);
 		writer.write("</section>\n\n");
 
-		writePagination(args, writer, queries.size(), page);
+		writePagination(args, reportPageSize, reportPaginationSize, writer, queries.size(), page);
 
 		writer.write("</footer>\n\n");
 
@@ -948,23 +729,32 @@ class Report {
 		writer.write("</html>\n");
 	}
 
-	static void copyHtmlResources(Path report) throws IOException {
-		for (String resource : HTML_RESOURCES) {
-			Files.copy(Report.class.getResourceAsStream("/html/" + resource), report.resolve(resource));
+	public static void copyHtmlResources(Path path, Version version) throws IOException {
+		Files.copy(Report.class.getResourceAsStream("/html/style.css"), path.resolve("edammap-" + version.getVersion() + ".css"));
+	}
+
+	public static void copyFontResources(Path path) throws IOException {
+		for (String resource : FONT_RESOURCES) {
+			Files.copy(Report.class.getResourceAsStream("/html/" + resource), path.resolve(resource));
 		}
 	}
 
-	static void output(MainArgs args, Path report, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publications, List<List<Webpage>> webpages, List<List<Webpage>> docs, Results results, long start, long stop, Version version) throws IOException {
+	static void output(CoreArgs args, List<Param> paramsMain, QueryType type, int reportPageSize, int reportPaginationSize, Path report, boolean existingDirectory, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publications, List<List<Webpage>> webpages, List<List<Webpage>> docs, Results results, long start, long stop, Version version) throws IOException {
 		if (report != null) {
-			Files.createDirectory(report);
-			copyHtmlResources(report);
-			int pageMax = (queries.size() - 1) / args.getReportPageSize() + 1;
+			if (!existingDirectory) {
+				Files.createDirectory(report);
+			}
+			if (type != QueryType.server) {
+				copyHtmlResources(report, version);
+				copyFontResources(report);
+			}
+			int pageMax = (queries.size() - 1) / reportPageSize + 1;
 			for (int page = 1; page <= pageMax; ++page) {
 				try (BufferedWriter writer = Files.newBufferedWriter(report.resolve("index" + (page == 1 ? "" : page) + ".html"), StandardCharsets.UTF_8)) {
-					out(args, writer, concepts, queries, publications, webpages, docs, results, start, stop, version, page);
+					out(args, paramsMain, type, reportPageSize, reportPaginationSize, writer, concepts, queries, publications, webpages, docs, results, start, stop, version, page);
 				} catch (IOException e) {
 					try {
-						Txt.out(args.getType(), System.out, concepts, queries, results.getMappings());
+						Txt.out(type, System.out, concepts, queries, results.getMappings());
 					} catch (Exception e2) {
 						throw e;
 					}

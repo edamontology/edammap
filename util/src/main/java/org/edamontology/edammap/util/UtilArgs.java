@@ -24,7 +24,6 @@ import java.util.List;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParametersDelegate;
 
-import org.edamontology.edammap.core.preprocessing.PreProcessorArgs;
 import org.edamontology.edammap.core.query.QueryType;
 import org.edamontology.pubfetcher.BasicArgs;
 import org.edamontology.pubfetcher.FetcherArgs;
@@ -47,33 +46,45 @@ public class UtilArgs extends BasicArgs {
 	@Parameter(names = { "-query-type" }, description = "TODO")
 	QueryType queryType = QueryType.generic;
 
-	@Parameter(names = { "--make-query-idf" }, arity = 4, description = "String queryPath, QueryType type, String outputPath, String database")
-	List<String> makeQueryIdf = null;
+	@Parameter(names = { "--make-idf", "--make-query-idf" }, arity = 3, description = "String queryPath, String database, String idfPath")
+	List<String> makeIdf = null;
 
-	@Parameter(names = { "--make-query-idf-without-database" }, arity = 3, description = "String queryPath, QueryType type, String outputPath")
-	List<String> makeQueryIdfWithoutDatabase = null;
+	@Parameter(names = { "--make-idf-nodb", "--make-query-idf-nodb" }, arity = 2, description = "String queryPath, String idfPath")
+	List<String> makeIdfNoDb = null;
 
-	@Parameter(names = { "--make-query-idf-no-webpages-docs" }, description = "TODO")
-	boolean makeQueryIdfNoWebpagesDocs = false;
+	@Parameter(names = { "--make-idf-stemmed", "--make-query-idf-stemmed" }, arity = 3, description = "String queryPath, String database, String idfPath")
+	List<String> makeIdfStemmed = null;
 
-	@Parameter(names = { "--make-query-idf-no-fulltext" }, description = "TODO")
-	boolean makeQueryIdfNoFulltext = false;
+	@Parameter(names = { "--make-idf-stemmed-nodb", "--make-query-idf-stemmed-nodb" }, arity = 2, description = "String queryPath, String idfPath")
+	List<String> makeIdfStemmedNoDb = null;
 
-	@Parameter(names = { "--print-query-idf-top" }, arity = 2, description = "String inputPath, long n")
-	List<String> printQueryIdfTop = null;
+	@Parameter(names = { "-make-idf-type", "-make-query-idf-type" }, description = "QueryType type")
+	QueryType makeIdfType = QueryType.biotools;
 
-	@Parameter(names = { "--biotools-full" }, description = "String outputPath")
+	@Parameter(names = { "-make-idf-webpages-docs", "-make-query-idf-webpages-docs" }, arity = 1, description = "TODO")
+	boolean makeIdfWebpagesDocs = true;
+
+	@Parameter(names = { "-make-idf-fulltext", "-make-query-idf-fulltext" }, arity = 1, description = "TODO")
+	boolean makeIdfFulltext = true;
+
+	@Parameter(names = { "--print-idf-top", "--print-query-idf-top" }, arity = 2, description = "String inputPath, long n")
+	List<String> printIdfTop = null;
+
+	@Parameter(names = { "--print-idf", "--print-query-idf" }, arity = 2, description = "String inputPath, String term")
+	List<String> printIdf = null;
+
+	@Parameter(names = { "--biotools-full" }, description = "String outputPath, FetcherArgs for timeout and user agent")
 	String biotoolsFull = null;
 
-	@Parameter(names = { "--biotools-dev-full" }, description = "String outputPath")
+	@Parameter(names = { "--biotools-dev-full" }, description = "String outputPath, FetcherArgs for timeout and user agent")
 	String biotoolsDevFull = null;
+
+	@Parameter(names = { "--make-server-files" }, description = "String outputPath")
+	String makeServerFiles = null;
 
 	@ParametersDelegate
 	FetcherArgs fetcherArgs = new FetcherArgs();
 
 	@ParametersDelegate
 	FetcherUtilArgs fetcherUtilArgs = new FetcherUtilArgs();
-
-	@ParametersDelegate
-	PreProcessorArgs preProcessorArgs = new PreProcessorArgs();
 }

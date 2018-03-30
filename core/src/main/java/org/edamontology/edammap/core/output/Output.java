@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016, 2017 Erik Jaaniso
+ * Copyright © 2016, 2017, 2018 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -24,11 +24,12 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-import org.edamontology.edammap.core.args.MainArgs;
+import org.edamontology.edammap.core.args.CoreArgs;
 import org.edamontology.edammap.core.benchmarking.Results;
 import org.edamontology.edammap.core.edam.Concept;
 import org.edamontology.edammap.core.edam.EdamUri;
 import org.edamontology.edammap.core.query.Query;
+import org.edamontology.edammap.core.query.QueryType;
 import org.edamontology.pubfetcher.FetcherCommon;
 import org.edamontology.pubfetcher.Publication;
 import org.edamontology.pubfetcher.Version;
@@ -36,22 +37,22 @@ import org.edamontology.pubfetcher.Webpage;
 
 public class Output {
 
-	private MainArgs args;
+	private final Path output;
 
-	private Path output;
+	private final Path report;
 
-	private Path report;
+	private final boolean existingDirectory;
 
-	public Output(MainArgs args) throws IOException {
-		this.args = args;
+	public Output(String output, String report, boolean existingDirectory) throws IOException {
+		this.output = (output == null || output.isEmpty()) ? null : FetcherCommon.outputPath(output);
 
-		this.output = args.getOutput().isEmpty() ? null : FetcherCommon.outputPath(args.getOutput());
+		this.report = (report == null || report.isEmpty()) ? null : FetcherCommon.outputPath(report, true, existingDirectory);
 
-		this.report = args.getReport().isEmpty() ? null : FetcherCommon.outputPath(args.getReport(), true);
+		this.existingDirectory = existingDirectory;
 	}
 
-	public void output(Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publications, List<List<Webpage>> webpages, List<List<Webpage>> docs, Results results, long start, long stop, Version version) throws IOException {
-		Txt.output(args.getType(), output, report, concepts, queries, publications, results.getMappings());
-		Report.output(args, report, concepts, queries, publications, webpages, docs, results, start, stop, version);
+	public void output(CoreArgs args, List<Param> paramsMain, QueryType type, int reportPageSize, int reportPaginationSize, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Webpage>> webpages, List<List<Webpage>> docs, List<List<Publication>> publications, Results results, long start, long stop, Version version) throws IOException {
+		Txt.output(type, output, report, concepts, queries, publications, results.getMappings());
+		Report.output(args, paramsMain, type, reportPageSize, reportPaginationSize, report, existingDirectory, concepts, queries, publications, webpages, docs, results, start, stop, version);
 	}
 }

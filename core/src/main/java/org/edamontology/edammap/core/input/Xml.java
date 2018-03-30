@@ -33,16 +33,15 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.edamontology.edammap.core.input.xml.Biotools14;
 import org.edamontology.edammap.core.query.QueryType;
-import org.edamontology.pubfetcher.FetcherArgs;
 
 public class Xml {
 
-	public static List<InputType> load(String queryPath, QueryType type, FetcherArgs fetcherArgs) throws IOException, ParseException {
+	public static List<InputType> load(String queryPath, QueryType type, int timeout, String userAgent) throws IOException, ParseException {
 		List<InputType> inputs = new ArrayList<>();
 
 		if (type == QueryType.biotools14) {
 			XMLStreamReader reader = null;
-			try (InputStream is = Input.newInputStream(queryPath, true, fetcherArgs)) {
+			try (InputStream is = Input.newInputStream(queryPath, true, timeout, userAgent)) {
 				XMLInputFactory factory = XMLInputFactory.newInstance();
 				factory.setProperty("javax.xml.stream.isCoalescing", true);
 				reader = factory.createXMLStreamReader(is, StandardCharsets.UTF_8.name());

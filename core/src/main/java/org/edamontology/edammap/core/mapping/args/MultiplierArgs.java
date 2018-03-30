@@ -24,38 +24,59 @@ import org.edamontology.edammap.core.args.ZeroToOneDouble;
 import com.beust.jcommander.Parameter;
 
 public class MultiplierArgs {
-	@Parameter(names = { "--label-multiplier" }, validateWith = ZeroToOneDouble.class, description = "Score multiplier for matching a concept label. Set to 0 to disable matching of labels.")
+
+	public static final String LABEL_MULTIPLIER = "label-multiplier";
+	@Parameter(names = { "--" + LABEL_MULTIPLIER }, validateWith = ZeroToOneDouble.class, description = "Score multiplier for matching a concept label. Set to 0 to disable matching of labels.")
 	private double labelMultiplier = 1;
 
-	@Parameter(names = { "--exact-synonym-multiplier" }, validateWith = ZeroToOneDouble.class, description = "Score multiplier for matching a concept exact synonym. Set to 0 to disable matching of exact synonyms.")
+	public static final String EXACT_SYNONYM_MULTIPLIER = "exact-synonym-multiplier";
+	@Parameter(names = { "--" + EXACT_SYNONYM_MULTIPLIER }, validateWith = ZeroToOneDouble.class, description = "Score multiplier for matching a concept exact synonym. Set to 0 to disable matching of exact synonyms.")
 	private double exactSynonymMultiplier = 1;
 
-	@Parameter(names = { "--narrow-broad-synonym-multiplier" }, validateWith = ZeroToOneDouble.class, description = "Score multiplier for matching a concept narrow or broad synonym. Set to 0 to disable matching of narrow and broad synonyms.")
-	private double narrowBroadMultiplier = 1;
+	public static final String NARROW_BROAD_SYNONYM_MULTIPLIER = "narrow-broad-synonym-multiplier";
+	@Parameter(names = { "--" + NARROW_BROAD_SYNONYM_MULTIPLIER }, validateWith = ZeroToOneDouble.class, description = "Score multiplier for matching a concept narrow or broad synonym. Set to 0 to disable matching of narrow and broad synonyms.")
+	private double narrowBroadSynonymMultiplier = 1;
 
-	@Parameter(names = { "--definition-multiplier" }, validateWith = ZeroToOneDouble.class, description = "Score multiplier for matching a concept definition. Set to 0 to disable matching of definitions.")
+	public static final String DEFINITION_MULTIPLIER = "definition-multiplier";
+	@Parameter(names = { "--" + DEFINITION_MULTIPLIER }, validateWith = ZeroToOneDouble.class, description = "Score multiplier for matching a concept definition. Set to 0 to disable matching of definitions.")
 	private double definitionMultiplier = 1;
 
-	@Parameter(names = { "--comment-multiplier" }, validateWith = ZeroToOneDouble.class, description = "Score multiplier for matching a concept comment. Set to 0 to disable matching of comments.")
+	public static final String COMMENT_MULTIPLIER = "comment-multiplier";
+	@Parameter(names = { "--" + COMMENT_MULTIPLIER }, validateWith = ZeroToOneDouble.class, description = "Score multiplier for matching a concept comment. Set to 0 to disable matching of comments.")
 	private double commentMultiplier = 1;
 
 	public double getLabelMultiplier() {
 		return labelMultiplier;
 	}
+	public void setLabelMultiplier(double labelMultiplier) {
+		this.labelMultiplier = labelMultiplier;
+	}
 
 	public double getExactSynonymMultiplier() {
 		return exactSynonymMultiplier;
 	}
+	public void setExactSynonymMultiplier(double exactSynonymMultiplier) {
+		this.exactSynonymMultiplier = exactSynonymMultiplier;
+	}
 
-	public double getNarrowBroadMultiplier() {
-		return narrowBroadMultiplier;
+	public double getNarrowBroadSynonymMultiplier() {
+		return narrowBroadSynonymMultiplier;
+	}
+	public void setNarrowBroadSynonymMultiplier(double narrowBroadSynonymMultiplier) {
+		this.narrowBroadSynonymMultiplier = narrowBroadSynonymMultiplier;
 	}
 
 	public double getDefinitionMultiplier() {
 		return definitionMultiplier;
 	}
+	public void setDefinitionMultiplier(double definitionMultiplier) {
+		this.definitionMultiplier = definitionMultiplier;
+	}
 
 	public double getCommentMultiplier() {
 		return commentMultiplier;
+	}
+	public void setCommentMultiplier(double commentMultiplier) {
+		this.commentMultiplier = commentMultiplier;
 	}
 }

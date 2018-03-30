@@ -155,7 +155,7 @@ public final class PubMedApps {
 
 		Set<String> pmids = new LinkedHashSet<>();
 
-		Document doc = new Fetcher(fetcherArgs).getDoc(meshQuery, null);
+		Document doc = new Fetcher().getDoc(meshQuery, null, fetcherArgs);
 		if (doc != null) {
 			for (Element id : doc.getElementsByTag("Id")) {
 				pmids.add(id.text());
@@ -809,7 +809,7 @@ public final class PubMedApps {
 
 		Idf idf = new Idf(queryIdf);
 
-		List<Query> queries = QueryLoader.get(queryPath, queryType, fetcherArgs);
+		List<Query> queries = QueryLoader.get(queryPath, queryType, fetcherArgs.getTimeout(), fetcherArgs.getPrivateArgs().getUserAgent());
 
 		List<List<String>> queryNamesExtracted = new ArrayList<>();
 		List<String> queryNamesProcessed = new ArrayList<>();

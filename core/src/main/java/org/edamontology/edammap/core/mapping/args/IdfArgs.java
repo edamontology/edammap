@@ -24,52 +24,81 @@ import com.beust.jcommander.Parameter;
 import org.edamontology.edammap.core.args.PositiveDouble;
 
 public class IdfArgs {
-	@Parameter(names = { "--concept-idf-scaling" }, validateWith = PositiveDouble.class, description = "Set to 0 to disable concept IDF. Setting to 1 means linear IDF weighting.")
+
+	public static final String CONCEPT_IDF_SCALING = "concept-idf-scaling";
+	@Parameter(names = { "--" + CONCEPT_IDF_SCALING }, validateWith = PositiveDouble.class, description = "Set to 0 to disable concept IDF. Setting to 1 means linear IDF weighting.")
 	private double conceptIdfScaling = 0.5;
 
-	@Parameter(names = { "--query-idf-scaling" }, validateWith = PositiveDouble.class, description = "Set to 0 to disable query IDF. Setting to 1 means linear IDF weighting.")
+	public static final String QUERY_IDF_SCALING = "query-idf-scaling";
+	@Parameter(names = { "--" + QUERY_IDF_SCALING }, validateWith = PositiveDouble.class, description = "Set to 0 to disable query IDF. Setting to 1 means linear IDF weighting.")
 	private double queryIdfScaling = 0.5;
 
-	@Parameter(names = { "--label-synonyms-idf" }, arity = 1, description = "IDF weighting for concept label and synonyms")
+	public static final String LABEL_SYNONYMS_IDF = "label-synonyms-idf";
+	@Parameter(names = { "--" + LABEL_SYNONYMS_IDF }, arity = 1, description = "IDF weighting for concept label and synonyms")
 	private boolean labelSynonymsIdf = false;
 
-	@Parameter(names = { "--name-keywords-idf" }, arity = 1, description = "IDF weighting for query name and keywords")
+	public static final String NAME_KEYWORDS_IDF = "name-keywords-idf";
+	@Parameter(names = { "--" + NAME_KEYWORDS_IDF }, arity = 1, description = "IDF weighting for query name and keywords")
 	private boolean nameKeywordsIdf = true;
 
-	@Parameter(names = { "--description-idf" }, arity = 1, description = "IDF weighting for query description")
+	public static final String DESCRIPTION_IDF = "description-idf";
+	@Parameter(names = { "--" + DESCRIPTION_IDF }, arity = 1, description = "IDF weighting for query description")
 	private boolean descriptionIdf = true;
 
-	@Parameter(names = { "--title-keywords-idf" }, arity = 1, description = "IDF weighting for publication title and keywords")
+	public static final String TITLE_KEYWORDS_IDF = "title-keywords-idf";
+	@Parameter(names = { "--" + TITLE_KEYWORDS_IDF }, arity = 1, description = "IDF weighting for publication title and keywords")
 	private boolean titleKeywordsIdf = true;
 
-	@Parameter(names = { "--abstract-idf" }, arity = 1, description = "IDF weighting for publication abstract")
+	public static final String ABSTRACT_IDF = "abstract-idf";
+	@Parameter(names = { "--" + ABSTRACT_IDF }, arity = 1, description = "IDF weighting for publication abstract")
 	private boolean abstractIdf = true;
 
 	public double getConceptIdfScaling() {
 		return conceptIdfScaling;
 	}
+	public void setConceptIdfScaling(double conceptIdfScaling) {
+		this.conceptIdfScaling = conceptIdfScaling;
+	}
 
 	public double getQueryIdfScaling() {
 		return queryIdfScaling;
+	}
+	public void setQueryIdfScaling(double queryIdfScaling) {
+		this.queryIdfScaling = queryIdfScaling;
 	}
 
 	public boolean isLabelSynonymsIdf() {
 		return labelSynonymsIdf;
 	}
+	public void setLabelSynonymsIdf(boolean labelSynonymsIdf) {
+		this.labelSynonymsIdf = labelSynonymsIdf;
+	}
 
 	public boolean isNameKeywordsIdf() {
 		return nameKeywordsIdf;
+	}
+	public void setNameKeywordsIdf(boolean nameKeywordsIdf) {
+		this.nameKeywordsIdf = nameKeywordsIdf;
 	}
 
 	public boolean isDescriptionIdf() {
 		return descriptionIdf;
 	}
+	public void setDescriptionIdf(boolean descriptionIdf) {
+		this.descriptionIdf = descriptionIdf;
+	}
 
 	public boolean isTitleKeywordsIdf() {
 		return titleKeywordsIdf;
 	}
+	public void setTitleKeywordsIdf(boolean titleKeywordsIdf) {
+		this.titleKeywordsIdf = titleKeywordsIdf;
+	}
 
 	public boolean isAbstractIdf() {
 		return abstractIdf;
+	}
+	public void setAbstractIdf(boolean abstractIdf) {
+		this.abstractIdf = abstractIdf;
 	}
 }

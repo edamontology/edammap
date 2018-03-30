@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016 Erik Jaaniso
+ * Copyright © 2016, 2018 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -19,42 +19,50 @@
 
 package org.edamontology.edammap.core.idf;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import com.carrotsearch.hppc.ObjectDoubleScatterMap;
 
 public class Idf {
 
-	private final Map<String, Double> idfMap;
+	private final ObjectDoubleScatterMap<String> idfMap;
 
-	private final Map<String, Integer> idfTop;
+	private final List<IdfTop> idfTop;
 
-	public Idf(Map<String, Double> idfMap) {
+	public Idf(ObjectDoubleScatterMap<String> idfMap) {
 		this.idfMap = idfMap;
 		this.idfTop = null;
 	}
 
 	public Idf(String inputPath, boolean top) throws IOException {
-		try (Stream<String> lines = Files.lines(Paths.get(inputPath), StandardCharsets.UTF_8)) {
+		try (BufferedReader br = Files.newBufferedReader(Paths.get(inputPath), StandardCharsets.UTF_8)) {
 			if (top) {
-				this.idfTop = lines.map(s -> s.split("\t"))
-					.sorted(Collections.reverseOrder(Comparator.comparing(i -> Integer.parseInt(i[1]))))
-					.collect(Collectors.toMap(s -> s[0], i -> Integer.parseInt(i[1]),
-						(u,v) -> { throw new IllegalStateException(String.format("Duplicate key %s", u)); },
-						LinkedHashMap::new));
+				this.idfTop = new ArrayList<>();
+				for (String line; (line = br.readLine()) != null; ) {
+					int tab = line.indexOf("\t");
+					String key = line.substring(0, tab);
+					int value = Integer.parseInt(line.substring(tab + 1, line.indexOf("\t", tab + 1)));
+					idfTop.add(new IdfTop(key, value));
+				}
+				Collections.sort(idfTop);
 				this.idfMap = null;
 			} else {
-				this.idfMap = lines.map(s -> s.split("\t"))
-					.collect(Collectors.toMap(s -> s[0], d -> Double.parseDouble(d[2])));
+				this.idfMap = new ObjectDoubleScatterMap<>();
+				for (String line; (line = br.readLine()) != null; ) {
+					int tab = line.indexOf("\t");
+					String key = line.substring(0, tab);
+					double value = Double.parseDouble(line.substring(line.indexOf("\t", tab + 1) + 1));
+					this.idfMap.put(key, value);
+				}
 				this.idfTop = null;
 			}
 		}
@@ -64,17 +72,19 @@ public class Idf {
 		this(inputPath, false);
 	}
 
-	public Double getIdf(String term) {
-		Double idf = idfMap.get(term);
-		if (idf != null) return idf;
-		else return Double.valueOf(1.0);
+	public double getIdf(String term) {
+		if (idfMap.containsKey(term)) {
+			return idfMap.get(term);
+		} else {
+			return 1.0d;
+		}
 	}
 
 	public List<Double> getIdf(Collection<String> terms) {
 		return terms.stream().map(term -> getIdf(term)).collect(Collectors.toList());
 	}
 
-	public Map<String, Integer> getTop() {
+	public List<IdfTop> getTop() {
 		return idfTop;
 	}
 }
