@@ -33,8 +33,12 @@ public class ServerArgs extends BasicArgs {
 	private String edam;
 
 	public static final String BASE_URI = "base-uri";
-	@Parameter(names = { "-b", "--" + BASE_URI }, description = "Base URI where server will be deployed")
+	@Parameter(names = { "-b", "--" + BASE_URI }, description = "URI where server will be deployed (as schema://host:port)")
 	private String baseUri = "http://localhost:8080";
+
+	public static final String PATH = "path";
+	@Parameter(names = { "-p", "--" + PATH }, description = "Path where server will be deployed (only one single path segment supported)")
+	private String path = "edammap";
 
 	public static final String FILES = "files";
 	@Parameter(names = { "-f", "--" + FILES }, required = true, description = "Directory with HTML resources and output results")
@@ -57,6 +61,10 @@ public class ServerArgs extends BasicArgs {
 
 	public String getBaseUri() {
 		return baseUri;
+	}
+
+	public String getPath() {
+		return path;
 	}
 
 	public String getFiles() {

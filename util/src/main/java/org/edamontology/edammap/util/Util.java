@@ -110,7 +110,7 @@ public final class Util {
 	}
 
 	private static void makeServerFiles(String outputPath, Version version) throws IOException {
-		logger.info("Copying server CSS, JS and fonts to {}", outputPath);
+		logger.info("Copying server HTML, CSS, JS and fonts to {}", outputPath);
 		Path path = FetcherCommon.outputPath(outputPath, true, false);
 		Files.createDirectory(path);
 		Server.copyHtmlResources(path);

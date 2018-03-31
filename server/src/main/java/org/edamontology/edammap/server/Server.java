@@ -31,10 +31,7 @@ import org.edamontology.edammap.core.preprocessing.Stopwords;
 import org.edamontology.edammap.core.processing.Processor;
 import org.edamontology.pubfetcher.BasicArgs;
 import org.edamontology.pubfetcher.Version;
-import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.grizzly.http.server.Request;
-import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.server.StaticHttpHandler;
 import org.glassfish.grizzly.http.server.accesslog.AccessLogBuilder;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
@@ -72,6 +69,7 @@ public final class Server {
 	static Map<EdamUri, Concept> concepts;
 
 	public static void copyHtmlResources(Path path) throws IOException {
+		Files.copy(Server.class.getResourceAsStream("/index.html"), path.resolve("index.html"));
 		Files.copy(Server.class.getResourceAsStream("/style.css"), path.resolve("style.css"));
 		Files.copy(Server.class.getResourceAsStream("/script.js"), path.resolve("script.js"));
 	}
@@ -104,27 +102,11 @@ public final class Server {
 		final ResourceConfig rc = new ResourceConfig().packages("org.edamontology.edammap.server");
 		// TODO .property(JsonGenerator.PRETTY_PRINTING, true);
 
-		HttpServer httpServer = GrizzlyHttpServerFactory.createHttpServer(URI.create(args.getBaseUri() + "/api"), rc, false);
+		HttpServer httpServer = GrizzlyHttpServerFactory.createHttpServer(URI.create(args.getBaseUri() + "/" + args.getPath() + "/api"), rc, false);
 
 		final StaticHttpHandler filesHttpHandler = new StaticHttpHandler(args.getFiles());
 		filesHttpHandler.setDirectorySlashOff(false);
-		httpServer.getServerConfiguration().addHttpHandler(filesHttpHandler, "/files/");
-
-		// TODO can add front page from src/main/resources/www/
-		//httpServer.getServerConfiguration().addHttpHandler(new CLStaticHttpHandler(Server.class.getClassLoader(), "/www/"), "/");
-
-		httpServer.getServerConfiguration().addHttpHandler(
-			new HttpHandler() {
-				@Override
-				public void service(Request request, Response response) throws Exception {
-					// TODO can add front page programmatically
-					//response.setContentType(MediaType.TEXT_PLAIN);
-					//response.setContentLength("Hello".length());
-					//response.getWriter().write("Hello");
-					response.sendRedirect("/api");
-				}
-			},
-			"/");
+		httpServer.getServerConfiguration().addHttpHandler(filesHttpHandler, "/" + args.getPath() + "/files");
 
 		if (args.getLog() != null) {
 			Path accessDir = Paths.get(args.getLog() + "/access");

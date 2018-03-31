@@ -195,7 +195,7 @@ public class Resource {
 		output.output(coreArgs, Server.paramsMain, QueryType.server, 1, 1,
 			Server.concepts, queries, webpages, docs, publications, results, start, stop, Server.version);
 
-		URI location = new URI("../files/" + uuid + "/");
+		URI location = new URI("/" + Server.args.getPath() + "/" + uuid + "/");
 		logger.info("POSTED {}", location);
 
 		return Response.seeOther(location).build();

@@ -1,5 +1,5 @@
 
-var check = function(id, method, api) {
+var check = function(id, method, endpoint) {
 	var input = document.getElementById(id);
 	var output = document.getElementById(id + '-output');
 	if (input.value === '') {
@@ -25,7 +25,7 @@ var check = function(id, method, api) {
 			input.readonly = false;
 		}
 	}
-	request.open(method, '/api/' + api, true);
+	request.open(method, endpoint, true);
 	request.send(input.value);
 	input.classList.remove('input-good');
 	output.classList.remove('output-good');
@@ -35,7 +35,6 @@ var check = function(id, method, api) {
 	output.classList.add('output-medium');
 	output.innerHTML = '<span>Working...</span>';
 };
-
 
 var entities = {
 	'&': '&amp;',
