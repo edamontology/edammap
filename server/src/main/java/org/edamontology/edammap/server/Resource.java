@@ -84,7 +84,7 @@ public class Resource {
 	private static final int MAX_LINKS_SIZE = 10;
 	private static final int MAX_PUBLICATION_IDS_SIZE = 10;
 
-	private String runGet(MultivaluedMap<String, String> params, Request request) {
+	static String runGet(MultivaluedMap<String, String> params, Request request) {
 		try {
 			logger.info("GET {} from {}", params, request.getRemoteAddr());
 			CoreArgs args = new CoreArgs();

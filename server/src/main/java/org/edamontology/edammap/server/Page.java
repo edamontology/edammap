@@ -43,7 +43,7 @@ public final class Page {
 
 		writer.write("<body>\n\n");
 
-		writer.write("<form method=\"post\">\n\n");
+		writer.write("<form action=\"/" + Server.args.getPath() + "/api\" method=\"post\">\n\n");
 
 		writer.write("<header>\n\n");
 

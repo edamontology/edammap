@@ -135,6 +135,7 @@ public final class ParamParse {
 	}
 
 	static void parseParams(MultivaluedMap<String, String> params, CoreArgs args) {
+		if (params == null) return; // TODO
 		Boolean valueBoolean = null;
 		Integer valueInteger = null;
 		Double valueDouble = null;
