@@ -1,5 +1,5 @@
 
-var check = function(id, method, endpoint) {
+var check = function(id, endpoint) {
 	var input = document.getElementById(id);
 	var output = document.getElementById(id + '-output');
 	if (input.value === '') {
@@ -25,7 +25,7 @@ var check = function(id, method, endpoint) {
 			input.readonly = false;
 		}
 	}
-	request.open(method, endpoint, true);
+	request.open('POST', endpoint, true);
 	request.send(input.value);
 	input.classList.remove('input-good');
 	output.classList.remove('output-good');

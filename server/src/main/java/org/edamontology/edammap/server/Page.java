@@ -94,7 +94,7 @@ public final class Page {
 		writer.write("\t\t<div>\n");
 		writer.write("\t\t\t<div class=\"label\">URLs of homepage, etc<br><span class=\"ex\">Ex:</span> <span class=\"example\">https://biit.cs.ut.ee/gprofiler/</span></div>\n");
 		writer.write("\t\t\t<div class=\"io\">\n");
-		writer.write("\t\t\t\t<div class=\"input\"><textarea id=\"webpage-urls\" name=\"webpage-urls\" rows=\"3\" onblur=\"check('webpage-urls','PATCH','/" + Server.args.getPath() + "/api/web')\" maxlength=\"" + Resource.MAX_LINKS_LENGTH + "\"></textarea></div>\n");
+		writer.write("\t\t\t\t<div class=\"input\"><textarea id=\"webpage-urls\" name=\"webpage-urls\" rows=\"3\" onblur=\"check('webpage-urls','/" + Server.args.getPath() + "/api/web')\" maxlength=\"" + Resource.MAX_LINKS_LENGTH + "\"></textarea></div>\n");
 		writer.write("\t\t\t\t<div id=\"webpage-urls-output\" class=\"output\"></div>\n");
 		writer.write("\t\t\t</div>\n");
 		writer.write("\t\t</div>\n");
@@ -104,7 +104,7 @@ public final class Page {
 		writer.write("\t\t<div>\n");
 		writer.write("\t\t\t<div class=\"label\">URLs of documentations<br><span class=\"ex\">Ex:</span> <span class=\"example\">https://biit.cs.ut.ee/gprofiler/help.cgi</span></div>\n");
 		writer.write("\t\t\t<div class=\"io\">\n");
-		writer.write("\t\t\t\t<div class=\"input\"><textarea id=\"doc-urls\" name=\"doc-urls\" rows=\"3\" onblur=\"check('doc-urls','PATCH','/" + Server.args.getPath() + "/api/doc')\" maxlength=\"" + Resource.MAX_LINKS_LENGTH + "\"></textarea></div>\n");
+		writer.write("\t\t\t\t<div class=\"input\"><textarea id=\"doc-urls\" name=\"doc-urls\" rows=\"3\" onblur=\"check('doc-urls','/" + Server.args.getPath() + "/api/doc')\" maxlength=\"" + Resource.MAX_LINKS_LENGTH + "\"></textarea></div>\n");
 		writer.write("\t\t\t\t<div id=\"doc-urls-output\" class=\"output\"></div>\n");
 		writer.write("\t\t\t</div>\n");
 		writer.write("\t\t</div>\n");
@@ -117,7 +117,7 @@ public final class Page {
 		writer.write("\t\t<div>\n");
 		writer.write("\t\t\t<div class=\"label\">PMID/PMCID/DOI of journal article<br><span class=\"ex\">Ex:</span> <span class=\"example\">17478515<br>PMC3125778<br>10.1093/nar/gkw199</span></div>\n");
 		writer.write("\t\t\t<div class=\"io\">\n");
-		writer.write("\t\t\t\t<div class=\"input\"><textarea id=\"publication-ids\" name=\"publication-ids\" rows=\"3\" onblur=\"check('publication-ids','PATCH','/" + Server.args.getPath() + "/api/pub')\" maxlength=\"" + Resource.MAX_PUBLICATION_IDS_LENGTH + "\"></textarea></div>\n");
+		writer.write("\t\t\t\t<div class=\"input\"><textarea id=\"publication-ids\" name=\"publication-ids\" rows=\"3\" onblur=\"check('publication-ids','/" + Server.args.getPath() + "/api/pub')\" maxlength=\"" + Resource.MAX_PUBLICATION_IDS_LENGTH + "\"></textarea></div>\n");
 		writer.write("\t\t\t\t<div id=\"publication-ids-output\" class=\"output\"></div>\n");
 		writer.write("\t\t\t</div>\n");
 		writer.write("\t\t</div>\n");
@@ -127,7 +127,7 @@ public final class Page {
 		writer.write("\t\t<div>\n");
 		writer.write("\t\t\t<div class=\"label\">Existing annotations from EDAM<br><span class=\"ex\">Ex:</span> <span class=\"example\">http://edamontology.org/topic_1775<br>operation_2436<br>data_3021<br>format_1964</span></div>\n");
 		writer.write("\t\t\t<div class=\"io\">\n");
-		writer.write("\t\t\t\t<div class=\"input\"><textarea id=\"annotations\" name=\"annotations\" rows=\"5\" onblur=\"check('annotations','POST','/" + Server.args.getPath() + "/api/edam')\" maxlength=\"" + Resource.MAX_ANNOTATIONS_LENGTH + "\"></textarea></div>\n");
+		writer.write("\t\t\t\t<div class=\"input\"><textarea id=\"annotations\" name=\"annotations\" rows=\"5\" onblur=\"check('annotations','/" + Server.args.getPath() + "/api/edam')\" maxlength=\"" + Resource.MAX_ANNOTATIONS_LENGTH + "\"></textarea></div>\n");
 		writer.write("\t\t\t\t<div id=\"annotations-output\" class=\"output\"></div>\n");
 		writer.write("\t\t\t</div>\n");
 		writer.write("\t\t</div>\n");

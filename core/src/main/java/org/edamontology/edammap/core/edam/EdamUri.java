@@ -44,7 +44,7 @@ public class EdamUri {
 	public static boolean isEdamUri(String uri, String prefix) {
 		if (uri == null || uri.isEmpty()) return false;
 		if (!uri.startsWith(prefix)) return false;
-		if (uri.charAt(prefix.length()) != '/') return false;
+		if (!(uri.length() > prefix.length()) || uri.charAt(prefix.length()) != '/') return false;
 
 		String[] branch_nr = uri.substring(prefix.length() + 1).split("_", 2);
 		try {

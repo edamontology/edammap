@@ -35,7 +35,6 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -67,6 +66,7 @@ import org.edamontology.pubfetcher.FetcherArgs;
 import org.edamontology.pubfetcher.Publication;
 import org.edamontology.pubfetcher.Webpage;
 import org.glassfish.grizzly.http.server.Request;
+import org.glassfish.grizzly.http.util.Header;
 
 @Path("/")
 public class Resource {
@@ -99,9 +99,10 @@ public class Resource {
 	}
 
 	@GET
-	@Produces(MediaType.TEXT_HTML)
-	public String get(@Context UriInfo ui, @Context Request request) {
-		return runGet(ui.getQueryParameters(), request);
+	@Produces(MediaType.TEXT_HTML + ";charset=utf-8")
+	public Response get(@Context UriInfo ui, @Context Request request) {
+		String responseText = runGet(ui.getQueryParameters(), request);
+		return Response.ok(responseText).header(Header.ContentLength.toString(), responseText.getBytes().length).build();
 	}
 
 	private Response runPost(MultivaluedMap<String, String> params, Request request) throws IOException, ParseException, URISyntaxException {
@@ -195,7 +196,7 @@ public class Resource {
 		output.output(coreArgs, Server.paramsMain, QueryType.server, 1, 1,
 			Server.concepts, queries, webpages, docs, publications, results, start, stop, Server.version);
 
-		URI location = new URI("/" + Server.args.getPath() + "/" + uuid + "/");
+		URI location = new URI(Server.args.getHttpsProxy() ? "https" : request.getScheme(), null, request.getServerName(), Server.args.getHttpsProxy() ? 443 : request.getServerPort(), "/" + Server.args.getPath() + "/" + uuid + "/", null, null);
 		logger.info("POSTED {}", location);
 
 		return Response.seeOther(location).build();
@@ -249,21 +250,21 @@ public class Resource {
 	}
 
 	@Path("web")
-	@PATCH
+	@POST
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response patchWeb(String requestString, @Context Request request) {
 		return patch(requestString, request, "/web", Webpage.class, false, MAX_LINKS_SIZE);
 	}
 
 	@Path("doc")
-	@PATCH
+	@POST
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response patchDoc(String requestString, @Context Request request) {
 		return patch(requestString, request, "/doc", Webpage.class, true, MAX_LINKS_SIZE);
 	}
 
 	@Path("pub")
-	@PATCH
+	@POST
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response patchPub(String requestString, @Context Request request) {
 		return patch(requestString, request, "/pub", Publication.class, false, MAX_PUBLICATION_IDS_SIZE);

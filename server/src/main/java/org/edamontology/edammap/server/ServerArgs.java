@@ -40,6 +40,10 @@ public class ServerArgs extends BasicArgs {
 	@Parameter(names = { "-p", "--" + PATH }, description = "Path where server will be deployed (only one single path segment supported)")
 	private String path = "edammap";
 
+	public static final String HTTPS_PROXY = "https-proxy";
+	@Parameter(names = { "--" + HTTPS_PROXY }, description = "Set if we are behind a HTTPS proxy")
+	private boolean httpsProxy = false;
+
 	public static final String FILES = "files";
 	@Parameter(names = { "-f", "--" + FILES }, required = true, description = "Directory with HTML resources and output results")
 	private String files;
@@ -65,6 +69,10 @@ public class ServerArgs extends BasicArgs {
 
 	public String getPath() {
 		return path;
+	}
+
+	public boolean getHttpsProxy() {
+		return httpsProxy;
 	}
 
 	public String getFiles() {

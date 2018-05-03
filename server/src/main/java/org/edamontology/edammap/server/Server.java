@@ -37,22 +37,27 @@ import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.server.StaticHttpHandler;
 import org.glassfish.grizzly.http.server.accesslog.AccessLogBuilder;
+import org.glassfish.grizzly.http.util.ContentType;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedHashMap;
 
 public final class Server {
 
@@ -82,8 +87,10 @@ public final class Server {
 		paramsMain.add(new Param("Ontology file", ServerArgs.EDAM, new File(args.getEdam()).getName(), "https://github.com/edamontology/edamontology/tree/master/releases"));
 		//paramsMain.add(new Param("Number of threads", ServerArgs.THREADS, args.getThreads(), 0.0, null)); // TODO
 
-		// TODO check files + Server.version.getVersion() is existing writable directory
-		//FetcherCommon.outputPath("", true);
+		Path filesDir = Paths.get(args.getFiles() + "/" + version.getVersion());
+		if (!Files.isDirectory(filesDir) || !Files.isWritable(filesDir)) {
+			throw new AccessDeniedException(filesDir.toAbsolutePath().normalize() + " is not a writeable directory!");
+		}
 
 		for (Stopwords stopwords : Stopwords.values()) {
 			stopwordsAll.put(stopwords, PreProcessor.getStopwords(stopwords));
@@ -108,7 +115,13 @@ public final class Server {
 
 		HttpServer httpServer = GrizzlyHttpServerFactory.createHttpServer(URI.create(args.getBaseUri() + "/" + args.getPath() + "/api"), rc, false);
 
-		final StaticHttpHandler filesHttpHandler = new StaticHttpHandler(args.getFiles());
+		final StaticHttpHandler filesHttpHandler = new StaticHttpHandler(args.getFiles()) {
+			@Override
+			protected boolean handle(String uri, Request request, Response response) throws Exception {
+				response.getResponse().setCharacterEncoding("utf-8");
+				return super.handle(uri, request, response);
+			}
+		};
 		filesHttpHandler.setDirectorySlashOff(true);
 		httpServer.getServerConfiguration().addHttpHandler(filesHttpHandler, "/" + args.getPath() + "/*");
 
@@ -116,9 +129,10 @@ public final class Server {
 			new HttpHandler() {
 				@Override
 				public void service(Request request, Response response) throws Exception {
-					String responseText = Resource.runGet(null, request); // TODO replace null with request.getParameterMap()
-					response.setContentType(MediaType.TEXT_HTML);
-					response.setContentLength(responseText.length());
+					String responseText = Resource.runGet(request.getParameterMap().entrySet().stream()
+						.collect(Collectors.toMap(Map.Entry::getKey, e -> Arrays.asList(e.getValue()), (k, v) -> { throw new AssertionError(); }, MultivaluedHashMap<String, String>::new)), request);
+					response.setContentType(ContentType.newContentType(MediaType.TEXT_HTML, "utf-8"));
+					response.setContentLength(responseText.getBytes().length);
 					response.getWriter().write(responseText);
 				}
 			},
@@ -131,7 +145,7 @@ public final class Server {
 			}
 			final AccessLogBuilder builder = new AccessLogBuilder(accessDir + "/edammap-access.log");
 			builder.rotatedDaily();
-			//builder.format(ApacheLogFormat.COMBINED); // TODO
+			//builder.format(ApacheLogFormat.COMBINED); // TODO change from default ApacheLogFormat.COMBINED?
 			builder.instrument(httpServer.getServerConfiguration());
 		}
 
