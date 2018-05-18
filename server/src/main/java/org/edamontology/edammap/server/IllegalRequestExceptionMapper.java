@@ -19,26 +19,27 @@
 
 package org.edamontology.edammap.server;
 
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
-public class ParamException extends WebApplicationException {
+import org.edamontology.pubfetcher.IllegalRequestException;
 
-	private static final long serialVersionUID = 7240254492703489733L;
+@Provider
+public class IllegalRequestExceptionMapper implements ExceptionMapper<IllegalRequestException> {
 
-	private static String toText(String key, String value, String reason) {
-		return "Param \"" + key + "=" + value + "\" " + reason;
-	}
+	@Context
+	private HttpHeaders headers;
 
-	private static String toTextJson(String key, String value, String reason) {
-		return "Param '" + key + "=" + value + "' " + reason;
-	}
-
-	ParamException(String key, String value, String reason, boolean json) {
-		super(Response.status(Status.BAD_REQUEST)
-			.entity(json ? ExceptionCommon.toJson(Status.BAD_REQUEST, toTextJson(key, value, reason)) : toText(key, value, reason) + "\n" + ExceptionCommon.time())
-			.type(json ? MediaType.APPLICATION_JSON : MediaType.TEXT_PLAIN + ";charset=utf-8").build());
+	@Override
+	public Response toResponse(IllegalRequestException e) {
+		boolean json = ExceptionCommon.isJson(headers);
+		return Response.status(Status.BAD_REQUEST)
+			.entity(json ? ExceptionCommon.toJson(Status.BAD_REQUEST, e.getMessage()) : e.getMessage() + "\n" + ExceptionCommon.time())
+			.type(json ? MediaType.APPLICATION_JSON : MediaType.TEXT_PLAIN + ";charset=utf-8").build();
 	}
 }

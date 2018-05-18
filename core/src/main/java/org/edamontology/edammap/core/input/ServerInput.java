@@ -20,8 +20,11 @@
 package org.edamontology.edammap.core.input;
 
 import java.text.ParseException;
+import java.util.regex.Pattern;
 
 public class ServerInput implements InputType {
+
+	private static final Pattern CRLF = Pattern.compile("\r\n");
 
 	private String id = null;
 
@@ -41,13 +44,13 @@ public class ServerInput implements InputType {
 
 	public ServerInput(String name, String keywords, String description,
 			String webpageUrls,	String docUrls,	String publicationIds, String annotations) {
-		this.name = name;
-		this.keywords = keywords;
-		this.description = description;
-		this.webpageUrls = webpageUrls;
-		this.docUrls = docUrls;
-		this.publicationIds = publicationIds;
-		this.annotations = annotations;
+		this.name = crlf(name);
+		this.keywords = crlf(keywords);
+		this.description = crlf(description);
+		this.webpageUrls = crlf(webpageUrls);
+		this.docUrls = crlf(docUrls);
+		this.publicationIds = crlf(publicationIds);
+		this.annotations = crlf(annotations);
 	}
 
 	@Override
@@ -55,6 +58,11 @@ public class ServerInput implements InputType {
 		if (name == null || name.equals("")) {
 			parseException("name", i);
 		}
+	}
+
+	private String crlf(String input) {
+		if (input == null) return null;
+		return CRLF.matcher(input).replaceAll("\n");
 	}
 
 	public String getId() {

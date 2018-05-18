@@ -22,6 +22,7 @@ package org.edamontology.edammap.core.mapping.args;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParametersDelegate;
@@ -42,33 +43,39 @@ public class MapperArgs {
 	@Parameter(names = { "--" + OBSOLETE }, arity = 1, description = "Include/exclude obsolete concepts")
 	private boolean obsolete = false;
 
-	public static final String DONE_ANNOTATIONS = "done-annotations";
+	public static final String DONE_ANNOTATIONS = "doneAnnotations";
 	@Parameter(names = { "--" + DONE_ANNOTATIONS }, arity = 1, description = "Do/don't suggest concepts already used for annotating query. Then parents and children of these concepts are not suggested either (unless --inferior-parent-child is set to true).")
 	private boolean doneAnnotations = true;
 
-	public static final String INFERIOR_PARENTS_CHILDREN = "inferior-parents-children";
+	public static final String INFERIOR_PARENTS_CHILDREN = "inferiorParentsChildren";
 	@Parameter(names = { "--" + INFERIOR_PARENTS_CHILDREN }, arity = 1, description = "Include/exclude parents and children of a better matched concept in suggestion results")
 	private boolean inferiorParentsChildren = false;
 
-	public static final String TOP_LEVEL = "top-level";
+	public static final String TOP_LEVEL = "topLevel";
 	@Parameter(names = { "--" + TOP_LEVEL }, arity = 1, description = "Include/exclude top level concepts (topic, operation, data, format) in suggestion results")
 	private boolean topLevel = false;
 
+	public static final String ALGORITHM_ARGS = "algorithmArgs";
 	@ParametersDelegate
 	private AlgorithmArgs algorithmArgs = new AlgorithmArgs();
 
+	public static final String IDF_ARGS = "idfArgs";
 	@ParametersDelegate
 	private IdfArgs idfArgs = new IdfArgs();
 
+	public static final String MULTIPLIER_ARGS = "multiplierArgs";
 	@ParametersDelegate
 	private MultiplierArgs multiplierArgs = new MultiplierArgs();
 
+	public static final String NORMALISER_ARGS = "normaliserArgs";
 	@ParametersDelegate
 	private NormaliserArgs normaliserArgs = new NormaliserArgs();
 
+	public static final String WEIGHT_ARGS = "weightArgs";
 	@ParametersDelegate
 	private WeightArgs weightArgs = new WeightArgs();
 
+	public static final String SCORE_ARGS = "scoreArgs";
 	@ParametersDelegate
 	private ScoreArgs scoreArgs = new ScoreArgs();
 
@@ -76,7 +83,7 @@ public class MapperArgs {
 		return branches;
 	}
 	public void setBranches(List<Branch> branches) {
-		this.branches = branches;
+		this.branches = branches.stream().distinct().collect(Collectors.toList());
 	}
 
 	public int getMatches() {

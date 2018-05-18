@@ -820,8 +820,12 @@ public final class PubMedApps {
 			queryNamesExtracted.add(Arrays.asList(BIOTOOLS_EXTRACTED_VERSION_TRIM.matcher(String.join(" ", queryNameExtracted)).replaceFirst("").split(" ")));
 			queryNamesProcessed.add(BIOTOOLS_PROCESSED_VERSION_TRIM.matcher(String.join(" ", queryNameProcessed)).replaceFirst(""));
 			List<Link> links = new ArrayList<>();
-			links.addAll(query.getWebpageUrls());
-			links.addAll(query.getDocUrls());
+			if (query.getWebpageUrls() != null) {
+				links.addAll(query.getWebpageUrls());
+			}
+			if (query.getDocUrls() != null) {
+				links.addAll(query.getDocUrls());
+			}
 			queryLinks.add(links.stream()
 				.map(l -> BIOTOOLS_LINK_TRIM_START.matcher(l.getUrl()).replaceFirst(""))
 				.map(l -> BIOTOOLS_LINK_TRIM_END.matcher(l).replaceFirst(""))
@@ -1358,33 +1362,35 @@ public final class PubMedApps {
 
 			for (int i = 0; i < queries.size(); ++i) {
 				Query query = queries.get(i);
-				for (PublicationIds pubIds : query.getPublicationIds()) {
-					if (!pubIds.getPmid().isEmpty() && !result.getPmid().isEmpty() && pubIds.getPmid().equals(result.getPmid())
-							|| !pubIds.getPmcid().isEmpty() && !result.getPmcid().isEmpty() && pubIds.getPmcid().equals(result.getPmcid())
-							|| !pubIds.getDoi().isEmpty() && !result.getDoi().isEmpty() && pubIds.getDoi().equals(result.getDoi())) {
-						result.addExistingName(query.getId(), query.getName());
-						for (String link : result.getLinks()) {
-							String linkTrimmed = BIOTOOLS_LINK_TRIM_START.matcher(link).replaceFirst("");
-							linkTrimmed = BIOTOOLS_LINK_TRIM_END.matcher(linkTrimmed).replaceFirst("");
-							boolean found = false;
-							for (String queryLink : queryLinks.get(i)) {
-								if (linkTrimmed.equalsIgnoreCase(queryLink)) {
-									found = true;
-									break;
-								} else if (linkTrimmed.startsWith(queryLink)) {
-									String rest = linkTrimmed.substring(queryLink.length() - 1);
-									if (LINK_COMPARE_REST.matcher(rest).matches()) {
+				if (query.getPublicationIds() != null) {
+					for (PublicationIds pubIds : query.getPublicationIds()) {
+						if (!pubIds.getPmid().isEmpty() && !result.getPmid().isEmpty() && pubIds.getPmid().equals(result.getPmid())
+								|| !pubIds.getPmcid().isEmpty() && !result.getPmcid().isEmpty() && pubIds.getPmcid().equals(result.getPmcid())
+								|| !pubIds.getDoi().isEmpty() && !result.getDoi().isEmpty() && pubIds.getDoi().equals(result.getDoi())) {
+							result.addExistingName(query.getId(), query.getName());
+							for (String link : result.getLinks()) {
+								String linkTrimmed = BIOTOOLS_LINK_TRIM_START.matcher(link).replaceFirst("");
+								linkTrimmed = BIOTOOLS_LINK_TRIM_END.matcher(linkTrimmed).replaceFirst("");
+								boolean found = false;
+								for (String queryLink : queryLinks.get(i)) {
+									if (linkTrimmed.equalsIgnoreCase(queryLink)) {
 										found = true;
 										break;
+									} else if (linkTrimmed.startsWith(queryLink)) {
+										String rest = linkTrimmed.substring(queryLink.length() - 1);
+										if (LINK_COMPARE_REST.matcher(rest).matches()) {
+											found = true;
+											break;
+										}
 									}
 								}
+								if (!found) {
+									// TODO queryLinks is not complete
+									//result.addNewLink(link);
+								}
 							}
-							if (!found) {
-								// TODO queryLinks is not complete
-								//result.addNewLink(link);
-							}
+							break;
 						}
-						break;
 					}
 				}
 			}

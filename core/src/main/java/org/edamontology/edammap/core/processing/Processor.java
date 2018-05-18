@@ -423,7 +423,7 @@ public class Processor {
 	}
 
 	public List<? extends DatabaseEntry<?>> getDatabaseEntries(List<Object> ids, FetcherArgs fetcherArgs, Class<?> clazz, boolean doc) {
-		if (ids.isEmpty()) return Collections.emptyList();
+		if (ids == null || ids.isEmpty()) return Collections.emptyList();
 		if (clazz.getName().equals(Webpage.class.getName()) && ids.get(0) instanceof String) {
 			if (doc) {
 				return ids.stream().map(s -> FetcherCommon.getDoc((String) s, database, fetcher, fetcherArgs)).collect(Collectors.toList());

@@ -34,7 +34,7 @@ public class ProcessorArgs {
 	@Parameter(names = { "--" + IDF, "--query-" + IDF }, description = "Use the given query IDF file (when stemming is not enabled); if not specified, weighting of queries with IDF scores will be disabled (when stemming is not enabled)")
 	private String idf = "";
 
-	public static final String IDF_STEMMED = "idf-stemmed";
+	public static final String IDF_STEMMED = "idfStemmed";
 	@Parameter(names = { "--" + IDF_STEMMED, "--query-" + IDF_STEMMED }, description = "Use the given query IDF file (when stemming is enabled); if not specified, weighting of queries with IDF scores will be disabled (when stemming is enabled)")
 	private String idfStemmed = "";
 

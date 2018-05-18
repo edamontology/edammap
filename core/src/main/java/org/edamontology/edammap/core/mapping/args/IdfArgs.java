@@ -25,31 +25,31 @@ import org.edamontology.edammap.core.args.PositiveDouble;
 
 public class IdfArgs {
 
-	public static final String CONCEPT_IDF_SCALING = "concept-idf-scaling";
+	public static final String CONCEPT_IDF_SCALING = "conceptIdfScaling";
 	@Parameter(names = { "--" + CONCEPT_IDF_SCALING }, validateWith = PositiveDouble.class, description = "Set to 0 to disable concept IDF. Setting to 1 means linear IDF weighting.")
 	private double conceptIdfScaling = 0.5;
 
-	public static final String QUERY_IDF_SCALING = "query-idf-scaling";
+	public static final String QUERY_IDF_SCALING = "queryIdfScaling";
 	@Parameter(names = { "--" + QUERY_IDF_SCALING }, validateWith = PositiveDouble.class, description = "Set to 0 to disable query IDF. Setting to 1 means linear IDF weighting.")
 	private double queryIdfScaling = 0.5;
 
-	public static final String LABEL_SYNONYMS_IDF = "label-synonyms-idf";
+	public static final String LABEL_SYNONYMS_IDF = "labelSynonymsIdf";
 	@Parameter(names = { "--" + LABEL_SYNONYMS_IDF }, arity = 1, description = "IDF weighting for concept label and synonyms")
 	private boolean labelSynonymsIdf = false;
 
-	public static final String NAME_KEYWORDS_IDF = "name-keywords-idf";
+	public static final String NAME_KEYWORDS_IDF = "nameKeywordsIdf";
 	@Parameter(names = { "--" + NAME_KEYWORDS_IDF }, arity = 1, description = "IDF weighting for query name and keywords")
 	private boolean nameKeywordsIdf = true;
 
-	public static final String DESCRIPTION_IDF = "description-idf";
+	public static final String DESCRIPTION_IDF = "descriptionIdf";
 	@Parameter(names = { "--" + DESCRIPTION_IDF }, arity = 1, description = "IDF weighting for query description")
 	private boolean descriptionIdf = true;
 
-	public static final String TITLE_KEYWORDS_IDF = "title-keywords-idf";
+	public static final String TITLE_KEYWORDS_IDF = "titleKeywordsIdf";
 	@Parameter(names = { "--" + TITLE_KEYWORDS_IDF }, arity = 1, description = "IDF weighting for publication title and keywords")
 	private boolean titleKeywordsIdf = true;
 
-	public static final String ABSTRACT_IDF = "abstract-idf";
+	public static final String ABSTRACT_IDF = "abstractIdf";
 	@Parameter(names = { "--" + ABSTRACT_IDF }, arity = 1, description = "IDF weighting for publication abstract")
 	private boolean abstractIdf = true;
 

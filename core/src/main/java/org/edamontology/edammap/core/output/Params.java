@@ -24,10 +24,9 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.regex.Pattern;
 
+import org.edamontology.edammap.core.args.CoreArgs;
 import org.edamontology.edammap.core.benchmarking.Measure;
 import org.edamontology.edammap.core.benchmarking.Results;
 import org.edamontology.edammap.core.benchmarking.Test;
@@ -51,13 +50,22 @@ import org.edamontology.pubfetcher.FetcherArgs;
 import org.edamontology.pubfetcher.FetcherCommon;
 import org.edamontology.pubfetcher.FetcherPrivateArgs;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+
 public class Params {
 
-	private static final Pattern ID_REMOVE = Pattern.compile("[^\\p{L}\\p{N}-]");
+	private static final String MAIN_ARGS_ID = "mainArgs";
 
-	private static String makeId(String id) {
-		return ID_REMOVE.matcher(id.toLowerCase(Locale.ROOT).replaceAll("[ /]", "-")).replaceAll("");
-	}
+	private static final String COUNTS_ID = "counts";
+	private static final String MEASURES_ID = "measures";
+
+	private static final String CONCEPTS_SIZE_ID = "conceptsSize";
+	private static final String TOPIC_SIZE_ID = "topicSize";
+	private static final String OPERATION_SIZE_ID = "operationSize";
+	private static final String DATA_SIZE_ID = "dataSize";
+	private static final String FORMAT_SIZE_ID = "formatSize";
+	private static final String QUERIES_SIZE_ID = "queriesSize";
+	private static final String RESULTS_SIZE_ID = "resultsSize";
 
 	private static void write(Writer writer, Param param, boolean input) throws IOException {
 		if (param.getValue() instanceof Boolean) {
@@ -181,24 +189,23 @@ public class Params {
 		writer.write("\t\t</div>\n");
 	}
 
-	private static void writeOutput(Writer writer, String label, String value) throws IOException {
-		writeOutput(writer, label, value, null);
+	private static void writeOutput(Writer writer, String id, String label, String value) throws IOException {
+		writeOutput(writer, id, label, value, null);
 	}
 
-	private static void writeOutput(Writer writer, String label, int value) throws IOException {
-		writeOutput(writer, label, Integer.toString(value), null);
+	private static void writeOutput(Writer writer, String id, String label, int value) throws IOException {
+		writeOutput(writer, id, label, Integer.toString(value), null);
 	}
 
 	private static void writeOutput(Writer writer, Test test, Results results) throws IOException {
-		writeOutput(writer, test.getName(), results.toStringTest(test), test.getUrl());
+		writeOutput(writer, test.name(), test.getName(), results.toStringTest(test), test.getUrl());
 	}
 
 	private static void writeOutput(Writer writer, Measure measure, Results results) throws IOException {
-		writeOutput(writer, measure.getName(), results.toStringMeasure(measure), measure.getUrl());
+		writeOutput(writer, measure.name(), measure.getName(), results.toStringMeasure(measure), measure.getUrl());
 	}
 
-	private static void writeOutput(Writer writer, String label, String value, String url) throws IOException {
-		String id = makeId(label);
+	private static void writeOutput(Writer writer, String id, String label, String value, String url) throws IOException {
 		writer.write("\t\t<div class=\"param\">\n");
 		writer.write("\t\t\t<label for=\"" + id + "\">");
 		writer.write(FetcherCommon.getLinkHtml(url, label));
@@ -207,8 +214,7 @@ public class Params {
 		writer.write("\t\t</div>\n");
 	}
 
-	private static void writeBegin(Writer writer, String title, boolean checked) throws IOException {
-		String id = makeId(title);
+	private static void writeBegin(Writer writer, String id, String title, boolean checked) throws IOException {
 		writer.write("<section class=\"tab\">\n");
 		writer.write("\t<input type=\"radio\" id=\"tab-title-" + id + "\" name=\"tab-group\"" + (checked ? " checked" : "") + ">\n");
 		writer.write("\t<label for=\"tab-title-" + id + "\">" + title + "</label>\n");
@@ -221,7 +227,7 @@ public class Params {
 	}
 
 	public static void writeProcessing(ProcessorArgs args, Writer writer) throws IOException {
-		writeBegin(writer, "Processing", false);
+		writeBegin(writer, CoreArgs.PROCESSOR_ARGS, "Processing", false);
 		writeBoolean(writer, new Param("Fetching", ProcessorArgs.FETCHING, args.isFetching()), false);
 		write(writer, new Param("Database file", ProcessorArgs.DB, new File(args.getDb()).getName()), false);
 		write(writer, new Param("Query IDF file", ProcessorArgs.IDF, new File(args.getIdf()).getName()), false);
@@ -230,7 +236,7 @@ public class Params {
 	}
 
 	public static void writePreProcessing(PreProcessorArgs args, Writer writer, boolean input) throws IOException {
-		writeBegin(writer, "Preprocessing", false);
+		writeBegin(writer, CoreArgs.PRE_PROCESSOR_ARGS, "Preprocessing", false);
 		writeBoolean(writer, new Param("Freestanding numbers", PreProcessorArgs.NUMBERS, args.isNumbers()), input);
 		writeEnum(writer, "Stopword list", PreProcessorArgs.STOPWORDS, Stopwords.class, args.getStopwords(), null, input);
 		writeBoolean(writer, new Param("Stemming", PreProcessorArgs.STEMMING, args.isStemming()), input);
@@ -239,7 +245,7 @@ public class Params {
 	}
 
 	public static void writeFetching(FetcherArgs args, Writer writer, boolean includePrivate, boolean input) throws IOException {
-		writeBegin(writer, "Fetching", false);
+		writeBegin(writer, CoreArgs.FETCHER_ARGS, "Fetching", false);
 		write(writer, new Param("Empty cooldown", FetcherArgs.EMPTY_COOLDOWN, args.getEmptyCooldown(), 0.0, null), input);
 		write(writer, new Param("Non-final cooldown", FetcherArgs.NON_FINAL_COOLDOWN, args.getNonFinalCooldown(), 0.0, null), input);
 		write(writer, new Param("Fetching exception cooldown", FetcherArgs.FETCH_EXCEPTION_COOLDOWN, args.getFetchExceptionCooldown(), 0.0, null), input);
@@ -259,9 +265,30 @@ public class Params {
 		}
 		writeEnd(writer);
 	}
+	public static void writeFetching(FetcherArgs args, boolean includePrivate, JsonGenerator generator) throws IOException {
+		generator.writeFieldName(CoreArgs.FETCHER_ARGS);
+		if (includePrivate) {
+			generator.writeObject(args);
+		} else {
+			generator.writeStartObject();
+			generator.writeNumberField(FetcherArgs.EMPTY_COOLDOWN, args.getEmptyCooldown());
+			generator.writeNumberField(FetcherArgs.NON_FINAL_COOLDOWN, args.getNonFinalCooldown());
+			generator.writeNumberField(FetcherArgs.FETCH_EXCEPTION_COOLDOWN, args.getFetchExceptionCooldown());
+			generator.writeNumberField(FetcherArgs.RETRY_LIMIT, args.getRetryLimit());
+			generator.writeNumberField(FetcherArgs.TITLE_MIN_LENGTH, args.getTitleMinLength());
+			generator.writeNumberField(FetcherArgs.KEYWORDS_MIN_SIZE, args.getKeywordsMinSize());
+			generator.writeNumberField(FetcherArgs.MINED_TERMS_MIN_SIZE, args.getMinedTermsMinSize());
+			generator.writeNumberField(FetcherArgs.ABSTRACT_MIN_LENGTH, args.getAbstractMinLength());
+			generator.writeNumberField(FetcherArgs.FULLTEXT_MIN_LENGTH, args.getFulltextMinLength());
+			generator.writeNumberField(FetcherArgs.WEBPAGE_MIN_LENGTH, args.getWebpageMinLength());
+			generator.writeNumberField(FetcherArgs.WEBPAGE_MIN_LENGTH_JAVASCRIPT, args.getWebpageMinLengthJavascript());
+			generator.writeNumberField(FetcherArgs.TIMEOUT, args.getTimeout());
+			generator.writeEndObject();
+		}
+	}
 
 	public static void writeMapping(MapperArgs args, Writer writer, boolean input) throws IOException {
-		writeBegin(writer, "Mapping", false);
+		writeBegin(writer, CoreArgs.MAPPER_ARGS, "Mapping", false);
 		writeEnum(writer, "Branches", MapperArgs.BRANCHES, Branch.class, args.getBranches(), "http://edamontology.org/page#Scope", input);
 		write(writer, new Param("Top matches per branch", MapperArgs.MATCHES, args.getMatches(), 0.0, null), input);
 		writeBoolean(writer, new Param("Obsolete concepts", MapperArgs.OBSOLETE, args.isObsolete()), input);
@@ -270,7 +297,7 @@ public class Params {
 		writeBoolean(writer, new Param("Top level concepts", MapperArgs.TOP_LEVEL, args.isTopLevel()), input);
 		writeEnd(writer);
 
-		writeBegin(writer, "Mapping algorithm", false);
+		writeBegin(writer, MapperArgs.ALGORITHM_ARGS, "Mapping algorithm", false);
 		write(writer, new Param("Compound words", AlgorithmArgs.COMPOUND_WORDS, args.getAlgorithmArgs().getCompoundWords(), 0.0, null), input);
 		write(writer, new Param("Mismatch multiplier", AlgorithmArgs.MISMATCH_MULTIPLIER, args.getAlgorithmArgs().getMismatchMultiplier(), 0.0, null), input);
 		write(writer, new Param("Match minimum", AlgorithmArgs.MATCH_MINIMUM, args.getAlgorithmArgs().getMatchMinimum(), 0.0, 1.0), input);
@@ -286,7 +313,7 @@ public class Params {
 		write(writer, new Param("Path weight", AlgorithmArgs.PATH_WEIGHT, args.getAlgorithmArgs().getPathWeight(), 0.0, null), input);
 		writeEnd(writer);
 
-		writeBegin(writer, "IDF", false);
+		writeBegin(writer, MapperArgs.IDF_ARGS, "IDF", false);
 		write(writer, new Param("Concept IDF scaling", IdfArgs.CONCEPT_IDF_SCALING, args.getIdfArgs().getConceptIdfScaling(), 0.0, null), input);
 		write(writer, new Param("Query IDF scaling", IdfArgs.QUERY_IDF_SCALING, args.getIdfArgs().getQueryIdfScaling(), 0.0, null), input);
 		writeBoolean(writer, new Param("Label/Synonyms IDF", IdfArgs.LABEL_SYNONYMS_IDF, args.getIdfArgs().isLabelSynonymsIdf()), input);
@@ -296,7 +323,7 @@ public class Params {
 		writeBoolean(writer, new Param("Abstract IDF", IdfArgs.ABSTRACT_IDF, args.getIdfArgs().isAbstractIdf()), input);
 		writeEnd(writer);
 
-		writeBegin(writer, "Concept multipliers", false);
+		writeBegin(writer, MapperArgs.MULTIPLIER_ARGS, "Concept multipliers", false);
 		write(writer, new Param("Label multiplier", MultiplierArgs.LABEL_MULTIPLIER, args.getMultiplierArgs().getLabelMultiplier(), 0.0, 1.0), input);
 		write(writer, new Param("Exact synonym multiplier", MultiplierArgs.EXACT_SYNONYM_MULTIPLIER, args.getMultiplierArgs().getExactSynonymMultiplier(), 0.0, 1.0), input);
 		write(writer, new Param("Narrow/Broad multiplier", MultiplierArgs.NARROW_BROAD_SYNONYM_MULTIPLIER, args.getMultiplierArgs().getNarrowBroadSynonymMultiplier(), 0.0, 1.0), input);
@@ -304,7 +331,7 @@ public class Params {
 		write(writer, new Param("Comment multiplier", MultiplierArgs.COMMENT_MULTIPLIER, args.getMultiplierArgs().getCommentMultiplier(), 0.0, 1.0), input);
 		writeEnd(writer);
 
-		writeBegin(writer, "Query normalisers", false);
+		writeBegin(writer, MapperArgs.NORMALISER_ARGS, "Query normalisers", false);
 		write(writer, new Param("Name norm.", NormaliserArgs.NAME_NORMALISER, args.getNormaliserArgs().getNameNormaliser(), 0.0, 1.0), input);
 		write(writer, new Param("Keyword norm.", NormaliserArgs.KEYWORD_NORMALISER, args.getNormaliserArgs().getKeywordNormaliser(), 0.0, 1.0), input);
 		write(writer, new Param("Description norm.", NormaliserArgs.DESCRIPTION_NORMALISER, args.getNormaliserArgs().getDescriptionNormaliser(), 0.0, 1.0), input);
@@ -318,7 +345,7 @@ public class Params {
 		write(writer, new Param("Webpage norm.", NormaliserArgs.WEBPAGE_NORMALISER, args.getNormaliserArgs().getWebpageNormaliser(), 0.0, 1.0), input);
 		writeEnd(writer);
 
-		writeBegin(writer, "Query weights", false);
+		writeBegin(writer, MapperArgs.WEIGHT_ARGS, "Query weights", false);
 		write(writer, new Param("Average strategy scaling", WeightArgs.AVERAGE_SCALING, args.getWeightArgs().getAverageScaling(), 0.0, null), input);
 		write(writer, new Param("Name weight", WeightArgs.NAME_WEIGHT, args.getWeightArgs().getNameWeight(), 0.0, null), input);
 		write(writer, new Param("Keyword weight", WeightArgs.KEYWORD_WEIGHT, args.getWeightArgs().getKeywordWeight(), 0.0, null), input);
@@ -333,7 +360,7 @@ public class Params {
 		write(writer, new Param("Webpage weight", WeightArgs.WEBPAGE_WEIGHT, args.getWeightArgs().getWebpageWeight(), 0.0, null), input);
 		writeEnd(writer);
 
-		writeBegin(writer, "Score limits", false);
+		writeBegin(writer, MapperArgs.SCORE_ARGS, "Score limits", false);
 		write(writer, new Param("Good score for topic", ScoreArgs.GOOD_SCORE_TOPIC, args.getScoreArgs().getGoodScoreTopic(), 0.0, 1.0), input);
 		write(writer, new Param("Good score for operation", ScoreArgs.GOOD_SCORE_OPERATION, args.getScoreArgs().getGoodScoreOperation(), 0.0, 1.0), input);
 		write(writer, new Param("Good score for data", ScoreArgs.GOOD_SCORE_DATA, args.getScoreArgs().getGoodScoreData(), 0.0, 1.0), input);
@@ -349,31 +376,39 @@ public class Params {
 	}
 
 	private static void writeCountsEdam(Writer writer, Map<EdamUri, Concept> concepts) throws IOException {
-		writeOutput(writer, "EDAM concepts", concepts.size());
+		writeOutput(writer, CONCEPTS_SIZE_ID, "EDAM concepts", concepts.size());
 		Map<Branch, Integer> branchCounts = Edam.branchCounts(concepts);
-		writeOutput(writer, "Topic terms", branchCounts.get(Branch.topic).toString());
-		writeOutput(writer, "Operation terms", branchCounts.get(Branch.operation).toString());
-		writeOutput(writer, "Data terms", branchCounts.get(Branch.data).toString());
-		writeOutput(writer, "Format terms", branchCounts.get(Branch.format).toString());
+		writeOutput(writer, TOPIC_SIZE_ID, "Topic terms", branchCounts.get(Branch.topic).toString());
+		writeOutput(writer, OPERATION_SIZE_ID, "Operation terms", branchCounts.get(Branch.operation).toString());
+		writeOutput(writer, DATA_SIZE_ID, "Data terms", branchCounts.get(Branch.data).toString());
+		writeOutput(writer, FORMAT_SIZE_ID, "Format terms", branchCounts.get(Branch.format).toString());
+	}
+	private static void writeCountsEdam(Map<EdamUri, Concept> concepts, JsonGenerator generator) throws IOException {
+		generator.writeNumberField(CONCEPTS_SIZE_ID, concepts.size());
+		Map<Branch, Integer> branchCounts = Edam.branchCounts(concepts);
+		generator.writeNumberField(TOPIC_SIZE_ID, branchCounts.get(Branch.topic));
+		generator.writeNumberField(OPERATION_SIZE_ID, branchCounts.get(Branch.operation));
+		generator.writeNumberField(DATA_SIZE_ID, branchCounts.get(Branch.data));
+		generator.writeNumberField(FORMAT_SIZE_ID, branchCounts.get(Branch.format));
 	}
 
 	public static void writeCountsEdamOnly(Writer writer, Map<EdamUri, Concept> concepts) throws IOException {
-		writeBegin(writer, "Counts", false);
+		writeBegin(writer, COUNTS_ID, "Counts", false);
 		writeCountsEdam(writer, concepts);
 		writeEnd(writer);
 	}
 
 	public static void writeBenchmarking(Writer writer, Map<EdamUri, Concept> concepts, List<Query> queries, Results results) throws IOException {
-		writeBegin(writer, "Counts", false);
+		writeBegin(writer, COUNTS_ID, "Counts", false);
 		writeCountsEdam(writer, concepts);
-		writeOutput(writer, "Queries", queries.size());
-		writeOutput(writer, "Results", results.getMappings().size());
+		writeOutput(writer, QUERIES_SIZE_ID, "Queries", queries.size());
+		writeOutput(writer, RESULTS_SIZE_ID, "Results", results.getMappings().size());
 		writeOutput(writer, Test.tp, results);
 		writeOutput(writer, Test.fp, results);
 		writeOutput(writer, Test.fn, results);
 		writeEnd(writer);
 
-		writeBegin(writer, "Measures", false);
+		writeBegin(writer, MEASURES_ID, "Measures", false);
 		writeOutput(writer, Measure.precision, results);
 		writeOutput(writer, Measure.recall, results);
 		writeOutput(writer, Measure.f1, results);
@@ -386,11 +421,73 @@ public class Params {
 		writeEnd(writer);
 	}
 
-	public static void writeMain(List<Param> paramsMain, Writer writer, boolean input) throws IOException {
-		writeBegin(writer, "Main", true);
-		for (Param param : paramsMain) {
-			write(writer, param, input);
+	private static void writeTest(Results results, Test test, JsonGenerator generator) throws IOException {
+		generator.writeFieldName(test.name());
+		generator.writeStartObject();
+		for (Branch branch : Branch.values()) {
+			generator.writeNumberField(branch.name(), results.getMeasures(branch).getTest(test));
+		}
+		generator.writeNumberField("total", results.getMeasuresTotal().getTest(test));
+		generator.writeEndObject();
+	}
+	private static void writeMeasure(Results results, Measure measure, JsonGenerator generator) throws IOException {
+		generator.writeFieldName(measure.name());
+		generator.writeStartObject();
+		for (Branch branch : Branch.values()) {
+			generator.writeNumberField(branch.name(), results.getMeasures(branch).getMeasure(measure));
+		}
+		generator.writeNumberField("total", results.getMeasuresTotal().getMeasure(measure));
+		generator.writeEndObject();
+	}
+
+	public static void writeBenchmarking(Map<EdamUri, Concept> concepts, List<Query> queries, Results results, JsonGenerator generator) throws IOException {
+		generator.writeFieldName(COUNTS_ID);
+		generator.writeStartObject();
+		writeCountsEdam(concepts, generator);
+		generator.writeNumberField(QUERIES_SIZE_ID, queries.size());
+		generator.writeNumberField(RESULTS_SIZE_ID, results.getMappings().size());
+		writeTest(results, Test.tp, generator);
+		writeTest(results, Test.fp, generator);
+		writeTest(results, Test.fn, generator);
+		generator.writeEndObject();
+
+		generator.writeFieldName(MEASURES_ID);
+		generator.writeStartObject();
+		writeMeasure(results, Measure.precision, generator);
+		writeMeasure(results, Measure.recall, generator);
+		writeMeasure(results, Measure.f1, generator);
+		writeMeasure(results, Measure.f2, generator);
+		writeMeasure(results, Measure.Jaccard, generator);
+		writeMeasure(results, Measure.AveP, generator);
+		writeMeasure(results, Measure.RP, generator);
+		writeMeasure(results, Measure.DCG, generator);
+		writeMeasure(results, Measure.DCGa, generator);
+		generator.writeEndObject();
+	}
+
+	public static void writeMain(List<ParamMain> paramsMain, Writer writer) throws IOException {
+		writeBegin(writer, MAIN_ARGS_ID, "Main", true);
+		for (ParamMain param : paramsMain) {
+			write(writer, param, param.getInput());
 		}
 		writeEnd(writer);
+	}
+	public static void writeMain(List<ParamMain> paramsMain, JsonGenerator generator) throws IOException {
+		generator.writeFieldName(MAIN_ARGS_ID);
+		generator.writeStartObject();
+		for (Param param : paramsMain) {
+			if (param.getValue() instanceof Boolean) {
+				generator.writeBooleanField(param.getId(), (Boolean) param.getValue());
+			} else if (param.getValue() instanceof Integer) {
+				generator.writeNumberField(param.getId(), (Integer) param.getValue());
+			} else if (param.getValue() instanceof Double) {
+				generator.writeNumberField(param.getId(), (Double) param.getValue());
+			} else if (param.getValue() instanceof String){
+				generator.writeStringField(param.getId(), (String) param.getValue());
+			} else {
+				throw new IllegalArgumentException("Param with id " + param.getId() + " is of illegal class " + param.getValue().getClass().getName() + "!");
+			}
+		}
+		generator.writeEndObject();
 	}
 }

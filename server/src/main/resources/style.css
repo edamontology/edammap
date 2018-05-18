@@ -189,11 +189,11 @@ article > section > h3 {
 	background-color: var(--black);
 	color: rgba(255,255,255,1);
 }
-#webpage-urls-section > h3, #doc-urls-section > h3 {
+#webpageUrls-section > h3, #docUrls-section > h3 {
 	background-color: var(--link);
 	color: rgba(255,255,255,1);
 }
-#publication-ids-section > h3 {
+#publicationIds-section > h3 {
 	background-color: var(--publication);
 }
 #annotations-section > h3 {

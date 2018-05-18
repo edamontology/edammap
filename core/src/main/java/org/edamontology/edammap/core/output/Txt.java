@@ -37,7 +37,7 @@ import org.edamontology.edammap.core.query.Query;
 import org.edamontology.edammap.core.query.QueryType;
 import org.edamontology.pubfetcher.Publication;
 
-class Txt {
+public class Txt {
 
 	private static final String SEP = "\t";
 
@@ -56,7 +56,7 @@ class Txt {
 		ps.print(SEP);
 		ps.print("best_one_query");
 		ps.print(SEP);
-		ps.print("best_one_edam");
+		ps.print("best_one_concept");
 		ps.print(SEP);
 		ps.print("best_one_score");
 		ps.print(SEP);
@@ -105,11 +105,11 @@ class Txt {
 		}
 	}
 
-	static void output(QueryType type, Path output, Path report, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publications, List<MappingTest> mappings) throws IOException {
-		if (output == null && report == null) {
+	static void output(QueryType type, Path txt, Path report, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publications, List<MappingTest> mappings) throws IOException {
+		if (txt == null && report == null) {
 			out(type, System.out, concepts, queries, mappings);
-		} else if (output != null) {
-			try (PrintStream ps = new PrintStream(new BufferedOutputStream(Files.newOutputStream(output)), true, "UTF-8")) {
+		} else if (txt != null) {
+			try (PrintStream ps = new PrintStream(new BufferedOutputStream(Files.newOutputStream(txt)), true, "UTF-8")) {
 				out(type, ps, concepts, queries, mappings);
 			} catch (IOException e) {
 				try {

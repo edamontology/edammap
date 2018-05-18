@@ -70,12 +70,10 @@
       <artifactId>grizzly-http-server</artifactId>
       <version>${grizzly.version}</version>
     </dependency>
-    <!-- TODO JSON
     <dependency>
       <groupId>org.glassfish.jersey.media</groupId>
       <artifactId>jersey-media-json-binding</artifactId>
     </dependency>
-     -->
   </dependencies>
 
   <build>

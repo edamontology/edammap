@@ -25,23 +25,23 @@ import com.beust.jcommander.Parameter;
 
 public class MultiplierArgs {
 
-	public static final String LABEL_MULTIPLIER = "label-multiplier";
+	public static final String LABEL_MULTIPLIER = "labelMultiplier";
 	@Parameter(names = { "--" + LABEL_MULTIPLIER }, validateWith = ZeroToOneDouble.class, description = "Score multiplier for matching a concept label. Set to 0 to disable matching of labels.")
 	private double labelMultiplier = 1;
 
-	public static final String EXACT_SYNONYM_MULTIPLIER = "exact-synonym-multiplier";
+	public static final String EXACT_SYNONYM_MULTIPLIER = "exactSynonymMultiplier";
 	@Parameter(names = { "--" + EXACT_SYNONYM_MULTIPLIER }, validateWith = ZeroToOneDouble.class, description = "Score multiplier for matching a concept exact synonym. Set to 0 to disable matching of exact synonyms.")
 	private double exactSynonymMultiplier = 1;
 
-	public static final String NARROW_BROAD_SYNONYM_MULTIPLIER = "narrow-broad-synonym-multiplier";
+	public static final String NARROW_BROAD_SYNONYM_MULTIPLIER = "narrowBroadSynonymMultiplier";
 	@Parameter(names = { "--" + NARROW_BROAD_SYNONYM_MULTIPLIER }, validateWith = ZeroToOneDouble.class, description = "Score multiplier for matching a concept narrow or broad synonym. Set to 0 to disable matching of narrow and broad synonyms.")
 	private double narrowBroadSynonymMultiplier = 1;
 
-	public static final String DEFINITION_MULTIPLIER = "definition-multiplier";
+	public static final String DEFINITION_MULTIPLIER = "definitionMultiplier";
 	@Parameter(names = { "--" + DEFINITION_MULTIPLIER }, validateWith = ZeroToOneDouble.class, description = "Score multiplier for matching a concept definition. Set to 0 to disable matching of definitions.")
 	private double definitionMultiplier = 1;
 
-	public static final String COMMENT_MULTIPLIER = "comment-multiplier";
+	public static final String COMMENT_MULTIPLIER = "commentMultiplier";
 	@Parameter(names = { "--" + COMMENT_MULTIPLIER }, validateWith = ZeroToOneDouble.class, description = "Score multiplier for matching a concept comment. Set to 0 to disable matching of comments.")
 	private double commentMultiplier = 1;
 

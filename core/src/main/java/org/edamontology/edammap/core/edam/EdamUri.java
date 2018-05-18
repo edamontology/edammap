@@ -21,6 +21,8 @@ package org.edamontology.edammap.core.edam;
 
 import java.util.Locale;
 
+import org.edamontology.pubfetcher.IllegalRequestException;
+
 public class EdamUri {
 
 	private String uri;
@@ -31,7 +33,7 @@ public class EdamUri {
 
 	public EdamUri(String uri, String prefix) {
 		if (!isEdamUri(uri, prefix)) {
-			throw new IllegalArgumentException("Illegal EDAM URI: " + uri);
+			throw new IllegalRequestException("Illegal EDAM URI: " + uri);
 		}
 
 		this.uri = uri;

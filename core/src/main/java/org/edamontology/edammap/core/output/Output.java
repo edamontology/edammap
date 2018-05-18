@@ -37,22 +37,30 @@ import org.edamontology.pubfetcher.Webpage;
 
 public class Output {
 
-	private final Path output;
+	private final Path txt;
 
 	private final Path report;
 
+	private final Path json;
+
 	private final boolean existingDirectory;
 
-	public Output(String output, String report, boolean existingDirectory) throws IOException {
-		this.output = (output == null || output.isEmpty()) ? null : FetcherCommon.outputPath(output);
+	public Output(String txt, String report, String json, boolean existingDirectory) throws IOException {
+		this.txt = (txt == null || txt.isEmpty()) ? null : FetcherCommon.outputPath(txt);
 
 		this.report = (report == null || report.isEmpty()) ? null : FetcherCommon.outputPath(report, true, existingDirectory);
+
+		this.json = (json == null || json.isEmpty()) ? null : FetcherCommon.outputPath(json);
 
 		this.existingDirectory = existingDirectory;
 	}
 
-	public void output(CoreArgs args, List<Param> paramsMain, QueryType type, int reportPageSize, int reportPaginationSize, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Webpage>> webpages, List<List<Webpage>> docs, List<List<Publication>> publications, Results results, long start, long stop, Version version) throws IOException {
-		Txt.output(type, output, report, concepts, queries, publications, results.getMappings());
-		Report.output(args, paramsMain, type, reportPageSize, reportPaginationSize, report, existingDirectory, concepts, queries, publications, webpages, docs, results, start, stop, version);
+	public void output(CoreArgs args, List<ParamMain> paramsMain, Map<String, String> jsonFields, QueryType type, int reportPageSize, int reportPaginationSize, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Webpage>> webpages, List<List<Webpage>> docs, List<List<Publication>> publications, Results results, long start, long stop, Version version) throws IOException {
+		Txt.output(type, txt, report, concepts, queries, publications, results.getMappings());
+		Report.output(args, paramsMain, type, reportPageSize, reportPaginationSize, report, existingDirectory, concepts, queries, publications, webpages, docs, results, start, stop, version, txt != null, json != null);
+		if (json != null) {
+			JsonType jsonType = (type == QueryType.server ? JsonType.full : JsonType.biotools);
+			Json.output(args, paramsMain, jsonFields, jsonType, json, concepts, queries, publications, webpages, docs, results, start, stop, version);
+		}
 	}
 }

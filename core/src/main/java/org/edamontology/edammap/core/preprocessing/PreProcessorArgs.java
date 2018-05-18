@@ -36,7 +36,7 @@ public class PreProcessorArgs {
 	@Parameter(names = { "--" + STEMMING }, arity = 1, description = "Do stemming as part of pre-processing")
 	private boolean stemming = true;
 
-	public static final String MIN_LENGTH = "min-length";
+	public static final String MIN_LENGTH = "minLength";
 	@Parameter(names = { "--" + MIN_LENGTH }, validateWith = PositiveInteger.class, description = "When all pre-processing steps are done, tokens with length less to this length are removed")
 	private int minLength = 1;
 

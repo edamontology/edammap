@@ -41,7 +41,7 @@ import org.edamontology.edammap.core.input.Input;
 import org.edamontology.edammap.core.mapping.Mapper;
 import org.edamontology.edammap.core.mapping.Mapping;
 import org.edamontology.edammap.core.output.Output;
-import org.edamontology.edammap.core.output.Param;
+import org.edamontology.edammap.core.output.ParamMain;
 import org.edamontology.edammap.core.preprocessing.PreProcessor;
 import org.edamontology.edammap.core.processing.ConceptProcessed;
 import org.edamontology.edammap.core.processing.Processor;
@@ -129,21 +129,22 @@ public class Cli implements Runnable {
 	}
 
 	private static void run(Version version) throws IOException, ParseException {
-		List<Param> paramsMain = new ArrayList<>();
-		paramsMain.add(new Param("Ontology file", CliArgs.EDAM, new File(args.getEdam()).getName(), "https://github.com/edamontology/edamontology/tree/master/releases"));
+		List<ParamMain> paramsMain = new ArrayList<>();
+		paramsMain.add(new ParamMain("Ontology file", CliArgs.EDAM, new File(args.getEdam()).getName(), "https://github.com/edamontology/edamontology/tree/master/releases", false));
 		if (Input.isProtocol(args.getQuery())) {
-			paramsMain.add(new Param("Query file", CliArgs.QUERY, args.getQuery(), args.getQuery()));
+			paramsMain.add(new ParamMain("Query file", CliArgs.QUERY, args.getQuery(), args.getQuery(), false));
 		} else {
-			paramsMain.add(new Param("Query file", CliArgs.QUERY, new File(args.getQuery()).getName()));
+			paramsMain.add(new ParamMain("Query file", CliArgs.QUERY, new File(args.getQuery()).getName(), false));
 		}
-		paramsMain.add(new Param("Type", CliArgs.TYPE, args.getType().toString()));
-		paramsMain.add(new Param("Output file", CliArgs.OUTPUT, new File(args.getOutput()).getName()));
-		paramsMain.add(new Param("Report file", CliArgs.REPORT, new File(args.getReport()).getName()));
-		paramsMain.add(new Param("Report page size", CliArgs.REPORT_PAGE_SIZE, args.getReportPageSize(), 0.0, null));
-		paramsMain.add(new Param("Report pagination size", CliArgs.REPORT_PAGINATION_SIZE, args.getReportPaginationSize(), 0.0, null));
-		paramsMain.add(new Param("Number of threads", CliArgs.THREADS, args.getThreads(), 0.0, null));
+		paramsMain.add(new ParamMain("Type", CliArgs.TYPE, args.getType().toString(), false));
+		paramsMain.add(new ParamMain("Output file", CliArgs.OUTPUT, new File(args.getOutput()).getName(), false));
+		paramsMain.add(new ParamMain("Report file", CliArgs.REPORT, new File(args.getReport()).getName(), false));
+		paramsMain.add(new ParamMain("JSON file", CliArgs.JSON, new File(args.getJson()).getName(), false));
+		paramsMain.add(new ParamMain("Report page size", CliArgs.REPORT_PAGE_SIZE, args.getReportPageSize(), 0.0, null, false));
+		paramsMain.add(new ParamMain("Report pagination size", CliArgs.REPORT_PAGINATION_SIZE, args.getReportPaginationSize(), 0.0, null, false));
+		paramsMain.add(new ParamMain("Number of threads", CliArgs.THREADS, args.getThreads(), 0.0, null, false));
 
-		Output output = new Output(args.getOutput(), args.getReport(), false);
+		Output output = new Output(args.getOutput(), args.getReport(), args.getJson(), false);
 
 		stopwords = PreProcessor.getStopwords(args.getPreProcessorArgs().getStopwords());
 
@@ -212,7 +213,7 @@ public class Cli implements Runnable {
 		Results results = Benchmark.calculate(queries, mappings);
 
 		logger.info("Outputting results");
-		output.output(args, paramsMain, args.getType(), args.getReportPageSize(), args.getReportPaginationSize(),
+		output.output(args, paramsMain, null, args.getType(), args.getReportPageSize(), args.getReportPaginationSize(),
 			concepts, queries, webpages, docs, publications, results, start, stop, version);
 
 		logger.info("{} : {}", results.toStringMeasure(Measure.recall), Measure.recall);

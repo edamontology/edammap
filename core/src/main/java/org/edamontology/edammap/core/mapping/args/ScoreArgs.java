@@ -25,47 +25,47 @@ import com.beust.jcommander.Parameter;
 
 public class ScoreArgs {
 
-	public static final String GOOD_SCORE_TOPIC = "good-score-topic";
+	public static final String GOOD_SCORE_TOPIC = "goodScoreTopic";
 	@Parameter(names = { "--" + GOOD_SCORE_TOPIC }, validateWith = ZeroToOneDouble.class, description = "Final scores over this are considered good (in topic branch)")
 	private double goodScoreTopic = 0.63;
 
-	public static final String GOOD_SCORE_OPERATION = "good-score-operation";
+	public static final String GOOD_SCORE_OPERATION = "goodScoreOperation";
 	@Parameter(names = { "--" + GOOD_SCORE_OPERATION }, validateWith = ZeroToOneDouble.class, description = "Final scores over this are considered good (in operation branch)")
 	private double goodScoreOperation = 0.63;
 
-	public static final String GOOD_SCORE_DATA = "good-score-data";
+	public static final String GOOD_SCORE_DATA = "goodScoreData";
 	@Parameter(names = { "--" + GOOD_SCORE_DATA }, validateWith = ZeroToOneDouble.class, description = "Final scores over this are considered good (in data branch)")
 	private double goodScoreData = 0.63;
 
-	public static final String GOOD_SCORE_FORMAT = "good-score-format";
+	public static final String GOOD_SCORE_FORMAT = "goodScoreFormat";
 	@Parameter(names = { "--" + GOOD_SCORE_FORMAT }, validateWith = ZeroToOneDouble.class, description = "Final scores over this are considered good (in format branch)")
 	private double goodScoreFormat = 0.63;
 
-	public static final String BAD_SCORE_TOPIC = "bad-score-topic";
+	public static final String BAD_SCORE_TOPIC = "badScoreTopic";
 	@Parameter(names = { "--" + BAD_SCORE_TOPIC }, validateWith = ZeroToOneDouble.class, description = "Final scores under this are considered bad (in topic branch)")
 	private double badScoreTopic = 0.57;
 
-	public static final String BAD_SCORE_OPERATION = "bad-score-operation";
+	public static final String BAD_SCORE_OPERATION = "badScoreOperation";
 	@Parameter(names = { "--" + BAD_SCORE_OPERATION }, validateWith = ZeroToOneDouble.class, description = "Final scores under this are considered bad (in operation branch)")
 	private double badScoreOperation = 0.57;
 
-	public static final String BAD_SCORE_DATA = "bad-score-data";
+	public static final String BAD_SCORE_DATA = "badScoreData";
 	@Parameter(names = { "--" + BAD_SCORE_DATA }, validateWith = ZeroToOneDouble.class, description = "Final scores under this are considered bad (in data branch)")
 	private double badScoreData = 0.57;
 
-	public static final String BAD_SCORE_FORMAT = "bad-score-format";
+	public static final String BAD_SCORE_FORMAT = "badScoreFormat";
 	@Parameter(names = { "--" + BAD_SCORE_FORMAT }, validateWith = ZeroToOneDouble.class, description = "Final scores under this are considered bad (in format branch)")
 	private double badScoreFormat = 0.57;
 
-	public static final String OUTPUT_GOOD_SCORES = "output-good-scores";
+	public static final String OUTPUT_GOOD_SCORES = "outputGoodScores";
 	@Parameter(names = { "--" + OUTPUT_GOOD_SCORES }, arity = 1, description = "Output matches with good scores")
 	private boolean outputGoodScores = true;
 
-	public static final String OUTPUT_MEDIUM_SCORES = "output-medium-scores";
+	public static final String OUTPUT_MEDIUM_SCORES = "outputMediumScores";
 	@Parameter(names = { "--" + OUTPUT_MEDIUM_SCORES }, arity = 1, description = "Output matches with medium scores")
 	private boolean outputMediumScores = true;
 
-	public static final String OUTPUT_BAD_SCORES = "output-bad-scores";
+	public static final String OUTPUT_BAD_SCORES = "outputBadScores";
 	@Parameter(names = { "--" + OUTPUT_BAD_SCORES }, arity = 1, description = "Output matches with bad scores")
 	private boolean outputBadScores = false;
 

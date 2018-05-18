@@ -58,6 +58,7 @@ import org.edamontology.edammap.core.input.json.Publication;
 import org.edamontology.edammap.core.input.json.ToolInput;
 import org.edamontology.edammap.core.input.xml.Biotools14;
 import org.edamontology.pubfetcher.FetcherCommon;
+import org.edamontology.pubfetcher.IllegalRequestException;
 import org.edamontology.pubfetcher.PublicationIds;
 import org.edamontology.pubfetcher.Webpage;
 
@@ -76,17 +77,21 @@ public class QueryLoader {
 	private static final Pattern INTERNAL_SEPARATOR_BAR = Pattern.compile("\\|");
 	private static final Pattern INTERNAL_SEPARATOR_COMMA = Pattern.compile(",");
 	private static final Pattern INTERNAL_SEPARATOR_NEWLINE = Pattern.compile("\n");
+	private static final Pattern PUBLICATION_ID_SEPARATOR = Pattern.compile("\t");
 
 	private static Stream<String> split(String toSplit) {
-		if (toSplit == null || toSplit.trim().isEmpty()) return Stream.empty();
+		if (toSplit == null) return null;
+		if (toSplit.trim().isEmpty()) return Stream.empty();
 		return INTERNAL_SEPARATOR_BAR.splitAsStream(toSplit);
 	}
 	private static Stream<String> split(String toSplit, Pattern pattern) {
-		if (toSplit == null || toSplit.trim().isEmpty()) return Stream.empty();
+		if (toSplit == null) return null;
+		if (toSplit.trim().isEmpty()) return Stream.empty();
 		return pattern.splitAsStream(toSplit);
 	}
 
 	private static List<Keyword> keywords(Stream<String> keywords, String type, String url, int max) {
+		if (keywords == null) return null;
 		List<Keyword> keywordsList = keywords
 			.filter(Objects::nonNull)
 			.map(String::trim)
@@ -94,11 +99,12 @@ public class QueryLoader {
 			.map(s -> new Keyword(type, s, url != null ? url + s.replaceAll(" ", "_") : null))
 			.collect(Collectors.toList());
 		if (max > 0 && keywordsList.size() > max) {
-			throw new IllegalArgumentException("Number of keywords (" + keywordsList.size() + ") is greater than maximum allowed (" + max + ")");
+			throw new IllegalRequestException("Number of keywords (" + keywordsList.size() + ") is greater than maximum allowed (" + max + ")");
 		}
 		return keywordsList;
 	}
 	private static List<Keyword> keywordsCamelCase(Stream<String> keywords, String type, String url) {
+		if (keywords == null) return null;
 		return keywords
 			.filter(Objects::nonNull)
 			.map(String::trim)
@@ -117,12 +123,13 @@ public class QueryLoader {
 		}
 	}
 	private static List<Link> links(Stream<String> links, String type, boolean throwException, int max) {
+		if (links == null) return null;
 		List<Link> linksList = links
 			.map(s -> link(s, type, throwException))
 			.filter(Objects::nonNull)
 			.collect(Collectors.toList());
 		if (max > 0 && linksList.size() > max) {
-			throw new IllegalArgumentException("Number of links (" + linksList.size() + ") is greater than maximum allowed (" + max + ")");
+			throw new IllegalRequestException("Number of links (" + linksList.size() + ") is greater than maximum allowed (" + max + ")");
 		}
 		return linksList;
 	}
@@ -152,12 +159,13 @@ public class QueryLoader {
 		}
 	}
 	private static List<PublicationIdsQuery> publicationIds(Stream<String> publicationIds, String url, String type, boolean throwException, int max) {
+		if (publicationIds == null) return null;
 		List<PublicationIdsQuery> publicationIdsList = publicationIds
 			.map(s -> publicationId(s, url, type, throwException))
 			.filter(Objects::nonNull)
 			.collect(Collectors.toList());
 		if (max > 0 && publicationIdsList.size() > max) {
-			throw new IllegalArgumentException("Number of publication IDs (" + publicationIdsList.size() + ") is greater than maximum allowed (" + max + ")");
+			throw new IllegalRequestException("Number of publication IDs (" + publicationIdsList.size() + ") is greater than maximum allowed (" + max + ")");
 		}
 		return publicationIdsList;
 	}
@@ -170,17 +178,38 @@ public class QueryLoader {
 		return collection;
 	}
 
-	private static PublicationIdsQuery publicationId(String pmid, String pmcid, String doi, String url, String type, boolean logEmpty) {
-		PublicationIds publicationIds = FetcherCommon.getPublicationIds(pmid, pmcid, doi, url, logEmpty);
+	private static PublicationIdsQuery publicationId(String pmid, String pmcid, String doi, String url, String type, boolean throwException, boolean logEmpty) {
+		PublicationIds publicationIds = FetcherCommon.getPublicationIds(pmid, pmcid, doi, url, throwException, logEmpty);
 		if (publicationIds != null) {
 			return new PublicationIdsQuery(publicationIds, type);
 		} else {
 			return null;
 		}
 	}
+	private static List<PublicationIdsQuery> publicationIds(List<List<String>> publicationIds, String url, String type, boolean throwException, boolean logEmpty, int max) {
+		if (publicationIds == null) return null;
+		List<PublicationIdsQuery> publicationIdsList = new ArrayList<>();
+		for (List<String> pubIds : publicationIds) {
+			PublicationIdsQuery publicationIdsQuery;
+			if (pubIds.size() == 1) {
+				publicationIdsQuery = publicationId(pubIds.get(0), url, type, throwException);
+			} else if (pubIds.size() == 3) {
+				publicationIdsQuery = publicationId(pubIds.get(0), pubIds.get(1), pubIds.get(2), url, type, throwException, logEmpty);
+			} else {
+				throw new IllegalRequestException("Publication ID has illegal number of parts (" + pubIds.size() + ")" + (pubIds.size() > 0 ? ", first part is " + pubIds.get(0) : ""));
+			}
+			if (publicationIdsQuery != null) {
+				publicationIdsList.add(publicationIdsQuery);
+			}
+		}
+		if (max > 0 && publicationIdsList.size() > max) {
+			throw new IllegalRequestException("Number of publication IDs (" + publicationIdsList.size() + ") is greater than maximum allowed (" + max + ")");
+		}
+		return publicationIdsList;
+	}
 
-	private static Collection<PublicationIdsQuery> addPublicationId(String pmid, String pmcid, String doi, String url, String type, boolean logEmpty, Collection<PublicationIdsQuery> collection) {
-		PublicationIdsQuery newPublicationId = publicationId(pmid, pmcid, doi, url, type, logEmpty);
+	private static Collection<PublicationIdsQuery> addPublicationId(String pmid, String pmcid, String doi, String url, String type, boolean throwException, boolean logEmpty, Collection<PublicationIdsQuery> collection) {
+		PublicationIdsQuery newPublicationId = publicationId(pmid, pmcid, doi, url, type, throwException, logEmpty);
 		if (newPublicationId != null) {
 			collection.add(newPublicationId);
 		}
@@ -189,12 +218,13 @@ public class QueryLoader {
 
 	private static boolean checkEdamUri(EdamUri edamUri, Map<EdamUri, Concept> concepts) {
 		if (concepts != null && concepts.get(edamUri) == null) {
-			throw new IllegalArgumentException("Non-existent EDAM URI: " + edamUri);
+			throw new IllegalRequestException("Non-existent EDAM URI: " + edamUri);
 		}
 		return true;
 	}
 
 	private static Set<EdamUri> edamUris(Stream<String> annotations, Map<EdamUri, Concept> concepts) {
+		if (annotations == null) return null;
 		return annotations
 			.filter(Objects::nonNull)
 			.map(String::trim)
@@ -264,12 +294,21 @@ public class QueryLoader {
 	}
 	private static Query getSEQwiki(SEQwiki SEQwiki, Map<EdamUri, Concept> concepts) {
 		List<Keyword> keywords = new ArrayList<>();
-		keywords.addAll(keywords(split(SEQwiki.getDomains(), INTERNAL_SEPARATOR_COMMA), "Domain", SEQWIKI, 0));
-		keywords.addAll(keywords(split(SEQwiki.getMethods(), INTERNAL_SEPARATOR_COMMA), "Method", SEQWIKI, 0));
+		List<Keyword> domainKeywords = keywords(split(SEQwiki.getDomains(), INTERNAL_SEPARATOR_COMMA), "Domain", SEQWIKI, 0);
+		if (domainKeywords != null) {
+			keywords.addAll(domainKeywords);
+		}
+		List<Keyword> methodKeywords = keywords(split(SEQwiki.getMethods(), INTERNAL_SEPARATOR_COMMA), "Method", SEQWIKI, 0);
+		if (methodKeywords != null) {
+			keywords.addAll(methodKeywords);
+		}
 
 		List<Link> webpageUrls = new ArrayList<>();
 		addLink(SEQWIKI + SEQwiki.getName().trim().replace(" ", "_"), null, false, webpageUrls);
-		webpageUrls.addAll(links(split(SEQwiki.getWebpages(), INTERNAL_SEPARATOR_COMMA), null, false, 0));
+		List<Link> webpagesLinks = links(split(SEQwiki.getWebpages(), INTERNAL_SEPARATOR_COMMA), null, false, 0);
+		if (webpagesLinks != null) {
+			webpageUrls.addAll(webpagesLinks);
+		}
 
 		Set<EdamUri> annotations = new LinkedHashSet<>();
 		for (Keyword keyword : keywords) {
@@ -294,10 +333,22 @@ public class QueryLoader {
 		addLink(msutils.getLink(), "Link", false, webpageUrls);
 
 		Set<EdamUri> annotations = new LinkedHashSet<>();
-		annotations.addAll(edamUris(split(msutils.getTopic()), concepts));
-		annotations.addAll(edamUris(split(msutils.getOperation()), concepts));
-		annotations.addAll(edamUris(split(msutils.getFormat_in()), concepts));
-		annotations.addAll(edamUris(split(msutils.getFormat_out()), concepts));
+		Set<EdamUri> topicUris = edamUris(split(msutils.getTopic()), concepts);
+		if (topicUris != null) {
+			annotations.addAll(topicUris);
+		}
+		Set<EdamUri> operationUris = edamUris(split(msutils.getOperation()), concepts);
+		if (operationUris != null) {
+			annotations.addAll(operationUris);
+		}
+		Set<EdamUri> formatInUris = edamUris(split(msutils.getFormat_in()), concepts);
+		if (formatInUris != null) {
+			annotations.addAll(formatInUris);
+		}
+		Set<EdamUri> formatOutUris = edamUris(split(msutils.getFormat_out()), concepts);
+		if (formatOutUris != null) {
+			annotations.addAll(formatOutUris);
+		}
 
 		return new Query(
 			null,
@@ -327,8 +378,14 @@ public class QueryLoader {
 		}
 
 		Set<EdamUri> annotations = new LinkedHashSet<>();
-		annotations.addAll(edamUris(split(bioconductor.getTopic_URI()), concepts));
-		annotations.addAll(edamUris(split(bioconductor.getOperation_URI()), concepts));
+		Set<EdamUri> topicUris = edamUris(split(bioconductor.getTopic_URI()), concepts);
+		if (topicUris != null) {
+			annotations.addAll(topicUris);
+		}
+		Set<EdamUri> operationUris = edamUris(split(bioconductor.getOperation_URI()), concepts);
+		if (operationUris != null) {
+			annotations.addAll(operationUris);
+		}
 
 		return new Query(
 			null,
@@ -344,7 +401,10 @@ public class QueryLoader {
 	private static Query getBiotools14(Biotools14 biotools, Map<EdamUri, Concept> concepts) {
 		List<Link> webpageUrls = new ArrayList<>();
 		addLink(biotools.getHomepage(), "Homepage", false, webpageUrls);
-		webpageUrls.addAll(links(biotools.getMirrors().stream(), "Mirror", false, 0));
+		List<Link> mirrorLinks = links(biotools.getMirrors().stream(), "Mirror", false, 0);
+		if (mirrorLinks != null) {
+			webpageUrls.addAll(mirrorLinks);
+		}
 
 		List<Link> docUrls = new ArrayList<>();
 		addLink(biotools.getDocsHome(), "Home", false, docUrls);
@@ -352,13 +412,28 @@ public class QueryLoader {
 
 		List<PublicationIdsQuery> publicationIds = new ArrayList<>();
 		addPublicationId(biotools.getPublicationsPrimaryID(), BIOTOOLS, "Primary", false, publicationIds);
-		publicationIds.addAll(publicationIds(biotools.getPublicationsOtherIDs().stream(), BIOTOOLS, "Other", false, 0));
+		List<PublicationIdsQuery> otherPublicationIds = publicationIds(biotools.getPublicationsOtherIDs().stream(), BIOTOOLS, "Other", false, 0);
+		if (otherPublicationIds != null) {
+			publicationIds.addAll(publicationIds(biotools.getPublicationsOtherIDs().stream(), BIOTOOLS, "Other", false, 0));
+		}
 
 		Set<EdamUri> annotations = new LinkedHashSet<>();
-		annotations.addAll(edamUris(biotools.getTopics().stream(), concepts));
-		annotations.addAll(edamUris(biotools.getFunctionNames().stream(), concepts));
-		annotations.addAll(edamUris(biotools.getDataTypes().stream(), concepts));
-		annotations.addAll(edamUris(biotools.getDataFormats().stream(), concepts));
+		Set<EdamUri> topicUris = edamUris(biotools.getTopics().stream(), concepts);
+		if (topicUris != null) {
+			annotations.addAll(topicUris);
+		}
+		Set<EdamUri> operationUris = edamUris(biotools.getFunctionNames().stream(), concepts);
+		if (operationUris != null) {
+			annotations.addAll(operationUris);
+		}
+		Set<EdamUri> dataUris = edamUris(biotools.getDataTypes().stream(), concepts);
+		if (dataUris != null) {
+			annotations.addAll(dataUris);
+		}
+		Set<EdamUri> formatUris = edamUris(biotools.getDataFormats().stream(), concepts);
+		if (formatUris != null) {
+			annotations.addAll(formatUris);
+		}
 
 		return new Query(
 			null,
@@ -382,7 +457,7 @@ public class QueryLoader {
 
 		List<PublicationIdsQuery> publicationIds = new ArrayList<>();
 		for (Publication publication : tool.getPublication()) {
-			addPublicationId(publication.getPmid(), publication.getPmcid(), publication.getDoi(), BIOTOOLS, publication.getType(), false, publicationIds);
+			addPublicationId(publication.getPmid(), publication.getPmcid(), publication.getDoi(), BIOTOOLS, publication.getType(), false, false, publicationIds);
 		}
 
 		Set<EdamUri> annotations = new LinkedHashSet<>();
@@ -450,14 +525,25 @@ public class QueryLoader {
 	}
 
 	private static Stream<String> parseServer(String string) {
-		if (string == null || string.trim().isEmpty()) return Stream.empty();
+		if (string == null) return null;
 		return INTERNAL_SEPARATOR_NEWLINE.splitAsStream(string)
 			.map(String::trim)
 			.filter(s -> !s.isEmpty() && s.charAt(0) != '#');
 	}
+	private static List<List<String>> parseServerPublicationIds(String string) {
+		if (string == null) return null;
+		return INTERNAL_SEPARATOR_NEWLINE.splitAsStream(string)
+			.filter(s -> !s.trim().isEmpty() && s.trim().charAt(0) != '#')
+			.map(s -> PUBLICATION_ID_SEPARATOR.splitAsStream(s + " ").map(String::trim).collect(Collectors.toList()))
+			.collect(Collectors.toList());
+	}
 
-	public static Query fromServer(ServerInput input, Map<EdamUri, Concept> concepts, int maxKeywords, int maxLinks, int maxPublicationIds) throws ParseException {
-		input.check(0);
+	public static Query fromServer(ServerInput input, Map<EdamUri, Concept> concepts, int maxKeywords, int maxLinks, int maxPublicationIds) {
+		try {
+			input.check(1);
+		} catch (ParseException e) {
+			throw new IllegalRequestException(e);
+		}
 		return new Query(
 			input.getId() != null ? input.getId().trim() : null,
 			input.getName().trim(),
@@ -465,24 +551,36 @@ public class QueryLoader {
 			input.getDescription() != null ? input.getDescription().trim() : null,
 			links(parseServer(input.getWebpageUrls()), null, true, maxLinks),
 			links(parseServer(input.getDocUrls()), null, true, maxLinks),
-			publicationIds(parseServer(input.getPublicationIds()), SERVER, null, true, maxPublicationIds),
+			publicationIds(parseServerPublicationIds(input.getPublicationIds()), SERVER, null, true, true, maxPublicationIds),
 			edamUris(parseServer(input.getAnnotations()), concepts));
 	}
 
 	public static List<Object> fromServerEntry(String input, Class<?> clazz, int max) {
+		if (input == null) return Collections.emptyList();
 		List<Object> list = Collections.emptyList();
 		if (clazz.getName().equals(Webpage.class.getName())) {
 			list = parseServer(input).map(s -> FetcherCommon.getUrl(s, true)).collect(Collectors.toList());
 		} else if (clazz.getName().equals(org.edamontology.pubfetcher.Publication.class.getName())) {
-			list = parseServer(input).map(s -> FetcherCommon.getPublicationIds(s, SERVER, true)).collect(Collectors.toList());
+			list = parseServerPublicationIds(input).stream().map(s -> {
+				PublicationIds publicationIds;
+				if (s.size() == 1) {
+					publicationIds = FetcherCommon.getPublicationIds(s.get(0), SERVER, true);
+				} else if (s.size() == 3) {
+					publicationIds = FetcherCommon.getPublicationIds(s.get(0), s.get(1), s.get(2), SERVER, true, true);
+				} else {
+					throw new IllegalRequestException("Publication ID has illegal number of parts (" + s.size() + ")" + (s.size() > 0 ? ", first part is " + s.get(0) : ""));
+				}
+				return publicationIds;
+			}).collect(Collectors.toList());
 		}
 		if (max > 0 && list.size() > max) {
-			throw new IllegalArgumentException("Number of entries (" + list.size() + ") is greater than maximum allowed (" + max + ")");
+			throw new IllegalRequestException("Number of entries (" + list.size() + ") is greater than maximum allowed (" + max + ")");
 		}
 		return list;
 	}
 
 	public static Map<EdamUri, Concept> fromServerEdam(String input, Map<EdamUri, Concept> concepts) {
+		if (input == null) return Collections.emptyMap();
 		return edamUris(parseServer(input), concepts).stream()
 			.collect(Collectors.toMap(e -> e, e -> concepts.get(e), (k, v) -> { throw new AssertionError(); }, LinkedHashMap::new));
 	}

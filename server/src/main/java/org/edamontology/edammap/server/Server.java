@@ -25,7 +25,7 @@ import org.edamontology.edammap.core.edam.Concept;
 import org.edamontology.edammap.core.edam.Edam;
 import org.edamontology.edammap.core.edam.EdamUri;
 import org.edamontology.edammap.core.idf.Idf;
-import org.edamontology.edammap.core.output.Param;
+import org.edamontology.edammap.core.output.ParamMain;
 import org.edamontology.edammap.core.preprocessing.PreProcessor;
 import org.edamontology.edammap.core.preprocessing.Stopwords;
 import org.edamontology.edammap.core.processing.Processor;
@@ -67,8 +67,6 @@ public final class Server {
 
 	static ServerArgs args;
 
-	static List<Param> paramsMain = new ArrayList<>();
-
 	static EnumMap<Stopwords, List<String>> stopwordsAll = new EnumMap<>(Stopwords.class);
 
 	static Processor processor;
@@ -78,15 +76,23 @@ public final class Server {
 
 	static Map<EdamUri, Concept> concepts;
 
+	static final String HTML_ID = "html";
+
+	static List<ParamMain> getParamsMain(boolean input, boolean txt, boolean html, boolean json) {
+		List<ParamMain> paramsMain = new ArrayList<>();
+		paramsMain.add(new ParamMain("Ontology file", ServerArgs.EDAM, new File(args.getEdam()).getName(), "https://github.com/edamontology/edamontology/tree/master/releases", false));
+		paramsMain.add(new ParamMain("Results to text", ServerArgs.TXT, txt, input));
+		paramsMain.add(new ParamMain("Results to HTML", HTML_ID, html, false));
+		paramsMain.add(new ParamMain("Results to JSON", ServerArgs.JSON, json, input));
+		return paramsMain;
+	}
+
 	public static void copyHtmlResources(Path path) throws IOException {
 		Files.copy(Server.class.getResourceAsStream("/style.css"), path.resolve("style.css"));
 		Files.copy(Server.class.getResourceAsStream("/script.js"), path.resolve("script.js"));
 	}
 
 	private static void run() throws IOException, ParseException {
-		paramsMain.add(new Param("Ontology file", ServerArgs.EDAM, new File(args.getEdam()).getName(), "https://github.com/edamontology/edamontology/tree/master/releases"));
-		//paramsMain.add(new Param("Number of threads", ServerArgs.THREADS, args.getThreads(), 0.0, null)); // TODO
-
 		Path filesDir = Paths.get(args.getFiles() + "/" + version.getVersion());
 		if (!Files.isDirectory(filesDir) || !Files.isWritable(filesDir)) {
 			throw new AccessDeniedException(filesDir.toAbsolutePath().normalize() + " is not a writeable directory!");
@@ -111,7 +117,6 @@ public final class Server {
 		logger.info("Configuring server");
 
 		final ResourceConfig rc = new ResourceConfig().packages("org.edamontology.edammap.server");
-		// TODO .property(JsonGenerator.PRETTY_PRINTING, true);
 
 		HttpServer httpServer = GrizzlyHttpServerFactory.createHttpServer(URI.create(args.getBaseUri() + "/" + args.getPath() + "/api"), rc, false);
 
@@ -119,6 +124,11 @@ public final class Server {
 			@Override
 			protected boolean handle(String uri, Request request, Response response) throws Exception {
 				response.getResponse().setCharacterEncoding("utf-8");
+				String path = request.getPathInfo();
+				int extStart = path.lastIndexOf(".");
+				if (extStart > -1 && path.substring(extStart).equals(".json")) {
+					response.getResponse().setContentType(MediaType.APPLICATION_JSON);
+				}
 				return super.handle(uri, request, response);
 			}
 		};
@@ -129,9 +139,23 @@ public final class Server {
 			new HttpHandler() {
 				@Override
 				public void service(Request request, Response response) throws Exception {
-					String responseText = Resource.runGet(request.getParameterMap().entrySet().stream()
-						.collect(Collectors.toMap(Map.Entry::getKey, e -> Arrays.asList(e.getValue()), (k, v) -> { throw new AssertionError(); }, MultivaluedHashMap<String, String>::new)), request);
-					response.setContentType(ContentType.newContentType(MediaType.TEXT_HTML, "utf-8"));
+					String responseText = null;
+					String mediaType = MediaType.TEXT_HTML;
+					try {
+						responseText = Resource.runGet(request.getParameterMap().entrySet().stream()
+							.collect(Collectors.toMap(Map.Entry::getKey, e -> Arrays.asList(e.getValue()), (k, v) -> { throw new AssertionError(); }, MultivaluedHashMap<String, String>::new)), request);
+					} catch (ParamException e) {
+						if (e.getResponse().getEntity() instanceof String) {
+							responseText = (String) e.getResponse().getEntity();
+						} else {
+							responseText = "400 Bad Request\n" + ExceptionCommon.time();
+						}
+						mediaType = MediaType.TEXT_PLAIN;
+					} catch (Throwable e) {
+						responseText = "500 Internal Server Error\n" + ExceptionCommon.time();
+						mediaType = MediaType.TEXT_PLAIN;
+					}
+					response.setContentType(ContentType.newContentType(mediaType, "utf-8"));
 					response.setContentLength(responseText.getBytes().length);
 					response.getWriter().write(responseText);
 				}

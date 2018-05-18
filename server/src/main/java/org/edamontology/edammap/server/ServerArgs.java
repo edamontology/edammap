@@ -32,7 +32,15 @@ public class ServerArgs extends BasicArgs {
 	@Parameter(names = { "-e", "--" + EDAM }, required = true, description = "Path of the EDAM ontology file")
 	private String edam;
 
-	public static final String BASE_URI = "base-uri";
+	public static final String TXT = "txt";
+	@Parameter(names = { "--" + TXT }, arity = 1, description = "Also output results to text file")
+	private boolean txt = true;
+
+	public static final String JSON = "json";
+	@Parameter(names = { "--" + JSON }, arity = 1, description = "Also output results to JSON file")
+	private boolean json = false;
+
+	public static final String BASE_URI = "baseUri";
 	@Parameter(names = { "-b", "--" + BASE_URI }, description = "URI where server will be deployed (as schema://host:port)")
 	private String baseUri = "http://localhost:8080";
 
@@ -40,7 +48,7 @@ public class ServerArgs extends BasicArgs {
 	@Parameter(names = { "-p", "--" + PATH }, description = "Path where server will be deployed (only one single path segment supported)")
 	private String path = "edammap";
 
-	public static final String HTTPS_PROXY = "https-proxy";
+	public static final String HTTPS_PROXY = "httpsProxy";
 	@Parameter(names = { "--" + HTTPS_PROXY }, description = "Set if we are behind a HTTPS proxy")
 	private boolean httpsProxy = false;
 
@@ -61,6 +69,14 @@ public class ServerArgs extends BasicArgs {
 
 	public String getEdam() {
 		return edam;
+	}
+
+	public boolean getTxt() {
+		return txt;
+	}
+
+	public boolean getJson() {
+		return json;
 	}
 
 	public String getBaseUri() {

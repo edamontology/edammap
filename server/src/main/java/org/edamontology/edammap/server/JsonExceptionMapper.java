@@ -19,26 +19,24 @@
 
 package org.edamontology.edammap.server;
 
-import javax.ws.rs.WebApplicationException;
+import javax.json.JsonException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
-public class ParamException extends WebApplicationException {
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-	private static final long serialVersionUID = 7240254492703489733L;
+@Provider
+public class JsonExceptionMapper implements ExceptionMapper<JsonException> {
 
-	private static String toText(String key, String value, String reason) {
-		return "Param \"" + key + "=" + value + "\" " + reason;
-	}
+	private static final Logger logger = LogManager.getLogger();
 
-	private static String toTextJson(String key, String value, String reason) {
-		return "Param '" + key + "=" + value + "' " + reason;
-	}
-
-	ParamException(String key, String value, String reason, boolean json) {
-		super(Response.status(Status.BAD_REQUEST)
-			.entity(json ? ExceptionCommon.toJson(Status.BAD_REQUEST, toTextJson(key, value, reason)) : toText(key, value, reason) + "\n" + ExceptionCommon.time())
-			.type(json ? MediaType.APPLICATION_JSON : MediaType.TEXT_PLAIN + ";charset=utf-8").build());
+	@Override
+	public Response toResponse(JsonException e) {
+		logger.error("Exception!", e);
+		return Response.status(Status.BAD_REQUEST).entity(ExceptionCommon.toJson(Status.BAD_REQUEST, e.getMessage())).type(MediaType.APPLICATION_JSON).build();
 	}
 }

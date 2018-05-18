@@ -29,15 +29,19 @@ import org.edamontology.pubfetcher.FetcherArgs;
 
 public class CoreArgs extends BasicArgs {
 
+	public static final String PROCESSOR_ARGS = "processorArgs";
 	@ParametersDelegate
 	private ProcessorArgs processorArgs = new ProcessorArgs();
 
+	public static final String PRE_PROCESSOR_ARGS = "preProcessorArgs";
 	@ParametersDelegate
 	private PreProcessorArgs preProcessorArgs = new PreProcessorArgs();
 
+	public static final String FETCHER_ARGS = "fetcherArgs";
 	@ParametersDelegate
 	private FetcherArgs fetcherArgs = new FetcherArgs();
 
+	public static final String MAPPER_ARGS = "mapperArgs";
 	@ParametersDelegate
 	private MapperArgs mapperArgs = new MapperArgs();
 

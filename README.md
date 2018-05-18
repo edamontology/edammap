@@ -49,14 +49,14 @@ Download [EDAM Ontology](http://edamontology.org/page) in OWL format.
 ## Run
 
 ```shell
-java -jar edammap-cli-0.2-SNAPSHOT.jar -e EDAM_1.20.owl -q biotools.json -t biotools -o results.txt -r results --threads 4 --fetching false --db biotools.db --idf-stemmed biotools.stemmed.idf --log edammap.log
+java -jar edammap-cli-0.2-SNAPSHOT.jar -e EDAM_1.20.owl -q biotools.json -t biotools -o results.txt -r results --threads 4 --fetching false --db biotools.db --idfStemmed biotools.stemmed.idf --log edammap.log
 ```
 
 Text results will be in "results.txt" and HTML results in directory "results".
 
 If biotools.db was not pre-fetched, then --fetching should be set to true.
 
-By default, --stemming is true, so --idf-stemmed with the stemmed IDF file must be used (if IDF weighting is desired). If --stemming is set to false, then --idf with the regular IDF file must be used.
+By default, --stemming is true, so --idfStemmed with the stemmed IDF file must be used (if IDF weighting is desired). If --stemming is set to false, then --idf with the regular IDF file must be used.
 
 Instead of adding arguments on the command line, the file [options.conf](core/options.conf) can be copied and used for managing program parameters.
 

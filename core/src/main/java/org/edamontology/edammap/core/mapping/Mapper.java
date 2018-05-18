@@ -1060,10 +1060,12 @@ public class Mapper {
 		}
 
 		Set<EdamUri> annotations = new LinkedHashSet<>();
-		for (EdamUri annotation : query.getAnnotations()) {
-			if (args.getBranches().contains(annotation.getBranch())) {
-				annotations.add(annotation);
-				matches.get(annotation).setExistingAnnotation(true);
+		if (query.getAnnotations() != null) {
+			for (EdamUri annotation : query.getAnnotations()) {
+				if (args.getBranches().contains(annotation.getBranch())) {
+					annotations.add(annotation);
+					matches.get(annotation).setExistingAnnotation(true);
+				}
 			}
 		}
 

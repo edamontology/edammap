@@ -45,6 +45,7 @@ public final class UtilMain {
 		logger.info("Load publication IDs from file {} of type {}", queryPaths, type);
 		for (String queryPath : queryPaths) {
 			publicationIds.addAll(QueryLoader.get(queryPath, type, fetcherArgs.getTimeout(), fetcherArgs.getPrivateArgs().getUserAgent()).stream()
+				.filter(q -> q.getPublicationIds() != null)
 				.flatMap(q -> q.getPublicationIds().stream()
 					.map(id -> new PublicationIds(id.getPmid(), id.getPmcid(), id.getDoi(), id.getPmidUrl(), id.getPmcidUrl(), id.getDoiUrl())))
 				.collect(Collectors.toList()));
@@ -58,6 +59,7 @@ public final class UtilMain {
 		logger.info("Load webpage URLs from file {} of type {}", queryPaths, type);
 		for (String queryPath : queryPaths) {
 			webpageUrls.addAll(QueryLoader.get(queryPath, type, fetcherArgs.getTimeout(), fetcherArgs.getPrivateArgs().getUserAgent()).stream()
+				.filter(q -> q.getWebpageUrls() != null)
 				.flatMap(q -> q.getWebpageUrls().stream()
 					.map(url -> url.getUrl()))
 				.collect(Collectors.toList()));
@@ -71,6 +73,7 @@ public final class UtilMain {
 		logger.info("Load doc URLs from file {} of type {}", queryPaths, type);
 		for (String queryPath : queryPaths) {
 			docUrls.addAll(QueryLoader.get(queryPath, type, fetcherArgs.getTimeout(), fetcherArgs.getPrivateArgs().getUserAgent()).stream()
+				.filter(q -> q.getDocUrls() != null)
 				.flatMap(q -> q.getDocUrls().stream()
 					.map(url -> url.getUrl()))
 				.collect(Collectors.toList()));

@@ -26,20 +26,28 @@ import org.edamontology.edammap.core.edam.EdamUri;
 
 public class Query {
 
+	public static final String ID = "id";
 	private final String id;
 
+	public static final String NAME = "name";
 	private final String name;
 
+	public static final String KEYWORDS = "keywords";
 	private final List<Keyword> keywords;
 
+	public static final String DESCRIPTION = "description";
 	private final String description;
 
+	public static final String WEBPAGE_URLS = "webpageUrls";
 	private final List<Link> webpageUrls;
 
+	public static final String DOC_URLS = "docUrls";
 	private final List<Link> docUrls;
 
+	public static final String PUBLICATION_IDS = "publicationIds";
 	private final List<PublicationIdsQuery> publicationIds;
 
+	public static final String ANNOTATIONS = "annotations";
 	private final Set<EdamUri> annotations;
 
 	public Query(String id, String name, List<Keyword> keywords, String description,

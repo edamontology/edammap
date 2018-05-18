@@ -36,7 +36,7 @@ public class CliArgs extends CoreArgs {
 	private String query;
 
 	public static final String TYPE = "type";
-	@Parameter(names = { "-t", "--" + TYPE, "--query-type" }, description = "Specifies the type of the query and how to output the results")
+	@Parameter(names = { "-t", "--" + TYPE, "--queryType" }, description = "Specifies the type of the query and how to output the results")
 	private QueryType type = QueryType.generic;
 
 	public static final String OUTPUT = "output";
@@ -47,11 +47,15 @@ public class CliArgs extends CoreArgs {
 	@Parameter(names = { "-r", "--" + REPORT, "--results" }, description = "Directory to write a HTML report to. In addition to detailed results, it will contain used parameters, metrics, comparisons to manual mapping, extended information about queries and nice formatting.")
 	private String report = "";
 
-	public static final String REPORT_PAGE_SIZE = "report-page-size";
+	public static final String JSON = "json";
+	@Parameter(names = { "-j", "--" + JSON }, description = "File to write results to, in JSON format. Will include same info as HTML report.")
+	private String json = "";
+
+	public static final String REPORT_PAGE_SIZE = "reportPageSize";
 	@Parameter(names = { "--" + REPORT_PAGE_SIZE }, validateWith = PositiveInteger.class, description = "Number of results in a HTML report page. Setting to 0 will output all results to a single HTML page.")
 	private int reportPageSize = 100;
 
-	public static final String REPORT_PAGINATION_SIZE = "report-pagination-size";
+	public static final String REPORT_PAGINATION_SIZE = "reportPaginationSize";
 	@Parameter(names = { "--" + REPORT_PAGINATION_SIZE }, validateWith = PositiveInteger.class, description = "Number of pagination links visible before/after the current page link in a HTML report page. Setting to 0 will make all pagination links visible.")
 	private int reportPaginationSize = 11;
 
@@ -77,6 +81,10 @@ public class CliArgs extends CoreArgs {
 
 	public String getReport() {
 		return report;
+	}
+
+	public String getJson() {
+		return json;
 	}
 
 	public int getReportPageSize() {
