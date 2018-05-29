@@ -64,6 +64,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 public class Json {
 
+	public static final String VERSION_ID = "version";
 	public static final String TYPE_ID = "type";
 
 	private static void webpageMeta(Webpage webpage, JsonGenerator generator, FetcherArgs fetcherArgs) throws IOException {
@@ -127,6 +128,7 @@ public class Json {
 		generator.writeBooleanField("oa", publication.isOA());
 		generator.writeStringField("journalTitle", publication.getJournalTitle());
 		generator.writeNumberField("pubDate", publication.getPubDate());
+		generator.writeStringField("pubDateHuman", publication.getPubDateHuman());
 		generator.writeNumberField("citationsCount", publication.getCitationsCount());
 		generator.writeNumberField("citationsTimestamp", publication.getCitationsTimestamp());
 		generator.writeStringField("citationsTimestampHuman", publication.getCitationsTimestampHuman());
@@ -301,7 +303,7 @@ public class Json {
 		generator.writeEndObject();
 	}
 
-	public static String output(CoreArgs args, List<ParamMain> paramsMain, Map<String, String> jsonFields, JsonType type, Path json, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publicationsAll, List<List<Webpage>> webpagesAll, List<List<Webpage>> docsAll, Results results, long start, long stop, Version version) throws IOException {
+	public static String output(CoreArgs args, List<ParamMain> paramsMain, Map<String, String> jsonFields, JsonType type, Path json, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publicationsAll, List<List<Webpage>> webpagesAll, List<List<Webpage>> docsAll, Results results, long start, long stop, Version version, String jsonVersion) throws IOException {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
 		mapper.enable(SerializationFeature.CLOSE_CLOSEABLE);
@@ -317,6 +319,10 @@ public class Json {
 		generator.writeStartObject();
 
 		generator.writeBooleanField("success", true);
+
+		if (jsonVersion != null) {
+			generator.writeStringField(VERSION_ID, jsonVersion);
+		}
 
 		generator.writeStringField(TYPE_ID, type.name());
 
@@ -366,7 +372,7 @@ public class Json {
 			if (server || query.getId() == null) {
 				generator.writeStringField(Query.ID, query.getId());
 			} else {
-				generator.writeStringField(Query.ID, QueryLoader.BIOTOOLS + query.getId());				
+				generator.writeStringField(Query.ID, QueryLoader.BIOTOOLS + query.getId());
 			}
 
 			generator.writeStringField(Query.NAME, query.getName());
@@ -378,7 +384,7 @@ public class Json {
 					if (server) {
 						generator.writeString(keyword.getValue());
 					} else {
-						generator.writeObject(keyword);					
+						generator.writeObject(keyword);
 					}
 				}
 				generator.writeEndArray();
@@ -395,7 +401,7 @@ public class Json {
 					if (server) {
 						generator.writeString(webpageUrl.getUrl());
 					} else {
-						generator.writeObject(webpageUrl);					
+						generator.writeObject(webpageUrl);
 					}
 				}
 				generator.writeEndArray();
@@ -429,7 +435,7 @@ public class Json {
 						generator.writeStringField("doi", publicationIds.getDoi());
 						generator.writeEndObject();
 					} else {
-						generator.writeObject(publicationIds);					
+						generator.writeObject(publicationIds);
 					}
 				}
 				generator.writeEndArray();
@@ -557,6 +563,8 @@ public class Json {
 		JsonGenerator generator = factory.createGenerator(writer);
 		generator.useDefaultPrettyPrinter();
 		generator.writeStartObject();
+
+		generator.writeBooleanField("success", true);
 
 		generator.writeFieldName(key);
 

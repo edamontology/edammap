@@ -31,6 +31,7 @@ import com.beust.jcommander.validators.PositiveInteger;
 import org.edamontology.edammap.core.edam.Branch;
 
 public class MapperArgs {
+
 	public static final String BRANCHES = "branches";
 	@Parameter(names = { "--" + BRANCHES }, variableArity = true, description = "Branches to include. Space separated from list [topic, operation, data, format].")
 	private List<Branch> branches = new ArrayList<>(Arrays.asList(Branch.topic, Branch.operation));
@@ -40,19 +41,19 @@ public class MapperArgs {
 	private int matches = 3;
 
 	public static final String OBSOLETE = "obsolete";
-	@Parameter(names = { "--" + OBSOLETE }, arity = 1, description = "Include/exclude obsolete concepts")
+	@Parameter(names = { "--" + OBSOLETE }, arity = 1, description = "Include obsolete concepts")
 	private boolean obsolete = false;
 
 	public static final String DONE_ANNOTATIONS = "doneAnnotations";
-	@Parameter(names = { "--" + DONE_ANNOTATIONS }, arity = 1, description = "Do/don't suggest concepts already used for annotating query. Then parents and children of these concepts are not suggested either (unless --inferior-parent-child is set to true).")
+	@Parameter(names = { "--" + DONE_ANNOTATIONS }, arity = 1, description = "Suggest concepts already used for annotating query. Parents and children of these concepts are not suggested in any case (unless --inferior-parent-child is set to true).")
 	private boolean doneAnnotations = true;
 
 	public static final String INFERIOR_PARENTS_CHILDREN = "inferiorParentsChildren";
-	@Parameter(names = { "--" + INFERIOR_PARENTS_CHILDREN }, arity = 1, description = "Include/exclude parents and children of a better matched concept in suggestion results")
+	@Parameter(names = { "--" + INFERIOR_PARENTS_CHILDREN }, arity = 1, description = "Include parents and children of a better matched concept in suggestion results")
 	private boolean inferiorParentsChildren = false;
 
 	public static final String TOP_LEVEL = "topLevel";
-	@Parameter(names = { "--" + TOP_LEVEL }, arity = 1, description = "Include/exclude top level concepts (topic, operation, data, format) in suggestion results")
+	@Parameter(names = { "--" + TOP_LEVEL }, arity = 1, description = "Include top level concepts (\"topic\", \"operation\", \"data\", \"format\") in suggestion results")
 	private boolean topLevel = false;
 
 	public static final String ALGORITHM_ARGS = "algorithmArgs";

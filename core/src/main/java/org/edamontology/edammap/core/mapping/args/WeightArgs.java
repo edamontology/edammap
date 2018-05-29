@@ -27,19 +27,19 @@ public class WeightArgs {
 
 	public static final String AVERAGE_SCALING = "averageScaling";
 	@Parameter(names = { "--" + AVERAGE_SCALING }, validateWith = PositiveDouble.class, description = "Scaling for the average strategy")
-	private double averageScaling = 10;
+	private double averageScaling = 10.0;
 
 	public static final String NAME_WEIGHT = "nameWeight";
 	@Parameter(names = { "--" + NAME_WEIGHT }, validateWith = PositiveDouble.class, description = "Weight of query name in average strategy. Set to 0 to disable matching of names in average strategy.")
-	private double nameWeight = 1;
+	private double nameWeight = 1.0;
 
 	public static final String KEYWORD_WEIGHT = "keywordWeight";
 	@Parameter(names = { "--" + KEYWORD_WEIGHT }, validateWith = PositiveDouble.class, description = "Weight of query keyword in average strategy. Set to 0 to disable matching of keywords in average strategy.")
-	private double keywordWeight = 1;
+	private double keywordWeight = 1.0;
 
 	public static final String DESCRIPTION_WEIGHT = "descriptionWeight";
 	@Parameter(names = { "--" + DESCRIPTION_WEIGHT }, validateWith = PositiveDouble.class, description = "Weight of query description in average strategy. Set to 0 to disable matching of descriptions in average strategy.")
-	private double descriptionWeight = 1;
+	private double descriptionWeight = 1.0;
 
 	public static final String PUBLICATION_TITLE_WEIGHT = "publicationTitleWeight";
 	@Parameter(names = { "--" + PUBLICATION_TITLE_WEIGHT }, validateWith = PositiveDouble.class, description = "Weight of publication title in average strategy. Set to 0 to disable matching of titles in average strategy.")

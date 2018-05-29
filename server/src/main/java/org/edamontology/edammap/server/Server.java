@@ -76,6 +76,7 @@ public final class Server {
 
 	static Map<EdamUri, Concept> concepts;
 
+	static final String VERSION_ID = "version";
 	static final String HTML_ID = "html";
 
 	static List<ParamMain> getParamsMain(boolean input, boolean txt, boolean html, boolean json) {

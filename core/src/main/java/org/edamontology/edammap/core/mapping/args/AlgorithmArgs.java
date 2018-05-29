@@ -34,11 +34,11 @@ public class AlgorithmArgs {
 
 	public static final String MISMATCH_MULTIPLIER = "mismatchMultiplier";
 	@Parameter(names = { "--" + MISMATCH_MULTIPLIER }, validateWith = PositiveDouble.class, description = "Multiplier for score decrease caused by mismatch")
-	private double mismatchMultiplier = 2;
+	private double mismatchMultiplier = 2.0;
 
 	public static final String MATCH_MINIMUM = "matchMinimum";
 	@Parameter(names = { "--" + MATCH_MINIMUM }, validateWith = ZeroToOneDouble.class, description = "Minimum score allowed for approximate match. Set to 1 to disable approximate matching.")
-	private double matchMinimum = 1;
+	private double matchMinimum = 1.0;
 
 	public static final String POSITION_OFF_BY_1 = "positionOffBy1";
 	@Parameter(names = { "--" + POSITION_OFF_BY_1 }, validateWith = ZeroToOneDouble.class, description = "Multiplier of a position score component for the case when a word is inserted between matched words or matched words are switched")
@@ -57,16 +57,16 @@ public class AlgorithmArgs {
 	private double positionLoss = 0.4;
 
 	public static final String SCORE_SCALING = "scoreScaling";
-	@Parameter(names = { "--" + SCORE_SCALING }, validateWith = PositiveDouble.class, description = "Score is scaled before appyling multiplier and weighting with other direction match. Setting to 0 or 1 means no scaling.")
+	@Parameter(names = { "--" + SCORE_SCALING }, validateWith = PositiveDouble.class, description = "Score is scaled before applying multiplier and weighting with other direction match. Setting to 0 or 1 means no scaling.")
 	private double scoreScaling = 0.2;
 
 	public static final String CONCEPT_WEIGHT = "conceptWeight";
 	@Parameter(names = { "--" + CONCEPT_WEIGHT }, validateWith = PositiveDouble.class, description = "Weight of matching a concept (with a query). Set to 0 to disable matching of concepts.")
-	private double conceptWeight = 1;
+	private double conceptWeight = 1.0;
 
 	public static final String QUERY_WEIGHT = "queryWeight";
 	@Parameter(names = { "--" + QUERY_WEIGHT }, validateWith = PositiveDouble.class, description = "Weight of matching a query (with a concept). Set to 0 to disable matching of queries.")
-	private double queryWeight = 1;
+	private double queryWeight = 1.0;
 
 	public static final String MAPPING_STRATEGY = "mappingStrategy";
 	@Parameter(names = { "--" + MAPPING_STRATEGY }, description = "Choose the best or take the average of query parts matches")
@@ -77,7 +77,7 @@ public class AlgorithmArgs {
 	private double parentWeight = 0.5;
 
 	public static final String PATH_WEIGHT = "pathWeight";
-	@Parameter(names = { "--" + PATH_WEIGHT }, validateWith = PositiveDouble.class, description = "Weight of path enrichment. Weight of concept is 1. Set to 0 to disable path enrichment")
+	@Parameter(names = { "--" + PATH_WEIGHT }, validateWith = PositiveDouble.class, description = "Weight of path enrichment. Weight of concept is 1. Set to 0 to disable path enrichment.")
 	private double pathWeight = 0.7;
 
 	public int getCompoundWords() {

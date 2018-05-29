@@ -143,6 +143,19 @@ public class Resource {
 		Instant startInstant = Instant.ofEpochMilli(start);
 		logger.info("Start: {}", startInstant);
 
+		String jsonVersion = null;
+		if (isJson) {
+			if ((jsonVersion = ParamParse.getParamString(params, Server.VERSION_ID)) != null) {
+				if (!jsonVersion.equals("1")) {
+					throw new IllegalRequestException("Illegal API version: '" + jsonVersion + "'; possible values: '1'");
+				}
+			} else {
+				jsonVersion = "1";
+			}
+		} else {
+			jsonVersion = "1";
+		}
+
 		CoreArgs coreArgs = new CoreArgs();
 		ParamParse.parseParams(params, coreArgs, isJson);
 		coreArgs.setProcessorArgs(Server.args.getProcessorArgs());
@@ -287,7 +300,7 @@ public class Resource {
 
 		logger.info("Outputting results");
 		output.output(coreArgs, Server.getParamsMain(false, txt, html, json), jsonFields, QueryType.server, 1, 1,
-			Server.concepts, queries, webpages, docs, publications, results, start, stop, Server.version);
+			Server.concepts, queries, webpages, docs, publications, results, start, stop, Server.version, jsonVersion);
 
 		if (isJson) {
 			logger.info("POSTED JSON {}", jsonLocation);
@@ -305,7 +318,7 @@ public class Resource {
 				}
 			}
 			jsonString = Json.output(coreArgs, Server.getParamsMain(false, txt, html, json), jsonFields, jsonType, null,
-				Server.concepts, queries, publications, webpages, docs, results, start, stop, Server.version);
+				Server.concepts, queries, publications, webpages, docs, results, start, stop, Server.version, jsonVersion);
 		}
 
 		return new PostResult(jsonString, htmlLocation);

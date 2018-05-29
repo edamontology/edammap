@@ -51,7 +51,7 @@ public class NormaliserArgs {
 
 	public static final String PUBLICATION_MINED_TERM_NORMALISER = "publicationMinedTermNormaliser";
 	@Parameter(names = { "--" + PUBLICATION_MINED_TERM_NORMALISER }, validateWith = ZeroToOneDouble.class, description = "Score normaliser for matching a publication mined term (EFO, GO). Set to 0 to disable matching of mined terms.")
-	private double publicationMinedTermNormaliser = 1;
+	private double publicationMinedTermNormaliser = 1.0;
 
 	public static final String PUBLICATION_ABSTRACT_NORMALISER = "publicationAbstractNormaliser";
 	@Parameter(names = { "--" + PUBLICATION_ABSTRACT_NORMALISER }, validateWith = ZeroToOneDouble.class, description = "Score normaliser for matching a publication abstract. Set to 0 to disable matching of abstracts.")
@@ -59,15 +59,15 @@ public class NormaliserArgs {
 
 	public static final String PUBLICATION_FULLTEXT_NORMALISER = "publicationFulltextNormaliser";
 	@Parameter(names = { "--" + PUBLICATION_FULLTEXT_NORMALISER }, validateWith = ZeroToOneDouble.class, description = "Score normaliser for matching a publication fulltext. Set to 0 to disable matching of fulltexts.")
-	private double publicationFulltextNormaliser = 1;
+	private double publicationFulltextNormaliser = 1.0;
 
 	public static final String DOC_NORMALISER = "docNormaliser";
 	@Parameter(names = { "--" + DOC_NORMALISER }, validateWith = ZeroToOneDouble.class, description = "Score normaliser for matching a query doc. Set to 0 to disable matching of docs.")
-	private double docNormaliser = 1;
+	private double docNormaliser = 1.0;
 
 	public static final String WEBPAGE_NORMALISER = "webpageNormaliser";
 	@Parameter(names = { "--" + WEBPAGE_NORMALISER }, validateWith = ZeroToOneDouble.class, description = "Score normaliser for matching a query webpage. Set to 0 to disable matching of webpages.")
-	private double webpageNormaliser = 1;
+	private double webpageNormaliser = 1.0;
 
 	public double getNameNormaliser() {
 		return nameNormaliser;
