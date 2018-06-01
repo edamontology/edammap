@@ -25,6 +25,8 @@ import org.edamontology.pubfetcher.IllegalRequestException;
 
 public class EdamUri {
 
+	public static final String DEFAULT_PREFIX = "http://edamontology.org";
+
 	private String uri;
 
 	private Branch branch;

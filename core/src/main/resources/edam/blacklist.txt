@@ -1,0 +1,42 @@
+
+### Organisational concepts not intended for annotation
+
+### Top-level concepts
+# Topic
+http://edamontology.org/topic_0003
+# Operation
+http://edamontology.org/operation_0004
+# Data
+http://edamontology.org/data_0006
+# Format
+http://edamontology.org/format_1915
+
+### From topic branch
+# Omics
+http://edamontology.org/topic_3391
+
+### From operation branch
+# Comparison
+http://edamontology.org/operation_2424
+# Design
+http://edamontology.org/operation_2430
+# Alignment
+http://edamontology.org/operation_2928
+# Analysis
+http://edamontology.org/operation_2945
+# Generation
+http://edamontology.org/operation_3429
+# Calculation
+http://edamontology.org/operation_3438
+# Correlation
+http://edamontology.org/operation_3465
+# Prediction and recognition
+http://edamontology.org/operation_2423
+# Conversion 
+http://edamontology.org/operation_3434
+# Annotation
+http://edamontology.org/operation_0226
+# Indexing
+http://edamontology.org/operation_0227
+# Classification
+http://edamontology.org/operation_2990

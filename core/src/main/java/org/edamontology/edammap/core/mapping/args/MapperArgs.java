@@ -52,10 +52,6 @@ public class MapperArgs {
 	@Parameter(names = { "--" + INFERIOR_PARENTS_CHILDREN }, arity = 1, description = "Include parents and children of a better matched concept in suggestion results")
 	private boolean inferiorParentsChildren = false;
 
-	public static final String TOP_LEVEL = "topLevel";
-	@Parameter(names = { "--" + TOP_LEVEL }, arity = 1, description = "Include top level concepts (\"topic\", \"operation\", \"data\", \"format\") in suggestion results")
-	private boolean topLevel = false;
-
 	public static final String ALGORITHM_ARGS = "algorithmArgs";
 	@ParametersDelegate
 	private AlgorithmArgs algorithmArgs = new AlgorithmArgs();
@@ -113,13 +109,6 @@ public class MapperArgs {
 	}
 	public void setInferiorParentsChildren(boolean inferiorParentsChildren) {
 		this.inferiorParentsChildren = inferiorParentsChildren;
-	}
-
-	public boolean isTopLevel() {
-		return topLevel;
-	}
-	public void setTopLevel(boolean topLevel) {
-		this.topLevel = topLevel;
 	}
 
 	public AlgorithmArgs getAlgorithmArgs() {

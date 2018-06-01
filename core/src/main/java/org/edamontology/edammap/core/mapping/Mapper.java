@@ -54,13 +54,16 @@ public class Mapper {
 
 	private final Map<EdamUri, ConceptProcessed> processedConcepts;
 
+	private final Set<EdamUri> edamBlacklist;
+
 	private final Levenshtein levenshtein;
 
-	public Mapper(Map<EdamUri, ConceptProcessed> processedConcepts) {
+	public Mapper(Map<EdamUri, ConceptProcessed> processedConcepts, Set<EdamUri> edamBlacklist) {
 		if (processedConcepts == null) {
 			throw new IllegalArgumentException("Given concepts is null");
 		}
 		this.processedConcepts = processedConcepts;
+		this.edamBlacklist = edamBlacklist;
 		this.levenshtein = new Levenshtein();
 	}
 
@@ -1046,8 +1049,8 @@ public class Mapper {
 
 			if (!args.getBranches().contains(edamUri.getBranch())) continue;
 
-			if ((processedConcept.isObsolete() && !args.isObsolete())
-				|| (processedConcept.getDirectParents().isEmpty() && !args.isTopLevel())) {
+			if (processedConcept.getDirectParents().isEmpty()
+					|| processedConcept.isObsolete() && !args.isObsolete()) {
 				Match zeroMatch = new Match(0, new ConceptMatch(0, ConceptMatchType.none, -1), new QueryMatch(0, QueryMatchType.none, -1, -1));
 				zeroMatch.setEdamUri(edamUri);
 				matches.put(edamUri, zeroMatch);
@@ -1085,8 +1088,11 @@ public class Mapper {
 				EdamUri edamUri = matchEntry.getKey();
 				Match match = matchEntry.getValue();
 
-				if (processedConcepts.get(edamUri).getDirectParents().isEmpty() && !args.isTopLevel()) {
+				if (processedConcepts.get(edamUri).getDirectParents().isEmpty()) {
 					match.setRemoved(true);
+					continue;
+				}
+				if (edamBlacklist != null && edamBlacklist.contains(edamUri)) {
 					continue;
 				}
 				if (processedConcepts.get(edamUri).isObsolete() && !args.isObsolete()) {
@@ -1110,6 +1116,7 @@ public class Mapper {
 			if (mapping.isFull(match.getEdamUri().getBranch())) continue;
 
 			if (match.isRemoved()) continue;
+			if (edamBlacklist != null && edamBlacklist.contains(match.getEdamUri())) continue;
 			if (processedConcepts.get(match.getEdamUri()).isObsolete() && !args.isObsolete()) continue;
 			if (!args.isDoneAnnotations() && match.isExistingAnnotation()) continue;
 

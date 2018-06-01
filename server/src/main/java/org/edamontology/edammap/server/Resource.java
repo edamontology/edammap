@@ -264,7 +264,7 @@ public class Resource {
 		QueryProcessed processedQuery = Server.processor.getProcessedQuery(query, QueryType.server, preProcessor, idf, coreArgs.getFetcherArgs());
 
 		logger.info("Mapping query");
-		Mapping mapping = new Mapper(processedConcepts).map(query, processedQuery, coreArgs.getMapperArgs());
+		Mapping mapping = new Mapper(processedConcepts, Server.edamBlacklist).map(query, processedQuery, coreArgs.getMapperArgs());
 
 		List<Query> queries = Collections.singletonList(query);
 		List<List<Webpage>> webpages = Collections.singletonList(processedQuery.getWebpages());

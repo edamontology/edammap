@@ -54,6 +54,7 @@ import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.MediaType;
@@ -68,6 +69,8 @@ public final class Server {
 	static ServerArgs args;
 
 	static EnumMap<Stopwords, List<String>> stopwordsAll = new EnumMap<>(Stopwords.class);
+
+	static Set<EdamUri> edamBlacklist;
 
 	static Processor processor;
 
@@ -102,6 +105,8 @@ public final class Server {
 		for (Stopwords stopwords : Stopwords.values()) {
 			stopwordsAll.put(stopwords, PreProcessor.getStopwords(stopwords));
 		}
+
+		edamBlacklist = Edam.getBlacklist();
 
 		processor = new Processor(args.getProcessorArgs());
 

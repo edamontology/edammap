@@ -238,9 +238,6 @@ public final class ParamParse {
 		if ((valueBoolean = getParamBoolean(params, MapperArgs.INFERIOR_PARENTS_CHILDREN)) != null) {
 			args.getMapperArgs().setInferiorParentsChildren(valueBoolean);
 		}
-		if ((valueBoolean = getParamBoolean(params, MapperArgs.TOP_LEVEL)) != null) {
-			args.getMapperArgs().setTopLevel(valueBoolean);
-		}
 
 		if ((valueInteger = getParamInteger(params, AlgorithmArgs.COMPOUND_WORDS, 0, null, json)) != null) {
 			args.getMapperArgs().getAlgorithmArgs().setCompoundWords(valueInteger);

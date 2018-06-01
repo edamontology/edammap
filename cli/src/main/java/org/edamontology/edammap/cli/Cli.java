@@ -26,6 +26,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -71,6 +72,8 @@ public class Cli implements Runnable {
 
 	private static List<String> stopwords;
 
+	private static Set<EdamUri> edamBlacklist;
+
 	private static Processor processor;
 
 	private static Idf idf;
@@ -93,7 +96,7 @@ public class Cli implements Runnable {
 		}
 		try {
 			PreProcessor pp = new PreProcessor(args.getPreProcessorArgs(), stopwords);
-			Mapper mapper = new Mapper(processedConcepts);
+			Mapper mapper = new Mapper(processedConcepts, edamBlacklist);
 
 			while (true) {
 				Query query;
@@ -147,6 +150,8 @@ public class Cli implements Runnable {
 		Output output = new Output(args.getOutput(), args.getReport(), args.getJson(), false);
 
 		stopwords = PreProcessor.getStopwords(args.getPreProcessorArgs().getStopwords());
+
+		edamBlacklist = Edam.getBlacklist();
 
 		processor = new Processor(args.getProcessorArgs());
 

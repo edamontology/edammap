@@ -66,7 +66,6 @@ public class QueryLoader {
 
 	private static final Logger logger = LogManager.getLogger();
 
-	private static final String EDAM_PREFIX = "http://edamontology.org";
 	private static final String GENERIC = QueryType.generic.name(); // TODO something better, like file name
 	private static final String SEQWIKI = "http://seqanswers.com/wiki/";
 	private static final String MSUTILS = "http://www.ms-utils.org/";
@@ -229,15 +228,15 @@ public class QueryLoader {
 			.filter(Objects::nonNull)
 			.map(String::trim)
 			.filter(s -> !s.isEmpty())
-			.map(s -> (s.contains("/") ? s : EDAM_PREFIX + "/" + s))
-			.map(s -> new EdamUri(s.toLowerCase(Locale.ROOT), EDAM_PREFIX))
+			.map(s -> (s.contains("/") ? s : EdamUri.DEFAULT_PREFIX + "/" + s))
+			.map(s -> new EdamUri(s.toLowerCase(Locale.ROOT), EdamUri.DEFAULT_PREFIX))
 			.filter(e -> checkEdamUri(e, concepts))
 			.collect(Collectors.toCollection(LinkedHashSet::new));
 	}
 
 	private static EdamUri edamUriJson(Edam edam, Map<EdamUri, Concept> concepts) {
 		if (edam.getUri() != null && !edam.getUri().trim().isEmpty()) {
-			EdamUri edamUri = new EdamUri(edam.getUri().trim().toLowerCase(Locale.ROOT), EDAM_PREFIX);
+			EdamUri edamUri = new EdamUri(edam.getUri().trim().toLowerCase(Locale.ROOT), EdamUri.DEFAULT_PREFIX);
 			if (!checkEdamUri(edamUri, concepts)) return null;
 			return edamUri;
 		}

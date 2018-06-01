@@ -294,7 +294,6 @@ public class Params {
 		writeBoolean(writer, new Param("Obsolete concepts", MapperArgs.OBSOLETE, args.isObsolete()), input);
 		writeBoolean(writer, new Param("Done annotations", MapperArgs.DONE_ANNOTATIONS, args.isDoneAnnotations()), input);
 		writeBoolean(writer, new Param("Inferior parents & children", MapperArgs.INFERIOR_PARENTS_CHILDREN, args.isInferiorParentsChildren()), input);
-		writeBoolean(writer, new Param("Top level concepts", MapperArgs.TOP_LEVEL, args.isTopLevel()), input);
 		writeEnd(writer);
 
 		writeBegin(writer, MapperArgs.ALGORITHM_ARGS, "Mapping algorithm", false);
