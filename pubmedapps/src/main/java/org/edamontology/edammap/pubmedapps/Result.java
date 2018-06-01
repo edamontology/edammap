@@ -56,6 +56,20 @@ public class Result {
 
 	private Set<String> newLinks = new LinkedHashSet<>();
 
+	private String title = "";
+
+	private boolean oa = false;
+
+	private String journalTitle = "";
+
+	private String pubDate = "";
+
+	private int citationsCount = -1;
+
+	private String citationsTimestamp = "";
+
+	private String correspAuthor = "";
+
 	public String getPmid() {
 		return pmid;
 	}
@@ -155,5 +169,54 @@ public class Result {
 	}
 	public void addNewLink(String newLink) {
 		newLinks.add(newLink);
+	}
+
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public boolean isOa() {
+		return oa;
+	}
+	public void setOa(boolean oa) {
+		this.oa = oa;
+	}
+
+	public String getJournalTitle() {
+		return journalTitle;
+	}
+	public void setJournalTitle(String journalTitle) {
+		this.journalTitle = journalTitle;
+	}
+
+	public String getPubDate() {
+		return pubDate;
+	}
+	public void setPubDate(String pubDate) {
+		this.pubDate = pubDate;
+	}
+
+	public int getCitationsCount() {
+		return citationsCount;
+	}
+	public void setCitationsCount(int citationsCount) {
+		this.citationsCount = citationsCount;
+	}
+
+	public String getCitationsTimestamp() {
+		return citationsTimestamp;
+	}
+	public void setCitationsTimestamp(String citationsTimestamp) {
+		this.citationsTimestamp = citationsTimestamp;
+	}
+
+	public String getCorrespAuthor() {
+		return correspAuthor;
+	}
+	public void setCorrespAuthor(String correspAuthor) {
+		this.correspAuthor = correspAuthor;
 	}
 }

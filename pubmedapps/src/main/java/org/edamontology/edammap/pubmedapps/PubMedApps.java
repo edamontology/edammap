@@ -1290,6 +1290,14 @@ public final class PubMedApps {
 			result.setPmcid(publication.getPmcid().getContent());
 			result.setDoi(publication.getDoi().getContent());
 
+			result.setTitle(publication.getTitle().getContent());
+			result.setOa(publication.isOA());
+			result.setJournalTitle(publication.getJournalTitle());
+			result.setPubDate(publication.getPubDateHuman());
+			result.setCitationsCount(publication.getCitationsCount());
+			result.setCitationsTimestamp(publication.getCitationsTimestampHuman());
+			result.setCorrespAuthor(publication.getCorrespAuthor());
+
 			List<String> resultLinks = new ArrayList<>();
 			List<String> suggestionsProcessed = new ArrayList<>();
 			Iterator<Map.Entry<String, Double>> sortedScoresIterator = sortedScores.entrySet().iterator();
@@ -1553,7 +1561,7 @@ public final class PubMedApps {
 
 		logger.info("Removed {} existing", publications.size() - results.size());
 
-		System.out.println("pmid\tpmcid\tdoi\tscore\tsuggestion\tlinks\tdocs\tsame_suggestions\tother_suggestions\tother_links\tleftover_links\texisting_names\tnew_links\tpossibly_existing");
+		System.out.println("pmid\tpmcid\tdoi\tscore\tsuggestion\tlinks\tdocs\tsame_suggestions\tother_suggestions\tother_links\tleftover_links\texisting_names\tnew_links\tpossibly_existing\ttitle\toa\tjournal_title\tpub_date\tcitations_count\tcitations_timestamp\tcorresp_author");
 		for (Result result : results) {
 			System.out.print(result.getPmid());
 			System.out.print("\t");
@@ -1582,6 +1590,20 @@ public final class PubMedApps {
 			System.out.print(String.join(" | ", result.getNewLinks()));
 			System.out.print("\t");
 			System.out.print(String.join(" | ", result.getPossiblyExisting().entrySet().stream().map(e -> e.getValue() + " (" + e.getKey() + ")").collect(Collectors.toList())));
+			System.out.print("\t");
+			System.out.print(result.getTitle());
+			System.out.print("\t");
+			System.out.print(result.isOa());
+			System.out.print("\t");
+			System.out.print(result.getJournalTitle());
+			System.out.print("\t");
+			System.out.print(result.getPubDate());
+			System.out.print("\t");
+			System.out.print(result.getCitationsCount());
+			System.out.print("\t");
+			System.out.print(result.getCitationsTimestamp());
+			System.out.print("\t");
+			System.out.print(result.getCorrespAuthor());
 			System.out.println();
 		}
 	}
