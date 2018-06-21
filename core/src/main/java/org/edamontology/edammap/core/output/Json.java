@@ -36,6 +36,7 @@ import org.edamontology.pubfetcher.core.common.FetcherArgs;
 import org.edamontology.pubfetcher.core.common.PubFetcher;
 import org.edamontology.pubfetcher.core.common.Version;
 import org.edamontology.pubfetcher.core.db.DatabaseEntry;
+import org.edamontology.pubfetcher.core.db.publication.CorrespAuthor;
 import org.edamontology.pubfetcher.core.db.publication.Publication;
 import org.edamontology.pubfetcher.core.db.publication.PublicationPart;
 import org.edamontology.pubfetcher.core.db.publication.PublicationPartList;
@@ -135,7 +136,18 @@ public class Json {
 		generator.writeNumberField("citationsCount", publication.getCitationsCount());
 		generator.writeNumberField("citationsTimestamp", publication.getCitationsTimestamp());
 		generator.writeStringField("citationsTimestampHuman", publication.getCitationsTimestampHuman());
-		generator.writeObjectField("correspAuthor", publication.getCorrespAuthor());
+		generator.writeFieldName("correspAuthor");
+		generator.writeStartArray();
+		for (CorrespAuthor correspAuthor : publication.getCorrespAuthor()) {
+			generator.writeStartObject();
+			generator.writeStringField("name", correspAuthor.getName());
+			generator.writeStringField("orcid", correspAuthor.getOrcid());
+			generator.writeStringField("email", correspAuthor.getEmail());
+			generator.writeStringField("phone", correspAuthor.getPhone());
+			generator.writeStringField("uri", correspAuthor.getUri());
+			generator.writeEndObject();
+		}
+		generator.writeEndArray();
 		generator.writeObjectField("visitedSites", publication.getVisitedSites());
 
 		generator.writeBooleanField("empty", publication.isEmpty());
