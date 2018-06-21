@@ -26,6 +26,23 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonEncoding;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+import org.edamontology.pubfetcher.core.common.FetcherArgs;
+import org.edamontology.pubfetcher.core.common.PubFetcher;
+import org.edamontology.pubfetcher.core.common.Version;
+import org.edamontology.pubfetcher.core.db.DatabaseEntry;
+import org.edamontology.pubfetcher.core.db.publication.Publication;
+import org.edamontology.pubfetcher.core.db.publication.PublicationPart;
+import org.edamontology.pubfetcher.core.db.publication.PublicationPartList;
+import org.edamontology.pubfetcher.core.db.publication.PublicationPartName;
+import org.edamontology.pubfetcher.core.db.publication.PublicationPartString;
+import org.edamontology.pubfetcher.core.db.webpage.Webpage;
+
 import org.edamontology.edammap.core.args.CoreArgs;
 import org.edamontology.edammap.core.benchmarking.MappingTest;
 import org.edamontology.edammap.core.benchmarking.MatchTest;
@@ -45,22 +62,6 @@ import org.edamontology.edammap.core.query.Link;
 import org.edamontology.edammap.core.query.PublicationIdsQuery;
 import org.edamontology.edammap.core.query.Query;
 import org.edamontology.edammap.core.query.QueryLoader;
-import org.edamontology.pubfetcher.DatabaseEntry;
-import org.edamontology.pubfetcher.FetcherArgs;
-import org.edamontology.pubfetcher.FetcherCommon;
-import org.edamontology.pubfetcher.Publication;
-import org.edamontology.pubfetcher.PublicationPart;
-import org.edamontology.pubfetcher.PublicationPartList;
-import org.edamontology.pubfetcher.PublicationPartName;
-import org.edamontology.pubfetcher.PublicationPartString;
-import org.edamontology.pubfetcher.Version;
-import org.edamontology.pubfetcher.Webpage;
-
-import com.fasterxml.jackson.core.JsonEncoding;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 
 public class Json {
 
@@ -78,6 +79,8 @@ public class Json {
 		generator.writeNumberField("statusCode", webpage.getStatusCode());
 		generator.writeNumberField("contentTime", webpage.getContentTime());
 		generator.writeStringField("contentTimeHuman", webpage.getContentTimeHuman());
+		generator.writeStringField("license", webpage.getLicense());
+		generator.writeStringField("language", webpage.getLanguage());
 		generator.writeNumberField("titleLength", webpage.getTitle().length());
 		generator.writeNumberField("contentLength", webpage.getContent().length());
 		generator.writeStringField("title", webpage.getTitle());
@@ -132,7 +135,7 @@ public class Json {
 		generator.writeNumberField("citationsCount", publication.getCitationsCount());
 		generator.writeNumberField("citationsTimestamp", publication.getCitationsTimestamp());
 		generator.writeStringField("citationsTimestampHuman", publication.getCitationsTimestampHuman());
-		generator.writeStringField("correspAuthor", publication.getCorrespAuthor());
+		generator.writeObjectField("correspAuthor", publication.getCorrespAuthor());
 		generator.writeObjectField("visitedSites", publication.getVisitedSites());
 
 		generator.writeBooleanField("empty", publication.isEmpty());
@@ -201,7 +204,7 @@ public class Json {
 		} else if (type == QueryMatchType.doc && index >= 0 && query.getDocUrls().get(index) != null) {
 			return query.getDocUrls().get(index).getUrl();
 		} else if (type.isPublication() && index >= 0) {
-			return FetcherCommon.getIdLink(query.getPublicationIds().get(index));
+			return PubFetcher.getIdLink(query.getPublicationIds().get(index));
 		} else {
 			return null;
 		}

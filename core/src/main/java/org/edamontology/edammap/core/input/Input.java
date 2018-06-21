@@ -27,7 +27,8 @@ import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.edamontology.pubfetcher.FetcherCommon;
+
+import org.edamontology.pubfetcher.core.common.PubFetcher;
 
 public final class Input {
 
@@ -45,7 +46,7 @@ public final class Input {
 	public static InputStream newInputStream(String path, boolean allowFile, int timeout, String userAgent) throws IOException {
 		InputStream is;
 		if (isProtocol(path)) {
-			URLConnection con = FetcherCommon.newConnection(path, timeout, userAgent);
+			URLConnection con = PubFetcher.newConnection(path, timeout, userAgent);
 			is = con.getInputStream();
 			logger.info("Opened URL {}", con.getURL().toString());
 		} else if (allowFile) {

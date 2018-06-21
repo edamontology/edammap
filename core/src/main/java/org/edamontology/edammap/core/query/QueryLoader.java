@@ -39,6 +39,12 @@ import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import org.edamontology.pubfetcher.core.common.IllegalRequestException;
+import org.edamontology.pubfetcher.core.common.PubFetcher;
+import org.edamontology.pubfetcher.core.db.publication.PublicationIds;
+import org.edamontology.pubfetcher.core.db.webpage.Webpage;
+
 import org.edamontology.edammap.core.edam.Branch;
 import org.edamontology.edammap.core.edam.Concept;
 import org.edamontology.edammap.core.edam.EdamUri;
@@ -57,10 +63,6 @@ import org.edamontology.edammap.core.input.json.InputOutput;
 import org.edamontology.edammap.core.input.json.Publication;
 import org.edamontology.edammap.core.input.json.ToolInput;
 import org.edamontology.edammap.core.input.xml.Biotools14;
-import org.edamontology.pubfetcher.FetcherCommon;
-import org.edamontology.pubfetcher.IllegalRequestException;
-import org.edamontology.pubfetcher.PublicationIds;
-import org.edamontology.pubfetcher.Webpage;
 
 public class QueryLoader {
 
@@ -114,7 +116,7 @@ public class QueryLoader {
 	}
 
 	private static Link link(String link, String type, boolean throwException) {
-		String url = FetcherCommon.getUrl(link, throwException);
+		String url = PubFetcher.getUrl(link, throwException);
 		if (url != null) {
 			return new Link(url, type);
 		} else {
@@ -150,7 +152,7 @@ public class QueryLoader {
 	}
 
 	private static PublicationIdsQuery publicationId(String publicationId, String url, String type, boolean throwException) {
-		PublicationIds publicationIds = FetcherCommon.getPublicationIds(publicationId, url, throwException);
+		PublicationIds publicationIds = PubFetcher.getPublicationIds(publicationId, url, throwException);
 		if (publicationIds != null) {
 			return new PublicationIdsQuery(publicationIds, type);
 		} else {
@@ -178,7 +180,7 @@ public class QueryLoader {
 	}
 
 	private static PublicationIdsQuery publicationId(String pmid, String pmcid, String doi, String url, String type, boolean throwException, boolean logEmpty) {
-		PublicationIds publicationIds = FetcherCommon.getPublicationIds(pmid, pmcid, doi, url, throwException, logEmpty);
+		PublicationIds publicationIds = PubFetcher.getPublicationIds(pmid, pmcid, doi, url, throwException, logEmpty);
 		if (publicationIds != null) {
 			return new PublicationIdsQuery(publicationIds, type);
 		} else {
@@ -558,14 +560,14 @@ public class QueryLoader {
 		if (input == null) return Collections.emptyList();
 		List<Object> list = Collections.emptyList();
 		if (clazz.getName().equals(Webpage.class.getName())) {
-			list = parseServer(input).map(s -> FetcherCommon.getUrl(s, true)).collect(Collectors.toList());
-		} else if (clazz.getName().equals(org.edamontology.pubfetcher.Publication.class.getName())) {
+			list = parseServer(input).map(s -> PubFetcher.getUrl(s, true)).collect(Collectors.toList());
+		} else if (clazz.getName().equals(org.edamontology.pubfetcher.core.db.publication.Publication.class.getName())) {
 			list = parseServerPublicationIds(input).stream().map(s -> {
 				PublicationIds publicationIds;
 				if (s.size() == 1) {
-					publicationIds = FetcherCommon.getPublicationIds(s.get(0), SERVER, true);
+					publicationIds = PubFetcher.getPublicationIds(s.get(0), SERVER, true);
 				} else if (s.size() == 3) {
-					publicationIds = FetcherCommon.getPublicationIds(s.get(0), s.get(1), s.get(2), SERVER, true, true);
+					publicationIds = PubFetcher.getPublicationIds(s.get(0), s.get(1), s.get(2), SERVER, true, true);
 				} else {
 					throw new IllegalRequestException("Publication ID has illegal number of parts (" + s.size() + ")" + (s.size() > 0 ? ", first part is " + s.get(0) : ""));
 				}

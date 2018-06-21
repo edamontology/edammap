@@ -19,11 +19,8 @@
 
 package org.edamontology.edammap.pubmedapps;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
 import java.net.URI;
@@ -44,7 +41,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.MissingResourceException;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -57,6 +53,15 @@ import com.beust.jcommander.Parameter;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import org.edamontology.pubfetcher.core.common.BasicArgs;
+import org.edamontology.pubfetcher.core.common.FetcherArgs;
+import org.edamontology.pubfetcher.core.common.PubFetcher;
+import org.edamontology.pubfetcher.core.common.Version;
+import org.edamontology.pubfetcher.core.db.publication.Publication;
+import org.edamontology.pubfetcher.core.db.publication.PublicationIds;
+import org.edamontology.pubfetcher.core.fetching.Fetcher;
+
 import org.edamontology.edammap.core.idf.Idf;
 import org.edamontology.edammap.core.preprocessing.PreProcessor;
 import org.edamontology.edammap.core.preprocessing.PreProcessorArgs;
@@ -64,15 +69,6 @@ import org.edamontology.edammap.core.query.Link;
 import org.edamontology.edammap.core.query.Query;
 import org.edamontology.edammap.core.query.QueryLoader;
 import org.edamontology.edammap.core.query.QueryType;
-import org.edamontology.pubfetcher.BasicArgs;
-import org.edamontology.pubfetcher.Database;
-import org.edamontology.pubfetcher.Fetcher;
-import org.edamontology.pubfetcher.FetcherArgs;
-import org.edamontology.pubfetcher.FetcherCommon;
-import org.edamontology.pubfetcher.FetcherUtil;
-import org.edamontology.pubfetcher.Publication;
-import org.edamontology.pubfetcher.PublicationIds;
-import org.edamontology.pubfetcher.Version;
 
 public final class PubMedApps {
 
@@ -784,26 +780,16 @@ public final class PubMedApps {
 		return resultLinks;
 	}
 
-	private static List<String> getResource(String name) throws IOException {
-		InputStream resource = PubMedApps.class.getResourceAsStream("/resources/" + name);
-		if (resource == null) {
-			throw new MissingResourceException("Can't find resource '" + name + "'!", PubMedApps.class.getSimpleName(), name);
-		}
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(resource, StandardCharsets.UTF_8))) {
-			return br.lines().filter(s -> !s.startsWith("#") && !s.trim().isEmpty()).collect(Collectors.toList());
-		}
-	}
-
 	private static List<Result> getResults(PreProcessorArgs preProcessorArgs, String queryIdf, String queryPath, QueryType queryType, FetcherArgs fetcherArgs, List<Publication> publications) throws IOException, ParseException {
 		List<Result> results = new ArrayList<>();
 
-		List<String> hostIgnore = getResource("host_ignore.txt");
-		List<String> beforeTier1 = getResource("before_tier1.txt");
-		List<String> beforeTier2 = getResource("before_tier2.txt");
-		List<String> beforeTier3 = getResource("before_tier3.txt");
-		List<String> afterTier1 = getResource("after_tier1.txt");
-		List<String> afterTier2 = getResource("after_tier2.txt");
-		List<String> afterTier3 = getResource("after_tier3.txt");
+		List<String> hostIgnore = PubFetcher.getResource(PubMedApps.class, "resources/host_ignore.txt");
+		List<String> beforeTier1 = PubFetcher.getResource(PubMedApps.class, "resources/before_tier1.txt");
+		List<String> beforeTier2 = PubFetcher.getResource(PubMedApps.class, "resources/before_tier2.txt");
+		List<String> beforeTier3 = PubFetcher.getResource(PubMedApps.class, "resources/before_tier3.txt");
+		List<String> afterTier1 = PubFetcher.getResource(PubMedApps.class, "resources/after_tier1.txt");
+		List<String> afterTier2 = PubFetcher.getResource(PubMedApps.class, "resources/after_tier2.txt");
+		List<String> afterTier3 = PubFetcher.getResource(PubMedApps.class, "resources/after_tier3.txt");
 
 		PreProcessor preProcessor = new PreProcessor(preProcessorArgs);
 
@@ -1296,7 +1282,7 @@ public final class PubMedApps {
 			result.setPubDate(publication.getPubDateHuman());
 			result.setCitationsCount(publication.getCitationsCount());
 			result.setCitationsTimestamp(publication.getCitationsTimestampHuman());
-			result.setCorrespAuthor(publication.getCorrespAuthor());
+			result.setCorrespAuthor(publication.getCorrespAuthor().toString());
 
 			List<String> resultLinks = new ArrayList<>();
 			List<String> suggestionsProcessed = new ArrayList<>();
@@ -1489,19 +1475,6 @@ public final class PubMedApps {
 		return results;
 	}
 
-	private static List<Publication> getPublications(String database, List<String> pubFile) throws IOException {
-		List<Publication> publications = new ArrayList<>();
-		try (Database db = new Database(database)) {
-			for (PublicationIds publicationIds : FetcherUtil.pubFile(pubFile)) {
-				Publication publication = db.getPublication(publicationIds);
-				if (publication != null) {
-					publications.add(publication);
-				}
-			}
-		}
-		return publications;
-	}
-
 	private static void extractDocs(List<Result> results) {
 		for (Result result : results) {
 			Set<String> links = new LinkedHashSet<>();
@@ -1532,10 +1505,10 @@ public final class PubMedApps {
 	}
 
 	private static void writeWebDoc(PreProcessorArgs preProcessorArgs, String queryIdf, String database, List<String> pubFile, String queryPath, QueryType queryType, String webFile, String docFile, FetcherArgs fetcherArgs) throws IOException, ParseException {
-		Path webPath = FetcherCommon.outputPath(webFile);
-		Path docPath = FetcherCommon.outputPath(docFile);
+		Path webPath = PubFetcher.outputPath(webFile);
+		Path docPath = PubFetcher.outputPath(docFile);
 
-		List<Publication> publications = getPublications(database, pubFile);
+		List<Publication> publications = PubFetcher.getPublications(database, pubFile, PubMedApps.class.getSimpleName());
 
 		List<Result> results = getResults(preProcessorArgs, queryIdf, queryPath, queryType, fetcherArgs, publications);
 
@@ -1553,7 +1526,7 @@ public final class PubMedApps {
 	}
 
 	private static void printResults(PreProcessorArgs preProcessorArgs, String queryIdf, String database, List<String> pubFile, String queryPath, QueryType queryType, FetcherArgs fetcherArgs) throws IOException, ParseException {
-		List<Publication> publications = getPublications(database, pubFile);
+		List<Publication> publications = PubFetcher.getPublications(database, pubFile, PubMedApps.class.getSimpleName());
 
 		List<Result> results = getResults(preProcessorArgs, queryIdf, queryPath, queryType, fetcherArgs, publications);
 
@@ -1613,7 +1586,7 @@ public final class PubMedApps {
 
 		Idf idf = new Idf(queryIdf);
 
-		List<Publication> publications = getPublications(database, pubFile);
+		List<Publication> publications = PubFetcher.getPublications(database, pubFile, PubMedApps.class.getSimpleName());
 
 		Map<String, Integer> before = new HashMap<>();
 		Map<String, Integer> after = new HashMap<>();

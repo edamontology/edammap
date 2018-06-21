@@ -27,6 +27,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+import org.edamontology.pubfetcher.core.db.publication.Publication;
+
 import org.edamontology.edammap.core.benchmarking.MappingTest;
 import org.edamontology.edammap.core.benchmarking.MatchTest;
 import org.edamontology.edammap.core.edam.Branch;
@@ -35,7 +37,6 @@ import org.edamontology.edammap.core.edam.EdamUri;
 import org.edamontology.edammap.core.mapping.Match;
 import org.edamontology.edammap.core.query.Query;
 import org.edamontology.edammap.core.query.QueryType;
-import org.edamontology.pubfetcher.Publication;
 
 public class Txt {
 

@@ -23,8 +23,8 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParametersDelegate;
 
 import org.edamontology.edammap.core.processing.ProcessorArgs;
-import org.edamontology.pubfetcher.BasicArgs;
-import org.edamontology.pubfetcher.FetcherPrivateArgs;
+import org.edamontology.pubfetcher.core.common.BasicArgs;
+import org.edamontology.pubfetcher.core.common.FetcherPrivateArgs;
 
 public class ServerArgs extends BasicArgs {
 

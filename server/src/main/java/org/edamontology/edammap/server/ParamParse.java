@@ -38,7 +38,7 @@ import org.edamontology.edammap.core.mapping.args.ScoreArgs;
 import org.edamontology.edammap.core.mapping.args.WeightArgs;
 import org.edamontology.edammap.core.preprocessing.PreProcessorArgs;
 import org.edamontology.edammap.core.preprocessing.Stopwords;
-import org.edamontology.pubfetcher.FetcherArgs;
+import org.edamontology.pubfetcher.core.common.FetcherArgs;
 
 public final class ParamParse {
 

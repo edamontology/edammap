@@ -49,7 +49,7 @@
   <dependencies>
     <dependency>
       <groupId>org.edamontology.pubfetcher</groupId>
-      <artifactId>pubfetcher</artifactId>
+      <artifactId>pubfetcher-core</artifactId>
       <version>${pubfetcher.version}</version>
     </dependency>
     <dependency>

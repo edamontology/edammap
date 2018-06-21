@@ -27,7 +27,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import org.edamontology.pubfetcher.IllegalRequestException;
+import org.edamontology.pubfetcher.core.common.IllegalRequestException;
 
 @Provider
 public class IllegalRequestExceptionMapper implements ExceptionMapper<IllegalRequestException> {

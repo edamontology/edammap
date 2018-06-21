@@ -31,6 +31,11 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import org.edamontology.pubfetcher.core.common.BasicArgs;
+import org.edamontology.pubfetcher.core.common.Version;
+import org.edamontology.pubfetcher.core.db.publication.Publication;
+import org.edamontology.pubfetcher.core.db.webpage.Webpage;
+
 import org.edamontology.edammap.core.benchmarking.Benchmark;
 import org.edamontology.edammap.core.benchmarking.Measure;
 import org.edamontology.edammap.core.benchmarking.Results;
@@ -49,10 +54,6 @@ import org.edamontology.edammap.core.processing.Processor;
 import org.edamontology.edammap.core.processing.QueryProcessed;
 import org.edamontology.edammap.core.query.Query;
 import org.edamontology.edammap.core.query.QueryLoader;
-import org.edamontology.pubfetcher.BasicArgs;
-import org.edamontology.pubfetcher.Publication;
-import org.edamontology.pubfetcher.Version;
-import org.edamontology.pubfetcher.Webpage;
 
 public class Cli implements Runnable {
 

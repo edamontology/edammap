@@ -26,6 +26,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+
+import org.edamontology.pubfetcher.core.common.FetcherArgs;
+import org.edamontology.pubfetcher.core.common.FetcherPrivateArgs;
+import org.edamontology.pubfetcher.core.common.PubFetcher;
+
 import org.edamontology.edammap.core.args.CoreArgs;
 import org.edamontology.edammap.core.benchmarking.Measure;
 import org.edamontology.edammap.core.benchmarking.Results;
@@ -46,11 +52,6 @@ import org.edamontology.edammap.core.preprocessing.PreProcessorArgs;
 import org.edamontology.edammap.core.preprocessing.Stopwords;
 import org.edamontology.edammap.core.processing.ProcessorArgs;
 import org.edamontology.edammap.core.query.Query;
-import org.edamontology.pubfetcher.FetcherArgs;
-import org.edamontology.pubfetcher.FetcherCommon;
-import org.edamontology.pubfetcher.FetcherPrivateArgs;
-
-import com.fasterxml.jackson.core.JsonGenerator;
 
 public class Params {
 
@@ -76,7 +77,7 @@ public class Params {
 		}
 		writer.write("\t\t<div class=\"param\">\n");
 		writer.write("\t\t\t<label for=\"" + param.getId() + "\">");
-		writer.write(FetcherCommon.getLinkHtml(param.getUrl(), param.getLabel()));
+		writer.write(PubFetcher.getLinkHtml(param.getUrl(), param.getLabel()));
 		writer.write("</label>\n");
 		writer.write("\t\t\t<input");
 		if (param.getValue() instanceof Integer || param.getValue() instanceof Double) {
@@ -106,7 +107,7 @@ public class Params {
 			}
 			writer.write(" step=\"any\"");
 		}
-		writer.write(" value=\"" + FetcherCommon.escapeHtmlAttribute(param.getValue().toString()) + "\"");
+		writer.write(" value=\"" + PubFetcher.escapeHtmlAttribute(param.getValue().toString()) + "\"");
 		if (!input) {
 			writer.write(" readonly");
 		}
@@ -120,7 +121,7 @@ public class Params {
 		}
 		writer.write("\t\t<div class=\"param\">\n");
 		writer.write("\t\t\t<span>");
-		writer.write(FetcherCommon.getLinkHtml(param.getUrl(), param.getLabel()));
+		writer.write(PubFetcher.getLinkHtml(param.getUrl(), param.getLabel()));
 		writer.write("</span>\n");
 		writer.write("\t\t\t<div>\n");
 		if (input) {
@@ -170,7 +171,7 @@ public class Params {
 		}
 		writer.write("\">\n");
 		writer.write("\t\t\t<label for=\"" + id + "\">");
-		writer.write(FetcherCommon.getLinkHtml(url, label));
+		writer.write(PubFetcher.getLinkHtml(url, label));
 		writer.write("</label>\n");
 		writer.write("\t\t\t<select");
 		writer.write(" id=\"" + id + "\" name=\"" + id + "\"");
@@ -208,9 +209,9 @@ public class Params {
 	private static void writeOutput(Writer writer, String id, String label, String value, String url) throws IOException {
 		writer.write("\t\t<div class=\"param\">\n");
 		writer.write("\t\t\t<label for=\"" + id + "\">");
-		writer.write(FetcherCommon.getLinkHtml(url, label));
+		writer.write(PubFetcher.getLinkHtml(url, label));
 		writer.write("</label>\n");
-		writer.write("\t\t\t<output id=\"" + id + "\">" + FetcherCommon.escapeHtml(value) + "</output>\n");
+		writer.write("\t\t\t<output id=\"" + id + "\">" + PubFetcher.escapeHtml(value) + "</output>\n");
 		writer.write("\t\t</div>\n");
 	}
 

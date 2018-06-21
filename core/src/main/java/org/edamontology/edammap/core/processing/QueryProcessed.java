@@ -22,8 +22,8 @@ package org.edamontology.edammap.core.processing;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.edamontology.pubfetcher.Publication;
-import org.edamontology.pubfetcher.Webpage;
+import org.edamontology.pubfetcher.core.db.publication.Publication;
+import org.edamontology.pubfetcher.core.db.webpage.Webpage;
 
 public class QueryProcessed {
 

@@ -19,22 +19,18 @@
 
 package org.edamontology.edammap.core.preprocessing;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.MissingResourceException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.edamontology.edammap.core.cots.Stemmer;
+import org.edamontology.pubfetcher.core.common.PubFetcher;
 
 public class PreProcessor {
 
@@ -153,16 +149,7 @@ public class PreProcessor {
 
 	public static List<String> getStopwords(Stopwords stopwords) throws IOException {
 		if (stopwords == Stopwords.off) return Collections.emptyList();
-		String resourceName = "stopwords/" + stopwords + ".txt";
-		InputStream resource = PreProcessor.class.getResourceAsStream("/" + resourceName);
-
-		if (resource != null) {
-			try (BufferedReader br = new BufferedReader(new InputStreamReader(resource, StandardCharsets.UTF_8))) {
-				return br.lines().filter(s -> !s.startsWith("#")).collect(Collectors.toList());
-			}
-		} else {
-			throw new MissingResourceException("Can't find stopword list " + resourceName, PreProcessor.class.getSimpleName(), resourceName);
-		}
+		else return PubFetcher.getResource(PreProcessor.class, "stopwords/" + stopwords + ".txt");
 	}
 
 	private String periodFix(String input) {

@@ -33,9 +33,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.edamontology.pubfetcher.FetcherCommon;
-
 import com.carrotsearch.hppc.ObjectDoubleScatterMap;
+
+import org.edamontology.pubfetcher.core.common.PubFetcher;
 
 public class IdfMake {
 
@@ -56,7 +56,7 @@ public class IdfMake {
 	public IdfMake(String outputPath) throws IOException {
 		this();
 
-		this.output = FetcherCommon.outputPath(outputPath);
+		this.output = PubFetcher.outputPath(outputPath);
 	}
 
 	public void addTerms(List<String> terms) {

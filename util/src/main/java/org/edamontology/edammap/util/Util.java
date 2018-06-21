@@ -30,6 +30,11 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import org.edamontology.pubfetcher.core.common.FetcherArgs;
+import org.edamontology.pubfetcher.core.common.PubFetcher;
+import org.edamontology.pubfetcher.core.common.Version;
+
 import org.edamontology.edammap.core.idf.Idf;
 import org.edamontology.edammap.core.input.Input;
 import org.edamontology.edammap.core.input.json.Biotools;
@@ -39,9 +44,6 @@ import org.edamontology.edammap.core.processing.Processor;
 import org.edamontology.edammap.core.processing.ProcessorArgs;
 import org.edamontology.edammap.core.query.QueryLoader;
 import org.edamontology.edammap.server.Server;
-import org.edamontology.pubfetcher.FetcherArgs;
-import org.edamontology.pubfetcher.FetcherCommon;
-import org.edamontology.pubfetcher.Version;
 
 public final class Util {
 
@@ -57,7 +59,8 @@ public final class Util {
 		processorArgs.setIdfStemmed(null);
 		Processor processor = new Processor(processorArgs);
 
-		int idfs = processor.makeQueryIdf(QueryLoader.get(queryPath, args.makeIdfType, args.fetcherArgs.getTimeout(), args.fetcherArgs.getPrivateArgs().getUserAgent()),
+		int idfs = processor.makeQueryIdf(QueryLoader.get(queryPath, args.makeIdfType,
+			args.fetcherArgs.getTimeout(), args.fetcherArgs.getPrivateArgs().getUserAgent()),
 			args.makeIdfType, idfPath, args.makeIdfWebpagesDocs, args.makeIdfFulltext,
 			new PreProcessor(stemming), null, args.fetcherArgs);
 		logger.info("Wrote {} IDFs to {}", idfs, idfPath);
@@ -76,7 +79,7 @@ public final class Util {
 		logger.info("Make full {}bio.tools JSON to {}", dev ? "dev." : "", outputPath);
 		String api = "https://" + (dev ? "dev." : "") + "bio.tools/api/tool";
 
-		Path output = FetcherCommon.outputPath(outputPath);
+		Path output = PubFetcher.outputPath(outputPath);
 
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
@@ -111,12 +114,12 @@ public final class Util {
 
 	private static void makeServerFiles(String outputPath, Version version) throws IOException {
 		logger.info("Copying server CSS, JS and fonts to {}", outputPath);
-		Path path = FetcherCommon.outputPath(outputPath, true, false);
+		Path path = PubFetcher.outputPath(outputPath, true, false);
 		Files.createDirectory(path);
 		Server.copyHtmlResources(path);
 		Report.copyFontResources(path);
 		logger.info("Copying output CSS and fonts to {}", outputPath);
-		Path versionPath = FetcherCommon.outputPath(outputPath + "/" + version.getVersion(), true, false);
+		Path versionPath = PubFetcher.outputPath(outputPath + "/" + version.getVersion(), true, false);
 		Files.createDirectory(versionPath);
 		Report.copyHtmlResources(versionPath, version);
 		Report.copyFontResources(versionPath);

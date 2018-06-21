@@ -21,7 +21,7 @@ package org.edamontology.edammap.core.edam;
 
 import java.util.Locale;
 
-import org.edamontology.pubfetcher.IllegalRequestException;
+import org.edamontology.pubfetcher.core.common.IllegalRequestException;
 
 public class EdamUri {
 

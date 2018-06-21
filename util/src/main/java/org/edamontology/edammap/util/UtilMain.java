@@ -27,14 +27,16 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import org.edamontology.pubfetcher.cli.PubFetcherMethods;
+import org.edamontology.pubfetcher.core.common.BasicArgs;
+import org.edamontology.pubfetcher.core.common.FetcherArgs;
+import org.edamontology.pubfetcher.core.common.Version;
+import org.edamontology.pubfetcher.core.db.publication.PublicationIds;
+import org.edamontology.pubfetcher.core.fetching.Fetcher;
+
 import org.edamontology.edammap.core.query.QueryLoader;
 import org.edamontology.edammap.core.query.QueryType;
-import org.edamontology.pubfetcher.BasicArgs;
-import org.edamontology.pubfetcher.Fetcher;
-import org.edamontology.pubfetcher.FetcherArgs;
-import org.edamontology.pubfetcher.FetcherUtil;
-import org.edamontology.pubfetcher.PublicationIds;
-import org.edamontology.pubfetcher.Version;
 
 public final class UtilMain {
 
@@ -99,7 +101,7 @@ public final class UtilMain {
 			else docUrls.addAll(docQuery(args.allQuery, args.queryType, args.fetcherArgs));
 		}
 
-		FetcherUtil.run(args.fetcherUtilArgs, new Fetcher(), args.fetcherArgs, publicationIds, webpageUrls, docUrls, version);
+		PubFetcherMethods.run(args.pubFetcherArgs, new Fetcher(), args.fetcherArgs, publicationIds, webpageUrls, docUrls, version);
 
 		Util.run(args, version);
 	}

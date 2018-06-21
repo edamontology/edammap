@@ -28,6 +28,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.edamontology.pubfetcher.core.common.FetcherArgs;
+import org.edamontology.pubfetcher.core.common.PubFetcher;
+import org.edamontology.pubfetcher.core.db.Database;
+import org.edamontology.pubfetcher.core.db.DatabaseEntry;
+import org.edamontology.pubfetcher.core.db.publication.MeshTerm;
+import org.edamontology.pubfetcher.core.db.publication.MinedTerm;
+import org.edamontology.pubfetcher.core.db.publication.Publication;
+import org.edamontology.pubfetcher.core.db.publication.PublicationIds;
+import org.edamontology.pubfetcher.core.db.webpage.Webpage;
+import org.edamontology.pubfetcher.core.fetching.Fetcher;
+
 import org.edamontology.edammap.core.edam.Concept;
 import org.edamontology.edammap.core.edam.EdamUri;
 import org.edamontology.edammap.core.idf.Idf;
@@ -40,16 +51,6 @@ import org.edamontology.edammap.core.query.Link;
 import org.edamontology.edammap.core.query.PublicationIdsQuery;
 import org.edamontology.edammap.core.query.Query;
 import org.edamontology.edammap.core.query.QueryType;
-import org.edamontology.pubfetcher.Database;
-import org.edamontology.pubfetcher.DatabaseEntry;
-import org.edamontology.pubfetcher.Fetcher;
-import org.edamontology.pubfetcher.FetcherArgs;
-import org.edamontology.pubfetcher.FetcherCommon;
-import org.edamontology.pubfetcher.MeshTerm;
-import org.edamontology.pubfetcher.MinedTerm;
-import org.edamontology.pubfetcher.Publication;
-import org.edamontology.pubfetcher.PublicationIds;
-import org.edamontology.pubfetcher.Webpage;
 
 public class Processor {
 
@@ -361,7 +362,7 @@ public class Processor {
 		if (query.getWebpageUrls() != null) {
 			for (Iterator<Link> it = query.getWebpageUrls().iterator(); it.hasNext(); ) {
 				String webpageUrl = it.next().getUrl();
-				Webpage webpage = FetcherCommon.getWebpage(webpageUrl, database, fetcher, fetcherArgs);
+				Webpage webpage = PubFetcher.getWebpage(webpageUrl, database, fetcher, fetcherArgs);
 				List<String> webpageTokens = null;
 				List<Double> webpageIdfs = null;
 				if (webpage != null && webpage.isUsable(fetcherArgs)) {
@@ -385,7 +386,7 @@ public class Processor {
 		if (query.getDocUrls() != null) {
 			for (Iterator<Link> it = query.getDocUrls().iterator(); it.hasNext(); ) {
 				String docUrl = it.next().getUrl();
-				Webpage doc = FetcherCommon.getDoc(docUrl, database, fetcher, fetcherArgs);
+				Webpage doc = PubFetcher.getDoc(docUrl, database, fetcher, fetcherArgs);
 				List<String> docTokens = null;
 				List<Double> docIdfs = null;
 				if (doc != null && doc.isUsable(fetcherArgs)) {
@@ -408,7 +409,7 @@ public class Processor {
 
 		if (query.getPublicationIds() != null) {
 			for (PublicationIdsQuery publicationIds : query.getPublicationIds()) {
-				Publication publication = FetcherCommon.getPublication(publicationIds, database, fetcher, null, fetcherArgs);
+				Publication publication = PubFetcher.getPublication(publicationIds, database, fetcher, null, fetcherArgs);
 				if (publication != null) {
 					queryProcessed.addPublication(publication);
 					queryProcessed.addProcessedPublication(processPublication(publication, pp, queryIdf, fetcherArgs));
@@ -426,12 +427,12 @@ public class Processor {
 		if (ids == null || ids.isEmpty()) return Collections.emptyList();
 		if (clazz.getName().equals(Webpage.class.getName()) && ids.get(0) instanceof String) {
 			if (doc) {
-				return ids.stream().map(s -> FetcherCommon.getDoc((String) s, database, fetcher, fetcherArgs)).collect(Collectors.toList());
+				return ids.stream().map(s -> PubFetcher.getDoc((String) s, database, fetcher, fetcherArgs)).collect(Collectors.toList());
 			} else {
-				return ids.stream().map(s -> FetcherCommon.getWebpage((String) s, database, fetcher, fetcherArgs)).collect(Collectors.toList());
+				return ids.stream().map(s -> PubFetcher.getWebpage((String) s, database, fetcher, fetcherArgs)).collect(Collectors.toList());
 			}
 		} else if (clazz.getName().equals(Publication.class.getName()) && ids.get(0) instanceof PublicationIds) {
-			return ids.stream().map(pubId -> FetcherCommon.getPublication((PublicationIds) pubId, database, fetcher, null, fetcherArgs)).collect(Collectors.toList());
+			return ids.stream().map(pubId -> PubFetcher.getPublication((PublicationIds) pubId, database, fetcher, null, fetcherArgs)).collect(Collectors.toList());
 		}
 		return Collections.emptyList();
 	}

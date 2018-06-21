@@ -33,6 +33,14 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.edamontology.pubfetcher.core.common.FetcherArgs;
+import org.edamontology.pubfetcher.core.common.PubFetcher;
+import org.edamontology.pubfetcher.core.common.Version;
+import org.edamontology.pubfetcher.core.db.publication.Publication;
+import org.edamontology.pubfetcher.core.db.publication.PublicationPart;
+import org.edamontology.pubfetcher.core.db.publication.PublicationPartName;
+import org.edamontology.pubfetcher.core.db.webpage.Webpage;
+
 import org.edamontology.edammap.core.args.CoreArgs;
 import org.edamontology.edammap.core.benchmarking.MappingTest;
 import org.edamontology.edammap.core.benchmarking.MatchTest;
@@ -53,13 +61,6 @@ import org.edamontology.edammap.core.query.PublicationIdsQuery;
 import org.edamontology.edammap.core.query.Query;
 import org.edamontology.edammap.core.query.QueryLoader;
 import org.edamontology.edammap.core.query.QueryType;
-import org.edamontology.pubfetcher.FetcherArgs;
-import org.edamontology.pubfetcher.FetcherCommon;
-import org.edamontology.pubfetcher.Publication;
-import org.edamontology.pubfetcher.PublicationPart;
-import org.edamontology.pubfetcher.PublicationPartName;
-import org.edamontology.pubfetcher.Version;
-import org.edamontology.pubfetcher.Webpage;
 
 public class Report {
 
@@ -103,9 +104,9 @@ public class Report {
 				status = "non-final";
 			}
 			writer.write("\t\t\t\t\t<div class=\"with-meta\"><span" + (status.isEmpty() ? "" : " class=\"" + status + "\"") + ">");
-			writer.write(FetcherCommon.getLinkHtml(webpageUrl.getUrl()));
+			writer.write(PubFetcher.getLinkHtml(webpageUrl.getUrl()));
 			if (webpageUrl.getType() != null && !webpageUrl.getType().isEmpty()) {
-				writer.write(" <span class=\"link-type\">(" + FetcherCommon.escapeHtml(webpageUrl.getType()) + ")</span>");
+				writer.write(" <span class=\"link-type\">(" + PubFetcher.escapeHtml(webpageUrl.getType()) + ")</span>");
 			}
 			if (!status.isEmpty()) {
 				writer.write(" (" + status + ")");
@@ -118,9 +119,9 @@ public class Report {
 			if (webpage != null) {
 				writer.write("\t\t\t\t\t\t<div class=\"" + (status.isEmpty() ? "info" : "warning") + "-box\" tabindex=\"0\">\n");
 				writer.write("\t\t\t\t\t\t\t<h4><span" + (status.isEmpty() ? "" : " class=\"" + status + "\"") + ">");
-				writer.write(FetcherCommon.getLinkHtml(webpageUrl.getUrl()));
+				writer.write(PubFetcher.getLinkHtml(webpageUrl.getUrl()));
 				if (webpageUrl.getType() != null && !webpageUrl.getType().isEmpty()) {
-					writer.write(" <span class=\"link-type\">(" + FetcherCommon.escapeHtml(webpageUrl.getType()) + ")</span>");
+					writer.write(" <span class=\"link-type\">(" + PubFetcher.escapeHtml(webpageUrl.getType()) + ")</span>");
 				}
 				if (!status.isEmpty()) {
 					writer.write(" (" + status + ")");
@@ -138,7 +139,7 @@ public class Report {
 		if (!id.isEmpty()) {
 			writer.write("\t\t\t\t\t<div><span>" + label + ":</span> <span>" + idLink);
 			if (!from.isEmpty()) {
-				writer.write(" (from " + FetcherCommon.getLinkHtml(from) + ")");
+				writer.write(" (from " + PubFetcher.getLinkHtml(from) + ")");
 			}
 			writer.write("</span></div>\n");
 		}
@@ -188,9 +189,9 @@ public class Report {
 			if (publication != null || !publicationId.isEmpty()) {
 				writer.write("<div class=\"" + statusIcon + "\" tabindex=\"0\"><div class=\"" + (statusIcon.equals("pub-info-warning") ? "pub-info" : statusIcon)  + "-box\" tabindex=\"0\">\n");
 				if (!publicationId.isEmpty()) {
-					writePublicationId(writer, "pmid", publicationId.getPmid(), FetcherCommon.getPmidLinkHtml(publicationId.getPmid()), publicationId.getPmidUrl());
-					writePublicationId(writer, "pmcid", publicationId.getPmcid(), FetcherCommon.getPmcidLinkHtml(publicationId.getPmcid()), publicationId.getPmcidUrl());
-					writePublicationId(writer, "doi", publicationId.getDoi(), FetcherCommon.getDoiLinkHtml(publicationId.getDoi()), publicationId.getDoiUrl());
+					writePublicationId(writer, "pmid", publicationId.getPmid(), PubFetcher.getPmidLinkHtml(publicationId.getPmid()), publicationId.getPmidUrl());
+					writePublicationId(writer, "pmcid", publicationId.getPmcid(), PubFetcher.getPmcidLinkHtml(publicationId.getPmcid()), publicationId.getPmcidUrl());
+					writePublicationId(writer, "doi", publicationId.getDoi(), PubFetcher.getDoiLinkHtml(publicationId.getDoi()), publicationId.getDoiUrl());
 					if (publication != null) {
 						writer.write("\t\t\t\t\t<hr>\n");
 					}
@@ -206,7 +207,7 @@ public class Report {
 			}
 			writer.write("Publication");
 			if (publicationId.getType() != null && !publicationId.getType().isEmpty()) {
-				writer.write(" (" + FetcherCommon.escapeHtml(publicationId.getType()) + ")");
+				writer.write(" (" + PubFetcher.escapeHtml(publicationId.getType()) + ")");
 			}
 			if (publication != null) {
 				writer.write("&nbsp; <span class=\"" + (publication.isOA() ? "oa" : "not-oa") + "\">" + (publication.isOA() ? "" : "Not ") + "Open Access</span>");
@@ -216,15 +217,15 @@ public class Report {
 			if (publication != null && (publication.getIdCount() > 0 || !publication.isEmpty())) {
 				if (!publication.getPmid().isEmpty()) {
 					writePublicationPartMeta(fetcherArgs, writer, publication, PublicationPartName.pmid);
-					writer.write("<span class=\"dt\">pmid:</span> " + FetcherCommon.getPmidLinkHtml(publication.getPmid().getContent()) + "</div>\n");
+					writer.write("<span class=\"dt\">pmid:</span> " + PubFetcher.getPmidLinkHtml(publication.getPmid().getContent()) + "</div>\n");
 				}
 				if (!publication.getPmcid().isEmpty()) {
 					writePublicationPartMeta(fetcherArgs, writer, publication, PublicationPartName.pmcid);
-					writer.write("<span class=\"dt\">pmcid:</span> " + FetcherCommon.getPmcidLinkHtml(publication.getPmcid().getContent()) + "</div>\n");
+					writer.write("<span class=\"dt\">pmcid:</span> " + PubFetcher.getPmcidLinkHtml(publication.getPmcid().getContent()) + "</div>\n");
 				}
 				if (!publication.getDoi().isEmpty()) {
 					writePublicationPartMeta(fetcherArgs, writer, publication, PublicationPartName.doi);
-					writer.write("<span class=\"dt\">doi:</span> " + FetcherCommon.getDoiLinkHtml(publication.getDoi().getContent()) + "</div>\n");
+					writer.write("<span class=\"dt\">doi:</span> " + PubFetcher.getDoiLinkHtml(publication.getDoi().getContent()) + "</div>\n");
 				}
 				if (publication.getIdCount() > 0 && !publication.isEmpty()) {
 					writer.write("\t\t\t\t\t<hr>\n");
@@ -265,12 +266,12 @@ public class Report {
 
 	private static String conceptMatchString(Concept concept, ConceptMatch conceptMatch) {
 		switch (conceptMatch.getType()) {
-			case label: return FetcherCommon.escapeHtml(concept.getLabel());
-			case exact_synonym: return FetcherCommon.escapeHtml(concept.getExactSynonyms().get(conceptMatch.getSynonymIndex()));
-			case narrow_synonym: return FetcherCommon.escapeHtml(concept.getNarrowSynonyms().get(conceptMatch.getSynonymIndex()));
-			case broad_synonym: return FetcherCommon.escapeHtml(concept.getBroadSynonyms().get(conceptMatch.getSynonymIndex()));
-			case definition: return FetcherCommon.escapeHtml(concept.getDefinition());
-			case comment: return FetcherCommon.escapeHtml(concept.getComment());
+			case label: return PubFetcher.escapeHtml(concept.getLabel());
+			case exact_synonym: return PubFetcher.escapeHtml(concept.getExactSynonyms().get(conceptMatch.getSynonymIndex()));
+			case narrow_synonym: return PubFetcher.escapeHtml(concept.getNarrowSynonyms().get(conceptMatch.getSynonymIndex()));
+			case broad_synonym: return PubFetcher.escapeHtml(concept.getBroadSynonyms().get(conceptMatch.getSynonymIndex()));
+			case definition: return PubFetcher.escapeHtml(concept.getDefinition());
+			case comment: return PubFetcher.escapeHtml(concept.getComment());
 			default: return "";
 		}
 	}
@@ -279,7 +280,7 @@ public class Report {
 		if (!pc.isEmpty()) {
 			writer.write("<br><span class=\"pc\">[" + desc + " ");
 			writer.write(pc.stream()
-				.map(a -> FetcherCommon.getLinkHtml(a.toString(), concepts.get(a).getLabel()))
+				.map(a -> PubFetcher.getLinkHtml(a.toString(), concepts.get(a).getLabel()))
 				.collect(Collectors.joining("; ")));
 			writer.write("]</span>");
 		}
@@ -292,7 +293,7 @@ public class Report {
 		if (concept.isObsolete()) {
 			writer.write("<span class=\"obsolete\">");
 		}
-		writer.write("<strong>" + FetcherCommon.getLinkHtml(edamUri.toString(), concept.getLabel() + " (" + edamUri.getNrString() + ")") + "</strong>");
+		writer.write("<strong>" + PubFetcher.getLinkHtml(edamUri.toString(), concept.getLabel() + " (" + edamUri.getNrString() + ")") + "</strong>");
 		if (match.getConceptMatch().getType() != ConceptMatchType.label && match.getConceptMatch().getType() != ConceptMatchType.none) {
 			writer.write(" (" + conceptMatchString(concept, match.getConceptMatch()) + ")");
 		}
@@ -312,14 +313,14 @@ public class Report {
 		QueryMatchType type = queryMatch.getType();
 		int index = queryMatch.getIndex();
 		if (type == QueryMatchType.webpage && index >= 0 && query.getWebpageUrls().get(index) != null) {
-			if (text) return FetcherCommon.getLinkHtml(query.getWebpageUrls().get(index).getUrl(), type.toString());
-			else return FetcherCommon.getLinkHtml(query.getWebpageUrls().get(index).getUrl());
+			if (text) return PubFetcher.getLinkHtml(query.getWebpageUrls().get(index).getUrl(), type.toString());
+			else return PubFetcher.getLinkHtml(query.getWebpageUrls().get(index).getUrl());
 		} else if (type == QueryMatchType.doc && index >= 0 && query.getDocUrls().get(index) != null) {
-			if (text) return FetcherCommon.getLinkHtml(query.getDocUrls().get(index).getUrl(), type.toString());
-			else return FetcherCommon.getLinkHtml(query.getDocUrls().get(index).getUrl());
+			if (text) return PubFetcher.getLinkHtml(query.getDocUrls().get(index).getUrl(), type.toString());
+			else return PubFetcher.getLinkHtml(query.getDocUrls().get(index).getUrl());
 		} else if (type.isPublication() && index >= 0) {
-			if (text) return FetcherCommon.getIdLinkHtml(query.getPublicationIds().get(index), type.toString());
-			else return FetcherCommon.getIdLinkHtml(query.getPublicationIds().get(index));
+			if (text) return PubFetcher.getIdLinkHtml(query.getPublicationIds().get(index), type.toString());
+			else return PubFetcher.getIdLinkHtml(query.getPublicationIds().get(index));
 		} else {
 			if (text) return type.toString();
 			else return "";
@@ -331,7 +332,7 @@ public class Report {
 		int indexInPublication = queryMatch.getIndexInPublication();
 		if (index >= 0) {
 			switch (queryMatch.getType()) {
-				case publication_keyword: return FetcherCommon.escapeHtml(publications.get(index).getKeywords().getList().get(indexInPublication));
+				case publication_keyword: return PubFetcher.escapeHtml(publications.get(index).getKeywords().getList().get(indexInPublication));
 				case publication_mesh: return publications.get(index).getMeshTerms().getList().get(indexInPublication).toStringHtml();
 				case publication_efo: return publications.get(index).getEfoTerms().getList().get(indexInPublication).toStringHtml();
 				case publication_go: return publications.get(index).getGoTerms().getList().get(indexInPublication).toStringHtml();
@@ -362,7 +363,7 @@ public class Report {
 		}
 		if (type == QueryMatchType.keyword && index >= 0 && query.getKeywords().get(index) != null) {
 			writer.write("<br>");
-			writer.write(FetcherCommon.getLinkHtml(query.getKeywords().get(index).getUrl(), query.getKeywords().get(index).getValue()));
+			writer.write(PubFetcher.getLinkHtml(query.getKeywords().get(index).getUrl(), query.getKeywords().get(index).getValue()));
 		}
 		if (main) {
 			writer.write("</div>\n");
@@ -467,12 +468,12 @@ public class Report {
 		if (queriesSize > 1) {
 			writer.write("<span class=\"rank\">" + nr + ". </span>");
 		}
-		writer.write("<span>" + (query.getName() != null ? FetcherCommon.escapeHtml(query.getName()) : "") + "</span>");
+		writer.write("<span>" + (query.getName() != null ? PubFetcher.escapeHtml(query.getName()) : "") + "</span>");
 		if (query.getId() != null) {
 			if (type == QueryType.biotools) {
-				writer.write("<a href=\"" + FetcherCommon.escapeHtmlAttribute(QueryLoader.BIOTOOLS + query.getId()) + "\" class=\"biotools-link\"></a>");
+				writer.write("<a href=\"" + PubFetcher.escapeHtmlAttribute(QueryLoader.BIOTOOLS + query.getId()) + "\" class=\"biotools-link\"></a>");
 			} else {
-				writer.write("<span> (" + FetcherCommon.escapeHtml(query.getId()) + ")</span>");
+				writer.write("<span> (" + PubFetcher.escapeHtml(query.getId()) + ")</span>");
 			}
 		}
 		writer.write("</span><span>");
@@ -552,10 +553,10 @@ public class Report {
 					}
 					for (Map.Entry<String, List<Keyword>> entry : keywords.entrySet()) {
 						writer.write("\t\t\t<div class=\"generic\">\n");
-						writer.write("\t\t\t\t<h3>" + FetcherCommon.escapeHtml(entry.getKey()) + "</h3><br>\n");
+						writer.write("\t\t\t\t<h3>" + PubFetcher.escapeHtml(entry.getKey()) + "</h3><br>\n");
 						writer.write("\t\t\t\t<div>");
 						writer.write(entry.getValue().stream()
-							.map(k -> FetcherCommon.getLinkHtml(k.getUrl(), k.getValue()))
+							.map(k -> PubFetcher.getLinkHtml(k.getUrl(), k.getValue()))
 							.collect(Collectors.joining("; "))
 						);
 						writer.write("</div>\n");
@@ -566,7 +567,7 @@ public class Report {
 				if (query.getDescription() != null && !query.getDescription().isEmpty()) {
 					writer.write("\t\t\t<div class=\"generic\">\n");
 					writer.write("\t\t\t\t<h3>Description</h3><br>\n");
-					writer.write("\t\t\t\t<div>" + FetcherCommon.getParagraphsHtml(query.getDescription()) + "</div>\n");
+					writer.write("\t\t\t\t<div>" + PubFetcher.getParagraphsHtml(query.getDescription()) + "</div>\n");
 					writer.write("\t\t\t</div>\n");
 				}
 
@@ -698,7 +699,7 @@ public class Report {
 		writer.write("</h1>\n\n");
 
 		String startInstant = Instant.ofEpochMilli(start).toString();
-		writer.write("<p>Generated by " + FetcherCommon.getLinkHtml(version.getUrl(), version.getName()) + " " + version.getVersion()
+		writer.write("<p>Generated by " + PubFetcher.getLinkHtml(version.getUrl(), version.getName()) + " " + version.getVersion()
 			+ " in " + ((stop - start) / 1000.0) + " seconds <span>(start <time datetime=\"" + startInstant + "\">" + startInstant + "</time>)</span></p>\n\n");
 		if (type == QueryType.server) {
 			if (txt) {

@@ -73,11 +73,11 @@ import org.edamontology.edammap.core.processing.QueryProcessed;
 import org.edamontology.edammap.core.query.Query;
 import org.edamontology.edammap.core.query.QueryLoader;
 import org.edamontology.edammap.core.query.QueryType;
-import org.edamontology.pubfetcher.DatabaseEntry;
-import org.edamontology.pubfetcher.FetcherArgs;
-import org.edamontology.pubfetcher.IllegalRequestException;
-import org.edamontology.pubfetcher.Publication;
-import org.edamontology.pubfetcher.Webpage;
+import org.edamontology.pubfetcher.core.common.FetcherArgs;
+import org.edamontology.pubfetcher.core.common.IllegalRequestException;
+import org.edamontology.pubfetcher.core.db.DatabaseEntry;
+import org.edamontology.pubfetcher.core.db.publication.Publication;
+import org.edamontology.pubfetcher.core.db.webpage.Webpage;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.util.Header;
 

@@ -19,16 +19,11 @@
 
 package org.edamontology.edammap.core.edam;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.MissingResourceException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -37,6 +32,8 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.search.EntitySearcher;
+
+import org.edamontology.pubfetcher.core.common.PubFetcher;
 
 public class Edam {
 	public static Map<EdamUri, Concept> load(String edamPath) throws IOException {
@@ -112,19 +109,8 @@ public class Edam {
 	}
 
 	public static Set<EdamUri> getBlacklist() throws IOException {
-		String resourceName = "edam/blacklist.txt";
-		InputStream resource = Edam.class.getResourceAsStream("/" + resourceName);
-
-		if (resource != null) {
-			try (BufferedReader br = new BufferedReader(new InputStreamReader(resource, StandardCharsets.UTF_8))) {
-				return br.lines()
-					.map(String::trim)
-					.filter(s -> !s.isEmpty() && !s.startsWith("#"))
-					.map(s -> new EdamUri(s, EdamUri.DEFAULT_PREFIX))
-					.collect(Collectors.toSet());
-			}
-		} else {
-			throw new MissingResourceException("Can't find EDAM concepts blacklist " + resourceName, Edam.class.getSimpleName(), resourceName);
-		}
+		return PubFetcher.getResource(Edam.class, "edam/blacklist.txt").stream()
+			.map(s -> new EdamUri(s, EdamUri.DEFAULT_PREFIX))
+			.collect(Collectors.toSet());
 	}
 }

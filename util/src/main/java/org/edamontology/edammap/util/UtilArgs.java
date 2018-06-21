@@ -24,10 +24,10 @@ import java.util.List;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParametersDelegate;
 
+import org.edamontology.pubfetcher.cli.PubFetcherArgs;
+import org.edamontology.pubfetcher.core.common.BasicArgs;
+import org.edamontology.pubfetcher.core.common.FetcherArgs;
 import org.edamontology.edammap.core.query.QueryType;
-import org.edamontology.pubfetcher.BasicArgs;
-import org.edamontology.pubfetcher.FetcherArgs;
-import org.edamontology.pubfetcher.FetcherUtilArgs;
 
 public class UtilArgs extends BasicArgs {
 
@@ -86,5 +86,5 @@ public class UtilArgs extends BasicArgs {
 	FetcherArgs fetcherArgs = new FetcherArgs();
 
 	@ParametersDelegate
-	FetcherUtilArgs fetcherUtilArgs = new FetcherUtilArgs();
+	PubFetcherArgs pubFetcherArgs = new PubFetcherArgs();
 }

@@ -24,16 +24,17 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+import org.edamontology.pubfetcher.core.common.PubFetcher;
+import org.edamontology.pubfetcher.core.common.Version;
+import org.edamontology.pubfetcher.core.db.publication.Publication;
+import org.edamontology.pubfetcher.core.db.webpage.Webpage;
+
 import org.edamontology.edammap.core.args.CoreArgs;
 import org.edamontology.edammap.core.benchmarking.Results;
 import org.edamontology.edammap.core.edam.Concept;
 import org.edamontology.edammap.core.edam.EdamUri;
 import org.edamontology.edammap.core.query.Query;
 import org.edamontology.edammap.core.query.QueryType;
-import org.edamontology.pubfetcher.FetcherCommon;
-import org.edamontology.pubfetcher.Publication;
-import org.edamontology.pubfetcher.Version;
-import org.edamontology.pubfetcher.Webpage;
 
 public class Output {
 
@@ -46,11 +47,11 @@ public class Output {
 	private final boolean existingDirectory;
 
 	public Output(String txt, String report, String json, boolean existingDirectory) throws IOException {
-		this.txt = (txt == null || txt.isEmpty()) ? null : FetcherCommon.outputPath(txt);
+		this.txt = (txt == null || txt.isEmpty()) ? null : PubFetcher.outputPath(txt);
 
-		this.report = (report == null || report.isEmpty()) ? null : FetcherCommon.outputPath(report, true, existingDirectory);
+		this.report = (report == null || report.isEmpty()) ? null : PubFetcher.outputPath(report, true, existingDirectory);
 
-		this.json = (json == null || json.isEmpty()) ? null : FetcherCommon.outputPath(json);
+		this.json = (json == null || json.isEmpty()) ? null : PubFetcher.outputPath(json);
 
 		this.existingDirectory = existingDirectory;
 	}

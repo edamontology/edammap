@@ -19,7 +19,7 @@
 
 package org.edamontology.edammap.core.query;
 
-import org.edamontology.pubfetcher.PublicationIds;
+import org.edamontology.pubfetcher.core.db.publication.PublicationIds;
 
 public class PublicationIdsQuery extends PublicationIds {
 
