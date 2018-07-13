@@ -148,9 +148,9 @@ public class Report {
 	private static void writePublicationPartMeta(FetcherArgs fetcherArgs, Writer writer, Publication publication, PublicationPartName name) throws IOException {
 		PublicationPart part = publication.getPart(name);
 		String partStatusIcon = "info";
-		if (!publication.isPartUsable(name, fetcherArgs)) {
+		if (!part.isUsable(fetcherArgs)) {
 			partStatusIcon = "warning";
-		} else if (!publication.isPartFinal(name, fetcherArgs)) {
+		} else if (!part.isFinal(fetcherArgs)) {
 			partStatusIcon = "info-warning";
 		}
 		writer.write("\t\t\t\t\t<div class=\"pub-part\"><div class=\"pub-" + partStatusIcon + "\" tabindex=\"0\"><div class=\"pub-" + (partStatusIcon.equals("info-warning") ? "info" : partStatusIcon) + "-box\" tabindex=\"0\">\n");

@@ -72,7 +72,7 @@ public final class Server {
 
 	static Set<EdamUri> edamBlacklist;
 
-	static Processor processor;
+	static Processor processor = null;
 
 	static Idf idf = null;
 	static Idf idfStemmed = null;
@@ -108,7 +108,7 @@ public final class Server {
 
 		edamBlacklist = Edam.getBlacklist();
 
-		processor = new Processor(args.getProcessorArgs());
+		processor = new Processor(args.getProcessorArgs(), args.getFetcherPrivateArgs());
 
 		if (args.getProcessorArgs().getIdf() != null && !args.getProcessorArgs().getIdf().isEmpty()) {
 			idf = new Idf(args.getProcessorArgs().getIdf());
@@ -182,6 +182,22 @@ public final class Server {
 		logger.info("Starting server");
 		httpServer.start();
 		logger.info("{} has started", version.getName());
+
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			@Override
+			public void run() {
+				logger.info("Stopping server");
+				if (processor != null) {
+					try {
+						processor.closeDatabase();
+					} catch (IOException e) {
+						logger.error("Exception!", e);
+					}
+				}
+				httpServer.shutdown();
+				logger.info("{} has stopped", version.getName());
+			}
+		});
 	}
 
 	public static void main(String[] argv) throws IOException, ReflectiveOperationException {

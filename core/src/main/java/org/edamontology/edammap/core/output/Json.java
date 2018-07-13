@@ -36,12 +36,7 @@ import org.edamontology.pubfetcher.core.common.FetcherArgs;
 import org.edamontology.pubfetcher.core.common.PubFetcher;
 import org.edamontology.pubfetcher.core.common.Version;
 import org.edamontology.pubfetcher.core.db.DatabaseEntry;
-import org.edamontology.pubfetcher.core.db.publication.CorrespAuthor;
 import org.edamontology.pubfetcher.core.db.publication.Publication;
-import org.edamontology.pubfetcher.core.db.publication.PublicationPart;
-import org.edamontology.pubfetcher.core.db.publication.PublicationPartList;
-import org.edamontology.pubfetcher.core.db.publication.PublicationPartName;
-import org.edamontology.pubfetcher.core.db.publication.PublicationPartString;
 import org.edamontology.pubfetcher.core.db.webpage.Webpage;
 
 import org.edamontology.edammap.core.args.CoreArgs;
@@ -68,116 +63,6 @@ public class Json {
 
 	public static final String VERSION_ID = "version";
 	public static final String TYPE_ID = "type";
-
-	private static void webpageMeta(Webpage webpage, JsonGenerator generator, FetcherArgs fetcherArgs) throws IOException {
-		generator.writeStartObject();
-		generator.writeNumberField("fetchTime", webpage.getFetchTime());
-		generator.writeStringField("fetchTimeHuman", webpage.getFetchTimeHuman());
-		generator.writeNumberField("retryCounter", webpage.getRetryCounter());
-		generator.writeStringField("startUrl", webpage.getStartUrl());
-		generator.writeStringField("finalUrl", webpage.getFinalUrl());
-		generator.writeStringField("contentType", webpage.getContentType());
-		generator.writeNumberField("statusCode", webpage.getStatusCode());
-		generator.writeNumberField("contentTime", webpage.getContentTime());
-		generator.writeStringField("contentTimeHuman", webpage.getContentTimeHuman());
-		generator.writeStringField("license", webpage.getLicense());
-		generator.writeStringField("language", webpage.getLanguage());
-		generator.writeNumberField("titleLength", webpage.getTitle().length());
-		generator.writeNumberField("contentLength", webpage.getContent().length());
-		generator.writeStringField("title", webpage.getTitle());
-		generator.writeBooleanField("broken", webpage.isBroken());
-		generator.writeBooleanField("empty", webpage.isEmpty());
-		generator.writeBooleanField("final", webpage.isFinal(fetcherArgs));
-		generator.writeBooleanField("usable", webpage.isUsable(fetcherArgs));
-		generator.writeEndObject();
-	}
-
-	private static void publicationPartMeta(Publication publication, PublicationPartName name, JsonGenerator generator, FetcherArgs fetcherArgs) throws IOException {
-		PublicationPart part = publication.getPart(name);
-		generator.writeStringField("type", part.getType().name());
-		generator.writeStringField("url", part.getUrl());
-		generator.writeNumberField("timestamp", part.getTimestamp());
-		generator.writeStringField("timestampHuman", part.getTimestampHuman());
-		generator.writeNumberField("size", part.getSize());
-		generator.writeBooleanField("empty", part.isEmpty());
-		generator.writeBooleanField("final", publication.isPartFinal(name, fetcherArgs));
-		generator.writeBooleanField("usable", publication.isPartUsable(name, fetcherArgs));
-	}
-
-	private static void publicationPartStringMeta(Publication publication, PublicationPartName name, JsonGenerator generator, FetcherArgs fetcherArgs) throws IOException {
-		PublicationPartString part = (PublicationPartString) publication.getPart(name);
-		generator.writeFieldName(name.name());
-		generator.writeStartObject();
-		generator.writeStringField("content", part.getContent());
-		publicationPartMeta(publication, name, generator, fetcherArgs);
-		generator.writeEndObject();
-	}
-
-	private static void publicationPartListMeta(Publication publication, PublicationPartName name, JsonGenerator generator, FetcherArgs fetcherArgs) throws IOException {
-		PublicationPartList<?> part = (PublicationPartList<?>) publication.getPart(name);
-		generator.writeFieldName(name.name());
-		generator.writeStartObject();
-		generator.writeObjectField("list", part.getList());
-		publicationPartMeta(publication, name, generator, fetcherArgs);
-		generator.writeEndObject();
-	}
-
-	private static void publicationMeta(Publication publication, JsonGenerator generator, FetcherArgs fetcherArgs) throws IOException {
-		generator.writeStartObject();
-
-		generator.writeNumberField("fetchTime", publication.getFetchTime());
-		generator.writeStringField("fetchTimeHuman", publication.getFetchTimeHuman());
-		generator.writeNumberField("retryCounter", publication.getRetryCounter());
-
-		generator.writeBooleanField("oa", publication.isOA());
-		generator.writeStringField("journalTitle", publication.getJournalTitle());
-		generator.writeNumberField("pubDate", publication.getPubDate());
-		generator.writeStringField("pubDateHuman", publication.getPubDateHuman());
-		generator.writeNumberField("citationsCount", publication.getCitationsCount());
-		generator.writeNumberField("citationsTimestamp", publication.getCitationsTimestamp());
-		generator.writeStringField("citationsTimestampHuman", publication.getCitationsTimestampHuman());
-		generator.writeFieldName("correspAuthor");
-		generator.writeStartArray();
-		for (CorrespAuthor correspAuthor : publication.getCorrespAuthor()) {
-			generator.writeStartObject();
-			generator.writeStringField("name", correspAuthor.getName());
-			generator.writeStringField("orcid", correspAuthor.getOrcid());
-			generator.writeStringField("email", correspAuthor.getEmail());
-			generator.writeStringField("phone", correspAuthor.getPhone());
-			generator.writeStringField("uri", correspAuthor.getUri());
-			generator.writeEndObject();
-		}
-		generator.writeEndArray();
-		generator.writeObjectField("visitedSites", publication.getVisitedSites());
-
-		generator.writeBooleanField("empty", publication.isEmpty());
-		generator.writeBooleanField("final", publication.isFinal(fetcherArgs));
-		generator.writeBooleanField("totallyFinal", publication.isTotallyFinal(fetcherArgs));
-		generator.writeBooleanField("usable", publication.isUsable(fetcherArgs));
-
-		publicationPartStringMeta(publication, PublicationPartName.pmid, generator, fetcherArgs);
-		publicationPartStringMeta(publication, PublicationPartName.pmcid, generator, fetcherArgs);
-		publicationPartStringMeta(publication, PublicationPartName.doi, generator, fetcherArgs);
-		publicationPartStringMeta(publication, PublicationPartName.title, generator, fetcherArgs);
-
-		publicationPartListMeta(publication, PublicationPartName.keywords, generator, fetcherArgs);
-		publicationPartListMeta(publication, PublicationPartName.mesh, generator, fetcherArgs);
-		publicationPartListMeta(publication, PublicationPartName.efo, generator, fetcherArgs);
-		publicationPartListMeta(publication, PublicationPartName.go, generator, fetcherArgs);
-
-		generator.writeFieldName("abstract");
-		generator.writeStartObject();
-		generator.writeStringField("content", publication.getAbstract().getContent());
-		publicationPartMeta(publication, PublicationPartName.theAbstract, generator, fetcherArgs);
-		generator.writeEndObject();
-
-		generator.writeFieldName("fulltext");
-		generator.writeStartObject();
-		publicationPartMeta(publication, PublicationPartName.fulltext, generator, fetcherArgs);
-		generator.writeEndObject();
-
-		generator.writeEndObject();
-	}
 
 	private static void parentsChildren(Map<EdamUri, Concept> concepts, List<EdamUri> pc, String field, JsonGenerator generator) throws IOException {
 		if (!pc.isEmpty()) {
@@ -478,21 +363,21 @@ public class Json {
 				generator.writeFieldName("webpages");
 				generator.writeStartArray();
 				for (Webpage webpage : webpages) {
-					webpageMeta(webpage, generator, args.getFetcherArgs());
+					webpage.toStringJson(generator, args.getFetcherArgs(), false);
 				}
 				generator.writeEndArray();
 
 				generator.writeFieldName("docs");
 				generator.writeStartArray();
 				for (Webpage doc : docs) {
-					webpageMeta(doc, generator, args.getFetcherArgs());
+					doc.toStringJson(generator, args.getFetcherArgs(), false);
 				}
 				generator.writeEndArray();
 
 				generator.writeFieldName("publications");
 				generator.writeStartArray();
 				for (Publication publication : publications) {
-					publicationMeta(publication, generator, args.getFetcherArgs());
+					publication.toStringJson(generator, args.getFetcherArgs(), false);
 				}
 				generator.writeEndArray();
 

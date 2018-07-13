@@ -84,7 +84,7 @@ public final class UtilMain {
 		return docUrls;
 	}
 
-	private static void run(UtilArgs args, Version version) throws IOException, ParseException, ReflectiveOperationException {
+	private static void run(UtilArgs args, Version version, String[] argv) throws IOException, ParseException, ReflectiveOperationException {
 		List<PublicationIds> publicationIds = null;
 		List<String> webpageUrls = null;
 		List<String> docUrls = null;
@@ -101,7 +101,7 @@ public final class UtilMain {
 			else docUrls.addAll(docQuery(args.allQuery, args.queryType, args.fetcherArgs));
 		}
 
-		PubFetcherMethods.run(args.pubFetcherArgs, new Fetcher(), args.fetcherArgs, publicationIds, webpageUrls, docUrls, version);
+		PubFetcherMethods.run(args.pubFetcherArgs, new Fetcher(args.fetcherArgs.getPrivateArgs()), args.fetcherArgs, publicationIds, webpageUrls, docUrls, version, argv);
 
 		Util.run(args, version);
 	}
@@ -118,7 +118,7 @@ public final class UtilMain {
 		logger.info("This is {} {}", version.getName(), version.getVersion());
 
 		try {
-			run(args, version);
+			run(args, version, argv);
 		} catch (Throwable e) {
 			logger.error("Exception!", e);
 		}

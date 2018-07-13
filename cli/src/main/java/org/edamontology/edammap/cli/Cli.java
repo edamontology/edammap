@@ -32,6 +32,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import org.edamontology.pubfetcher.core.common.BasicArgs;
+import org.edamontology.pubfetcher.core.common.PubFetcher;
 import org.edamontology.pubfetcher.core.common.Version;
 import org.edamontology.pubfetcher.core.db.publication.Publication;
 import org.edamontology.pubfetcher.core.db.webpage.Webpage;
@@ -75,7 +76,7 @@ public class Cli implements Runnable {
 
 	private static Set<EdamUri> edamBlacklist;
 
-	private static Processor processor;
+	private static Processor processor = null;
 
 	private static Idf idf;
 
@@ -111,7 +112,7 @@ public class Cli implements Runnable {
 					++index;
 				}
 
-				logger.info("{}/{} @ {}s", localIndex + 1, queries.size(), (System.currentTimeMillis() - start) / 1000.0);
+				logger.info(PubFetcher.progress(localIndex + 1, queries.size(), start));
 
 				QueryProcessed processedQuery = processor.getProcessedQuery(query, args.getType(), pp, idf, args.getFetcherArgs());
 
@@ -154,7 +155,7 @@ public class Cli implements Runnable {
 
 		edamBlacklist = Edam.getBlacklist();
 
-		processor = new Processor(args.getProcessorArgs());
+		processor = new Processor(args.getProcessorArgs(), args.getFetcherArgs().getPrivateArgs());
 
 		idf = null;
 		if (args.getPreProcessorArgs().isStemming()) {
@@ -205,6 +206,7 @@ public class Cli implements Runnable {
 					lock.wait();
 				} catch (InterruptedException e) {
 					// TODO exit threads cleanly? give timeout for threads to exit? close db? print that exiting and waiting for threads to terminate?
+					// Runtime.getRuntime().addShutdownHook(new Thread() {
 					logger.error("Exception!", e);
 					System.exit(1);
 				}
@@ -241,6 +243,10 @@ public class Cli implements Runnable {
 			run(version);
 		} catch (Throwable e) {
 			logger.error("Exception!", e);
+		}
+
+		if (processor != null) {
+			processor.closeDatabase();
 		}
 	}
 }

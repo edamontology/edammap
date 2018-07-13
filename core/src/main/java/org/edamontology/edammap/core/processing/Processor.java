@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.edamontology.pubfetcher.core.common.FetcherArgs;
+import org.edamontology.pubfetcher.core.common.FetcherPrivateArgs;
 import org.edamontology.pubfetcher.core.common.PubFetcher;
 import org.edamontology.pubfetcher.core.db.Database;
 import org.edamontology.pubfetcher.core.db.DatabaseEntry;
@@ -58,17 +59,23 @@ public class Processor {
 
 	private final Database database;
 
-	public Processor(ProcessorArgs args) throws IOException, ParseException {
+	public Processor(ProcessorArgs args, FetcherPrivateArgs fetcherPrivateArgs) throws IOException, ParseException {
 		if (!args.isFetching()) {
 			this.fetcher = null;
 		} else {
-			this.fetcher = new Fetcher();
+			this.fetcher = new Fetcher(fetcherPrivateArgs);
 		}
 
 		if (args.getDb() == null || args.getDb().isEmpty()) {
 			this.database = null;
 		} else {
 			this.database = new Database(args.getDb());
+		}
+	}
+
+	public void closeDatabase() throws IOException {
+		if (database != null) {
+			database.close();
 		}
 	}
 
@@ -215,7 +222,7 @@ public class Processor {
 	private PublicationProcessed processPublication(Publication publication, PreProcessor pp, Idf queryIdf, FetcherArgs fetcherArgs) {
 		PublicationProcessed publicationProcessed = new PublicationProcessed();
 
-		if (publication.isTitleUsable(fetcherArgs)) {
+		if (publication.getTitle().isUsable(fetcherArgs)) {
 			List<String> titleTokens = pp.process(publication.getTitle().getContent());
 			if (!titleTokens.isEmpty()) {
 				publicationProcessed.setTitleTokens(titleTokens);
@@ -225,7 +232,7 @@ public class Processor {
 			}
 		}
 
-		if (publication.isKeywordsUsable(fetcherArgs)) {
+		if (publication.getKeywords().isUsable(fetcherArgs)) {
 			for (String keyword : publication.getKeywords().getList()) {
 				List<String> keywordTokens = pp.process(keyword);
 				List<Double> keywordIdfs = null;
@@ -239,7 +246,7 @@ public class Processor {
 			}
 		}
 
-		if (publication.isMeshTermsUsable(fetcherArgs)) {
+		if (publication.getMeshTerms().isUsable(fetcherArgs)) {
 			for (MeshTerm meshTerm : publication.getMeshTerms().getList()) {
 				List<String> meshTermTokens = pp.process(meshTerm.getTerm());
 				List<Double> meshTermIdfs = null;
@@ -253,7 +260,7 @@ public class Processor {
 			}
 		}
 
-		if (publication.isAbstractUsable(fetcherArgs)) {
+		if (publication.getAbstract().isUsable(fetcherArgs)) {
 			List<String> abstractTokens = pp.process(publication.getAbstract().getContent());
 			if (!abstractTokens.isEmpty()) {
 				publicationProcessed.setAbstractTokens(abstractTokens);
@@ -264,7 +271,7 @@ public class Processor {
 		}
 
 		int fulltextWordCount = 0;
-		if (publication.isFulltextUsable(fetcherArgs)) {
+		if (publication.getFulltext().isUsable(fetcherArgs)) {
 			List<String> fulltextTokens = pp.process(publication.getFulltext().getContent());
 			if (!fulltextTokens.isEmpty()) {
 				publicationProcessed.setFulltextTokens(fulltextTokens);
@@ -275,7 +282,7 @@ public class Processor {
 			}
 		}
 
-		if (publication.isEfoTermsUsable(fetcherArgs)) {
+		if (publication.getEfoTerms().isUsable(fetcherArgs)) {
 			for (MinedTerm efoTerm : publication.getEfoTerms().getList()) {
 				List<String> efoTermTokens = pp.process(efoTerm.getTerm());
 				List<Double> efoTermIdfs = null;
@@ -294,7 +301,7 @@ public class Processor {
 			}
 		}
 
-		if (publication.isGoTermsUsable(fetcherArgs)) {
+		if (publication.getGoTerms().isUsable(fetcherArgs)) {
 			for (MinedTerm goTerm : publication.getGoTerms().getList()) {
 				List<String> goTermTokens = pp.process(goTerm.getTerm());
 				List<Double> goTermIdfs = null;
