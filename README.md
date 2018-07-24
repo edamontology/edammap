@@ -7,7 +7,7 @@ A test [web application](https://biit.cs.ut.ee/edammap) and API are available.
 
 ## Documentation
 See [usage](https://github.com/edamontology/edammap#compile) below, and:
-* [Tutorial] (https://github.com/edamontology/edammap/blob/master/Documentation/Tutorial%20for%20EDAMmapper.pdf)
+* [Tutorial](https://github.com/edamontology/edammap/blob/master/Documentation/Tutorial%20for%20EDAMmapper.pdf)
 * [Background information](https://github.com/edamontology/edammap/blob/master/Documentation/Automatic%20mapping%20of%20free%20texts%20to%20bioinformatics%20ontology%20terms.pdf)
 
 ## Usage
