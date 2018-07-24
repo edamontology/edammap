@@ -151,7 +151,7 @@ public final class PubMedApps {
 
 		Set<String> pmids = new LinkedHashSet<>();
 
-		Document doc = new Fetcher().getDoc(meshQuery, null, fetcherArgs);
+		Document doc = new Fetcher(fetcherArgs.getPrivateArgs()).getDoc(meshQuery, false, fetcherArgs);
 		if (doc != null) {
 			for (Element id : doc.getElementsByTag("Id")) {
 				pmids.add(id.text());

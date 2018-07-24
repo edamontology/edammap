@@ -57,13 +57,15 @@ public final class Util {
 		processorArgs.setDb(database);
 		processorArgs.setIdf(null);
 		processorArgs.setIdfStemmed(null);
-		Processor processor = new Processor(processorArgs);
+		Processor processor = new Processor(processorArgs, args.fetcherArgs.getPrivateArgs());
 
 		int idfs = processor.makeQueryIdf(QueryLoader.get(queryPath, args.makeIdfType,
 			args.fetcherArgs.getTimeout(), args.fetcherArgs.getPrivateArgs().getUserAgent()),
 			args.makeIdfType, idfPath, args.makeIdfWebpagesDocs, args.makeIdfFulltext,
 			new PreProcessor(stemming), null, args.fetcherArgs);
 		logger.info("Wrote {} IDFs to {}", idfs, idfPath);
+
+		processor.closeDatabase();
 	}
 
 	private static void printIdfTop(String inputPath, long n) throws IOException {

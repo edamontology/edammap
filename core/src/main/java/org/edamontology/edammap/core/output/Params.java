@@ -263,6 +263,8 @@ public class Params {
 			write(writer, new Param("Europe PMC e-mail", FetcherPrivateArgs.EUROPEPMC_EMAIL, args.getPrivateArgs().getEuropepmcEmail()), input);
 			write(writer, new Param("oaDOI e-mail", FetcherPrivateArgs.OADOI_EMAIL, args.getPrivateArgs().getOadoiEmail()), input);
 			write(writer, new Param("User Agent", FetcherPrivateArgs.USER_AGENT, args.getPrivateArgs().getUserAgent()), input);
+			write(writer, new Param("Journals scrape rules", FetcherPrivateArgs.JOURNALS_YAML, new File(args.getPrivateArgs().getJournalsYaml()).getName()), false);
+			write(writer, new Param("Webpages scrape rules", FetcherPrivateArgs.WEBPAGES_YAML, new File(args.getPrivateArgs().getWebpagesYaml()).getName()), false);
 		}
 		writeEnd(writer);
 	}
