@@ -3,7 +3,7 @@
 Tool for mapping text to [EDAM](http://edamontology.org/page). It is designed to assist not replace a curator.
 
 ## Use online
-A test installation is available at https://biit.cs.ut.ee/edammap.
+A test [web application](https://biit.cs.ut.ee/edammap.) with web API is available.
 
 ## Documentation
 See [usage](https://github.com/edamontology/edammap#compile) below, and:
