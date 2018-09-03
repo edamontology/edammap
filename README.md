@@ -2,7 +2,18 @@
 
 Tool for mapping text to [EDAM](http://edamontology.org/page). It is designed to assist not replace a curator.
 
-## Compile
+## Use online
+A test [web application](https://biit.cs.ut.ee/edammap) and [API](https://github.com/edamontology/edammap/wiki/API ) are available.
+
+## Documentation
+See [usage](https://github.com/edamontology/edammap#compile) below, and:
+* [wiki](https://github.com/edamontology/edammap/wiki)
+* [Tutorial](https://github.com/edamontology/edammap/blob/master/Documentation/Tutorial%20for%20EDAMmapper.pdf)
+* [Background information](https://github.com/edamontology/edammap/blob/master/Documentation/Automatic%20mapping%20of%20free%20texts%20to%20bioinformatics%20ontology%20terms.pdf)
+
+## Usage
+
+### Compile
 
 [Apache Maven](https://maven.apache.org/) is required.
 
@@ -18,7 +29,7 @@ $ java -jar target/edammap-server-0.2-SNAPSHOT.jar -h
 $ java -jar target/pubmedapps-0.2-SNAPSHOT.jar -h
 ```
 
-## Setup
+### Setup
 
 Generate queries (here, content of [bio.tools](https://bio.tools/)) and empty database.
 
@@ -46,7 +57,7 @@ java -jar edammap-util-0.2-SNAPSHOT.jar --make-idf-stemmed biotools.json biotool
 
 Download [EDAM Ontology](http://edamontology.org/page) in OWL format.
 
-## Run
+### Run
 
 ```shell
 java -jar edammap-cli-0.2-SNAPSHOT.jar -e EDAM_1.20.owl -q biotools.json -t biotools -o results.txt -r results --threads 4 --fetching false --db biotools.db --idfStemmed biotools.stemmed.idf --log edammap.log
