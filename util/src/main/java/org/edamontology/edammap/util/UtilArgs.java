@@ -43,7 +43,7 @@ public class UtilArgs extends BasicArgs {
 	@Parameter(names = { "-all-query" }, variableArity = true, description = "TODO")
 	List<String> allQuery = null;
 
-	@Parameter(names = { "-query-type" }, description = "TODO")
+	@Parameter(names = { "--query-type" }, description = "TODO")
 	QueryType queryType = QueryType.generic;
 
 	@Parameter(names = { "--make-idf", "--make-query-idf" }, arity = 3, description = "String queryPath, String database, String idfPath")

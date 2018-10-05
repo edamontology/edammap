@@ -79,6 +79,7 @@ public class QueryLoader {
 	private static final Pattern INTERNAL_SEPARATOR_COMMA = Pattern.compile(",");
 	private static final Pattern INTERNAL_SEPARATOR_NEWLINE = Pattern.compile("\n");
 	private static final Pattern PUBLICATION_ID_SEPARATOR = Pattern.compile("\t");
+	private static final Pattern BIOTOOLS_LINKS_EXCLUDE = Pattern.compile("(?i)^https?://(www\\.)?(bioconductor\\.org|git\\.bioconductor\\.org/+packages/+.*|cbs\\.dtu\\.dk/+services|expasy\\.org|ms-utils\\.org|emboss\\.open-bio\\.org/+html/+adm/+ch01s01\\.html|rostlab\\.org/+owiki/+index\\.php/+Packages)/*$");
 
 	private static Stream<String> split(String toSplit) {
 		if (toSplit == null) return null;
@@ -146,6 +147,7 @@ public class QueryLoader {
 	private static List<Link> linksJson(Stream<org.edamontology.edammap.core.input.json.Link> links, List<String> types, boolean throwException) {
 		return links
 			.filter(l -> types.contains(l.getType().trim().toLowerCase(Locale.ROOT)))
+			.filter(l -> !BIOTOOLS_LINKS_EXCLUDE.matcher(l.getUrl()).matches())
 			.map(l -> link(l.getUrl(), l.getType(), throwException))
 			.filter(Objects::nonNull)
 			.collect(Collectors.toList());
@@ -451,7 +453,7 @@ public class QueryLoader {
 		List<Link> webpageUrls = new ArrayList<>();
 		addLink(tool.getHomepage(), "Homepage", false, webpageUrls);
 		webpageUrls.addAll(linksJson(tool.getLink().stream(),
-			Arrays.asList("mirror", "repository", "browser"), false));
+			Arrays.asList("mirror", "repository", "browser", "registry"), false));
 
 		List<Link> docUrls = linksJson(tool.getDocumentation().stream(),
 			Arrays.asList("general", "manual", "api documentation", "training material"), false);
