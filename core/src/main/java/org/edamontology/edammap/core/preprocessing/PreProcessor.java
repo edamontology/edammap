@@ -104,6 +104,8 @@ public class PreProcessor {
 	private final Pattern LINK_END_REMOVE = Pattern.compile("[^\\p{L}\\p{N}/]*$");
 	private final Pattern LINK_START_REMOVE = Pattern.compile("^[^\\p{L}\\p{N}]*");
 	private final Pattern KNOWN_SCHEMA = Pattern.compile("(?i)(http://|https://|ftp://)");
+	private final Pattern TILDE = Pattern.compile("[\\u223C\\u02DC]");
+	private final Pattern HYPHEN = Pattern.compile("[\\u2010]");
 	//private final List<String> INVALID_DOMAINS = Arrays.asList("js", "py", "go", "bio", "seq", "app", "hmm", "db", "txt"); // TODO
 
 	// Freestanding number (not part of a word)
@@ -384,7 +386,7 @@ public class PreProcessor {
 			}
 
 			if (!EMAIL_ONLY.matcher(link).matches()) {
-				output.add(link);
+				output.add(HYPHEN.matcher(TILDE.matcher(link).replaceAll("~")).replaceAll("-"));
 			}
 		}
 

@@ -56,11 +56,11 @@ public class PubMedAppsArgs extends BasicArgs {
 	@Parameter(names = { "--mesh-query" }, description = "TODO")
 	boolean meshQuery = false;
 
-	@Parameter(names = { "--write-web-doc" }, description = "TODO")
-	boolean writeWebDoc = false;
+	@Parameter(names = { "--pass1" }, description = "TODO")
+	boolean pass1 = false;
 
-	@Parameter(names = { "--print-results" }, description = "TODO")
-	boolean printResults = false;
+	@Parameter(names = { "--pass2" }, description = "TODO")
+	boolean pass2 = false;
 
 	@Parameter(names = { "--before-after" }, description = "TODO")
 	boolean beforeAfter = false;

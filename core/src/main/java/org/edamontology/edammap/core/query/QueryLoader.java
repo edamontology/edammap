@@ -57,9 +57,12 @@ import org.edamontology.edammap.core.input.csv.Bioconductor;
 import org.edamontology.edammap.core.input.csv.Generic;
 import org.edamontology.edammap.core.input.csv.Msutils;
 import org.edamontology.edammap.core.input.csv.SEQwiki;
+import org.edamontology.edammap.core.input.json.DocumentationType;
+import org.edamontology.edammap.core.input.json.DownloadType;
 import org.edamontology.edammap.core.input.json.Edam;
 import org.edamontology.edammap.core.input.json.Function;
 import org.edamontology.edammap.core.input.json.InputOutput;
+import org.edamontology.edammap.core.input.json.LinkType;
 import org.edamontology.edammap.core.input.json.Publication;
 import org.edamontology.edammap.core.input.json.ToolInput;
 import org.edamontology.edammap.core.input.xml.Biotools14;
@@ -79,7 +82,7 @@ public class QueryLoader {
 	private static final Pattern INTERNAL_SEPARATOR_COMMA = Pattern.compile(",");
 	private static final Pattern INTERNAL_SEPARATOR_NEWLINE = Pattern.compile("\n");
 	private static final Pattern PUBLICATION_ID_SEPARATOR = Pattern.compile("\t");
-	private static final Pattern BIOTOOLS_LINKS_EXCLUDE = Pattern.compile("(?i)^https?://(www\\.)?(bioconductor\\.org|git\\.bioconductor\\.org/+packages/+.*|cbs\\.dtu\\.dk/+services|expasy\\.org|ms-utils\\.org|emboss\\.open-bio\\.org/+html/+adm/+ch01s01\\.html|rostlab\\.org/+owiki/+index\\.php/+Packages)/*$");
+	private static final Pattern BIOTOOLS_LINKS_EXCLUDE = Pattern.compile("(?i)^https?://(www\\.)?(bioconductor\\.org|git\\.bioconductor\\.org/+packages/+.*|cbs\\.dtu\\.dk/+services|expasy\\.org|ms-utils\\.org|emboss\\.open-bio\\.org/+html/+adm/+ch01s01\\.html|rostlab\\.org/+owiki/+index\\.php/+Packages|bioconductor/+packages/+release/+bioc/+src/+contrib/+[^/]+\\.tar\\.gz)/*$");
 
 	private static Stream<String> split(String toSplit) {
 		if (toSplit == null) return null;
@@ -146,9 +149,9 @@ public class QueryLoader {
 
 	private static List<Link> linksJson(Stream<org.edamontology.edammap.core.input.json.Link> links, List<String> types, boolean throwException) {
 		return links
-			.filter(l -> types.contains(l.getType().trim().toLowerCase(Locale.ROOT)))
+			.filter(l -> types.contains(l.getType().trim()))
 			.filter(l -> !BIOTOOLS_LINKS_EXCLUDE.matcher(l.getUrl()).matches())
-			.map(l -> link(l.getUrl(), l.getType(), throwException))
+			.map(l -> link(l.getUrl(), l.getType().trim(), throwException))
 			.filter(Objects::nonNull)
 			.collect(Collectors.toList());
 	}
@@ -452,11 +455,30 @@ public class QueryLoader {
 	private static Query getBiotools(ToolInput tool, Map<EdamUri, Concept> concepts) {
 		List<Link> webpageUrls = new ArrayList<>();
 		addLink(tool.getHomepage(), "Homepage", false, webpageUrls);
-		webpageUrls.addAll(linksJson(tool.getLink().stream(),
-			Arrays.asList("mirror", "repository", "browser", "registry"), false));
+		webpageUrls.addAll(linksJson(tool.getLink().stream(), Arrays.asList(
+				LinkType.MIRROR.toString(),
+				LinkType.REPOSITORY.toString(),
+				LinkType.BROWSER.toString(),
+				LinkType.REGISTRY.toString()
+			), false));
+		webpageUrls.addAll(linksJson(tool.getLink().stream(), Arrays.asList(
+				DownloadType.API_SPECIFICATION.toString(),
+				DownloadType.BIOLOGICAL_DATA.toString(),
+				DownloadType.COMMAND_LINE_SPECIFICATION.toString(),
+				DownloadType.CWL_FILE.toString(),
+				DownloadType.SOURCE_CODE.toString(),
+				DownloadType.TEST_SCRIPT.toString()
+			), false));
 
-		List<Link> docUrls = linksJson(tool.getDocumentation().stream(),
-			Arrays.asList("general", "manual", "api documentation", "training material"), false);
+		List<Link> docUrls = linksJson(tool.getDocumentation().stream(), Arrays.asList(
+				DocumentationType.GENERAL.toString(),
+				DocumentationType.MANUAL.toString(),
+				DocumentationType.API_DOCUMENTATION.toString(),
+				DocumentationType.TRAINING_MATERIAL.toString(),
+				DocumentationType.TUTORIAL.toString(),
+				DocumentationType.INSTALLATION_INSTRUCTIONS.toString(),
+				DocumentationType.OTHER.toString()
+			), false);
 
 		List<PublicationIdsQuery> publicationIds = new ArrayList<>();
 		for (Publication publication : tool.getPublication()) {

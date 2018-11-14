@@ -20,43 +20,40 @@
 package org.edamontology.edammap.pubmedapps;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-public class Result {
-	private String pmid = "";
+import org.edamontology.pubfetcher.core.db.publication.PublicationIds;
 
-	private String pmcid = "";
+public class Result implements Comparable<Result> {
 
-	private String doi = "";
+	private List<Suggestion> suggestions = new ArrayList<>();
 
-	private double score = 0;
+	private List<PublicationIds> sameSuggestions = new ArrayList<>();
 
-	private String suggestion = "";
+	private List<String> leftoverLinksAbstract = new ArrayList<>();
 
-	private Set<String> links = new LinkedHashSet<>();
+	private List<String> leftoverLinksFulltext = new ArrayList<>();
 
-	private Set<String> docs = new LinkedHashSet<>();
+	private List<Integer> existing = new ArrayList<>();
 
-	private List<String> sameSuggestions = new ArrayList<>();
+	private List<Integer> possiblyExisting = new ArrayList<>();
 
-	private List<String> otherSuggestions = new ArrayList<>();
-
-	private Set<String> otherLinks = new LinkedHashSet<>();
-
-	private Set<String> leftoverLinks = new LinkedHashSet<>();
-
-	private Map<String, String> existingNames = new LinkedHashMap<>();
-
-	private Map<String, String> possiblyExisting = new LinkedHashMap<>();
-
-	private Set<String> newLinks = new LinkedHashSet<>();
+	private List<Integer> possiblyRelated = new ArrayList<>();
 
 	private String title = "";
+
+	private String toolTitle = "";
+
+	private String toolTitleTwo = "";
+
+	private String toolTitleAcronym = "";
+
+	private String toolTitleTwoAcronym = "";
+
+	private String toolTitlePruned = "";
+
+	private String toolTitleTwoPruned = "";
 
 	private boolean oa = false;
 
@@ -68,107 +65,101 @@ public class Result {
 
 	private String citationsTimestamp = "";
 
-	private String correspAuthor = "";
-
-	public String getPmid() {
-		return pmid;
-	}
-	public void setPmid(String pmid) {
-		this.pmid = pmid;
-	}
-
-	public String getPmcid() {
-		return pmcid;
-	}
-	public void setPmcid(String pmcid) {
-		this.pmcid = pmcid;
+	private boolean hasSuggestionLink(String link) {
+		for (Suggestion suggestion : suggestions) {
+			if (suggestion.getLinksAbstract().contains(link) || suggestion.getLinksFulltext().contains(link)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
-	public String getDoi() {
-		return doi;
-	}
-	public void setDoi(String doi) {
-		this.doi = doi;
-	}
-
-	public double getScore() {
-		return score;
-	}
-	public void setScore(double score) {
-		this.score = score;
+	private boolean removePossiblyExisting(Integer index) {
+		Iterator<Integer> it = possiblyExisting.iterator();
+		while (it.hasNext()) {
+			if (index.equals(it.next())) {
+				it.remove();
+				return true;
+			}
+		}
+		return false;
 	}
 
-	public String getSuggestion() {
-		return suggestion;
-	}
-	public void setSuggestion(String suggestion) {
-		this.suggestion = suggestion;
-	}
-
-	public Set<String> getLinks() {
-		return links;
-	}
-	public void addLinks(List<String> links) {
-		this.links.addAll(links);
-	}
-	public void setLinks(Set<String> links) {
-		this.links = links;
+	private boolean removePossiblyRelated(Integer index) {
+		Iterator<Integer> it = possiblyRelated.iterator();
+		while (it.hasNext()) {
+			if (index.equals(it.next())) {
+				it.remove();
+				return true;
+			}
+		}
+		return false;
 	}
 
-	public Set<String> getDocs() {
-		return docs;
+	public List<Suggestion> getSuggestions() {
+		return suggestions;
 	}
-	public void addDoc(String doc) {
-		docs.add(doc);
+	public void addSuggestion(Suggestion suggestion) {
+		suggestions.add(suggestion);
 	}
 
-	public List<String> getSameSuggestions() {
+	public List<PublicationIds> getSameSuggestions() {
 		return sameSuggestions;
 	}
-	public void addSameSuggestion(String sameSuggestion) {
+	public void addSameSuggestion(PublicationIds sameSuggestion) {
 		sameSuggestions.add(sameSuggestion);
 	}
 
-	public List<String> getOtherSuggestions() {
-		return otherSuggestions;
+	public List<String> getLeftoverLinksAbstract() {
+		return leftoverLinksAbstract;
 	}
-	public void addOtherSuggestion(String otherSuggestion) {
-		otherSuggestions.add(otherSuggestion);
-	}
-
-	public Set<String> getOtherLinks() {
-		return otherLinks;
-	}
-	public void addOtherLinks(Collection<String> otherLinks) {
-		this.otherLinks.addAll(otherLinks);
+	public void addLeftoverLinksAbstract(List<String> linksAbstract) {
+		for (String link : linksAbstract) {
+			if (!hasSuggestionLink(link)) {
+				leftoverLinksAbstract.add(link);
+			}
+		}
 	}
 
-	public Set<String> getLeftoverLinks() {
-		return leftoverLinks;
+	public List<String> getLeftoverLinksFulltext() {
+		return leftoverLinksFulltext;
 	}
-	public void addLeftoverLinks(Collection<String> leftoverLinks) {
-		this.leftoverLinks.addAll(leftoverLinks);
-	}
-
-	public Map<String, String> getExistingNames() {
-		return existingNames;
-	}
-	public void addExistingName(String existingId, String existingName) {
-		existingNames.put(existingId, existingName);
+	public void addLeftoverLinksFulltext(List<String> linksFulltext) {
+		for (String link : linksFulltext) {
+			if (!hasSuggestionLink(link)) {
+				leftoverLinksFulltext.add(link);
+			}
+		}
 	}
 
-	public Map<String, String> getPossiblyExisting() {
+	public List<Integer> getExisting() {
+		return existing;
+	}
+	public void addExisting(Integer index) {
+		if (!existing.contains(index)) {
+			existing.add(index);
+			removePossiblyExisting(index);
+			removePossiblyRelated(index);
+		}
+	}
+
+	public List<Integer> getPossiblyExisting() {
 		return possiblyExisting;
 	}
-	public void addPossiblyExisting(String possiblyExistingId, String possiblyExistingName) {
-		possiblyExisting.put(possiblyExistingId, possiblyExistingName);
+	public void addPossiblyExisting(Integer index) {
+		if (!existing.contains(index) && !possiblyExisting.contains(index)) {
+			possiblyExisting.add(index);
+			removePossiblyRelated(index);
+		}
 	}
 
-	public Set<String> getNewLinks() {
-		return newLinks;
+	public List<Integer> getPossiblyRelated() {
+		return possiblyRelated;
 	}
-	public void addNewLink(String newLink) {
-		newLinks.add(newLink);
+	public void addPossiblyRelated(Integer index) {
+		if (!existing.contains(index) && !possiblyExisting.contains(index) && !possiblyRelated.contains(index)) {
+			possiblyRelated.add(index);
+		}
 	}
 
 	public String getTitle() {
@@ -176,6 +167,48 @@ public class Result {
 	}
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public String getToolTitle() {
+		return toolTitle;
+	}
+	public void setToolTitle(String toolTitle) {
+		this.toolTitle = toolTitle;
+	}
+
+	public String getToolTitleTwo() {
+		return toolTitleTwo;
+	}
+	public void setToolTitleTwo(String toolTitleTwo) {
+		this.toolTitleTwo = toolTitleTwo;
+	}
+
+	public String getToolTitleAcronym() {
+		return toolTitleAcronym;
+	}
+	public void setToolTitleAcronym(String toolTitleAcronym) {
+		this.toolTitleAcronym = toolTitleAcronym;
+	}
+
+	public String getToolTitleTwoAcronym() {
+		return toolTitleTwoAcronym;
+	}
+	public void setToolTitleTwoAcronym(String toolTitleTwoAcronym) {
+		this.toolTitleTwoAcronym = toolTitleTwoAcronym;
+	}
+
+	public String getToolTitlePruned() {
+		return toolTitlePruned;
+	}
+	public void setToolTitlePruned(String toolTitlePruned) {
+		this.toolTitlePruned = toolTitlePruned;
+	}
+
+	public String getToolTitleTwoPruned() {
+		return toolTitleTwoPruned;
+	}
+	public void setToolTitleTwoPruned(String toolTitleTwoPruned) {
+		this.toolTitleTwoPruned = toolTitleTwoPruned;
 	}
 
 	public boolean isOa() {
@@ -213,10 +246,14 @@ public class Result {
 		this.citationsTimestamp = citationsTimestamp;
 	}
 
-	public String getCorrespAuthor() {
-		return correspAuthor;
-	}
-	public void setCorrespAuthor(String correspAuthor) {
-		this.correspAuthor = correspAuthor;
+	@Override
+	public int compareTo(Result o) {
+		if (o == null) return -1;
+		if (o.suggestions.isEmpty() && this.suggestions.isEmpty()) return 0;
+		if (o.suggestions.isEmpty()) return -1;
+		if (this.suggestions.isEmpty()) return 1;
+		if (this.suggestions.get(0).getScore() > o.suggestions.get(0).getScore()) return -1;
+		if (this.suggestions.get(0).getScore() < o.suggestions.get(0).getScore()) return 1;
+		return 0;
 	}
 }

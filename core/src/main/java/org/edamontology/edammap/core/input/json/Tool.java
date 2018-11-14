@@ -41,11 +41,17 @@ public class Tool {
 
 	protected List<Link> link = new ArrayList<>();
 
+	protected List<Link> download = new ArrayList<>();
+
 	protected List<Link> documentation = new ArrayList<>();
 
 	protected List<String> toolType = new ArrayList<>();
 
 	protected List<Publication> publication = new ArrayList<>();
+
+	protected String license;
+
+	protected List<String> language = new ArrayList<>();
 
 	protected Map<String, Object> others = new LinkedHashMap<>();
 
@@ -91,6 +97,13 @@ public class Tool {
 		this.link = link;
 	}
 
+	public List<Link> getDownload() {
+		return download;
+	}
+	public void setDownload(List<Link> download) {
+		this.download = download;
+	}
+
 	public List<Link> getDocumentation() {
 		return documentation;
 	}
@@ -110,6 +123,20 @@ public class Tool {
 	}
 	public void setPublication(List<Publication> publication) {
 		this.publication = publication;
+	}
+
+	public String getLicense() {
+		return license;
+	}
+	public void setLicense(String license) {
+		this.license = license;
+	}
+
+	public List<String> getLanguage() {
+		return language;
+	}
+	public void setLanguage(List<String> language) {
+		this.language = language;
 	}
 
 	@JsonAnyGetter
