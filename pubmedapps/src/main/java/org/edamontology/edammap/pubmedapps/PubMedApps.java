@@ -1005,7 +1005,7 @@ public final class PubMedApps {
 		return null;
 	}
 
-	private static String getWebpageContent(String url, Database db, Scrape scrape, int maxLength, boolean doc, boolean checkScrape) {
+	private static String getWebpageContent(String url, Database db, Scrape scrape, int maxLength, int minLength, boolean doc, boolean checkScrape) {
 		if (!checkScrape || scrape.getWebpage(url) != null) {
 			Webpage webpage;
 			if (!doc) {
@@ -1013,13 +1013,15 @@ public final class PubMedApps {
 			} else {
 				webpage = db.getDoc(url);
 			}
-			if (webpage != null && !webpage.getTitleAndContent().isEmpty()) {
+			if (webpage != null && webpage.getTitleAndContent().length() >= minLength) {
 				if (webpage.getTitleAndContent().length() > maxLength) {
 					if (maxLength <= 4) {
 						return webpage.getTitleAndContent().substring(0, maxLength);
 					} else {
 						return webpage.getTitleAndContent().substring(0, maxLength - 4) + " ...";
 					}
+				} else {
+					return webpage.getTitleAndContent();
 				}
 			}
 		}
@@ -1034,31 +1036,31 @@ public final class PubMedApps {
 		}
 	}
 
-	private static String chooseDescription(String homepage, List<String> linksAbstract, List<BiotoolsLink> linkLinks, List<BiotoolsLink> documentationLinks, Database db, Scrape scrape, int maxLength) {
+	private static String chooseDescription(String homepage, List<String> linksAbstract, List<BiotoolsLink> linkLinks, List<BiotoolsLink> documentationLinks, Database db, Scrape scrape, int maxLength, int minLength) {
 		if (maxLength <= 0) return "";
 		if (!homepage.isEmpty()) {
-			String content = getWebpageContent(homepage, db, scrape, maxLength, false, true);
+			String content = getWebpageContent(homepage, db, scrape, maxLength, minLength, false, true);
 			if (content != null) {
 				return content;
 			}
-			content = getWebpageContent(homepage, db, scrape, maxLength, true, true);
+			content = getWebpageContent(homepage, db, scrape, maxLength, minLength, true, true);
 			if (content != null) {
 				return content;
 			}
 		}
 		for (String linkAbstract : linksAbstract) {
-			String content = getWebpageContent(prependHttp(linkAbstract), db, scrape, maxLength, false, true);
+			String content = getWebpageContent(prependHttp(linkAbstract), db, scrape, maxLength, minLength, false, true);
 			if (content != null) {
 				return content;
 			}
-			content = getWebpageContent(prependHttp(linkAbstract), db, scrape, maxLength, true, true);
+			content = getWebpageContent(prependHttp(linkAbstract), db, scrape, maxLength, minLength, true, true);
 			if (content != null) {
 				return content;
 			}
 		}
 		for (BiotoolsLink linkLink : linkLinks) {
 			if (linkLink.getType() == LinkType.MIRROR.toString()) {
-				String content = getWebpageContent(linkLink.getUrl(), db, scrape, maxLength, false, true);
+				String content = getWebpageContent(linkLink.getUrl(), db, scrape, maxLength, minLength, false, true);
 				if (content != null) {
 					return content;
 				}
@@ -1066,7 +1068,7 @@ public final class PubMedApps {
 		}
 		for (BiotoolsLink linkLink : linkLinks) {
 			if (linkLink.getType() == LinkType.REPOSITORY.toString()) {
-				String content = getWebpageContent(linkLink.getUrl(), db, scrape, maxLength, false, true);
+				String content = getWebpageContent(linkLink.getUrl(), db, scrape, maxLength, minLength, false, true);
 				if (content != null) {
 					return content;
 				}
@@ -1074,7 +1076,7 @@ public final class PubMedApps {
 		}
 		for (BiotoolsLink documentationLink : documentationLinks) {
 			if (documentationLink.getType() == DocumentationType.GENERAL.toString()) {
-				String content = getWebpageContent(documentationLink.getUrl(), db, scrape, maxLength, true, true);
+				String content = getWebpageContent(documentationLink.getUrl(), db, scrape, maxLength, minLength, true, true);
 				if (content != null) {
 					return content;
 				}
@@ -1086,18 +1088,18 @@ public final class PubMedApps {
 					|| documentationLink.getType() == DocumentationType.TUTORIAL.toString()
 					|| documentationLink.getType() == DocumentationType.TRAINING_MATERIAL.toString()
 					|| documentationLink.getType() == DocumentationType.API_DOCUMENTATION.toString()) {
-				String content = getWebpageContent(documentationLink.getUrl(), db, scrape, maxLength, true, true);
+				String content = getWebpageContent(documentationLink.getUrl(), db, scrape, maxLength, minLength, true, true);
 				if (content != null) {
 					return content;
 				}
 			}
 		}
 		if (!homepage.isEmpty()) {
-			String content = getWebpageContent(homepage, db, scrape, maxLength, false, false);
+			String content = getWebpageContent(homepage, db, scrape, maxLength, minLength, false, false);
 			if (content != null) {
 				return content;
 			}
-			content = getWebpageContent(homepage, db, scrape, maxLength, true, false);
+			content = getWebpageContent(homepage, db, scrape, maxLength, minLength, true, false);
 			if (content != null) {
 				return content;
 			}
@@ -1985,11 +1987,15 @@ public final class PubMedApps {
 					System.out.print("\t");
 					System.out.print(result.getValue().getSameSuggestions().stream().map(pubIds -> pubIds.toString()).collect(Collectors.joining(" | ")));
 					System.out.print("\t");
+					final String name;
 					if (!result.getValue().getSuggestions().isEmpty()) {
-						System.out.print(result.getValue().getSuggestions().get(0).getExtracted());
+						name = result.getValue().getSuggestions().get(0).getExtracted();
+						System.out.print(name);
+					} else {
+						name = "";
 					}
 					System.out.print("\t");
-					System.out.print(result.getValue().getExisting().stream().map(e -> biotools.get(e)).map(q -> q.getName() + " (" + q.getId() + ")").collect(Collectors.joining(" | ")));
+					System.out.print(result.getValue().getExisting().stream().map(e -> biotools.get(e)).map(q -> ((q.getName() != null && !name.isEmpty() && q.getName().equals(name)) ? "SAME" : q.getName()) + " (" + q.getId() + ")").collect(Collectors.joining(" | ")));
 					System.out.print("\t");
 					System.out.print(result.getValue().getPossiblyExisting().stream().map(e -> biotools.get(e)).map(q -> q.getName() + " (" + q.getId() + ")").collect(Collectors.joining(" | ")));
 					System.out.print("\t");
@@ -2075,7 +2081,7 @@ public final class PubMedApps {
 					System.out.print("\t");
 					System.out.print(result.getValue().getTitle());
 					System.out.print("\t");
-					System.out.print(chooseDescription(homepage, linksAbstract, linkLinks, documentationLinks, db, scrape, BIOTOOLS_DESCRIPTION_MAX_LENGTH - result.getValue().getTitle().length() - 2).replaceAll("\n", "\\\\n").replaceAll("\r", "\\\\r").replaceAll("\t", "\\\\t"));
+					System.out.print(chooseDescription(homepage, linksAbstract, linkLinks, documentationLinks, db, scrape, BIOTOOLS_DESCRIPTION_MAX_LENGTH - result.getValue().getTitle().length() - 2, fetcherArgs.getWebpageMinLength()).replaceAll("\n", "\\\\n").replaceAll("\r", "\\\\r").replaceAll("\t", "\\\\t"));
 					System.out.print("\t");
 					System.out.print(result.getValue().getExisting().stream().map(e -> biotools.get(e)).map(q -> q.getDescription().replaceAll("\n", "\\\\n").replaceAll("\r", "\\\\r").replaceAll("\t", "\\\\t")).collect(Collectors.joining(" | ")));
 					System.out.print("\t");
