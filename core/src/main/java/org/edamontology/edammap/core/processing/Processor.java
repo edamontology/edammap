@@ -373,7 +373,7 @@ public class Processor {
 				List<String> webpageTokens = null;
 				List<Double> webpageIdfs = null;
 				if (webpage != null && webpage.isUsable(fetcherArgs)) {
-					webpageTokens = pp.process(webpage.getTitleAndContent());
+					webpageTokens = pp.process(webpage.getTitle() + "\n" + webpage.getContent());
 					if (webpageTokens.isEmpty()) {
 						webpageTokens = null;
 					} else if (queryIdf != null) {

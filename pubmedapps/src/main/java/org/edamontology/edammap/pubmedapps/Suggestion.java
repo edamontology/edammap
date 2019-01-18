@@ -20,7 +20,9 @@
 package org.edamontology.edammap.pubmedapps;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Suggestion {
 
@@ -36,13 +38,17 @@ public class Suggestion {
 
 	private String homepage = "";
 
-	private List<BiotoolsLink> linkLinks = new ArrayList<>();
+	private boolean homepageBroken = false;
 
-	private List<BiotoolsLink> downloadLinks = new ArrayList<>();
+	private boolean homepageMissing = false;
 
-	private List<BiotoolsLink> documentationLinks = new ArrayList<>();
+	private Set<BiotoolsLink> linkLinks = new LinkedHashSet<>();
 
-	private List<BiotoolsLink> brokenLinks = new ArrayList<>();
+	private Set<BiotoolsLink> downloadLinks = new LinkedHashSet<>();
+
+	private Set<BiotoolsLink> documentationLinks = new LinkedHashSet<>();
+
+	private Set<BiotoolsLink> brokenLinks = new LinkedHashSet<>();
 
 	public double getScore() {
 		return score;
@@ -99,28 +105,49 @@ public class Suggestion {
 		this.homepage = homepage;
 	}
 
-	public List<BiotoolsLink> getLinkLinks() {
+	public boolean isHomepageBroken() {
+		return homepageBroken;
+	}
+	public void setHomepageBroken(boolean homepageBroken) {
+		this.homepageBroken = homepageBroken;
+	}
+
+	public boolean isHomepageMissing() {
+		return homepageMissing;
+	}
+	public void setHomepageMissing(boolean homepageMissing) {
+		this.homepageMissing = homepageMissing;
+	}
+
+	public Set<BiotoolsLink> getLinkLinks() {
 		return linkLinks;
 	}
 	public void addLinkLinks(List<BiotoolsLink> linkLinks) {
 		this.linkLinks.addAll(linkLinks);
 	}
 
-	public List<BiotoolsLink> getDownloadLinks() {
+	public Set<BiotoolsLink> getDownloadLinks() {
 		return downloadLinks;
 	}
 	public void addDownloadLinks(List<BiotoolsLink> downloadLinks) {
 		this.downloadLinks.addAll(downloadLinks);
 	}
 
-	public List<BiotoolsLink> getDocumentationLinks() {
+	public Set<BiotoolsLink> getDocumentationLinks() {
 		return documentationLinks;
 	}
 	public void addDocumentationLinks(List<BiotoolsLink> documentationLinks) {
 		this.documentationLinks.addAll(documentationLinks);
 	}
 
-	public List<BiotoolsLink> getBrokenLinks() {
+	public void removeHomepageFromLinks() {
+		String homepageTrimmed = PubMedApps.trimUrl(homepage);
+		linkLinks.removeIf(l -> l.getUrlTrimmed().equals(homepageTrimmed));
+		downloadLinks.removeIf(l -> l.getUrlTrimmed().equals(homepageTrimmed));
+		documentationLinks.removeIf(l -> l.getUrlTrimmed().equals(homepageTrimmed));
+	}
+
+	public Set<BiotoolsLink> getBrokenLinks() {
 		return brokenLinks;
 	}
 }

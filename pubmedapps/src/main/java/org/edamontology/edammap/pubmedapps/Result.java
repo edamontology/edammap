@@ -55,6 +55,8 @@ public class Result implements Comparable<Result> {
 
 	private String toolTitleTwoPruned = "";
 
+	private List<String> abstractSentences = new ArrayList<>();
+
 	private boolean oa = false;
 
 	private String journalTitle = "";
@@ -209,6 +211,13 @@ public class Result implements Comparable<Result> {
 	}
 	public void setToolTitleTwoPruned(String toolTitleTwoPruned) {
 		this.toolTitleTwoPruned = toolTitleTwoPruned;
+	}
+
+	public List<String> getAbstractSentences() {
+		return abstractSentences;
+	}
+	public void setAbstractSentences(List<String> abstractSentences) {
+		this.abstractSentences = abstractSentences;
 	}
 
 	public boolean isOa() {

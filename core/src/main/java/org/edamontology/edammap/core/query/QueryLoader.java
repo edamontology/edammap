@@ -150,7 +150,7 @@ public class QueryLoader {
 	private static List<Link> linksJson(Stream<org.edamontology.edammap.core.input.json.Link> links, List<String> types, boolean throwException) {
 		return links
 			.filter(l -> types.contains(l.getType().trim()))
-			.filter(l -> !BIOTOOLS_LINKS_EXCLUDE.matcher(l.getUrl()).matches())
+			.filter(l -> !BIOTOOLS_LINKS_EXCLUDE.matcher(l.getUrl().trim()).matches())
 			.map(l -> link(l.getUrl(), l.getType().trim(), throwException))
 			.filter(Objects::nonNull)
 			.collect(Collectors.toList());
