@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016, 2018 Erik Jaaniso
+ * Copyright © 2016, 2018, 2019 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -31,15 +31,22 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.carrotsearch.hppc.ObjectDoubleScatterMap;
+import com.carrotsearch.hppc.ObjectIntScatterMap;
 
 public class Idf {
 
 	private final ObjectDoubleScatterMap<String> idfMap;
 
+	private final ObjectIntScatterMap<String> countsMap;
+
+	private final int documentCount;
+
 	private final List<IdfTop> idfTop;
 
-	public Idf(ObjectDoubleScatterMap<String> idfMap) {
+	public Idf(ObjectDoubleScatterMap<String> idfMap, ObjectIntScatterMap<String> countsMap, int documentCount) {
 		this.idfMap = idfMap;
+		this.countsMap = countsMap;
+		this.documentCount = documentCount;
 		this.idfTop = null;
 	}
 
@@ -55,13 +62,25 @@ public class Idf {
 				}
 				Collections.sort(idfTop);
 				this.idfMap = null;
+				this.countsMap = null;
+				this.documentCount = 0;
 			} else {
 				this.idfMap = new ObjectDoubleScatterMap<>();
-				for (String line; (line = br.readLine()) != null; ) {
+				this.countsMap = new ObjectIntScatterMap<>();
+				String line = br.readLine();
+				if (line != null) {
+					this.documentCount = Integer.parseInt(line);
+				} else {
+					throw new IOException("First line must be document count!");
+				}
+				while ((line = br.readLine()) != null) {
 					int tab = line.indexOf("\t");
 					String key = line.substring(0, tab);
-					double value = Double.parseDouble(line.substring(line.indexOf("\t", tab + 1) + 1));
-					this.idfMap.put(key, value);
+					int tab2 = line.indexOf("\t", tab + 1);
+					int count = Integer.parseInt(line.substring(tab + 1, tab2));
+					this.countsMap.put(key, count);
+					double idf = Double.parseDouble(line.substring(tab2 + 1));
+					this.idfMap.put(key, idf);
 				}
 				this.idfTop = null;
 			}
@@ -78,6 +97,19 @@ public class Idf {
 		} else {
 			return 1.0d;
 		}
+	}
+
+	// getIdf(String) has shift +1
+	public double getIdfShifted(String term, int shift) {
+		int termCount = 0;
+		if (countsMap.containsKey(term)) {
+			termCount = countsMap.get(term);
+		}
+		int totalCount = termCount + shift;
+		if (totalCount < 1) totalCount = 1;
+		double idf = Math.log10(documentCount / (double) totalCount) / Math.log10(documentCount);
+		if (idf < 0) idf = 0;
+		return idf;
 	}
 
 	public List<Double> getIdf(Collection<String> terms) {

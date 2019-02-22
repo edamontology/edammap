@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Erik Jaaniso
+ * Copyright © 2018, 2019 Erik Jaaniso
  *
  * This file is part of PubMedApps.
  *
@@ -20,52 +20,62 @@
 package org.edamontology.edammap.pubmedapps;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
+import org.edamontology.pubfetcher.core.db.publication.CorrespAuthor;
 import org.edamontology.pubfetcher.core.db.publication.PublicationIds;
 
 public class Result implements Comparable<Result> {
 
-	private List<Suggestion> suggestions = new ArrayList<>();
+	private List<PublicationIds> publicationIds = new ArrayList<>();
 
 	private List<PublicationIds> sameSuggestions = new ArrayList<>();
 
-	private List<String> leftoverLinksAbstract = new ArrayList<>();
+	private List<Suggestion> suggestions = new ArrayList<>();
 
-	private List<String> leftoverLinksFulltext = new ArrayList<>();
+	private List<List<String>> leftoverLinksAbstract = new ArrayList<>();
 
-	private List<Integer> existing = new ArrayList<>();
+	private List<List<String>> leftoverLinksFulltext = new ArrayList<>();
 
-	private List<Integer> possiblyExisting = new ArrayList<>();
+	private List<Integer> nameMatch = new ArrayList<>();
 
-	private List<Integer> possiblyRelated = new ArrayList<>();
+	private List<Integer> linkMatch = new ArrayList<>();
 
-	private String title = "";
+	private List<List<String>> linkMatchLinks = new ArrayList<>();
 
-	private String toolTitle = "";
+	private List<Integer> nameWordMatch = new ArrayList<>();
 
-	private String toolTitleTwo = "";
+	private List<String> title = new ArrayList<>();
 
-	private String toolTitleAcronym = "";
+	private List<String> toolTitleExtractedOriginal = new ArrayList<>();
 
-	private String toolTitleTwoAcronym = "";
+	private List<String> toolTitle = new ArrayList<>();
 
-	private String toolTitlePruned = "";
+	private List<String> toolTitlePruned = new ArrayList<>();
 
-	private String toolTitleTwoPruned = "";
+	private List<String> toolTitleAcronym = new ArrayList<>();
 
-	private List<String> abstractSentences = new ArrayList<>();
+	private List<List<String>> abstractSentences = new ArrayList<>();
 
-	private boolean oa = false;
+	private List<Boolean> oa = new ArrayList<>();
 
-	private String journalTitle = "";
+	private List<String> journalTitle = new ArrayList<>();
 
-	private String pubDate = "";
+	private List<Long> pubDate = new ArrayList<>();
 
-	private int citationsCount = -1;
+	private List<String> pubDateHuman = new ArrayList<>();
 
-	private String citationsTimestamp = "";
+	private List<Integer> citationsCount = new ArrayList<>();
+
+	private List<Long> citationsTimestamp = new ArrayList<>();
+
+	private List<String> citationsTimestampHuman = new ArrayList<>();
+
+	private List<List<CorrespAuthor>> correspAuthor = new ArrayList<>();
+
+	public Result(PublicationIds publicationIds) {
+		this.publicationIds.add(publicationIds);
+	}
 
 	private boolean hasSuggestionLink(String link) {
 		for (Suggestion suggestion : suggestions) {
@@ -76,33 +86,11 @@ public class Result implements Comparable<Result> {
 		return false;
 	}
 
-	private boolean removePossiblyExisting(Integer index) {
-		Iterator<Integer> it = possiblyExisting.iterator();
-		while (it.hasNext()) {
-			if (index.equals(it.next())) {
-				it.remove();
-				return true;
-			}
-		}
-		return false;
+	public List<PublicationIds> getPublicationIds() {
+		return publicationIds;
 	}
-
-	private boolean removePossiblyRelated(Integer index) {
-		Iterator<Integer> it = possiblyRelated.iterator();
-		while (it.hasNext()) {
-			if (index.equals(it.next())) {
-				it.remove();
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public List<Suggestion> getSuggestions() {
-		return suggestions;
-	}
-	public void addSuggestion(Suggestion suggestion) {
-		suggestions.add(suggestion);
+	public void addPublicationIds(PublicationIds publicationIds) {
+		this.publicationIds.add(publicationIds);
 	}
 
 	public List<PublicationIds> getSameSuggestions() {
@@ -112,157 +100,169 @@ public class Result implements Comparable<Result> {
 		sameSuggestions.add(sameSuggestion);
 	}
 
-	public List<String> getLeftoverLinksAbstract() {
+	public List<Suggestion> getSuggestions() {
+		return suggestions;
+	}
+	public void addSuggestion(Suggestion suggestion) {
+		suggestions.add(suggestion);
+	}
+
+	public List<List<String>> getLeftoverLinksAbstract() {
 		return leftoverLinksAbstract;
 	}
 	public void addLeftoverLinksAbstract(List<String> linksAbstract) {
+		List<String> leftoverLinksAbstract = new ArrayList<>();
 		for (String link : linksAbstract) {
 			if (!hasSuggestionLink(link)) {
 				leftoverLinksAbstract.add(link);
 			}
 		}
+		this.leftoverLinksAbstract.add(leftoverLinksAbstract);
 	}
 
-	public List<String> getLeftoverLinksFulltext() {
+	public List<List<String>> getLeftoverLinksFulltext() {
 		return leftoverLinksFulltext;
 	}
 	public void addLeftoverLinksFulltext(List<String> linksFulltext) {
+		List<String> leftoverLinksFulltext = new ArrayList<>();
 		for (String link : linksFulltext) {
 			if (!hasSuggestionLink(link)) {
 				leftoverLinksFulltext.add(link);
 			}
 		}
+		this.leftoverLinksFulltext.add(leftoverLinksFulltext);
 	}
 
-	public List<Integer> getExisting() {
-		return existing;
+	public List<Integer> getNameMatch() {
+		return nameMatch;
 	}
-	public void addExisting(Integer index) {
-		if (!existing.contains(index)) {
-			existing.add(index);
-			removePossiblyExisting(index);
-			removePossiblyRelated(index);
-		}
+	public void addNameMatch(Integer index) {
+		nameMatch.add(index);
 	}
 
-	public List<Integer> getPossiblyExisting() {
-		return possiblyExisting;
+	public List<Integer> getLinkMatch() {
+		return linkMatch;
 	}
-	public void addPossiblyExisting(Integer index) {
-		if (!existing.contains(index) && !possiblyExisting.contains(index)) {
-			possiblyExisting.add(index);
-			removePossiblyRelated(index);
-		}
+	public void addLinkMatch(Integer index, List<String> links) {
+		linkMatch.add(index);
+		linkMatchLinks.add(links);
 	}
 
-	public List<Integer> getPossiblyRelated() {
-		return possiblyRelated;
-	}
-	public void addPossiblyRelated(Integer index) {
-		if (!existing.contains(index) && !possiblyExisting.contains(index) && !possiblyRelated.contains(index)) {
-			possiblyRelated.add(index);
-		}
+	public List<List<String>> getLinkMatchLinks() {
+		return linkMatchLinks;
 	}
 
-	public String getTitle() {
+	public List<Integer> getNameWordMatch() {
+		return nameWordMatch;
+	}
+	public void addNameWordMatch(Integer index) {
+		nameWordMatch.add(index);
+	}
+
+	public List<String> getTitle() {
 		return title;
 	}
-	public void setTitle(String title) {
-		this.title = title;
+	public void addTitle(String title) {
+		this.title.add(title);
 	}
 
-	public String getToolTitle() {
+	public List<String> getToolTitleExtractedOriginal() {
+		return toolTitleExtractedOriginal;
+	}
+	public void addToolTitleExtractedOriginal(String toolTitleExtractedOriginal) {
+		this.toolTitleExtractedOriginal.add(toolTitleExtractedOriginal);
+	}
+
+	public List<String> getToolTitle() {
 		return toolTitle;
 	}
-	public void setToolTitle(String toolTitle) {
-		this.toolTitle = toolTitle;
+	public void addToolTitle(String toolTitle) {
+		this.toolTitle.add(toolTitle);
 	}
 
-	public String getToolTitleTwo() {
-		return toolTitleTwo;
-	}
-	public void setToolTitleTwo(String toolTitleTwo) {
-		this.toolTitleTwo = toolTitleTwo;
-	}
-
-	public String getToolTitleAcronym() {
-		return toolTitleAcronym;
-	}
-	public void setToolTitleAcronym(String toolTitleAcronym) {
-		this.toolTitleAcronym = toolTitleAcronym;
-	}
-
-	public String getToolTitleTwoAcronym() {
-		return toolTitleTwoAcronym;
-	}
-	public void setToolTitleTwoAcronym(String toolTitleTwoAcronym) {
-		this.toolTitleTwoAcronym = toolTitleTwoAcronym;
-	}
-
-	public String getToolTitlePruned() {
+	public List<String> getToolTitlePruned() {
 		return toolTitlePruned;
 	}
-	public void setToolTitlePruned(String toolTitlePruned) {
-		this.toolTitlePruned = toolTitlePruned;
+	public void addToolTitlePruned(String toolTitlePruned) {
+		this.toolTitlePruned.add(toolTitlePruned);
 	}
 
-	public String getToolTitleTwoPruned() {
-		return toolTitleTwoPruned;
+	public List<String> getToolTitleAcronym() {
+		return toolTitleAcronym;
 	}
-	public void setToolTitleTwoPruned(String toolTitleTwoPruned) {
-		this.toolTitleTwoPruned = toolTitleTwoPruned;
+	public void addToolTitleAcronym(String toolTitleAcronym) {
+		this.toolTitleAcronym.add(toolTitleAcronym);
 	}
 
-	public List<String> getAbstractSentences() {
+	public List<List<String>> getAbstractSentences() {
 		return abstractSentences;
 	}
-	public void setAbstractSentences(List<String> abstractSentences) {
-		this.abstractSentences = abstractSentences;
+	public void addAbstractSentences(List<String> abstractSentences) {
+		this.abstractSentences.add(abstractSentences);
 	}
 
-	public boolean isOa() {
+	public List<Boolean> isOa() {
 		return oa;
 	}
-	public void setOa(boolean oa) {
-		this.oa = oa;
+	public void addOa(boolean oa) {
+		this.oa.add(oa);
 	}
 
-	public String getJournalTitle() {
+	public List<String> getJournalTitle() {
 		return journalTitle;
 	}
-	public void setJournalTitle(String journalTitle) {
-		this.journalTitle = journalTitle;
+	public void addJournalTitle(String journalTitle) {
+		this.journalTitle.add(journalTitle);
 	}
 
-	public String getPubDate() {
+	public List<Long> getPubDate() {
 		return pubDate;
 	}
-	public void setPubDate(String pubDate) {
-		this.pubDate = pubDate;
+	public void addPubDate(Long pubDate) {
+		this.pubDate.add(pubDate);
 	}
 
-	public int getCitationsCount() {
+	public List<String> getPubDateHuman() {
+		return pubDateHuman;
+	}
+	public void addPubDateHuman(String pubDateHuman) {
+		this.pubDateHuman.add(pubDateHuman);
+	}
+
+	public List<Integer> getCitationsCount() {
 		return citationsCount;
 	}
-	public void setCitationsCount(int citationsCount) {
-		this.citationsCount = citationsCount;
+	public void addCitationsCount(int citationsCount) {
+		this.citationsCount.add(citationsCount);
 	}
 
-	public String getCitationsTimestamp() {
+	public List<Long> getCitationsTimestamp() {
 		return citationsTimestamp;
 	}
-	public void setCitationsTimestamp(String citationsTimestamp) {
-		this.citationsTimestamp = citationsTimestamp;
+	public void addCitationsTimestamp(Long citationsTimestamp) {
+		this.citationsTimestamp.add(citationsTimestamp);
+	}
+
+	public List<String> getCitationsTimestampHuman() {
+		return citationsTimestampHuman;
+	}
+	public void addCitationsTimestampHuman(String citationsTimestampHuman) {
+		this.citationsTimestampHuman.add(citationsTimestampHuman);
+	}
+
+	public List<List<CorrespAuthor>> getCorrespAuthor() {
+		return correspAuthor;
+	}
+	public void addCorrespAuthor(List<CorrespAuthor> correspAuthor) {
+		this.correspAuthor.add(correspAuthor);
 	}
 
 	@Override
 	public int compareTo(Result o) {
 		if (o == null) return -1;
-		if (o.suggestions.isEmpty() && this.suggestions.isEmpty()) return 0;
-		if (o.suggestions.isEmpty()) return -1;
-		if (this.suggestions.isEmpty()) return 1;
-		if (this.suggestions.get(0).getScore() > o.suggestions.get(0).getScore()) return -1;
-		if (this.suggestions.get(0).getScore() < o.suggestions.get(0).getScore()) return 1;
-		return 0;
+		if ((o.suggestions.isEmpty() || o.suggestions.get(0) == null) && (this.suggestions.isEmpty() || this.suggestions.get(0) == null)) return 0;
+		if (o.suggestions.isEmpty() || o.suggestions.get(0) == null) return -1;
+		if (this.suggestions.isEmpty() || this.suggestions.get(0) == null) return 1;
+		return this.suggestions.get(0).compareTo(o.suggestions.get(0));
 	}
 }

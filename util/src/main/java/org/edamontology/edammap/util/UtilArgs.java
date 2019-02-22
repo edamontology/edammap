@@ -73,6 +73,9 @@ public class UtilArgs extends BasicArgs {
 	@Parameter(names = { "--print-idf", "--print-query-idf" }, arity = 2, description = "String inputPath, String term")
 	List<String> printIdf = null;
 
+	@Parameter(names = { "--print-idf-stemmed", "--print-query-idf-stemmed" }, arity = 2, description = "String inputPath, String term")
+	List<String> printIdfStemmed = null;
+
 	@Parameter(names = { "--biotools-full" }, description = "String outputPath, FetcherArgs for timeout and user agent")
 	String biotoolsFull = null;
 

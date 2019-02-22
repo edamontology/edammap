@@ -41,7 +41,7 @@ public class Tool {
 
 	protected List<Link> link = new ArrayList<>();
 
-	protected List<Link> download = new ArrayList<>();
+	protected List<LinkVersion> download = new ArrayList<>();
 
 	protected List<Link> documentation = new ArrayList<>();
 
@@ -97,10 +97,10 @@ public class Tool {
 		this.link = link;
 	}
 
-	public List<Link> getDownload() {
+	public List<LinkVersion> getDownload() {
 		return download;
 	}
-	public void setDownload(List<Link> download) {
+	public void setDownload(List<LinkVersion> download) {
 		this.download = download;
 	}
 

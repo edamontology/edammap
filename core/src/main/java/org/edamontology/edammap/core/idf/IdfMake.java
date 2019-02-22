@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import com.carrotsearch.hppc.ObjectDoubleScatterMap;
+import com.carrotsearch.hppc.ObjectIntScatterMap;
 
 import org.edamontology.pubfetcher.core.common.PubFetcher;
 
@@ -74,6 +75,10 @@ public class IdfMake {
 		++documentCount;
 	}
 
+	public int getDocumentCount() {
+		return documentCount;
+	}
+
 	// no +1, as for concepts, where all words will be in IDF
 	public ObjectDoubleScatterMap<String> getIdf() {
 		ObjectDoubleScatterMap<String> idfMap = new ObjectDoubleScatterMap<>();
@@ -85,12 +90,21 @@ public class IdfMake {
 		return idfMap;
 	}
 
+	public ObjectIntScatterMap<String> getCounts() {
+		ObjectIntScatterMap<String> countsMap = new ObjectIntScatterMap<>();
+		for (Map.Entry<String, Integer> termCount : termCounts.entrySet()) {
+			countsMap.put(termCount.getKey(), termCount.getValue());
+		}
+		return countsMap;
+	}
+
 	// +1, as for queries, where unknown words might be queried
 	public int writeOutput() throws IOException {
 		CharsetEncoder encoder = StandardCharsets.UTF_8.newEncoder();
 		encoder.onMalformedInput(CodingErrorAction.REPLACE);
 		encoder.onUnmappableCharacter(CodingErrorAction.REPLACE);
 		try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(Files.newOutputStream(output), encoder))) {
+			writer.write(documentCount + "\n");
 			double idf_max = Math.log10(documentCount);
 			for (Map.Entry<String, Integer> termCount : termCounts.entrySet()) {
 				writer.write(termCount.getKey());

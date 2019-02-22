@@ -207,7 +207,7 @@ public class Processor {
 			processedConcepts.put(concept.getKey(), processConcept(concept.getValue(), idfMake, preProcessor));
 		}
 
-		Idf idf = new Idf(idfMake.getIdf());
+		Idf idf = new Idf(idfMake.getIdf(), idfMake.getCounts(), idfMake.getDocumentCount());
 		for (ConceptProcessed processedConcept : processedConcepts.values()) {
 			processConceptIdf(processedConcept, idf);
 		}

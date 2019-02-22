@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Erik Jaaniso
+ * Copyright © 2018, 2019 Erik Jaaniso
  *
  * This file is part of PubMedApps.
  *
@@ -24,13 +24,39 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-public class Suggestion {
+import org.edamontology.pubfetcher.core.db.publication.PublicationIds;
+
+public class Suggestion implements Comparable<Suggestion> {
+
+	private static final double SCORE_MIN = 1000;
+
+	private static final double SCORE2_MIN = 1072.1;
+
+	private static final double SCORE2_LOW_CONFIDENCE = 1750;
 
 	private double score = 0;
+
+	private double score2 = -1;
+
+	private Double[] score2Parts = { 0d, 0d, 0d, 0d };
 
 	private String extracted = "";
 
 	private String processed = "";
+
+	private List<Integer> publicationAndNameExisting = null;
+
+	private List<Integer> nameExistingSomePublicationDifferent = null;
+
+	private List<List<PublicationIds>> nameExistingSomePublicationDifferentPublicationIds = null;
+
+	private List<Integer> somePublicationExistingNameDifferent = null;
+
+	private List<List<PublicationIds>> somePublicationExistingNameDifferentPublicationIds = null;
+
+	private List<Integer> nameExistingPublicationDifferent = null;
+
+	private List<List<PublicationIds>> nameExistingPublicationDifferentPublicationIds = null;
 
 	private List<String> linksAbstract = new ArrayList<>();
 
@@ -50,11 +76,36 @@ public class Suggestion {
 
 	private Set<BiotoolsLink> brokenLinks = new LinkedHashSet<>();
 
+	private boolean fromAbstractLink = false;
+
+	public boolean calculateScore2() {
+		return score < SCORE_MIN;
+	}
+
+	public boolean include() {
+		return score >= SCORE_MIN || score2 >= SCORE2_MIN;
+	}
+
+	public boolean lowConfidence() {
+		return score < SCORE_MIN && score2 >= SCORE2_MIN && score2 <= SCORE2_LOW_CONFIDENCE;
+	}
+
 	public double getScore() {
 		return score;
 	}
 	public void setScore(double score) {
 		this.score = score;
+	}
+
+	public double getScore2() {
+		return score2;
+	}
+	public void setScore2(double score2) {
+		this.score2 = score2;
+	}
+
+	public Double[] getScore2Parts() {
+		return score2Parts;
 	}
 
 	public String getExtracted() {
@@ -71,6 +122,55 @@ public class Suggestion {
 		this.processed = processed;
 	}
 
+	public List<Integer> getPublicationAndNameExisting() {
+		return publicationAndNameExisting;
+	}
+	public void setPublicationAndNameExisting(List<Integer> publicationAndNameExisting) {
+		this.publicationAndNameExisting = publicationAndNameExisting;
+	}
+
+	public List<Integer> getNameExistingSomePublicationDifferent() {
+		return nameExistingSomePublicationDifferent;
+	}
+	public void setNameExistingSomePublicationDifferent(List<Integer> nameExistingSomePublicationDifferent) {
+		this.nameExistingSomePublicationDifferent = nameExistingSomePublicationDifferent;
+	}
+
+	public List<List<PublicationIds>> getNameExistingSomePublicationDifferentPublicationIds() {
+		return nameExistingSomePublicationDifferentPublicationIds;
+	}
+	public void setNameExistingSomePublicationDifferentPublicationIds(List<List<PublicationIds>> nameExistingSomePublicationDifferentPublicationIds) {
+		this.nameExistingSomePublicationDifferentPublicationIds = nameExistingSomePublicationDifferentPublicationIds;
+	}
+
+	public List<Integer> getSomePublicationExistingNameDifferent() {
+		return somePublicationExistingNameDifferent;
+	}
+	public void setSomePublicationExistingNameDifferent(List<Integer> somePublicationExistingNameDifferent) {
+		this.somePublicationExistingNameDifferent = somePublicationExistingNameDifferent;
+	}
+
+	public List<List<PublicationIds>> getSomePublicationExistingNameDifferentPublicationIds() {
+		return somePublicationExistingNameDifferentPublicationIds;
+	}
+	public void setSomePublicationExistingNameDifferentPublicationIds(List<List<PublicationIds>> somePublicationExistingNameDifferentPublicationIds) {
+		this.somePublicationExistingNameDifferentPublicationIds = somePublicationExistingNameDifferentPublicationIds;
+	}
+
+	public List<Integer> getNameExistingPublicationDifferent() {
+		return nameExistingPublicationDifferent;
+	}
+	public void setNameExistingPublicationDifferent(List<Integer> nameExistingPublicationDifferent) {
+		this.nameExistingPublicationDifferent = nameExistingPublicationDifferent;
+	}
+
+	public List<List<PublicationIds>> getNameExistingPublicationDifferentPublicationIds() {
+		return nameExistingPublicationDifferentPublicationIds;
+	}
+	public void setNameExistingPublicationDifferentPublicationIds(List<List<PublicationIds>> nameExistingPublicationDifferentPublicationIds) {
+		this.nameExistingPublicationDifferentPublicationIds = nameExistingPublicationDifferentPublicationIds;
+	}
+
 	public List<String> getLinksAbstract() {
 		return linksAbstract;
 	}
@@ -79,6 +179,9 @@ public class Suggestion {
 	}
 	public void addLinkAbstract(String linkAbstract) {
 		linksAbstract.add(linkAbstract);
+	}
+	public void addLinksAbstract(List<String> linksAbstract) {
+		this.linksAbstract.addAll(linksAbstract);
 	}
 
 	public List<String> getLinksFulltext() {
@@ -90,12 +193,8 @@ public class Suggestion {
 	public void addLinkFulltext(String linkFulltext) {
 		linksFulltext.add(linkFulltext);
 	}
-
-	public List<String> getLinks() {
-		List<String> links = new ArrayList<>();
-		links.addAll(linksAbstract);
-		links.addAll(linksFulltext);
-		return links;
+	public void addLinksFulltext(List<String> linksFulltext) {
+		this.linksFulltext.addAll(linksFulltext);
 	}
 
 	public String getHomepage() {
@@ -149,5 +248,25 @@ public class Suggestion {
 
 	public Set<BiotoolsLink> getBrokenLinks() {
 		return brokenLinks;
+	}
+
+	public boolean isFromAbstractLink() {
+		return fromAbstractLink;
+	}
+	public void setFromAbstractLink(boolean fromAbstractLink) {
+		this.fromAbstractLink = fromAbstractLink;
+	}
+
+	@Override
+	public int compareTo(Suggestion o) {
+		if (o == null) return -1;
+		if (this.score < SCORE_MIN && o.score < SCORE_MIN) {
+			if (this.score2 > o.score2) return -1;
+			if (this.score2 < o.score2) return 1;
+		} else {
+			if (this.score > o.score) return -1;
+			if (this.score < o.score) return 1;
+		}
+		return 0;
 	}
 }

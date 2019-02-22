@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017 Erik Jaaniso
+ * Copyright © 2019 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -19,43 +19,14 @@
 
 package org.edamontology.edammap.core.input.json;
 
-import java.text.ParseException;
+public class LinkVersion extends Link {
 
-public class Link {
+	private String version;
 
-	private String url;
-
-	private String type;
-
-	private String note;
-
-	public void check(ToolInput tool, int i, String index) throws ParseException {
-		if (url == null || url.equals("")) {
-			tool.parseException("url", i, index);
-		}
-		if (type == null || type.equals("")) {
-			tool.parseException("type", i, index);
-		}
+	public String getVersion() {
+		return version;
 	}
-
-	public String getUrl() {
-		return url;
-	}
-	public void setUrl(String url) {
-		this.url = url;
-	}
-
-	public String getType() {
-		return type;
-	}
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public String getNote() {
-		return note;
-	}
-	public void setNote(String note) {
-		this.note = note;
+	public void setVersion(String version) {
+		this.version = version;
 	}
 }

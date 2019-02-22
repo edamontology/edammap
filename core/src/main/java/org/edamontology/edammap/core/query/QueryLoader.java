@@ -147,7 +147,7 @@ public class QueryLoader {
 		return collection;
 	}
 
-	private static List<Link> linksJson(Stream<org.edamontology.edammap.core.input.json.Link> links, List<String> types, boolean throwException) {
+	private static List<Link> linksJson(Stream<? extends org.edamontology.edammap.core.input.json.Link> links, List<String> types, boolean throwException) {
 		return links
 			.filter(l -> types.contains(l.getType().trim()))
 			.filter(l -> !BIOTOOLS_LINKS_EXCLUDE.matcher(l.getUrl().trim()).matches())
@@ -504,7 +504,7 @@ public class QueryLoader {
 		}
 
 		return new Query(
-			tool.getId().trim(),
+			tool.getBiotoolsID().trim(),
 			tool.getName().trim(),
 			null,
 			tool.getDescription().trim(),

@@ -31,7 +31,9 @@ public class Function {
 
 	private List<InputOutput> output = new ArrayList<>();
 
-	private String comment;
+	private String note;
+
+	private String cmd;
 
 	public void check(ToolInput tool, int i, String index) throws ParseException {
 		if (operation == null || operation.isEmpty()) {
@@ -74,10 +76,17 @@ public class Function {
 		this.output = output;
 	}
 
-	public String getComment() {
-		return comment;
+	public String getNote() {
+		return note;
 	}
-	public void setComment(String comment) {
-		this.comment = comment;
+	public void setNote(String note) {
+		this.note = note;
+	}
+
+	public String getCmd() {
+		return cmd;
+	}
+	public void setCmd(String cmd) {
+		this.cmd = cmd;
 	}
 }

@@ -73,8 +73,8 @@ public final class Util {
 			.limit(n).forEach(e -> System.out.println(e.getTerm() + "\t" + e.getCount()));
 	}
 
-	private static void printIdf(String inputPath, String term) throws IOException {
-		System.out.println(new Idf(inputPath).getIdf(term));
+	private static void printIdf(String inputPath, String term, boolean stemming) throws IOException {
+		System.out.println(new Idf(inputPath).getIdf(new PreProcessor(stemming).process(term)));
 	}
 
 	private static void biotoolsFull(String outputPath, FetcherArgs fetcherArgs, boolean dev) throws IOException {
@@ -149,7 +149,10 @@ public final class Util {
 			printIdfTop(args.printIdfTop.get(0), Long.parseLong(args.printIdfTop.get(1)));
 		}
 		if (args.printIdf != null) {
-			printIdf(args.printIdf.get(0), args.printIdf.get(1));
+			printIdf(args.printIdf.get(0), args.printIdf.get(1), false);
+		}
+		if (args.printIdfStemmed != null) {
+			printIdf(args.printIdfStemmed.get(0), args.printIdfStemmed.get(1), true);
 		}
 
 		if (args.biotoolsFull != null) {
