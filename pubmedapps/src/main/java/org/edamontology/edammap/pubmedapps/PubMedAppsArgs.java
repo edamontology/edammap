@@ -53,6 +53,9 @@ public class PubMedAppsArgs extends BasicArgs {
 	@Parameter(names = { "-doc", "-doc-file" }, description = "TODO")
 	String doc = null;
 
+	@Parameter(names = { "-output", "-output-dir" }, description = "TODO")
+	String output = null;
+
 	@Parameter(names = { "--mesh-query" }, description = "TODO")
 	boolean meshQuery = false;
 

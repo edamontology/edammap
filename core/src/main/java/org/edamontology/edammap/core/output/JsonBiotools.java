@@ -17,16 +17,29 @@
  * along with EDAMmap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.edamontology.edammap.core.input.json;
+package org.edamontology.edammap.core.output;
 
-public class LinkVersion<T> extends Link<T> {
+import java.util.List;
 
-	private String version;
+import org.edamontology.edammap.core.input.json.Tool;
 
-	public String getVersion() {
-		return version;
+public class JsonBiotools {
+
+	private int count;
+
+	private List<Tool> list;
+
+	public int getCount() {
+		return count;
 	}
-	public void setVersion(String version) {
-		this.version = version;
+	public void setCount(int count) {
+		this.count = count;
+	}
+
+	public List<Tool> getList() {
+		return list;
+	}
+	public void setList(List<Tool> list) {
+		this.list = list;
 	}
 }

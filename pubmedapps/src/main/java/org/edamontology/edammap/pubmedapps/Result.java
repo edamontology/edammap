@@ -47,6 +47,8 @@ public class Result implements Comparable<Result> {
 
 	private List<String> title = new ArrayList<>();
 
+	private List<List<String>> toolTitleOthers = new ArrayList<>();
+
 	private List<String> toolTitleExtractedOriginal = new ArrayList<>();
 
 	private List<String> toolTitle = new ArrayList<>();
@@ -178,6 +180,13 @@ public class Result implements Comparable<Result> {
 	}
 	public void addToolTitle(String toolTitle) {
 		this.toolTitle.add(toolTitle);
+	}
+
+	public List<List<String>> getToolTitleOthers() {
+		return toolTitleOthers;
+	}
+	public void addToolTitleOthers(List<String> toolTitleOthers) {
+		this.toolTitleOthers.add(toolTitleOthers);
 	}
 
 	public List<String> getToolTitlePruned() {

@@ -19,25 +19,34 @@
 
 package org.edamontology.edammap.core.input.json;
 
+import java.text.ParseException;
+
 public class Publication {
 
-	private String pmcid;
+	private String doi;
 
 	private String pmid;
 
-	private String doi;
+	private String pmcid;
 
 	private String type;
 
 	private String version;
 
+	// TODO not in schema
 	private PublicationMetadata metadata;
 
-	public String getPmcid() {
-		return pmcid;
+	public void check(ToolInput tool, int i, String index) throws ParseException {
+		if ((doi == null || doi.equals("")) && (pmid == null || pmid.equals("")) && (pmcid == null || pmcid.equals(""))) {
+			tool.parseException("doi and pmid and pmcid", i, index);
+		}
 	}
-	public void setPmcid(String pmcid) {
-		this.pmcid = pmcid;
+
+	public String getDoi() {
+		return doi;
+	}
+	public void setDoi(String doi) {
+		this.doi = doi;
 	}
 
 	public String getPmid() {
@@ -47,11 +56,11 @@ public class Publication {
 		this.pmid = pmid;
 	}
 
-	public String getDoi() {
-		return doi;
+	public String getPmcid() {
+		return pmcid;
 	}
-	public void setDoi(String doi) {
-		this.doi = doi;
+	public void setPmcid(String pmcid) {
+		this.pmcid = pmcid;
 	}
 
 	public String getType() {

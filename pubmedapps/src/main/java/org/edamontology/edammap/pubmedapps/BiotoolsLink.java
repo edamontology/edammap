@@ -19,15 +19,15 @@
 
 package org.edamontology.edammap.pubmedapps;
 
-public class BiotoolsLink {
+public class BiotoolsLink<T> {
 
 	private final String url;
 
 	private final String urlTrimmed;
 
-	private final String type;
+	private final T type;
 
-	public BiotoolsLink(String url, String type) {
+	public BiotoolsLink(String url, T type) {
 		this.url = PubMedApps.prependHttp(url);
 		this.urlTrimmed = PubMedApps.trimUrl(url);
 		this.type = type;
@@ -41,7 +41,7 @@ public class BiotoolsLink {
 		return urlTrimmed;
 	}
 
-	public String getType() {
+	public T getType() {
 		return type;
 	}
 
@@ -49,7 +49,7 @@ public class BiotoolsLink {
 	public boolean equals(Object obj) {
 		if (this == obj) return true;
 		if (!(obj instanceof BiotoolsLink)) return false;
-		BiotoolsLink other = (BiotoolsLink) obj;
+		BiotoolsLink<?> other = (BiotoolsLink<?>) obj;
 		if (urlTrimmed == null) {
 			if (other.urlTrimmed != null) return false;
 		} else if (!urlTrimmed.equals(other.urlTrimmed)) return false;

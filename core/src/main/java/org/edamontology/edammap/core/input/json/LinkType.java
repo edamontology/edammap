@@ -19,17 +19,38 @@
 
 package org.edamontology.edammap.core.input.json;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public enum LinkType {
+	@JsonProperty("Browser")
 	BROWSER("Browser"),
+	@JsonProperty("Helpdesk")
 	HELPDESK("Helpdesk"),
+	@JsonProperty("Issue tracker")
 	ISSUE_TRACKER("Issue tracker"),
+	@JsonProperty("Mailing list")
 	MAILING_LIST("Mailing list"),
+	@JsonProperty("Mirror")
 	MIRROR("Mirror"),
+	@JsonProperty("Registry")
 	REGISTRY("Registry"),
+	@JsonProperty("Repository")
 	REPOSITORY("Repository"),
+	@JsonProperty("Social media")
 	SOCIAL_MEDIA("Social media"),
+	@JsonProperty("Scientific benchmark")
 	SCIENTIFIC_BENCHMARK("Scientific benchmark"),
-	TECHNICAL_MONITORING("Technical monitoring");
+	@JsonProperty("Technical monitoring")
+	TECHNICAL_MONITORING("Technical monitoring"),
+	// TODO hack https://github.com/bio-tools/biotoolsSchema/issues/129
+	@JsonProperty("Galaxy service")
+	GALAXY_SERVICE("Galaxy service"),
+	// TODO hack https://github.com/bio-tools/biotoolsSchema/issues/128
+	@JsonProperty("Other")
+	OTHER("Other"),
+	// TODO hack https://github.com/bio-tools/biotoolsSchema/issues/138
+	@JsonProperty("Discussion forum")
+	DISCUSSION_FORUM("Discussion forum");
 
 	private String type;
 

@@ -25,7 +25,6 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 
-// TODO
 public class PublicationMetadata {
 
 	private Map<String, Object> others = new LinkedHashMap<>();

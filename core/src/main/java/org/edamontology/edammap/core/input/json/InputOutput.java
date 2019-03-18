@@ -33,7 +33,7 @@ public class InputOutput {
 		if (data == null) {
 			tool.parseException("data", i, index);
 		} else {
-			data.check(tool, i, index);
+			data.check(tool, i, index + ", data");
 		}
 		if (format != null) {
 			for (int j = 0; j < format.size(); ++j) {

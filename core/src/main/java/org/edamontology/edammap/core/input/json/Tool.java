@@ -31,27 +31,27 @@ public class Tool {
 
 	protected String name;
 
-	protected List<Edam> topic = new ArrayList<>();
-
-	protected List<Function> function = new ArrayList<>();
+	protected String description;
 
 	protected String homepage;
 
-	protected String description;
+	protected List<Function> function = new ArrayList<>();
 
-	protected List<Link> link = new ArrayList<>();
+	protected List<Edam> topic = new ArrayList<>();
 
-	protected List<LinkVersion> download = new ArrayList<>();
-
-	protected List<Link> documentation = new ArrayList<>();
-
-	protected List<String> toolType = new ArrayList<>();
-
-	protected List<Publication> publication = new ArrayList<>();
+	protected List<String> language = new ArrayList<>();
 
 	protected String license;
 
-	protected List<String> language = new ArrayList<>();
+	protected List<Link<LinkType>> link = new ArrayList<>();
+
+	protected List<LinkVersion<DownloadType>> download = new ArrayList<>();
+
+	protected List<Link<DocumentationType>> documentation = new ArrayList<>();
+
+	protected List<Publication> publication = new ArrayList<>();
+
+	protected List<Credit> credit = new ArrayList<>();
 
 	protected Map<String, Object> others = new LinkedHashMap<>();
 
@@ -62,18 +62,11 @@ public class Tool {
 		this.name = name;
 	}
 
-	public List<Edam> getTopic() {
-		return topic;
+	public String getDescription() {
+		return description;
 	}
-	public void setTopic(List<Edam> topic) {
-		this.topic = topic;
-	}
-
-	public List<Function> getFunction() {
-		return function;
-	}
-	public void setFunction(List<Function> function) {
-		this.function = function;
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public String getHomepage() {
@@ -83,46 +76,25 @@ public class Tool {
 		this.homepage = homepage;
 	}
 
-	public String getDescription() {
-		return description;
+	public List<Function> getFunction() {
+		return function;
 	}
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public List<Link> getLink() {
-		return link;
-	}
-	public void setLink(List<Link> link) {
-		this.link = link;
+	public void setFunction(List<Function> function) {
+		this.function = function;
 	}
 
-	public List<LinkVersion> getDownload() {
-		return download;
+	public List<Edam> getTopic() {
+		return topic;
 	}
-	public void setDownload(List<LinkVersion> download) {
-		this.download = download;
-	}
-
-	public List<Link> getDocumentation() {
-		return documentation;
-	}
-	public void setDocumentation(List<Link> documentation) {
-		this.documentation = documentation;
+	public void setTopic(List<Edam> topic) {
+		this.topic = topic;
 	}
 
-	public List<String> getToolType() {
-		return toolType;
+	public List<String> getLanguage() {
+		return language;
 	}
-	public void setToolType(List<String> toolType) {
-		this.toolType = toolType;
-	}
-
-	public List<Publication> getPublication() {
-		return publication;
-	}
-	public void setPublication(List<Publication> publication) {
-		this.publication = publication;
+	public void setLanguage(List<String> language) {
+		this.language = language;
 	}
 
 	public String getLicense() {
@@ -132,11 +104,39 @@ public class Tool {
 		this.license = license;
 	}
 
-	public List<String> getLanguage() {
-		return language;
+	public List<Link<LinkType>> getLink() {
+		return link;
 	}
-	public void setLanguage(List<String> language) {
-		this.language = language;
+	public void setLink(List<Link<LinkType>> link) {
+		this.link = link;
+	}
+
+	public List<LinkVersion<DownloadType>> getDownload() {
+		return download;
+	}
+	public void setDownload(List<LinkVersion<DownloadType>> download) {
+		this.download = download;
+	}
+
+	public List<Link<DocumentationType>> getDocumentation() {
+		return documentation;
+	}
+	public void setDocumentation(List<Link<DocumentationType>> documentation) {
+		this.documentation = documentation;
+	}
+
+	public List<Publication> getPublication() {
+		return publication;
+	}
+	public void setPublication(List<Publication> publication) {
+		this.publication = publication;
+	}
+
+	public List<Credit> getCredit() {
+		return credit;
+	}
+	public void setCredit(List<Credit> credit) {
+		this.credit = credit;
 	}
 
 	@JsonAnyGetter

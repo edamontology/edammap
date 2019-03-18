@@ -21,6 +21,7 @@ package org.edamontology.edammap.core.output;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
@@ -46,6 +47,7 @@ import org.edamontology.edammap.core.benchmarking.Results;
 import org.edamontology.edammap.core.edam.Branch;
 import org.edamontology.edammap.core.edam.Concept;
 import org.edamontology.edammap.core.edam.EdamUri;
+import org.edamontology.edammap.core.input.json.Tool;
 import org.edamontology.edammap.core.mapping.ConceptMatch;
 import org.edamontology.edammap.core.mapping.ConceptMatchType;
 import org.edamontology.edammap.core.mapping.Match;
@@ -491,5 +493,15 @@ public class Json {
 		generator.writeEndObject();
 		generator.close();
 		return writer.toString();
+	}
+
+	public static void outputBiotools(List<Tool> tools, Writer writer) throws IOException {
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.enable(SerializationFeature.INDENT_OUTPUT);
+		mapper.enable(SerializationFeature.CLOSE_CLOSEABLE);
+		JsonBiotools jsonBiotools = new JsonBiotools();
+		jsonBiotools.setCount(tools.size());
+		jsonBiotools.setList(tools);
+		mapper.writeValue(writer, jsonBiotools);
 	}
 }

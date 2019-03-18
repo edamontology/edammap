@@ -37,7 +37,7 @@ public class Function {
 
 	public void check(ToolInput tool, int i, String index) throws ParseException {
 		if (operation == null || operation.isEmpty()) {
-			tool.parseException("operation", i, index);
+			// tool.parseException("operation", i, index); // TODO sometimes "operation" : [ ],
 		} else {
 			for (int j = 0; j < operation.size(); ++j) {
 				operation.get(j).check(tool, i, index + ", operation " + j);

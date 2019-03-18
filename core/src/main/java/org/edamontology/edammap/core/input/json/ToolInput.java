@@ -30,35 +30,37 @@ public class ToolInput extends Tool implements InputType {
 	@Override
 	public void check(int i) throws ParseException {
 		// We are not doing any thorough validation, just checking that the required attributes are present
+		// TODO add length (accounting for potential whitespace collapse) and regex validations, possibly in a separate class/package
 		if (biotoolsID == null || biotoolsID.equals("")) {
 			parseException("biotoolsID", i);
 		}
 		if (name == null || name.equals("")) {
 			parseException("name", i);
 		}
-		if (topic == null || topic.isEmpty()) {
-			//parseException("topic", i); // TODO
-		} else {
-			for (int j = 0; j < topic.size(); ++j) {
-				topic.get(j).check(this, i, i + ", topic " + j);
-			}
-		}
-		if (function == null || function.isEmpty()) {
-			//parseException("function", i); // TODO
-		} else {
-			for (int j = 0; j < function.size(); ++j) {
-				//function.get(j).check(this, i, i + ", function " + j); // TODO
-			}
+		if (description == null || description.equals("")) {
+			parseException("description", i);
 		}
 		if (homepage == null || homepage.equals("")) {
 			parseException("homepage", i);
 		}
-		if (description == null || description.equals("")) {
-			parseException("description", i);
+		if (function != null) {
+			for (int j = 0; j < function.size(); ++j) {
+				function.get(j).check(this, i, i + ", function " + j);
+			}
+		}
+		if (topic != null) {
+			for (int j = 0; j < topic.size(); ++j) {
+				topic.get(j).check(this, i, i + ", topic " + j);
+			}
 		}
 		if (link != null) {
 			for (int j = 0; j < link.size(); ++j) {
 				link.get(j).check(this, i, i + ", link " + j);
+			}
+		}
+		if (download != null) {
+			for (int j = 0; j < download.size(); ++j) {
+				download.get(j).check(this, i, i + ", download " + j);
 			}
 		}
 		if (documentation != null) {
@@ -66,18 +68,15 @@ public class ToolInput extends Tool implements InputType {
 				documentation.get(j).check(this, i, i + ", documentation " + j);
 			}
 		}
-		if (toolType == null || toolType.isEmpty()) {
-			//parseException("toolType", i); // TODO
-		} else {
-			for (int j = 0; j < toolType.size(); ++j) {
-				if (toolType.get(j) == null || toolType.get(j).equals("")) {
-					throw new ParseException("A \"toolType\" is null or empty for " + biotoolsID + "! (record " + i + ", toolType " + j + ")", i);
-				}
+		if (publication != null) {
+			for (int j = 0; j < publication.size(); ++j) {
+				publication.get(j).check(this, i, i + ", publication " + j);
 			}
 		}
-		// We are not checking publication.isEmpty(), as currently `"publication" : [ ]` is valid // TODO
-		if (publication == null) {
-			throw new ParseException("Attribute \"publication\" missing for " + biotoolsID + "! (record " + i + ")", i);
+		if (credit != null) {
+			for (int j = 0; j < credit.size(); ++j) {
+				credit.get(j).check(this, i, i + ", credit " + j);
+			}
 		}
 	}
 

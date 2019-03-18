@@ -147,11 +147,11 @@ public class QueryLoader {
 		return collection;
 	}
 
-	private static List<Link> linksJson(Stream<? extends org.edamontology.edammap.core.input.json.Link> links, List<String> types, boolean throwException) {
+	private static List<Link> linksJson(Stream<? extends org.edamontology.edammap.core.input.json.Link<?>> links, List<String> types, boolean throwException) {
 		return links
-			.filter(l -> types.contains(l.getType().trim()))
+			.filter(l -> types.contains(l.getType().toString()))
 			.filter(l -> !BIOTOOLS_LINKS_EXCLUDE.matcher(l.getUrl().trim()).matches())
-			.map(l -> link(l.getUrl(), l.getType().trim(), throwException))
+			.map(l -> link(l.getUrl(), l.getType().toString(), throwException))
 			.filter(Objects::nonNull)
 			.collect(Collectors.toList());
 	}
@@ -459,7 +459,9 @@ public class QueryLoader {
 				LinkType.MIRROR.toString(),
 				LinkType.REPOSITORY.toString(),
 				LinkType.BROWSER.toString(),
-				LinkType.REGISTRY.toString()
+				LinkType.REGISTRY.toString(),
+				LinkType.GALAXY_SERVICE.toString(),
+				LinkType.OTHER.toString()
 			), false));
 		webpageUrls.addAll(linksJson(tool.getLink().stream(), Arrays.asList(
 				DownloadType.API_SPECIFICATION.toString(),
@@ -467,7 +469,9 @@ public class QueryLoader {
 				DownloadType.COMMAND_LINE_SPECIFICATION.toString(),
 				DownloadType.CWL_FILE.toString(),
 				DownloadType.SOURCE_CODE.toString(),
-				DownloadType.TEST_SCRIPT.toString()
+				DownloadType.TEST_SCRIPT.toString(),
+				DownloadType.DOWNLOADS_PAGE.toString(),
+				DownloadType.OTHER.toString()
 			), false));
 
 		List<Link> docUrls = linksJson(tool.getDocumentation().stream(), Arrays.asList(
@@ -477,7 +481,9 @@ public class QueryLoader {
 				DocumentationType.TRAINING_MATERIAL.toString(),
 				DocumentationType.TUTORIAL.toString(),
 				DocumentationType.INSTALLATION_INSTRUCTIONS.toString(),
-				DocumentationType.OTHER.toString()
+				DocumentationType.OTHER.toString(),
+				DocumentationType.FAQ.toString(),
+				DocumentationType.COMMAND_LINE_OPTIONS.toString()
 			), false);
 
 		List<PublicationIdsQuery> publicationIds = new ArrayList<>();

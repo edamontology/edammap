@@ -19,14 +19,32 @@
 
 package org.edamontology.edammap.core.input.json;
 
-public class LinkVersion<T> extends Link<T> {
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-	private String version;
+public enum RoleType {
+	@JsonProperty("Primary contact")
+	PRIMARY_CONTACT("Primary contact"),
+	@JsonProperty("Contributor")
+	CONTRIBUTOR("Contributor"),
+	@JsonProperty("Developer")
+	DEVELOPER("Developer"),
+	@JsonProperty("Documentor")
+	DOCUMENTOR("Documentor"),
+	@JsonProperty("Maintainer")
+	MAINTAINER("Maintainer"),
+	@JsonProperty("Provider")
+	PROVIDER("Provider"),
+	@JsonProperty("Support")
+	SUPPORT("Support");
 
-	public String getVersion() {
-		return version;
+	private String type;
+
+	private RoleType(String type) {
+		this.type = type;
 	}
-	public void setVersion(String version) {
-		this.version = version;
+
+	@Override
+	public String toString() {
+		return type;
 	}
 }

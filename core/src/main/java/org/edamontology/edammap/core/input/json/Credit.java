@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017 Erik Jaaniso
+ * Copyright © 2019 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -20,19 +20,42 @@
 package org.edamontology.edammap.core.input.json;
 
 import java.text.ParseException;
+import java.util.List;
 
-public class Link<T> {
+public class Credit {
+
+	private String name;
+
+	private String email;
 
 	private String url;
 
-	private T type;
+	private String orcidid;
+
+	private EntityType typeEntity;
+
+	private List<RoleType> typeRole;
 
 	private String note;
 
 	public void check(ToolInput tool, int i, String index) throws ParseException {
-		if (url == null || url.equals("")) {
-			tool.parseException("url", i, index);
+		if ((name == null || name.equals("")) && (email == null || email.equals("")) && (url == null || url.equals(""))) {
+			tool.parseException("name and email and url", i, index);
 		}
+	}
+
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public String getUrl() {
@@ -42,11 +65,25 @@ public class Link<T> {
 		this.url = url;
 	}
 
-	public T getType() {
-		return type;
+	public String getOrcidid() {
+		return orcidid;
 	}
-	public void setType(T type) {
-		this.type = type;
+	public void setOrcidid(String orcidid) {
+		this.orcidid = orcidid;
+	}
+
+	public EntityType getTypeEntity() {
+		return typeEntity;
+	}
+	public void setTypeEntity(EntityType typeEntity) {
+		this.typeEntity = typeEntity;
+	}
+
+	public List<RoleType> getTypeRole() {
+		return typeRole;
+	}
+	public void setTypeRole(List<RoleType> typeRole) {
+		this.typeRole = typeRole;
 	}
 
 	public String getNote() {

@@ -24,6 +24,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.edamontology.edammap.core.input.json.DocumentationType;
+import org.edamontology.edammap.core.input.json.DownloadType;
+import org.edamontology.edammap.core.input.json.LinkType;
 import org.edamontology.pubfetcher.core.db.publication.PublicationIds;
 
 public class Suggestion implements Comparable<Suggestion> {
@@ -40,6 +43,8 @@ public class Suggestion implements Comparable<Suggestion> {
 
 	private Double[] score2Parts = { 0d, 0d, 0d, 0d };
 
+	private String original = "";
+
 	private String extracted = "";
 
 	private String processed = "";
@@ -48,15 +53,15 @@ public class Suggestion implements Comparable<Suggestion> {
 
 	private List<Integer> nameExistingSomePublicationDifferent = null;
 
-	private List<List<PublicationIds>> nameExistingSomePublicationDifferentPublicationIds = null;
+	private List<Set<PublicationIds>> nameExistingSomePublicationDifferentPublicationIds = null;
 
 	private List<Integer> somePublicationExistingNameDifferent = null;
 
-	private List<List<PublicationIds>> somePublicationExistingNameDifferentPublicationIds = null;
+	private List<Set<PublicationIds>> somePublicationExistingNameDifferentPublicationIds = null;
 
 	private List<Integer> nameExistingPublicationDifferent = null;
 
-	private List<List<PublicationIds>> nameExistingPublicationDifferentPublicationIds = null;
+	private List<Set<PublicationIds>> nameExistingPublicationDifferentPublicationIds = null;
 
 	private List<String> linksAbstract = new ArrayList<>();
 
@@ -68,13 +73,13 @@ public class Suggestion implements Comparable<Suggestion> {
 
 	private boolean homepageMissing = false;
 
-	private Set<BiotoolsLink> linkLinks = new LinkedHashSet<>();
+	private Set<BiotoolsLink<LinkType>> linkLinks = new LinkedHashSet<>();
 
-	private Set<BiotoolsLink> downloadLinks = new LinkedHashSet<>();
+	private Set<BiotoolsLink<DownloadType>> downloadLinks = new LinkedHashSet<>();
 
-	private Set<BiotoolsLink> documentationLinks = new LinkedHashSet<>();
+	private Set<BiotoolsLink<DocumentationType>> documentationLinks = new LinkedHashSet<>();
 
-	private Set<BiotoolsLink> brokenLinks = new LinkedHashSet<>();
+	private Set<BiotoolsLink<?>> brokenLinks = new LinkedHashSet<>();
 
 	private boolean fromAbstractLink = false;
 
@@ -108,6 +113,13 @@ public class Suggestion implements Comparable<Suggestion> {
 		return score2Parts;
 	}
 
+	public String getOriginal() {
+		return original;
+	}
+	public void setOriginal(String original) {
+		this.original = original;
+	}
+
 	public String getExtracted() {
 		return extracted;
 	}
@@ -136,10 +148,10 @@ public class Suggestion implements Comparable<Suggestion> {
 		this.nameExistingSomePublicationDifferent = nameExistingSomePublicationDifferent;
 	}
 
-	public List<List<PublicationIds>> getNameExistingSomePublicationDifferentPublicationIds() {
+	public List<Set<PublicationIds>> getNameExistingSomePublicationDifferentPublicationIds() {
 		return nameExistingSomePublicationDifferentPublicationIds;
 	}
-	public void setNameExistingSomePublicationDifferentPublicationIds(List<List<PublicationIds>> nameExistingSomePublicationDifferentPublicationIds) {
+	public void setNameExistingSomePublicationDifferentPublicationIds(List<Set<PublicationIds>> nameExistingSomePublicationDifferentPublicationIds) {
 		this.nameExistingSomePublicationDifferentPublicationIds = nameExistingSomePublicationDifferentPublicationIds;
 	}
 
@@ -150,10 +162,10 @@ public class Suggestion implements Comparable<Suggestion> {
 		this.somePublicationExistingNameDifferent = somePublicationExistingNameDifferent;
 	}
 
-	public List<List<PublicationIds>> getSomePublicationExistingNameDifferentPublicationIds() {
+	public List<Set<PublicationIds>> getSomePublicationExistingNameDifferentPublicationIds() {
 		return somePublicationExistingNameDifferentPublicationIds;
 	}
-	public void setSomePublicationExistingNameDifferentPublicationIds(List<List<PublicationIds>> somePublicationExistingNameDifferentPublicationIds) {
+	public void setSomePublicationExistingNameDifferentPublicationIds(List<Set<PublicationIds>> somePublicationExistingNameDifferentPublicationIds) {
 		this.somePublicationExistingNameDifferentPublicationIds = somePublicationExistingNameDifferentPublicationIds;
 	}
 
@@ -164,10 +176,10 @@ public class Suggestion implements Comparable<Suggestion> {
 		this.nameExistingPublicationDifferent = nameExistingPublicationDifferent;
 	}
 
-	public List<List<PublicationIds>> getNameExistingPublicationDifferentPublicationIds() {
+	public List<Set<PublicationIds>> getNameExistingPublicationDifferentPublicationIds() {
 		return nameExistingPublicationDifferentPublicationIds;
 	}
-	public void setNameExistingPublicationDifferentPublicationIds(List<List<PublicationIds>> nameExistingPublicationDifferentPublicationIds) {
+	public void setNameExistingPublicationDifferentPublicationIds(List<Set<PublicationIds>> nameExistingPublicationDifferentPublicationIds) {
 		this.nameExistingPublicationDifferentPublicationIds = nameExistingPublicationDifferentPublicationIds;
 	}
 
@@ -218,24 +230,24 @@ public class Suggestion implements Comparable<Suggestion> {
 		this.homepageMissing = homepageMissing;
 	}
 
-	public Set<BiotoolsLink> getLinkLinks() {
+	public Set<BiotoolsLink<LinkType>> getLinkLinks() {
 		return linkLinks;
 	}
-	public void addLinkLinks(List<BiotoolsLink> linkLinks) {
+	public void addLinkLinks(List<BiotoolsLink<LinkType>> linkLinks) {
 		this.linkLinks.addAll(linkLinks);
 	}
 
-	public Set<BiotoolsLink> getDownloadLinks() {
+	public Set<BiotoolsLink<DownloadType>> getDownloadLinks() {
 		return downloadLinks;
 	}
-	public void addDownloadLinks(List<BiotoolsLink> downloadLinks) {
+	public void addDownloadLinks(List<BiotoolsLink<DownloadType>> downloadLinks) {
 		this.downloadLinks.addAll(downloadLinks);
 	}
 
-	public Set<BiotoolsLink> getDocumentationLinks() {
+	public Set<BiotoolsLink<DocumentationType>> getDocumentationLinks() {
 		return documentationLinks;
 	}
-	public void addDocumentationLinks(List<BiotoolsLink> documentationLinks) {
+	public void addDocumentationLinks(List<BiotoolsLink<DocumentationType>> documentationLinks) {
 		this.documentationLinks.addAll(documentationLinks);
 	}
 
@@ -246,7 +258,7 @@ public class Suggestion implements Comparable<Suggestion> {
 		documentationLinks.removeIf(l -> l.getUrlTrimmed().equals(homepageTrimmed));
 	}
 
-	public Set<BiotoolsLink> getBrokenLinks() {
+	public Set<BiotoolsLink<?>> getBrokenLinks() {
 		return brokenLinks;
 	}
 

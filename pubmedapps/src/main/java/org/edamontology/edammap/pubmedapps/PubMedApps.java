@@ -22,6 +22,7 @@ package org.edamontology.edammap.pubmedapps;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -30,6 +31,7 @@ import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.Normalizer;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -70,10 +72,14 @@ import org.edamontology.pubfetcher.core.fetching.Fetcher;
 import org.edamontology.pubfetcher.core.scrape.Scrape;
 import org.edamontology.edammap.core.idf.Idf;
 import org.edamontology.edammap.core.input.Json;
+import org.edamontology.edammap.core.input.json.Credit;
 import org.edamontology.edammap.core.input.json.DocumentationType;
 import org.edamontology.edammap.core.input.json.DownloadType;
+import org.edamontology.edammap.core.input.json.EntityType;
 import org.edamontology.edammap.core.input.json.Link;
 import org.edamontology.edammap.core.input.json.LinkType;
+import org.edamontology.edammap.core.input.json.LinkVersion;
+import org.edamontology.edammap.core.input.json.Tool;
 import org.edamontology.edammap.core.input.json.ToolInput;
 import org.edamontology.edammap.core.preprocessing.PreProcessor;
 import org.edamontology.edammap.core.preprocessing.PreProcessorArgs;
@@ -101,6 +107,7 @@ public final class PubMedApps {
 	private static final Pattern TOOL_TITLE_SEPARATOR_ALL = Pattern.compile("(?i)(,? (and|&) )|(, )");
 	private static final int TOOL_TITLE_SEPARATOR_MAX_WORDS = 5;
 	private static final int TOOL_TITLE_STANDALONE_MAX_CHARS = 18;
+	private static final Pattern TOOL_TITLE_NOT_ALPHANUM = Pattern.compile("[^\\p{L}\\p{N}]");
 
 	private static final Pattern ACRONYM_STOP = Pattern.compile("(?i)(http:|https:|ftp:|;|, |: )");
 
@@ -181,6 +188,7 @@ public final class PubMedApps {
 	private static final Pattern DOWNLOAD_API = Pattern.compile("(?i)\\.(wsdl)([^\\p{L}-]|$)");
 	private static final Pattern DOWNLOAD_CONTAINER = Pattern.compile("(?i)(^|[^\\p{L}-])(docker)([^\\p{L}-]|$)");
 	private static final Pattern DOWNLOAD_CWL = Pattern.compile("(?i)\\.(cwl)([^\\p{L}-]|$)");
+	private static final Pattern DOWNLOAD_PAGE = Pattern.compile("(?i)(^|[^\\p{Ll}])download(s|ing)?([^\\p{Ll}]|$)");
 
 	private static final Pattern DOCUMENTATION_API = Pattern.compile("(?i)(^|[^\\p{L}-])(api|apidoc)s?([^\\p{L}-]|$)");
 	private static final String DOCUMENTATION_CITE_EITHER = "citing";
@@ -203,7 +211,6 @@ public final class PubMedApps {
 
 	private static final Pattern SCHEMA_START = Pattern.compile("^[a-zA-Z][a-zA-Z0-9+.-]*://");
 	private static final Pattern KNOWN_SCHEMA_START = Pattern.compile("(?i)^(http|https|ftp)://");
-	private static final Pattern FTP_START = Pattern.compile("(?i)^ftp://");
 
 	private static final Pattern FIND_NAME_NOT_ALPHANUM = Pattern.compile("[^\\p{L}\\p{N}]");
 	private static final Pattern FIND_NAME_CAMEL = Pattern.compile("(\\p{Ll})(\\p{Lu})");
@@ -243,30 +250,32 @@ public final class PubMedApps {
 	private static final double IDF_POWER = 5;
 	private static final double IDF_MULTIPLIER = 500;
 
+	// TODO move BIOTOOLS_SCHEMA stuff to org.edamontology.edammap.core.input.json
 	private static final int BIOTOOLS_SCHEMA_NAME_MIN = 1;
 	private static final int BIOTOOLS_SCHEMA_NAME_MAX = 100;
 	private static final String BIOTOOLS_SCHEMA_NAME_CHARS = " A-Za-z0-9+.,\\-_:;()";
 	private static final Pattern BIOTOOLS_SCHEMA_NAME_PATTERN = Pattern.compile("^[" + BIOTOOLS_SCHEMA_NAME_CHARS + "]*$");
 	private static final Pattern BIOTOOLS_SCHEMA_NAME_INVALID_CHAR = Pattern.compile("[^" + BIOTOOLS_SCHEMA_NAME_CHARS + "]");
-	private static final Pattern BIOTOOLS_SCHEMA_NAME_CHAR_HYPHEN = Pattern.compile("\\u2010");
-	// From EDAMmap
-	// TODO Add ' and ", replace with " " only if before and after is alphanum
-	//private final String APOSTROPHE_CODES = "\\u0060\\u00B4\\u2018\\u2019\\u02BC\\u201B\\u0091\\u0092";
-	//private final String QUOTATION_CODES = "\\u00AB\\u00BB\\u201A\\u201C\\u201D\\u201E\\u201F\\u2039\\u203A\\u2E42";
-	private static final Pattern BIOTOOLS_SCHEMA_NAME_CHAR_APOSTROPHE = Pattern.compile("'");
-	private static final Pattern BIOTOOLS_SCHEMA_NAME_CHAR_AND = Pattern.compile("&");
-	private static final Pattern BIOTOOLS_SCHEMA_NAME_CHAR_TWO = Pattern.compile("²");
-	private static final Pattern BIOTOOLS_SCHEMA_NAME_CHAR_AT = Pattern.compile("@");
-	private static final Pattern BIOTOOLS_SCHEMA_NAME_CHAR_E = Pattern.compile("[éè]");
-	private static final Pattern BIOTOOLS_SCHEMA_NAME_CHAR_ALPHA = Pattern.compile("α");
-	private static final Pattern BIOTOOLS_SCHEMA_NAME_CHAR_BETA = Pattern.compile("β");
-	private static final Pattern BIOTOOLS_SCHEMA_NAME_CHAR_MICRO = Pattern.compile("[μµ]");
+	private static final String[][] BIOTOOLS_SCHEMA_NAME_REPLACEMENTS = {
+			{ "\u2010", "-" },
+			{ "&", " and " },
+			{ "@", "a" },
+			{ "α", "a" }, { "β", "b" }, { "μ", "u" }, { "µ", "u" },
+			{ "²", "2" }
+	};
+	private static final Pattern BIOTOOLS_SCHEMA_NAME_APOSTROPHE_QUOTATION_SPACE = Pattern.compile("([\\p{L}\\p{N}])['\"\\u0060\\u00B4\\u2018\\u2019\\u02BC\\u201B\\u0091\\u0092\\u00AB\\u00BB\\u201A\\u201C\\u201D\\u201E\\u201F\\u2039\\u203A\\u2E42]+([\\p{L}\\p{N}])");
 	private static final int BIOTOOLS_SCHEMA_DESCRIPTION_MIN = 10;
 	private static final int BIOTOOLS_SCHEMA_DESCRIPTION_MAX = 1000;
+	// TODO unescaped dot metacharacter https://github.com/bio-tools/biotoolsSchema/issues/124
 	private static final Pattern BIOTOOLS_SCHEMA_URL_PATTERN = Pattern.compile("^https?://[^\\s/$.?#].[^\\s]*$");
 	private static final Pattern BIOTOOLS_SCHEMA_URLFTP_PATTERN = Pattern.compile("^(https?|s?ftp)://[^\\s/$.?#].[^\\s]*$");
+	private static final Pattern BIOTOOLS_SCHEMA_PMID_PATTERN = Pattern.compile("^[1-9][0-9]{0,8}$");
+	private static final Pattern BIOTOOLS_SCHEMA_PMCID_PATTERN = Pattern.compile("^(PMC)[1-9][0-9]{0,8}$");
+	// TODO too restrictive https://github.com/bio-tools/biotoolsSchema/issues/8
+	private static final Pattern BIOTOOLS_SCHEMA_DOI_PATTERN = Pattern.compile("^10.[0-9]{4,9}[A-Za-z0-9:;)(_/.-]+$");
 	private static final int BIOTOOLS_SCHEMA_CREDIT_NAME_MIN = 1;
 	private static final int BIOTOOLS_SCHEMA_CREDIT_NAME_MAX = 100;
+	// TODO too restrictive (last character can be 'X')
 	private static final Pattern BIOTOOLS_SCHEMA_CREDIT_ORCIDID_PATTERN = Pattern.compile("^https?://orcid.org/[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}$");
 	private static final Pattern BIOTOOLS_SCHEMA_CREDIT_EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9_]+([-+.'][A-Za-z0-9_]+)*@[A-Za-z0-9_]+([-.][A-Za-z0-9_]+)*\\.[A-Za-z0-9_]+([-.][A-Za-z0-9_]+)*$");
 
@@ -275,6 +284,12 @@ public final class PubMedApps {
 	private static final int BIOTOOLS_DESCRIPTION_LONG_LENGTH = 160;
 	private static final int BIOTOOLS_DESCRIPTION_MINMIN_LENGTH = 24;
 	private static final int BIOTOOLS_DESCRIPTION_MESSAGE_MAX_LENGTH = 500;
+
+	private static final Pattern WHITESPACE = Pattern.compile("[\\p{Z}\\p{Cc}\\p{Cf}]+");
+	private static final Pattern PUNCTUATION_NUMBERS = Pattern.compile("[\\p{P}\\p{S}\\p{N}]+");
+	private static final Pattern NAME_SEPARATOR = Pattern.compile("[ \\u002D\\u2010]+");
+	private static final Pattern PERIOD = Pattern.compile("[.]");
+	private static final Pattern UPPERCASE = Pattern.compile("^\\{Lu}+$");
 
 	static String prependHttp(String url) {
 		if (!SCHEMA_START.matcher(url).find()) {
@@ -977,87 +992,98 @@ public final class PubMedApps {
 		return links;
 	}
 
-	private static BiotoolsLink getDocumentationLink(String link) {
+	private static BiotoolsLink<DocumentationType> getDocumentationLink(String link) {
 		if (DOCUMENTATION_API.matcher(link).find()) {
-			return new BiotoolsLink(link, DocumentationType.API_DOCUMENTATION.toString());
+			return new BiotoolsLink<DocumentationType>(link, DocumentationType.API_DOCUMENTATION);
 		} else if (DOCUMENTATION_TRAINING.matcher(link).find()) {
-			return new BiotoolsLink(link, DocumentationType.TRAINING_MATERIAL.toString());
+			return new BiotoolsLink<DocumentationType>(link, DocumentationType.TRAINING_MATERIAL);
 		} else if (DOCUMENTATION_TUTORIAL.matcher(link).find()) {
-			return new BiotoolsLink(link, DocumentationType.TUTORIAL.toString());
+			return new BiotoolsLink<DocumentationType>(link, DocumentationType.TUTORIAL);
 		} else if (DOCUMENTATION_INSTALL.matcher(link).find()) {
-			return new BiotoolsLink(link, DocumentationType.INSTALLATION_INSTRUCTIONS.toString());
+			return new BiotoolsLink<DocumentationType>(link, DocumentationType.INSTALLATION_INSTRUCTIONS);
 		} else if (DOCUMENTATION.matcher(link).find()) {
-			return new BiotoolsLink(link, DocumentationType.MANUAL.toString());
+			return new BiotoolsLink<DocumentationType>(link, DocumentationType.MANUAL);
 		} else if (DOCUMENTATION_GENERAL.matcher(link).find()) {
-			return new BiotoolsLink(link, DocumentationType.GENERAL.toString());
+			return new BiotoolsLink<DocumentationType>(link, DocumentationType.GENERAL);
 		} else if (DOCUMENTATION_CITE.matcher(link).find()) {
-			return new BiotoolsLink(link, DocumentationType.CITATION_INSTRUCTIONS.toString());
+			return new BiotoolsLink<DocumentationType>(link, DocumentationType.CITATION_INSTRUCTIONS);
 		} else if (DOCUMENTATION_TERMS.matcher(link).find()) {
-			return new BiotoolsLink(link, DocumentationType.TERMS_OF_USE.toString());
+			return new BiotoolsLink<DocumentationType>(link, DocumentationType.TERMS_OF_USE);
 		} else if (DOCUMENTATION_WIKI.matcher(link).find()) {
-			return new BiotoolsLink(link, DocumentationType.MANUAL.toString());
+			return new BiotoolsLink<DocumentationType>(link, DocumentationType.MANUAL);
 		} else {
 			return null;
 		}
 	}
 
-	private static void makeBiotoolsLinks(List<String> links, List<BiotoolsLink> linkLinks, List<BiotoolsLink> downloadLinks, List<BiotoolsLink> documentationLinks) {
+	private static void makeBiotoolsLinks(List<String> links, List<BiotoolsLink<LinkType>> linkLinks, List<BiotoolsLink<DownloadType>> downloadLinks, List<BiotoolsLink<DocumentationType>> documentationLinks) {
 		for (String link : links) {
-			BiotoolsLink documentationLink = null;
+			BiotoolsLink<DocumentationType> documentationLink = null;
 			if (LINK_REGISTRY.matcher(link).find()) {
-				linkLinks.add(new BiotoolsLink(link, LinkType.REGISTRY.toString()));
+				linkLinks.add(new BiotoolsLink<LinkType>(link, LinkType.REGISTRY));
 			} else if (DOCUMENTATION_EXT.matcher(link).find()) {
 				documentationLink = getDocumentationLink(link);
 				if (documentationLink != null) {
 					documentationLinks.add(documentationLink);
 				} else {
-					documentationLinks.add(new BiotoolsLink(link, DocumentationType.MANUAL.toString()));
+					documentationLinks.add(new BiotoolsLink<DocumentationType>(link, DocumentationType.MANUAL));
 				}
 			} else if (DOWNLOAD_EXT.matcher(link).find()) {
-				downloadLinks.add(new BiotoolsLink(link, DownloadType.BINARY_PACKAGE.toString()));
+				downloadLinks.add(new BiotoolsLink<DownloadType>(link, DownloadType.BINARY_PACKAGE));
 			} else if (DOWNLOAD_API.matcher(link).find()) {
-				downloadLinks.add(new BiotoolsLink(link, DownloadType.API_SPECIFICATION.toString()));
+				downloadLinks.add(new BiotoolsLink<DownloadType>(link, DownloadType.API_SPECIFICATION));
 			} else if (DOWNLOAD_CWL.matcher(link).find()) {
-				downloadLinks.add(new BiotoolsLink(link, DownloadType.CWL_FILE.toString()));
+				downloadLinks.add(new BiotoolsLink<DownloadType>(link, DownloadType.CWL_FILE));
 			} else if (DOWNLOAD_CONTAINER.matcher(link).find()) {
-				downloadLinks.add(new BiotoolsLink(link, DownloadType.CONTAINER_FILE.toString()));
+				downloadLinks.add(new BiotoolsLink<DownloadType>(link, DownloadType.CONTAINER_FILE));
 			} else if (DOWNLOAD_FTP.matcher(link).find()) {
-				downloadLinks.add(new BiotoolsLink(link, DownloadType.BINARIES.toString()));
+				downloadLinks.add(new BiotoolsLink<DownloadType>(link, DownloadType.BINARIES));
 			} else if (DOWNLOAD_SRC_PKG.matcher(link).find()) {
-				downloadLinks.add(new BiotoolsLink(link, DownloadType.SOURCE_PACKAGE.toString()));
+				downloadLinks.add(new BiotoolsLink<DownloadType>(link, DownloadType.SOURCE_PACKAGE));
 			} else if (DOWNLOAD_SRC_CODE.matcher(link).find()) {
-				downloadLinks.add(new BiotoolsLink(link, DownloadType.SOURCE_CODE.toString()));
+				downloadLinks.add(new BiotoolsLink<DownloadType>(link, DownloadType.SOURCE_CODE));
 			} else if ((documentationLink = getDocumentationLink(link)) != null) {
 				documentationLinks.add(documentationLink);
 			} else if (LINK_ISSUES.matcher(link).find()) {
-				linkLinks.add(new BiotoolsLink(link, LinkType.ISSUE_TRACKER.toString()));
+				linkLinks.add(new BiotoolsLink<LinkType>(link, LinkType.ISSUE_TRACKER));
 			} else if (LINK_LIST_ADDR.matcher(link).find()) {
-				linkLinks.add(new BiotoolsLink(link, LinkType.MAILING_LIST.toString()));
+				linkLinks.add(new BiotoolsLink<LinkType>(link, LinkType.MAILING_LIST));
 			} else if (LINK_REPOSITORY.matcher(link).find()) {
-				linkLinks.add(new BiotoolsLink(link, LinkType.REPOSITORY.toString()));
+				linkLinks.add(new BiotoolsLink<LinkType>(link, LinkType.REPOSITORY));
 			} else if (LINK_LIST_BOTH.matcher(link).find()) {
-				linkLinks.add(new BiotoolsLink(link, LinkType.MAILING_LIST.toString()));
+				linkLinks.add(new BiotoolsLink<LinkType>(link, LinkType.MAILING_LIST));
 			} else if (LINK_HELPDESK.matcher(link).find()) {
-				linkLinks.add(new BiotoolsLink(link, LinkType.HELPDESK.toString()));
+				linkLinks.add(new BiotoolsLink<LinkType>(link, LinkType.HELPDESK));
 			} else if (LINK_SOCIAL.matcher(link).find()) {
-				linkLinks.add(new BiotoolsLink(link, LinkType.SOCIAL_MEDIA.toString()));
+				linkLinks.add(new BiotoolsLink<LinkType>(link, LinkType.SOCIAL_MEDIA));
+			} else if (DOWNLOAD_PAGE.matcher(link).find()) {
+				downloadLinks.add(new BiotoolsLink<DownloadType>(link, DownloadType.DOWNLOADS_PAGE));
 			} else {
-				linkLinks.add(new BiotoolsLink(link, LinkType.MIRROR.toString()));
+				linkLinks.add(new BiotoolsLink<LinkType>(link, LinkType.OTHER));
 			}
 		}
 	}
 
-	private static void removeBroken(List<BiotoolsLink> links, Set<BiotoolsLink> broken, Database db, boolean doc) {
-		for (Iterator<BiotoolsLink> it = links.iterator(); it.hasNext(); ) {
-			BiotoolsLink link = it.next();
+	private static <T> void removeBroken(List<BiotoolsLink<T>> links, Set<BiotoolsLink<?>> broken, Database db, boolean doc, String name) {
+		for (Iterator<BiotoolsLink<T>> it = links.iterator(); it.hasNext(); ) {
+			BiotoolsLink<T> link = it.next();
+			boolean removed = false;
 			if (!doc) {
 				if (db.getWebpage(link.getUrl()) == null || db.getWebpage(link.getUrl()).isBroken()) {
 					broken.add(link);
 					it.remove();
+					removed = true;
 				}
 			} else {
 				if (db.getDoc(link.getUrl()) == null || db.getDoc(link.getUrl()).isBroken()) {
 					broken.add(link);
+					it.remove();
+					removed = true;
+				}
+			}
+			if (!removed) {
+				if (!BIOTOOLS_SCHEMA_URLFTP_PATTERN.matcher(link.getUrl()).matches()) {
+					logger.warn("Discarded invalid link url '{}' (for name '{}')", link.getUrl(), name);
 					it.remove();
 				}
 			}
@@ -1074,36 +1100,36 @@ public final class PubMedApps {
 		return true;
 	}
 
-	private static String chooseHomepage(List<String> links, List<BiotoolsLink> linkLinks, List<BiotoolsLink> documentationLinks, Database db) {
-		for (Iterator<BiotoolsLink> it =  linkLinks.iterator(); it.hasNext(); ) {
-			BiotoolsLink linkLink = it.next();
-			if (linkLink.getType() == LinkType.MIRROR.toString() && !FTP_START.matcher(linkLink.getUrl()).find()) {
+	private static String chooseHomepage(List<String> links, List<BiotoolsLink<LinkType>> linkLinks, List<BiotoolsLink<DocumentationType>> documentationLinks, Database db) {
+		for (Iterator<BiotoolsLink<LinkType>> it =  linkLinks.iterator(); it.hasNext(); ) {
+			BiotoolsLink<LinkType> linkLink = it.next();
+			if (linkLink.getType() == LinkType.OTHER && BIOTOOLS_SCHEMA_URL_PATTERN.matcher(linkLink.getUrl()).matches()) {
 				it.remove();
 				return linkLink.getUrl();
 			}
 		}
-		for (Iterator<BiotoolsLink> it =  linkLinks.iterator(); it.hasNext(); ) {
-			BiotoolsLink linkLink = it.next();
-			if (linkLink.getType() == LinkType.REPOSITORY.toString() && !FTP_START.matcher(linkLink.getUrl()).find()) {
+		for (Iterator<BiotoolsLink<LinkType>> it =  linkLinks.iterator(); it.hasNext(); ) {
+			BiotoolsLink<LinkType> linkLink = it.next();
+			if (linkLink.getType() == LinkType.REPOSITORY && BIOTOOLS_SCHEMA_URL_PATTERN.matcher(linkLink.getUrl()).matches()) {
 				it.remove();
 				return linkLink.getUrl();
 			}
 		}
-		for (Iterator<BiotoolsLink> it =  documentationLinks.iterator(); it.hasNext(); ) {
-			BiotoolsLink documentationLink = it.next();
-			if (documentationLink.getType() == DocumentationType.GENERAL.toString() && !FTP_START.matcher(documentationLink.getUrl()).find()) {
+		for (Iterator<BiotoolsLink<DocumentationType>> it =  documentationLinks.iterator(); it.hasNext(); ) {
+			BiotoolsLink<DocumentationType> documentationLink = it.next();
+			if (documentationLink.getType() == DocumentationType.GENERAL && BIOTOOLS_SCHEMA_URL_PATTERN.matcher(documentationLink.getUrl()).matches()) {
 				it.remove();
 				return documentationLink.getUrl();
 			}
 		}
-		for (Iterator<BiotoolsLink> it =  documentationLinks.iterator(); it.hasNext(); ) {
-			BiotoolsLink documentationLink = it.next();
-			if ((documentationLink.getType() == DocumentationType.MANUAL.toString()
-					|| documentationLink.getType() == DocumentationType.INSTALLATION_INSTRUCTIONS.toString()
-					|| documentationLink.getType() == DocumentationType.TUTORIAL.toString()
-					|| documentationLink.getType() == DocumentationType.TRAINING_MATERIAL.toString()
-					|| documentationLink.getType() == DocumentationType.API_DOCUMENTATION.toString())
-					&& !FTP_START.matcher(documentationLink.getUrl()).find()) {
+		for (Iterator<BiotoolsLink<DocumentationType>> it =  documentationLinks.iterator(); it.hasNext(); ) {
+			BiotoolsLink<DocumentationType> documentationLink = it.next();
+			if ((documentationLink.getType() == DocumentationType.MANUAL
+					|| documentationLink.getType() == DocumentationType.INSTALLATION_INSTRUCTIONS
+					|| documentationLink.getType() == DocumentationType.TUTORIAL
+					|| documentationLink.getType() == DocumentationType.TRAINING_MATERIAL
+					|| documentationLink.getType() == DocumentationType.API_DOCUMENTATION)
+					&& BIOTOOLS_SCHEMA_URL_PATTERN.matcher(documentationLink.getUrl()).matches()) {
 				it.remove();
 				return documentationLink.getUrl();
 			}
@@ -1111,7 +1137,7 @@ public final class PubMedApps {
 		for (String link : links) {
 			link = prependHttp(link);
 			if (db.getWebpage(link) != null && !db.getWebpage(link).isBroken() || db.getDoc(link) != null && !db.getDoc(link).isBroken()) {
-				if (!DOWNLOAD_EXT.matcher(link).find() && !FTP_START.matcher(link).find()) {
+				if (!DOWNLOAD_EXT.matcher(link).find() && BIOTOOLS_SCHEMA_URL_PATTERN.matcher(link).matches()) {
 					return link;
 				}
 			}
@@ -1274,7 +1300,7 @@ public final class PubMedApps {
 	}
 
 	private static String fillToMin(String string, int minLength) {
-		if (string.length() >= minLength || string.isEmpty()) {
+		if (string.length() >= minLength) {
 			return string;
 		} else if (string.length() + 1 == minLength) {
 			return string + "+";
@@ -1317,36 +1343,100 @@ public final class PubMedApps {
 		}
 	}
 
-	private static String getDescription(List<Description> descriptions, String homepage, Set<BiotoolsLink> linkLinks, Set<BiotoolsLink> documentationLinks, Set<BiotoolsLink> downloadLinks, Database db, Scrape scrape, int minLength, int maxLength, String name, PreProcessor preProcessor) {
+	private static String getDescription(List<Description> descriptions, String homepage, Set<BiotoolsLink<LinkType>> linkLinks, Set<BiotoolsLink<DocumentationType>> documentationLinks, Set<BiotoolsLink<DownloadType>> downloadLinks, Database db, Scrape scrape, int minLength, int maxLength, String name, PreProcessor preProcessor) {
 		if (!homepage.isEmpty()) {
 			descriptionsFromWebpage(descriptions, homepage, db, scrape, minLength, name, null, preProcessor);
 		}
-		for (BiotoolsLink linkLink : linkLinks) {
-			if (linkLink.getType() == LinkType.MIRROR.toString()
-					|| linkLink.getType() == LinkType.REPOSITORY.toString()
-					|| linkLink.getType() == LinkType.REGISTRY.toString()) {
+		for (BiotoolsLink<LinkType> linkLink : linkLinks) {
+			if (linkLink.getType() == LinkType.OTHER
+					|| linkLink.getType() == LinkType.REPOSITORY
+					|| linkLink.getType() == LinkType.REGISTRY) {
 				descriptionsFromWebpage(descriptions, linkLink.getUrl(), db, scrape, minLength, name, false, preProcessor);
 			}
 		}
-		for (BiotoolsLink documentationLink : documentationLinks) {
-			if (documentationLink.getType() == DocumentationType.GENERAL.toString()
-					|| documentationLink.getType() == DocumentationType.MANUAL.toString()
-					|| documentationLink.getType() == DocumentationType.INSTALLATION_INSTRUCTIONS.toString()
-					|| documentationLink.getType() == DocumentationType.TUTORIAL.toString()
-					|| documentationLink.getType() == DocumentationType.TRAINING_MATERIAL.toString()
-					|| documentationLink.getType() == DocumentationType.API_DOCUMENTATION.toString()) {
+		for (BiotoolsLink<DocumentationType> documentationLink : documentationLinks) {
+			if (documentationLink.getType() == DocumentationType.GENERAL
+					|| documentationLink.getType() == DocumentationType.MANUAL
+					|| documentationLink.getType() == DocumentationType.INSTALLATION_INSTRUCTIONS
+					|| documentationLink.getType() == DocumentationType.TUTORIAL
+					|| documentationLink.getType() == DocumentationType.TRAINING_MATERIAL
+					|| documentationLink.getType() == DocumentationType.API_DOCUMENTATION) {
 				descriptionsFromWebpage(descriptions, documentationLink.getUrl(), db, scrape, minLength, name, true, preProcessor);
 			}
 		}
-		for (BiotoolsLink downloadLink : downloadLinks) {
-			if (downloadLink.getType() == DownloadType.SOURCE_CODE.toString()
-					|| downloadLink.getType() == DownloadType.CONTAINER_FILE.toString()) {
+		for (BiotoolsLink<DownloadType> downloadLink : downloadLinks) {
+			if (downloadLink.getType() == DownloadType.SOURCE_CODE
+					|| downloadLink.getType() == DownloadType.CONTAINER_FILE) {
 				descriptionsFromWebpage(descriptions, downloadLink.getUrl(), db, scrape, minLength, name, false, preProcessor);
 			}
 		}
 		Collections.sort(descriptions);
 		limitDescriptions(descriptions, maxLength, preProcessor);
 		return descriptions.stream().map(d -> d.getDescription()).collect(Collectors.joining(" | "));
+	}
+
+	private static List<String> normaliseCreditName(String name) {
+		List<String> normalisedName = new ArrayList<>();
+		name = PERIOD.matcher(name).replaceAll(". ");
+		name = WHITESPACE.matcher(name).replaceAll(" ").trim();
+		String[] nameParts = NAME_SEPARATOR.split(name);
+		for (int i = 0; i < nameParts.length; ++i) {
+			String namePart = nameParts[i];
+			namePart = PUNCTUATION_NUMBERS.matcher(namePart).replaceAll("");
+			if (namePart.length() <= 1 || UPPERCASE.matcher(namePart).matches() && i < nameParts.length - 1 || namePart.equalsIgnoreCase("dr") || namePart.equalsIgnoreCase("prof")) {
+				continue;
+			}
+			namePart = namePart.toLowerCase(Locale.ROOT);
+			namePart = Normalizer.normalize(namePart, Normalizer.Form.NFKD);
+			normalisedName.add(namePart);
+		}
+		return normalisedName;
+	}
+
+	private static boolean creditNameEqual(String name1, String name2) {
+		if (name1.isEmpty() || name2.isEmpty()) {
+			return false;
+		}
+		List<String> normalisedName1 = normaliseCreditName(name1);
+		List<String> normalisedName2 = normaliseCreditName(name2);
+		if (normalisedName1.isEmpty() || normalisedName2.isEmpty()) {
+			return false;
+		}
+		if (normalisedName1.size() >= 2 && normalisedName2.size() >= 2) {
+			return normalisedName1.get(0).equals(normalisedName2.get(0)) && normalisedName1.get(normalisedName1.size() - 1).equals(normalisedName2.get(normalisedName2.size() - 1));
+		} else if (normalisedName1.size() < 2) {
+			return normalisedName1.get(0).equals(normalisedName2.get(normalisedName2.size() - 1));
+		} else {
+			return normalisedName2.get(0).equals(normalisedName1.get(normalisedName1.size() - 1));
+		}
+	}
+
+	private static boolean creditOrcidEqual(String orcid1, String orcid2) {
+		if (orcid1.isEmpty() || orcid2.isEmpty()) {
+			return false;
+		}
+		return trimUrl(orcid1).equals(trimUrl(orcid2));
+	}
+
+	private static boolean creditEmailEqual(String email1, String email2) {
+		if (email1.isEmpty() || email2.isEmpty()) {
+			return false;
+		}
+		int email1At = email1.indexOf("@");
+		if (email1At > -1) {
+			int email2At = email2.indexOf("@");
+			if (email2At > -1) {
+				String email1User = email1.substring(0, email1At);
+				String email1Domain = email1.substring(email1At + 1);
+				String email2User = email2.substring(0, email2At);
+				String email2Domain = email2.substring(email2At + 1);
+				if (email1User.isEmpty() || email1Domain.isEmpty() || email2User.isEmpty() || email2Domain.isEmpty()) {
+					return false;
+				}
+				return PERIOD.matcher(email1User).replaceAll("").equalsIgnoreCase(PERIOD.matcher(email2User).replaceAll("")) && email1Domain.equalsIgnoreCase(email2Domain);
+			}
+		}
+		return false;
 	}
 
 	private static void writeLinks(Path txt, List<String> links) throws IOException {
@@ -1365,9 +1455,9 @@ public final class PubMedApps {
 	}
 
 	private static void makeResult(List<Result> results, Publication publication,
-			String title, String titleRest,	String toolTitleExtractedOriginal, String toolTitle, String toolTitlePruned, String toolTitleAcronym, List<String> toolTitleProcessedOthers,
+			String title, String titleRest,	int toolTitleSize, String toolTitleExtractedOriginal, String toolTitle, String toolTitlePruned, String toolTitleAcronym, List<String> toolTitleOthers, List<String> toolTitleProcessedOthers,
 			List<String> hostIgnore, List<String> beforeTier1, List<String> beforeTier2, List<String> beforeTier3, List<String> afterTier1, List<String> afterTier2, List<String> afterTier3,
-			PreProcessor preProcessor, Idf idf, List<ToolInput> biotools) {
+			PreProcessor preProcessor, Idf idf) {
 		String theAbstract = publication.getAbstract().getContent();
 
 		String titleWithoutLinks = preProcessor.removeLinks(title);
@@ -1721,10 +1811,26 @@ public final class PubMedApps {
 			.sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
 			.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (k, v) -> { throw new AssertionError(); }, LinkedHashMap::new));
 
-		Result result = new Result(new PublicationIds(publication.getPmid().getContent(), publication.getPmcid().getContent(), publication.getDoi().getContent(),
-			publication.getPmid().getUrl(), publication.getPmcid().getUrl(), publication.getDoi().getUrl()));
+		String pmid = publication.getPmid().getContent();
+		String pmcid = publication.getPmcid().getContent();
+		String doi = publication.getDoi().getContent();
+		if (!pmid.isEmpty() && !BIOTOOLS_SCHEMA_PMID_PATTERN.matcher(pmid).matches()) {
+			logger.warn("Discarded invalid publication PMID '{}' (PMCID is '{}', DOI is '{}')", pmid, pmcid, doi);
+			pmid = "";
+		}
+		if (!pmcid.isEmpty() && !BIOTOOLS_SCHEMA_PMCID_PATTERN.matcher(pmcid).matches()) {
+			logger.warn("Discarded invalid publication PMCID '{}' (PMID is '{}', DOI is '{}')", pmcid, pmid, doi);
+			pmcid = "";
+		}
+		if (!doi.isEmpty() && !BIOTOOLS_SCHEMA_DOI_PATTERN.matcher(doi).matches()) {
+			logger.warn("Discarded invalid publication DOI '{}' (PMID is '{}', PMCID is '{}')", doi, pmid, pmcid);
+			doi = "";
+		}
+
+		Result result = new Result(new PublicationIds(pmid, pmcid, doi, publication.getPmid().getUrl(), publication.getPmcid().getUrl(), publication.getDoi().getUrl()));
 
 		result.addTitle(title);
+		result.addToolTitleOthers(toolTitleOthers != null ? toolTitleOthers : new ArrayList<>());
 		result.addToolTitleExtractedOriginal(toolTitleExtractedOriginal != null ? toolTitleExtractedOriginal : "");
 		result.addToolTitle(toolTitle != null ? toolTitle : "");
 		result.addToolTitlePruned(toolTitlePruned != null ? toolTitlePruned : "");
@@ -1743,24 +1849,48 @@ public final class PubMedApps {
 			String name = License.WHITESPACE.matcher(ca.getName()).replaceAll(" ").trim();
 			if (name.length() < BIOTOOLS_SCHEMA_CREDIT_NAME_MIN && !name.isEmpty()) {
 				name = fillToMin(name, BIOTOOLS_SCHEMA_CREDIT_NAME_MIN);
-				logger.warn("Credit name filled to min from '{}' to '{}'", ca.getName(), name);
+				logger.warn("Credit name filled to min from '{}' to '{}' (from pub {})", ca.getName(), name, result.getPublicationIds().get(0).toString());
 			}
 			if (name.length() > BIOTOOLS_SCHEMA_CREDIT_NAME_MAX) {
 				name = pruneToMax(name, BIOTOOLS_SCHEMA_CREDIT_NAME_MAX);
-				logger.warn("Credit name pruned to max from '{}' to '{}'", ca.getName(), name);
+				logger.warn("Credit name pruned to max from '{}' to '{}' (from pub {})", ca.getName(), name, result.getPublicationIds().get(0).toString());
 			}
 			ca.setName(name);
 			if (!ca.getOrcid().isEmpty() && !BIOTOOLS_SCHEMA_CREDIT_ORCIDID_PATTERN.matcher(ca.getOrcid()).matches()) {
-				logger.warn("Discarded invalid credit orcidid {}", ca.getOrcid());
+				logger.warn("Discarded invalid credit orcidid '{}' (from pub {})", ca.getOrcid(), result.getPublicationIds().get(0).toString());
 				ca.setOrcid("");
 			}
 			if (!ca.getEmail().isEmpty() && !BIOTOOLS_SCHEMA_CREDIT_EMAIL_PATTERN.matcher(ca.getEmail()).matches()) {
-				logger.warn("Discarded invalid credit email {}", ca.getEmail());
-				ca.setEmail("");
+				String email = ca.getEmail();
+				if (email.charAt(email.length() - 1) == '.') {
+					email = email.substring(0, email.length() - 1);
+				}
+				boolean valid = false;
+				for (String emailPart : email.split(" ")) {
+					if (BIOTOOLS_SCHEMA_CREDIT_EMAIL_PATTERN.matcher(emailPart).matches()) {
+						email = emailPart;
+						valid = true;
+						break;
+					}
+				}
+				if (valid) {
+					logger.warn("Credit email changed from '{}' to '{}' (from pub {})", ca.getEmail(), email, result.getPublicationIds().get(0).toString());
+					ca.setEmail(email);
+				} else {
+					logger.warn("Discarded invalid credit email '{}' (from pub {})", ca.getEmail(), result.getPublicationIds().get(0).toString());
+					ca.setEmail("");
+				}
 			}
 			if (!ca.getUri().isEmpty() && !BIOTOOLS_SCHEMA_URL_PATTERN.matcher(ca.getUri()).matches()) {
-				logger.warn("Discarded invalid credit url {}", ca.getUri());
+				logger.warn("Discarded invalid credit url '{}' (from pub {})", ca.getUri(), result.getPublicationIds().get(0).toString());
 				ca.setUri("");
+			}
+		}
+		for (Iterator<CorrespAuthor> it = correspAuthor.iterator(); it.hasNext(); ) {
+			CorrespAuthor ca = it.next();
+			if (ca.getName().isEmpty() && ca.getEmail().isEmpty() && ca.getUri().isEmpty()) {
+				logger.warn("Discarded empty credit (from pub {})", result.getPublicationIds().get(0).toString());
+				it.remove();
 			}
 		}
 		result.addCorrespAuthor(correspAuthor);
@@ -1783,32 +1913,29 @@ public final class PubMedApps {
 			String suggestionExtractedOriginal = processedToExtracted.get(entry.getKey());
 			String suggestionExtracted = suggestionExtractedOriginal;
 			if (!BIOTOOLS_SCHEMA_NAME_PATTERN.matcher(suggestionExtracted).matches() && !suggestionExtracted.isEmpty()) {
-				suggestionExtracted = BIOTOOLS_SCHEMA_NAME_CHAR_HYPHEN.matcher(suggestionExtracted).replaceAll("-");
-				suggestionExtracted = BIOTOOLS_SCHEMA_NAME_CHAR_APOSTROPHE.matcher(suggestionExtracted).replaceAll(" ");
-				suggestionExtracted = BIOTOOLS_SCHEMA_NAME_CHAR_AND.matcher(suggestionExtracted).replaceAll(" and ");
-				suggestionExtracted = BIOTOOLS_SCHEMA_NAME_CHAR_TWO.matcher(suggestionExtracted).replaceAll("2");
-				suggestionExtracted = BIOTOOLS_SCHEMA_NAME_CHAR_AT.matcher(suggestionExtracted).replaceAll("a");
-				suggestionExtracted = BIOTOOLS_SCHEMA_NAME_CHAR_E.matcher(suggestionExtracted).replaceAll("e");
-				suggestionExtracted = BIOTOOLS_SCHEMA_NAME_CHAR_ALPHA.matcher(suggestionExtracted).replaceAll("a");
-				suggestionExtracted = BIOTOOLS_SCHEMA_NAME_CHAR_BETA.matcher(suggestionExtracted).replaceAll("b");
-				suggestionExtracted = BIOTOOLS_SCHEMA_NAME_CHAR_MICRO.matcher(suggestionExtracted).replaceAll("u");
+				for (int j = 0; j < BIOTOOLS_SCHEMA_NAME_REPLACEMENTS.length; ++j) {
+					suggestionExtracted = suggestionExtracted.replace(BIOTOOLS_SCHEMA_NAME_REPLACEMENTS[j][0], BIOTOOLS_SCHEMA_NAME_REPLACEMENTS[j][1]);
+				}
+				suggestionExtracted = BIOTOOLS_SCHEMA_NAME_APOSTROPHE_QUOTATION_SPACE.matcher(suggestionExtracted).replaceAll("$1 $2");
+				suggestionExtracted = Normalizer.normalize(suggestionExtracted, Normalizer.Form.NFKD);
 				suggestionExtracted = License.WHITESPACE.matcher(suggestionExtracted).replaceAll(" ").trim();
 				suggestionExtracted = BIOTOOLS_SCHEMA_NAME_INVALID_CHAR.matcher(suggestionExtracted).replaceAll("");
-				logger.warn("Name changed from '{}' to '{}'", suggestionExtractedOriginal, suggestionExtracted);
+				logger.info("Name changed from '{}' to '{}' (from pub {})", suggestionExtractedOriginal, suggestionExtracted, result.getPublicationIds().get(0).toString());
 			}
-			if (suggestionExtracted.length() < BIOTOOLS_SCHEMA_NAME_MIN && !suggestionExtracted.isEmpty()) {
+			if (suggestionExtracted.length() < BIOTOOLS_SCHEMA_NAME_MIN) {
 				suggestionExtracted = fillToMin(suggestionExtracted, BIOTOOLS_SCHEMA_NAME_MIN);
-				logger.warn("Name filled to min from '{}' to '{}'", suggestionExtractedOriginal, suggestionExtracted);
+				logger.info("Name filled to min from '{}' to '{}' (from pub {})", suggestionExtractedOriginal, suggestionExtracted, result.getPublicationIds().get(0).toString());
 			}
 			if (suggestionExtracted.length() > BIOTOOLS_SCHEMA_NAME_MAX) {
 				suggestionExtracted = pruneToMax(suggestionExtracted, BIOTOOLS_SCHEMA_NAME_MAX);
-				logger.warn("Name pruned to max from '{}' to '{}'", suggestionExtractedOriginal, suggestionExtracted);
+				logger.info("Name pruned to max from '{}' to '{}' (from pub {})", suggestionExtractedOriginal, suggestionExtracted, result.getPublicationIds().get(0).toString());
 			}
 			suggestion.setExtracted(suggestionExtracted);
 			if (suggestionExtracted.equals(suggestionExtractedOriginal)) {
 				suggestion.setProcessed(entry.getKey());
 			} else {
 				suggestion.setProcessed(String.join(" ", preProcessor.process(suggestionExtracted)));
+				suggestion.setOriginal(suggestionExtractedOriginal);
 			}
 			if (linksAbstract.get(entry.getKey()) != null) {
 				suggestion.setLinksAbstract(linksAbstract.get(entry.getKey()));
@@ -1901,7 +2028,190 @@ public final class PubMedApps {
 		}
 	}
 
-	private static void run(PreProcessorArgs preProcessorArgs, String queryIdf, String database, List<String> pubFile, String queryPath, QueryType queryType, String webFile, String docFile, FetcherArgs fetcherArgs, boolean pass1) throws IOException, ParseException {
+	private static Diff makeDiff(List<ToolInput> biotools, List<List<String>> queryLinksList, int existing, List<PublicationIds> publications, Set<PublicationIds> addPublications, String modifyName, String homepage, Set<BiotoolsLink<LinkType>> links, Set<BiotoolsLink<DownloadType>> downloads, Set<BiotoolsLink<DocumentationType>> documentations, Provenance license, List<Provenance> languages, List<CorrespAuthor> credits) {
+		Diff diff = new Diff();
+		ToolInput biotool = biotools.get(existing);
+		List<String> queryLinks = queryLinksList.get(existing);
+
+		diff.setExisting(existing);
+		diff.setAddPublications(addPublications);
+		diff.setModifyName(modifyName);
+
+		for (PublicationIds publicationIds : publications) {
+			if (biotool.getPublication() != null) {
+				for (org.edamontology.edammap.core.input.json.Publication pubIds : biotool.getPublication()) {
+					if ((!publicationIds.getPmid().isEmpty() && pubIds.getPmid() != null && pubIds.getPmid().trim().equals(publicationIds.getPmid())
+							|| !publicationIds.getPmcid().isEmpty() && pubIds.getPmcid() != null && pubIds.getPmcid().trim().equals(publicationIds.getPmcid())
+							|| !publicationIds.getDoi().isEmpty() && pubIds.getDoi() != null && PubFetcher.normaliseDoi(pubIds.getDoi().trim()).equals(publicationIds.getDoi()))
+						&& (!publicationIds.getPmid().isEmpty() && pubIds.getPmid() != null && !pubIds.getPmid().isEmpty() && !pubIds.getPmid().trim().equals(publicationIds.getPmid())
+							|| !publicationIds.getPmcid().isEmpty() && pubIds.getPmcid() != null && !pubIds.getPmcid().isEmpty() && !pubIds.getPmcid().trim().equals(publicationIds.getPmcid())
+							|| !publicationIds.getDoi().isEmpty() && pubIds.getDoi() != null && !pubIds.getDoi().isEmpty() && !PubFetcher.normaliseDoi(pubIds.getDoi().trim()).equals(publicationIds.getDoi()))) {
+						diff.addModifyPublication(publicationIds);
+					}
+				}
+			}
+		}
+
+		if (homepage != null) {
+			String homepageTrimmed = trimUrl(homepage);
+			if (!homepageTrimmed.isEmpty() && !homepageTrimmed.equals(trimUrl(biotool.getHomepage()))) {
+				diff.setModifyHomepage(homepage);
+			}
+		}
+
+		if (links != null) {
+			String homepageBiotoolsTrimmed = trimUrl(biotool.getHomepage());
+			for (BiotoolsLink<LinkType> link : links) {
+				if (biotool.getLink() == null) {
+					diff.addAddLink(link);
+				} else {
+					boolean found = false;
+					if (link.getType().equals(LinkType.OTHER)) {
+						for (String queryLink : queryLinks) {
+							if (!queryLink.equals(homepageBiotoolsTrimmed) && link.getUrlTrimmed().equals(queryLink)) {
+								found = true;
+								break;
+							}
+						}
+					} else {
+						for (Link<LinkType> linkBiotools : biotool.getLink()) {
+							if (link.getUrlTrimmed().equals(trimUrl(linkBiotools.getUrl()))) {
+								found = true;
+								break;
+							}
+						}
+					}
+					if (!found) {
+						diff.addAddLink(link);
+					}
+				}
+			}
+		}
+
+		if (downloads != null) {
+			for (BiotoolsLink<DownloadType> download : downloads) {
+				if (biotool.getDownload() == null) {
+					diff.addAddDownload(download);
+				} else {
+					boolean found = false;
+					for (Link<DownloadType> downloadBiotools : biotool.getDownload()) {
+						if (download.getUrlTrimmed().equals(trimUrl(downloadBiotools.getUrl()))) {
+							found = true;
+							break;
+						}
+					}
+					if (!found) {
+						diff.addAddDownload(download);
+					}
+				}
+			}
+		}
+
+		if (documentations != null) {
+			for (BiotoolsLink<DocumentationType> documentation : documentations) {
+				if (biotool.getDocumentation() == null) {
+					diff.addAddDocumentation(documentation);
+				} else {
+					boolean found = false;
+					for (Link<DocumentationType> documentationBiotools : biotool.getDocumentation()) {
+						if (documentation.getUrlTrimmed().equals(trimUrl(documentationBiotools.getUrl()))) {
+							found = true;
+							break;
+						}
+					}
+					if (!found) {
+						diff.addAddDocumentation(documentation);
+					}
+				}
+			}
+		}
+
+		if (license != null) {
+			if (!license.isEmpty() && (biotool.getLicense() == null || !biotool.getLicense().equals(license.getObject()))) {
+				diff.setModifyLicense(license);
+			}
+		}
+
+		for (Provenance language : languages) {
+			if (!language.isEmpty() && (biotool.getLanguage() == null || !biotool.getLanguage().contains(language.getObject()))) {
+				diff.addAddLanguage(language);
+			}
+		}
+
+		for (CorrespAuthor credit : credits) {
+			if (biotool.getCredit() == null) {
+				diff.addAddCredit(credit);
+			} else {
+				boolean found = false;
+				boolean foundModify = false;
+				for (Credit creditBiotools : biotool.getCredit()) {
+					if ((credit.getName().isEmpty() || credit.getName().equals(creditBiotools.getName()))
+							&& (credit.getOrcid().isEmpty() || credit.getOrcid().equals(creditBiotools.getOrcidid()))
+							&& (credit.getEmail().isEmpty() || credit.getEmail().equals(creditBiotools.getEmail()))) {
+						found = true;
+						break;
+					}
+					if (creditBiotools.getName() != null && creditNameEqual(credit.getName(), creditBiotools.getName())
+							|| creditBiotools.getOrcidid() != null && creditOrcidEqual(credit.getOrcid(), creditBiotools.getOrcidid())
+							|| creditBiotools.getEmail() != null && creditEmailEqual(credit.getEmail(), creditBiotools.getEmail())) {
+						foundModify = true;
+					}
+				}
+				if (!found) {
+					if (!foundModify) {
+						diff.addAddCredit(credit);
+					} else {
+						diff.addModifyCredit(credit);
+					}
+				}
+			}
+		}
+
+		return diff;
+	}
+
+	private static List<Integer> removeExisting(List<Integer> existing, List<ToolInput> biotools, List<String> toolTitleOthers, String suggestionProcessed) {
+		List<Integer> removeIndex = new ArrayList<>();
+		if (existing != null) {
+			for (int i = 0; i < existing.size(); ++i) {
+				ToolInput biotool = biotools.get(existing.get(i));
+				String idProcessed = String.join("", biotool.getBiotoolsID());
+				String nameProcessed = String.join("", biotool.getName());
+				for (String other : toolTitleOthers) {
+					if ((idProcessed.contains(other) || nameProcessed.contains(other)) && !(suggestionProcessed.equals(idProcessed) || suggestionProcessed.equals(nameProcessed))) {
+						removeIndex.add(i);
+					}
+				}
+			}
+		}
+		return removeIndex;
+	}
+
+	private static void writeField(Writer writer, String value, boolean last) throws IOException {
+		if (value != null && value.length() > 0 && (value.charAt(0) == '"' || value.indexOf('\t') > -1)) {
+			value = "\"" + value.replace("\"", "\"\"") + "\"";
+		}
+		if (value != null) {
+			writer.write(value);
+		}
+		if (last) {
+			writer.write("\n");
+		} else {
+			writer.write("\t");
+		}
+	}
+
+	private static void writeField(Writer writer, String value) throws IOException {
+		writeField(writer, value, false);
+	}
+
+	private static void run(PreProcessorArgs preProcessorArgs, String queryIdf, String database, List<String> pubFile, String queryPath, QueryType queryType, String webFile, String docFile, String outputDir, FetcherArgs fetcherArgs, boolean pass1) throws IOException, ParseException {
+		Path outputPath = null;
+		if (outputDir != null) {
+			outputPath = PubFetcher.outputPath(outputDir, true, false);
+			Files.createDirectory(outputPath);
+		}
+
 		List<String> hostIgnore = PubFetcher.getResource(PubMedApps.class, "resources/host_ignore.txt");
 		List<String> beforeTier1 = PubFetcher.getResource(PubMedApps.class, "resources/before_tier1.txt");
 		List<String> beforeTier2 = PubFetcher.getResource(PubMedApps.class, "resources/before_tier2.txt");
@@ -2016,6 +2326,12 @@ public final class PubMedApps {
 				List<String> toolTitleProcessedDone = new ArrayList<>();
 				for (int i = 0; i < toolTitleProcessed.size(); ++i) {
 					if (!toolTitleProcessedDone.contains(toolTitleProcessed.get(i))) {
+						List<String> toolTitleOthers = new ArrayList<>();
+						for (int j = 0; j < toolTitle.size(); ++j) {
+							if (!toolTitle.get(i).equals(toolTitle.get(j))) {
+								toolTitleOthers.add(toolTitle.get(j));
+							}
+						}
 						List<String> toolTitleProcessedOthers = new ArrayList<>();
 						for (int j = 0; j < toolTitleProcessed.size(); ++j) {
 							if (!toolTitleProcessed.get(i).equals(toolTitleProcessed.get(j))) {
@@ -2023,22 +2339,23 @@ public final class PubMedApps {
 							}
 						}
 						makeResult(results, publication,
-							title, titleRest, toolTitleExtractedOriginal.get(i), toolTitle.get(i), toolTitlePruned.get(i), toolTitleAcronym, toolTitleProcessedOthers,
+							title, titleRest, toolTitle.size(), toolTitleExtractedOriginal.get(i), toolTitle.get(i), toolTitlePruned.get(i), toolTitleAcronym, toolTitleOthers, toolTitleProcessedOthers,
 							hostIgnore, beforeTier1, beforeTier2, beforeTier3, afterTier1, afterTier2, afterTier3,
-							preProcessor, idf, biotools);
+							preProcessor, idf);
 						toolTitleProcessedDone.add(toolTitleProcessed.get(i));
 					}
 				}
 			} else {
 				makeResult(results, publication,
-					title, titleRest, null, null, null, null, null,
+					title, titleRest, 0, null, null, null, null, null, null,
 					hostIgnore, beforeTier1, beforeTier2, beforeTier3, afterTier1, afterTier2, afterTier3,
-					preProcessor, idf, biotools);
+					preProcessor, idf);
 			}
 		}
 
 		System.err.println(); // TODO this changes line after the progress bar
 
+		// TODO Removed -89 existing
 		logger.info("Removed {} existing", publications.size() - results.size());
 
 		if (pass1) {
@@ -2049,9 +2366,9 @@ public final class PubMedApps {
 
 			for (Result result : results) {
 				for (Suggestion suggestion : result.getSuggestions()) {
-					List<BiotoolsLink> linkLinks = new ArrayList<>();
-					List<BiotoolsLink> downloadLinks = new ArrayList<>();
-					List<BiotoolsLink> documentationLinks = new ArrayList<>();
+					List<BiotoolsLink<LinkType>> linkLinks = new ArrayList<>();
+					List<BiotoolsLink<DownloadType>> downloadLinks = new ArrayList<>();
+					List<BiotoolsLink<DocumentationType>> documentationLinks = new ArrayList<>();
 					makeBiotoolsLinks(suggestion.getLinksAbstract(), linkLinks, downloadLinks, documentationLinks);
 					makeBiotoolsLinks(suggestion.getLinksFulltext(), linkLinks, downloadLinks, documentationLinks);
 					linkLinks.forEach(link -> webpages.add(link.getUrl()));
@@ -2060,13 +2377,15 @@ public final class PubMedApps {
 				}
 			}
 
+			// TODO can throw IOException, do in the beginning
 			Path webPath = PubFetcher.outputPath(webFile);
 			Path docPath = PubFetcher.outputPath(docFile);
 
+			// TODO can throw IOException, maybe open writer in the beginning
 			writeLinks(webPath, webpages);
 			writeLinks(docPath, docs);
 
-			System.out.println("pmid\tpmcid\tdoi\tscore\tsuggestion\tsuggestion_processed\tlinks_abstract\tlinks_fulltext\tfrom_abstract_link\tother_scores\tother_suggestions\tother_suggestions_processed\tother_links_abstract\tother_links_fulltext\tleftover_links_abstract\tleftover_links_fulltext\ttitle\ttool_title_extracted_original\ttool_title\ttool_title_pruned\ttool_title_acronym\toa\tjournal_title\tpub_date\tcitations_count\tcitations_timestamp\tcorresp_author_name\tcorresp_author_orcid\tcorresp_author_email\tcorresp_author_phone\tcorresp_author_uri");
+			System.out.println("pmid\tpmcid\tdoi\tscore\tsuggestion_original\tsuggestion\tsuggestion_processed\tlinks_abstract\tlinks_fulltext\tfrom_abstract_link\tother_scores\tother_suggestions_original\tother_suggestions\tother_suggestions_processed\tother_links_abstract\tother_links_fulltext\tleftover_links_abstract\tleftover_links_fulltext\ttitle\ttool_title_multiple\ttool_title_extracted_original\ttool_title\ttool_title_pruned\ttool_title_acronym\toa\tjournal_title\tpub_date\tcitations_count\tcitations_timestamp\tcorresp_author_name\tcorresp_author_orcid\tcorresp_author_email\tcorresp_author_phone\tcorresp_author_uri");
 			for (Result result : results) {
 				System.out.print(result.getPublicationIds().get(0).getPmid());
 				System.out.print("\t");
@@ -2076,6 +2395,10 @@ public final class PubMedApps {
 				System.out.print("\t");
 				if (!result.getSuggestions().isEmpty()) {
 					System.out.print(result.getSuggestions().get(0).getScore());
+				}
+				System.out.print("\t");
+				if (!result.getSuggestions().isEmpty()) {
+					System.out.print(result.getSuggestions().get(0).getOriginal());
 				}
 				System.out.print("\t");
 				if (!result.getSuggestions().isEmpty()) {
@@ -2097,6 +2420,8 @@ public final class PubMedApps {
 				System.out.print(result.getSuggestions().stream().map(s -> String.valueOf(s.isFromAbstractLink())).collect(Collectors.joining(" | ")));
 				System.out.print("\t");
 				System.out.print(result.getSuggestions().stream().skip(1).map(suggestion -> String.format(Locale.ROOT, "%.1f", suggestion.getScore())).collect(Collectors.joining(" | ")));
+				System.out.print("\t");
+				System.out.print(result.getSuggestions().stream().skip(1).map(suggestion -> suggestion.getOriginal()).collect(Collectors.joining(" | ")));
 				System.out.print("\t");
 				System.out.print(result.getSuggestions().stream().skip(1).map(suggestion -> suggestion.getExtracted()).collect(Collectors.joining(" | ")));
 				System.out.print("\t");
@@ -2132,6 +2457,8 @@ public final class PubMedApps {
 				System.out.print("\t");
 				System.out.print(result.getTitle().get(0));
 				System.out.print("\t");
+				System.out.print(result.getToolTitleOthers().get(0));
+				System.out.print("\t");
 				System.out.print(result.getToolTitleExtractedOriginal().get(0));
 				System.out.print("\t");
 				System.out.print(result.getToolTitle().get(0));
@@ -2144,11 +2471,11 @@ public final class PubMedApps {
 				System.out.print("\t");
 				System.out.print(result.getJournalTitle().get(0));
 				System.out.print("\t");
-				System.out.print(result.getPubDate().get(0));
+				System.out.print(result.getPubDateHuman().get(0) + " (" + result.getPubDate().get(0) + ")");
 				System.out.print("\t");
 				System.out.print(result.getCitationsCount().get(0));
 				System.out.print("\t");
-				System.out.print(result.getCitationsTimestamp().get(0));
+				System.out.print(result.getCitationsTimestampHuman().get(0) + " (" + result.getCitationsTimestamp().get(0) + ")");
 				System.out.print("\t");
 				System.out.print(result.getCorrespAuthor().get(0).stream().map(ca -> ca.getName()).collect(Collectors.joining(" | ")));
 				System.out.print("\t");
@@ -2164,9 +2491,13 @@ public final class PubMedApps {
 
 		} else {
 
-			System.out.println("pmid\tpmcid\tdoi\tsame_suggestions\tscore\tscore2\tscore2_parts\tsuggestion\tsuggestion_processed\tpublication_and_name_existing\tname_existing_some_publication_different\tsome_publication_existing_name_different\tname_existing_publication_different\tname_match\tlink_match\tname_word_match\tlinks_abstract\tlinks_fulltext\tfrom_abstract_link\thomepage\thomepage_biotools\tlink\tlink_biotools\tdownload\tdownload_biotools\tdocumentation\tdocumentation_biotools\tbroken_links\tother_scores\tother_scores2\tother_scores2_parts\tother_suggestions\tother_suggestions_processed\tother_publication_and_name_existing\tother_name_existing_some_publication_different\tother_some_publication_existing_name_different\tother_name_existing_publication_different\tother_links_abstract\tother_links_fulltext\tleftover_links_abstract\tleftover_links_fulltext\ttitle\ttool_title_extracted_original\ttool_title\ttool_title_pruned\ttool_title_acronym\tdescription\tdescription_biotools\tlicense_homepage\tlicense_link\tlicense_download\tlicense_documentation\tlicense_abstract\tlicense\tlicense_biotools\tlanguage_homepage\tlanguage_link\tlanguage_download\tlanguage_documentation\tlanguage_abstract\tlanguage\tlanguage_biotools\toa\tjournal_title\tpub_date\tcitations_count\tcitations_timestamp\tcitations_count_normalised\tcorresp_author_name\tcorresp_author_orcid\tcorresp_author_email\tcorresp_author_phone\tcorresp_author_uri");
+			try (Database db = new Database(database);
+					BufferedWriter resultsWriter = Files.newBufferedWriter(outputPath.resolve("results.csv"), StandardCharsets.UTF_8);
+					BufferedWriter diffWriter = Files.newBufferedWriter(outputPath.resolve("diff.csv"), StandardCharsets.UTF_8);
+					BufferedWriter newWriter = Files.newBufferedWriter(outputPath.resolve("new.json"), StandardCharsets.UTF_8)) {
+				resultsWriter.write("pmid\tpmcid\tdoi\tsame_suggestions\tscore\tscore2\tscore2_parts\tsuggestion_original\tsuggestion\tsuggestion_processed\tpublication_and_name_existing\tname_existing_some_publication_different\tsome_publication_existing_name_different\tname_existing_publication_different\tname_match\tlink_match\tname_word_match\tlinks_abstract\tlinks_fulltext\tfrom_abstract_link\thomepage\thomepage_biotools\tlink\tlink_biotools\tdownload\tdownload_biotools\tdocumentation\tdocumentation_biotools\tbroken_links\tother_scores\tother_scores2\tother_scores2_parts\tother_suggestions_original\tother_suggestions\tother_suggestions_processed\tother_publication_and_name_existing\tother_name_existing_some_publication_different\tother_some_publication_existing_name_different\tother_name_existing_publication_different\tother_links_abstract\tother_links_fulltext\tleftover_links_abstract\tleftover_links_fulltext\ttitle\ttool_title_others\ttool_title_extracted_original\ttool_title\ttool_title_pruned\ttool_title_acronym\tdescription\tdescription_biotools\tlicense_homepage\tlicense_link\tlicense_download\tlicense_documentation\tlicense_abstract\tlicense\tlicense_biotools\tlanguage_homepage\tlanguage_link\tlanguage_download\tlanguage_documentation\tlanguage_abstract\tlanguage\tlanguage_biotools\toa\tjournal_title\tpub_date\tcitations_count\tcitations_timestamp\tcitations_count_normalised\tcorresp_author_name\tcredit_name_biotools\tcorresp_author_orcid\tcredit_orcidid_biotools\tcorresp_author_email\tcredit_email_biotools\tcorresp_author_phone\tcorresp_author_uri\tcredit_url_biotools\tcredit\n");
+				diffWriter.write("biotools_id\tscore_score2\tcurrent_publications\tmodify_publications\tadd_publications\tcurrent_name\tmodify_name\tpossibly_related\tcurrent_homepage\tmodify_homepage\tcurrent_links\tadd_links\tcurrent_downloads\tadd_downloads\tcurrent_documentations\tadd_documentations\tcurrent_license\tmodify_license\tcurrent_languages\tadd_languages\tcurrent_credits\tmodify_credits\tadd_credits\n");
 
-			try (Database db = new Database(database)) {
 				for (Result result : results) {
 					if (!result.getSuggestions().isEmpty() && result.getSuggestions().get(0).calculateScore2()) {
 						result.getSuggestions().get(0).setScore2(result.getSuggestions().get(0).getScore());
@@ -2378,6 +2709,7 @@ public final class PubMedApps {
 									resultI.addPublicationIds(resultJ.getPublicationIds().get(0));
 
 									resultI.addTitle(resultJ.getTitle().get(0));
+									resultI.addToolTitleOthers(resultJ.getToolTitleOthers().get(0));
 									resultI.addToolTitleExtractedOriginal(resultJ.getToolTitleExtractedOriginal().get(0));
 									resultI.addToolTitle(resultJ.getToolTitle().get(0));
 									resultI.addToolTitlePruned(resultJ.getToolTitlePruned().get(0));
@@ -2452,17 +2784,19 @@ public final class PubMedApps {
 					List<String> queryNameProcessed = preProcessor.process(biotool.getName(), queryNameExtracted);
 					queryNamesExtracted.add(Arrays.asList(BIOTOOLS_EXTRACTED_VERSION_TRIM.matcher(String.join(" ", queryNameExtracted)).replaceFirst("").split(" ")));
 					queryNamesProcessed.add(BIOTOOLS_PROCESSED_VERSION_TRIM.matcher(String.join(" ", queryNameProcessed)).replaceFirst(""));
-					List<Link> links = new ArrayList<>();
-					Link homepage = new Link();
-					homepage.setUrl(biotool.getHomepage());
-					homepage.setType("Homepage");
-					links.add(homepage);
-					links.addAll(biotool.getLink());
-					links.addAll(biotool.getDownload());
-					links.addAll(biotool.getDocumentation());
+					List<String> links = new ArrayList<>();
+					links.add(biotool.getHomepage());
+					if (biotool.getLink() != null) {
+						links.addAll(biotool.getLink().stream().map(l -> l.getUrl()).collect(Collectors.toList()));
+					}
+					if (biotool.getDownload() != null) {
+						links.addAll(biotool.getDownload().stream().map(l -> l.getUrl()).collect(Collectors.toList()));
+					}
+					if (biotool.getDocumentation() != null) {
+						links.addAll(biotool.getDocumentation().stream().map(l -> l.getUrl()).collect(Collectors.toList()));
+					}
 					queryLinks.add(links.stream()
-						.map(l -> l.getUrl().trim())
-						.map(l -> trimUrl(l))
+						.map(l -> trimUrl(l.trim()))
 						.filter(l -> !l.isEmpty())
 						.collect(Collectors.toList()));
 				}
@@ -2470,12 +2804,12 @@ public final class PubMedApps {
 				for (Result result : results) {
 					List<Boolean> oneMatches = new ArrayList<>();
 					List<Boolean> allMatches = new ArrayList<>();
-					List<List<PublicationIds>> notMatches = new ArrayList<>();
+					List<Set<PublicationIds>> notMatches = new ArrayList<>();
 					for (int i = 0; i < biotools.size(); ++i) {
 						ToolInput biotool = biotools.get(i);
 						boolean oneMatch = false;
 						boolean allMatch = true;
-						List<PublicationIds> notMatch = null;
+						Set<PublicationIds> notMatch = null;
 						for (PublicationIds publicationIds : result.getPublicationIds()) {
 							boolean match = false;
 							if (biotool.getPublication() != null) {
@@ -2493,7 +2827,7 @@ public final class PubMedApps {
 							} else {
 								allMatch = false;
 								if (notMatch == null) {
-									notMatch = new ArrayList<>();
+									notMatch = new LinkedHashSet<>();
 								}
 								notMatch.add(publicationIds);
 							}
@@ -2506,11 +2840,11 @@ public final class PubMedApps {
 						Suggestion suggestion = result.getSuggestions().get(i);
 						List<Integer> publicationAndNameExisting = null;
 						List<Integer> nameExistingSomePublicationDifferent = null;
-						List<List<PublicationIds>> nameExistingSomePublicationDifferentPublicationIds = null;
+						List<Set<PublicationIds>> nameExistingSomePublicationDifferentPublicationIds = null;
 						List<Integer> somePublicationExistingNameDifferent = null;
-						List<List<PublicationIds>> somePublicationExistingNameDifferentPublicationIds = null;
+						List<Set<PublicationIds>> somePublicationExistingNameDifferentPublicationIds = null;
 						List<Integer> nameExistingPublicationDifferent = null;
-						List<List<PublicationIds>> nameExistingPublicationDifferentPublicationIds = null;
+						List<Set<PublicationIds>> nameExistingPublicationDifferentPublicationIds = null;
 						for (int j = 0; j < biotools.size(); ++j) {
 							ToolInput biotool = biotools.get(j);
 							if (suggestion.getExtracted().equals(biotool.getName())) {
@@ -2607,30 +2941,39 @@ public final class PubMedApps {
 					}
 				}
 
+				List<Tool> tools = new ArrayList<>();
+
 				for (Result result : results) {
+					final String name;
+					if (!result.getSuggestions().isEmpty()) {
+						name = result.getSuggestions().get(0).getExtracted();
+					} else {
+						name = "";
+					}
+
 					for (Suggestion suggestion : result.getSuggestions()) {
-						List<BiotoolsLink> linkLinksAbstract = new ArrayList<>();
-						List<BiotoolsLink> downloadLinksAbstract = new ArrayList<>();
-						List<BiotoolsLink> documentationLinksAbstract = new ArrayList<>();
+						List<BiotoolsLink<LinkType>> linkLinksAbstract = new ArrayList<>();
+						List<BiotoolsLink<DownloadType>> downloadLinksAbstract = new ArrayList<>();
+						List<BiotoolsLink<DocumentationType>> documentationLinksAbstract = new ArrayList<>();
 						makeBiotoolsLinks(suggestion.getLinksAbstract(), linkLinksAbstract, downloadLinksAbstract, documentationLinksAbstract);
-						removeBroken(linkLinksAbstract, suggestion.getBrokenLinks(), db, false);
-						removeBroken(downloadLinksAbstract, suggestion.getBrokenLinks(), db, false);
-						removeBroken(documentationLinksAbstract, suggestion.getBrokenLinks(), db, true);
+						removeBroken(linkLinksAbstract, suggestion.getBrokenLinks(), db, false, name);
+						removeBroken(downloadLinksAbstract, suggestion.getBrokenLinks(), db, false, name);
+						removeBroken(documentationLinksAbstract, suggestion.getBrokenLinks(), db, true, name);
 						String homepage = chooseHomepage(suggestion.getLinksAbstract(), linkLinksAbstract, documentationLinksAbstract, db);
-						List<BiotoolsLink> linkLinksFulltext = new ArrayList<>();
-						List<BiotoolsLink> downloadLinksFulltext = new ArrayList<>();
-						List<BiotoolsLink> documentationLinksFulltext = new ArrayList<>();
+						List<BiotoolsLink<LinkType>> linkLinksFulltext = new ArrayList<>();
+						List<BiotoolsLink<DownloadType>> downloadLinksFulltext = new ArrayList<>();
+						List<BiotoolsLink<DocumentationType>> documentationLinksFulltext = new ArrayList<>();
 						makeBiotoolsLinks(suggestion.getLinksFulltext(), linkLinksFulltext, downloadLinksFulltext, documentationLinksFulltext);
-						removeBroken(linkLinksFulltext, suggestion.getBrokenLinks(), db, false);
-						removeBroken(downloadLinksFulltext, suggestion.getBrokenLinks(), db, false);
-						removeBroken(documentationLinksFulltext, suggestion.getBrokenLinks(), db, true);
+						removeBroken(linkLinksFulltext, suggestion.getBrokenLinks(), db, false, name);
+						removeBroken(downloadLinksFulltext, suggestion.getBrokenLinks(), db, false, name);
+						removeBroken(documentationLinksFulltext, suggestion.getBrokenLinks(), db, true, name);
 						if (homepage == null) {
 							homepage = chooseHomepage(suggestion.getLinksFulltext(), linkLinksFulltext, documentationLinksFulltext, db);
 						}
 						if (homepage == null) {
 							for (String link : suggestion.getLinksAbstract()) {
 								link = prependHttp(link);
-								if (!DOWNLOAD_EXT.matcher(link).find() && !FTP_START.matcher(link).find()) {
+								if (!DOWNLOAD_EXT.matcher(link).find() && BIOTOOLS_SCHEMA_URL_PATTERN.matcher(link).matches()) {
 									homepage = link;
 									suggestion.setHomepageBroken(true);
 									break;
@@ -2640,7 +2983,7 @@ public final class PubMedApps {
 						if (homepage == null) {
 							for (String link : suggestion.getLinksFulltext()) {
 								link = prependHttp(link);
-								if (!DOWNLOAD_EXT.matcher(link).find() && !FTP_START.matcher(link).find()) {
+								if (!DOWNLOAD_EXT.matcher(link).find() && BIOTOOLS_SCHEMA_URL_PATTERN.matcher(link).matches()) {
 									homepage = link;
 									suggestion.setHomepageBroken(true);
 									break;
@@ -2659,6 +3002,9 @@ public final class PubMedApps {
 									break;
 								}
 							}
+							if (homepage == null) {
+								suggestion.setHomepage("https://bio.tools");
+							}
 							suggestion.setHomepageMissing(true);
 						}
 						suggestion.addLinkLinks(linkLinksAbstract);
@@ -2670,44 +3016,27 @@ public final class PubMedApps {
 						suggestion.removeHomepageFromLinks();
 					}
 
-					System.out.print(result.getPublicationIds().stream().map(p -> p.getPmid()).collect(Collectors.joining(" | ")));
-					System.out.print("\t");
-					System.out.print(result.getPublicationIds().stream().map(p -> p.getPmcid()).collect(Collectors.joining(" | ")));
-					System.out.print("\t");
-					System.out.print(result.getPublicationIds().stream().map(p -> p.getDoi()).collect(Collectors.joining(" | ")));
-					System.out.print("\t");
-					System.out.print(result.getSameSuggestions().stream().map(pubIds -> pubIds.toString()).collect(Collectors.joining(" | ")));
-					System.out.print("\t");
+					writeField(resultsWriter, result.getPublicationIds().stream().map(p -> p.getPmid()).collect(Collectors.joining(" | ")));
+					writeField(resultsWriter, result.getPublicationIds().stream().map(p -> p.getPmcid()).collect(Collectors.joining(" | ")));
+					writeField(resultsWriter, result.getPublicationIds().stream().map(p -> p.getDoi()).collect(Collectors.joining(" | ")));
+
+					writeField(resultsWriter, result.getSameSuggestions().stream().map(pubIds -> pubIds.toString()).collect(Collectors.joining(" | ")));
+
 					final Suggestion suggestion;
 					if (!result.getSuggestions().isEmpty()) {
 						suggestion = result.getSuggestions().get(0);
 					} else {
 						suggestion = null;
 					}
-					if (suggestion != null) {
-						System.out.print(suggestion.getScore());
-					}
-					System.out.print("\t");
-					if (suggestion != null && suggestion.getScore2() > -1) {
-						System.out.print(suggestion.getScore2());
-					}
-					System.out.print("\t");
-					if (suggestion != null && suggestion.getScore2() > -1) {
-						System.out.print(Arrays.toString(suggestion.getScore2Parts()));
-					}
-					System.out.print("\t");
-					final String name;
-					if (suggestion != null) {
-						name = suggestion.getExtracted();
-						System.out.print(name);
-					} else {
-						name = "";
-					}
-					System.out.print("\t");
-					if (suggestion != null) {
-						System.out.print(suggestion.getProcessed());
-					}
-					System.out.print("\t");
+
+					writeField(resultsWriter, suggestion != null ? String.valueOf(suggestion.getScore()) : null);
+					writeField(resultsWriter, suggestion != null && suggestion.getScore2() > -1 ? String.valueOf(suggestion.getScore2()) : null);
+					writeField(resultsWriter, suggestion != null && suggestion.getScore2() > -1 ? Arrays.toString(suggestion.getScore2Parts()) : null);
+
+					writeField(resultsWriter, suggestion != null ? suggestion.getOriginal() : null);
+					writeField(resultsWriter, name);
+					writeField(resultsWriter, suggestion != null ? suggestion.getProcessed() : null);
+
 					List<Integer> existing = new ArrayList<>();
 					if (suggestion != null) {
 						if (suggestion.getPublicationAndNameExisting() != null) {
@@ -2723,12 +3052,15 @@ public final class PubMedApps {
 							existing.addAll(suggestion.getNameExistingPublicationDifferent());
 						}
 					}
+
 					List<String> publicationAndNameExisting = null;
 					if (suggestion != null && suggestion.getPublicationAndNameExisting() != null) {
 						publicationAndNameExisting = suggestion.getPublicationAndNameExisting().stream().map(e -> biotools.get(e)).map(q -> q.getBiotoolsID()).collect(Collectors.toList());
-						System.out.print(String.join(" | ", publicationAndNameExisting));
+						writeField(resultsWriter, String.join(" | ", publicationAndNameExisting));
+					} else {
+						writeField(resultsWriter, null);
 					}
-					System.out.print("\t");
+
 					List<String> nameExistingSomePublicationDifferent = null;
 					if (suggestion != null && suggestion.getNameExistingSomePublicationDifferent() != null) {
 						nameExistingSomePublicationDifferent = IntStream.range(0, suggestion.getNameExistingSomePublicationDifferent().size())
@@ -2736,9 +3068,11 @@ public final class PubMedApps {
 								((suggestion.getNameExistingSomePublicationDifferentPublicationIds() != null && suggestion.getNameExistingSomePublicationDifferentPublicationIds().get(i) != null) ? (" (" +
 									String.join(" ; ", suggestion.getNameExistingSomePublicationDifferentPublicationIds().get(i).stream().map(p -> p.toString()).collect(Collectors.toList()))
 								+ ")") : "")).collect(Collectors.toList());
-						System.out.print(String.join(" | ", nameExistingSomePublicationDifferent));
+						writeField(resultsWriter, String.join(" | ", nameExistingSomePublicationDifferent));
+					} else {
+						writeField(resultsWriter, null);
 					}
-					System.out.print("\t");
+
 					List<String> somePublicationExistingNameDifferent = null;
 					if (suggestion != null && suggestion.getSomePublicationExistingNameDifferent() != null) {
 						somePublicationExistingNameDifferent = IntStream.range(0, suggestion.getSomePublicationExistingNameDifferent().size())
@@ -2746,9 +3080,11 @@ public final class PubMedApps {
 								((suggestion.getSomePublicationExistingNameDifferentPublicationIds() != null && suggestion.getSomePublicationExistingNameDifferentPublicationIds().get(i) != null && !suggestion.getSomePublicationExistingNameDifferentPublicationIds().get(i).isEmpty()) ? (" (" +
 									String.join(" ; ", suggestion.getSomePublicationExistingNameDifferentPublicationIds().get(i).stream().map(p -> p.toString()).collect(Collectors.toList()))
 								+ ")") : "")).collect(Collectors.toList());
-						System.out.print(String.join(" | ", somePublicationExistingNameDifferent));
+						writeField(resultsWriter, String.join(" | ", somePublicationExistingNameDifferent));
+					} else {
+						writeField(resultsWriter, null);
 					}
-					System.out.print("\t");
+
 					List<String> nameExistingPublicationDifferent = null;
 					if (suggestion != null && suggestion.getNameExistingPublicationDifferent() != null) {
 						nameExistingPublicationDifferent = IntStream.range(0, suggestion.getNameExistingPublicationDifferent().size())
@@ -2756,88 +3092,100 @@ public final class PubMedApps {
 								((suggestion.getNameExistingPublicationDifferentPublicationIds() != null && suggestion.getNameExistingPublicationDifferentPublicationIds().get(i) != null) ? (" (" +
 									String.join(" ; ", suggestion.getNameExistingPublicationDifferentPublicationIds().get(i).stream().map(p -> p.toString()).collect(Collectors.toList()))
 								+ ")") : "")).collect(Collectors.toList());
-						System.out.print(String.join(" | ", nameExistingPublicationDifferent));
+						writeField(resultsWriter, String.join(" | ", nameExistingPublicationDifferent));
+					} else {
+						writeField(resultsWriter, null);
 					}
-					System.out.print("\t");
+
 					List<String> nameMatch = result.getNameMatch().stream().map(e -> biotools.get(e)).map(q -> q.getBiotoolsID() + " (" + q.getName() + ")").collect(Collectors.toList());
-					System.out.print(String.join(" | ", nameMatch));
-					System.out.print("\t");
+					writeField(resultsWriter, String.join(" | ", nameMatch));
+
 					List<String> linkMatch = IntStream.range(0, result.getLinkMatch().size())
 						.mapToObj(i -> biotools.get(result.getLinkMatch().get(i)).getBiotoolsID() + " (" +
 							String.join(" ; ", result.getLinkMatchLinks().get(i))
 						+ ")").collect(Collectors.toList());
-					System.out.print(String.join(" | ", linkMatch));
-					System.out.print("\t");
+					writeField(resultsWriter, String.join(" | ", linkMatch));
+
 					List<String> nameWordMatch = result.getNameWordMatch().stream().map(e -> biotools.get(e)).map(q -> q.getBiotoolsID() + " (" + q.getName() + ")").collect(Collectors.toList());
-					System.out.print(String.join(" | ", nameWordMatch));
-					System.out.print("\t");
+					writeField(resultsWriter, String.join(" | ", nameWordMatch));
+
 					List<String> linksAbstract = new ArrayList<>();
 					if (suggestion != null) {
 						linksAbstract = suggestion.getLinksAbstract();
-						System.out.print(String.join(" | ", linksAbstract));
+						writeField(resultsWriter, String.join(" | ", linksAbstract));
+					} else {
+						writeField(resultsWriter, null);
 					}
-					System.out.print("\t");
 					if (suggestion != null) {
-						System.out.print(String.join(" | ", suggestion.getLinksFulltext()));
+						writeField(resultsWriter, String.join(" | ", suggestion.getLinksFulltext()));
+					} else {
+						writeField(resultsWriter, null);
 					}
-					System.out.print("\t");
-					System.out.print(result.getSuggestions().stream().map(s -> String.valueOf(s.isFromAbstractLink())).collect(Collectors.joining(" | ")));
-					System.out.print("\t");
-					String homepage = "";
+
+					writeField(resultsWriter, result.getSuggestions().stream().map(s -> String.valueOf(s.isFromAbstractLink())).collect(Collectors.joining(" | ")));
+
+					final String homepage;
 					boolean homepageBroken = false;
 					boolean homepageMissing = true;
 					if (suggestion != null) {
-						System.out.print(suggestion.getHomepage());
+						writeField(resultsWriter, suggestion.getHomepage());
 						homepageBroken = suggestion.isHomepageBroken();
 						homepageMissing = suggestion.isHomepageMissing();
 						if (!homepageBroken && !homepageMissing) {
 							homepage = suggestion.getHomepage();
+						} else {
+							homepage = "";
 						}
+					} else {
+						writeField(resultsWriter, null);
+						homepage = "";
 					}
-					System.out.print("\t");
-					System.out.print(existing.stream().map(e -> biotools.get(e)).map(q -> q.getHomepage()).collect(Collectors.joining(" | ")));
-					System.out.print("\t");
-					Set<BiotoolsLink> linkLinks = new LinkedHashSet<>();
+					writeField(resultsWriter, existing.stream().map(e -> biotools.get(e)).map(q -> q.getHomepage()).collect(Collectors.joining(" | ")));
+
+					Set<BiotoolsLink<LinkType>> linkLinks = new LinkedHashSet<>();
 					if (suggestion != null) {
 						linkLinks = suggestion.getLinkLinks();
-						System.out.print(linkLinks.stream().map(l -> l.getUrl() + " (" + l.getType() + ")").collect(Collectors.joining(" | ")));
+						writeField(resultsWriter, linkLinks.stream().map(l -> l.getUrl() + " (" + l.getType() + ")").collect(Collectors.joining(" | ")));
+					} else {
+						writeField(resultsWriter, null);
 					}
-					System.out.print("\t");
-					System.out.print(existing.stream().map(e -> biotools.get(e)).map(t -> t.getLink().stream().map(l -> l.getUrl() + " (" + l.getType() + ")").collect(Collectors.joining(" ; "))).collect(Collectors.joining(" | ")));
-					System.out.print("\t");
-					Set<BiotoolsLink> downloadLinks = new LinkedHashSet<>();
+					writeField(resultsWriter, existing.stream().map(e -> biotools.get(e)).map(t -> (t.getLink() == null ? "" : t.getLink().stream().map(l -> l.getUrl() + " (" + l.getType() + ")").collect(Collectors.joining(" ; ")))).collect(Collectors.joining(" | ")));
+
+					Set<BiotoolsLink<DownloadType>> downloadLinks = new LinkedHashSet<>();
 					if (suggestion != null) {
 						downloadLinks = suggestion.getDownloadLinks();
-						System.out.print(downloadLinks.stream().map(l -> l.getUrl() + " (" + l.getType() + ")").collect(Collectors.joining(" | ")));
+						writeField(resultsWriter, downloadLinks.stream().map(l -> l.getUrl() + " (" + l.getType() + ")").collect(Collectors.joining(" | ")));
+					} else {
+						writeField(resultsWriter, null);
 					}
-					System.out.print("\t");
-					System.out.print(existing.stream().map(e -> biotools.get(e)).map(t -> t.getDownload().stream().map(l -> l.getUrl() + " (" + l.getType() + ")").collect(Collectors.joining(" ; "))).collect(Collectors.joining(" | ")));
-					System.out.print("\t");
-					Set<BiotoolsLink> documentationLinks = new LinkedHashSet<>();
+					writeField(resultsWriter, existing.stream().map(e -> biotools.get(e)).map(t -> (t.getDownload() == null ? "" : t.getDownload().stream().map(l -> l.getUrl() + " (" + l.getType() + ")").collect(Collectors.joining(" ; ")))).collect(Collectors.joining(" | ")));
+
+					Set<BiotoolsLink<DocumentationType>> documentationLinks = new LinkedHashSet<>();
 					if (suggestion != null) {
 						documentationLinks = suggestion.getDocumentationLinks();
-						System.out.print(documentationLinks.stream().map(l -> l.getUrl() + " (" + l.getType() + ")").collect(Collectors.joining(" | ")));
+						writeField(resultsWriter, documentationLinks.stream().map(l -> l.getUrl() + " (" + l.getType() + ")").collect(Collectors.joining(" | ")));
+					} else {
+						writeField(resultsWriter, null);
 					}
-					System.out.print("\t");
-					System.out.print(existing.stream().map(e -> biotools.get(e)).map(t -> t.getDocumentation().stream().map(l -> l.getUrl() + " (" + l.getType() + ")").collect(Collectors.joining(" ; "))).collect(Collectors.joining(" | ")));
-					System.out.print("\t");
+					writeField(resultsWriter, existing.stream().map(e -> biotools.get(e)).map(t -> (t.getDocumentation() == null ? "" : t.getDocumentation().stream().map(l -> l.getUrl() + " (" + l.getType() + ")").collect(Collectors.joining(" ; ")))).collect(Collectors.joining(" | ")));
+
 					if (suggestion != null) {
-						System.out.print(suggestion.getBrokenLinks().stream().map(l -> l.getUrl() + " (" + l.getType() + ")").collect(Collectors.joining(" | ")));
+						writeField(resultsWriter, suggestion.getBrokenLinks().stream().map(l -> l.getUrl() + " (" + l.getType() + ")").collect(Collectors.joining(" | ")));
+					} else {
+						writeField(resultsWriter, null);
 					}
-					System.out.print("\t");
-					System.out.print(result.getSuggestions().stream().skip(1).map(s -> String.format(Locale.ROOT, "%.1f", s.getScore())).collect(Collectors.joining(" | ")));
-					System.out.print("\t");
-					System.out.print(result.getSuggestions().stream().skip(1).map(s -> (s.getScore2() > -1) ? String.format(Locale.ROOT, "%.1f", s.getScore2()) : "").collect(Collectors.joining(" | ")));
-					System.out.print("\t");
-					System.out.print(result.getSuggestions().stream().skip(1).map(s -> (s.getScore2() > -1) ? ("[" + Arrays.asList(s.getScore2Parts()).stream().map(part -> String.format(Locale.ROOT, "%.1f", part)).collect(Collectors.joining(", ")) + "]") : "").collect(Collectors.joining(" | ")));
-					System.out.print("\t");
-					System.out.print(result.getSuggestions().stream().skip(1).map(s -> s.getExtracted()).collect(Collectors.joining(" | ")));
-					System.out.print("\t");
-					System.out.print(result.getSuggestions().stream().skip(1).map(s -> s.getProcessed()).collect(Collectors.joining(" | ")));
-					System.out.print("\t");
+
+					writeField(resultsWriter, result.getSuggestions().stream().skip(1).map(s -> String.format(Locale.ROOT, "%.1f", s.getScore())).collect(Collectors.joining(" | ")));
+					writeField(resultsWriter, result.getSuggestions().stream().skip(1).map(s -> (s.getScore2() > -1) ? String.format(Locale.ROOT, "%.1f", s.getScore2()) : "").collect(Collectors.joining(" | ")));
+					writeField(resultsWriter, result.getSuggestions().stream().skip(1).map(s -> (s.getScore2() > -1) ? ("[" + Arrays.asList(s.getScore2Parts()).stream().map(part -> String.format(Locale.ROOT, "%.1f", part)).collect(Collectors.joining(", ")) + "]") : "").collect(Collectors.joining(" | ")));
+
+					writeField(resultsWriter, result.getSuggestions().stream().skip(1).map(s -> s.getOriginal()).collect(Collectors.joining(" | ")));
+					writeField(resultsWriter, result.getSuggestions().stream().skip(1).map(s -> s.getExtracted()).collect(Collectors.joining(" | ")));
+					writeField(resultsWriter, result.getSuggestions().stream().skip(1).map(s -> s.getProcessed()).collect(Collectors.joining(" | ")));
+
 					List<List<String>> otherPublicationAndNameExisting = result.getSuggestions().stream().skip(1).map(s -> s.getPublicationAndNameExisting() != null ? s.getPublicationAndNameExisting().stream().map(e -> biotools.get(e)).map(q -> q.getBiotoolsID()).collect(Collectors.toList()) : null).collect(Collectors.toList());
-					System.out.print(otherPublicationAndNameExisting.stream().map(e -> e != null ? String.join(" ; ", e) : "").collect(Collectors.joining(" | ")));
-					System.out.print("\t");
+					writeField(resultsWriter, otherPublicationAndNameExisting.stream().map(e -> e != null ? String.join(" ; ", e) : "").collect(Collectors.joining(" | ")));
+
 					List<List<String>> otherNameExistingSomePublicationDifferent = result.getSuggestions().stream().skip(1)
 						.map(s -> s.getNameExistingSomePublicationDifferent() != null ? IntStream.range(0, s.getNameExistingSomePublicationDifferent().size())
 							.mapToObj(i -> biotools.get(s.getNameExistingSomePublicationDifferent().get(i)).getBiotoolsID() +
@@ -2845,8 +3193,8 @@ public final class PubMedApps {
 									String.join(" ; ", s.getNameExistingSomePublicationDifferentPublicationIds().get(i).stream().map(p -> p.toString()).collect(Collectors.toList()))
 								+ ")") : "")).collect(Collectors.toList())
 						: null).collect(Collectors.toList());
-					System.out.print(otherNameExistingSomePublicationDifferent.stream().map(e -> e != null ? String.join(" ; ", e) : "").collect(Collectors.joining(" | ")));
-					System.out.print("\t");
+					writeField(resultsWriter, otherNameExistingSomePublicationDifferent.stream().map(e -> e != null ? String.join(" ; ", e) : "").collect(Collectors.joining(" | ")));
+
 					List<List<String>> otherSomePublicationExistingNameDifferent = result.getSuggestions().stream().skip(1)
 						.map(s -> s.getSomePublicationExistingNameDifferent() != null ? IntStream.range(0, s.getSomePublicationExistingNameDifferent().size())
 							.mapToObj(i -> biotools.get(s.getSomePublicationExistingNameDifferent().get(i)).getBiotoolsID() + " (" + biotools.get(s.getSomePublicationExistingNameDifferent().get(i)).getName() + ")" +
@@ -2854,8 +3202,8 @@ public final class PubMedApps {
 									String.join(" ; ", s.getSomePublicationExistingNameDifferentPublicationIds().get(i).stream().map(p -> p.toString()).collect(Collectors.toList()))
 								+ ")") : "")).collect(Collectors.toList())
 						: null).collect(Collectors.toList());
-					System.out.print(otherSomePublicationExistingNameDifferent.stream().map(e -> e != null ? String.join(" ; ", e) : "").collect(Collectors.joining(" | ")));
-					System.out.print("\t");
+					writeField(resultsWriter, otherSomePublicationExistingNameDifferent.stream().map(e -> e != null ? String.join(" ; ", e) : "").collect(Collectors.joining(" | ")));
+
 					List<List<String>> otherNameExistingPublicationDifferent = result.getSuggestions().stream().skip(1)
 						.map(s -> s.getNameExistingPublicationDifferent() != null ? IntStream.range(0, s.getNameExistingPublicationDifferent().size())
 							.mapToObj(i -> biotools.get(s.getNameExistingPublicationDifferent().get(i)).getBiotoolsID() +
@@ -2863,8 +3211,8 @@ public final class PubMedApps {
 									String.join(" ; ", s.getNameExistingPublicationDifferentPublicationIds().get(i).stream().map(p -> p.toString()).collect(Collectors.toList()))
 								+ ")") : "")).collect(Collectors.toList())
 						: null).collect(Collectors.toList());
-					System.out.print(otherNameExistingPublicationDifferent.stream().map(e -> e != null ? String.join(" ; ", e) : "").collect(Collectors.joining(" | ")));
-					System.out.print("\t");
+					writeField(resultsWriter, otherNameExistingPublicationDifferent.stream().map(e -> e != null ? String.join(" ; ", e) : "").collect(Collectors.joining(" | ")));
+
 					List<String> otherLinksAbstract = new ArrayList<>();
 					boolean otherLinksAbstractEmpty = true;
 					for (int i = 1; i < result.getSuggestions().size(); ++i) {
@@ -2873,10 +3221,8 @@ public final class PubMedApps {
 							otherLinksAbstractEmpty = false;
 						}
 					}
-					if (!otherLinksAbstractEmpty) {
-						System.out.print(String.join(" | ", otherLinksAbstract));
-					}
-					System.out.print("\t");
+					writeField(resultsWriter, !otherLinksAbstractEmpty ? String.join(" | ", otherLinksAbstract) : null);
+
 					List<String> otherLinksFulltext = new ArrayList<>();
 					boolean otherLinksFulltextEmpty = true;
 					for (int i = 1; i < result.getSuggestions().size(); ++i) {
@@ -2885,26 +3231,20 @@ public final class PubMedApps {
 							otherLinksFulltextEmpty = false;
 						}
 					}
-					if (!otherLinksFulltextEmpty) {
-						System.out.print(String.join(" | ", otherLinksFulltext));
-					}
-					System.out.print("\t");
-					System.out.print(result.getLeftoverLinksAbstract().stream().map(l -> String.join(" ; ", l)).collect(Collectors.joining(" | ")));
-					System.out.print("\t");
-					System.out.print(result.getLeftoverLinksFulltext().stream().map(l -> String.join(" ; ", l)).collect(Collectors.joining(" | ")));
-					System.out.print("\t");
-					System.out.print(String.join(" | ", result.getTitle()));
-					System.out.print("\t");
-					System.out.print(String.join(" | ", result.getToolTitleExtractedOriginal()));
-					System.out.print("\t");
-					System.out.print(IntStream.range(0, result.getToolTitle().size())
+					writeField(resultsWriter, !otherLinksFulltextEmpty ? String.join(" | ", otherLinksFulltext) : null);
+
+					writeField(resultsWriter, result.getLeftoverLinksAbstract().stream().map(l -> String.join(" ; ", l)).collect(Collectors.joining(" | ")));
+					writeField(resultsWriter, result.getLeftoverLinksFulltext().stream().map(l -> String.join(" ; ", l)).collect(Collectors.joining(" | ")));
+
+					writeField(resultsWriter, String.join(" | ", result.getTitle()));
+					writeField(resultsWriter, result.getToolTitleOthers().stream().map(t -> String.join(" ; ", t)).collect(Collectors.joining(" | ")));
+					writeField(resultsWriter, String.join(" | ", result.getToolTitleExtractedOriginal()));
+					writeField(resultsWriter, IntStream.range(0, result.getToolTitle().size())
 						.mapToObj(i -> result.getToolTitle().get(i).equals(result.getToolTitleExtractedOriginal().get(i)) ? "" : result.getToolTitle().get(i)).collect(Collectors.joining(" | ")));
-					System.out.print("\t");
-					System.out.print(IntStream.range(0, result.getToolTitlePruned().size())
+					writeField(resultsWriter, IntStream.range(0, result.getToolTitlePruned().size())
 						.mapToObj(i -> result.getToolTitlePruned().get(i).equals(result.getToolTitle().get(i)) ? "" : result.getToolTitlePruned().get(i)).collect(Collectors.joining(" | ")));
-					System.out.print("\t");
-					System.out.print(String.join(" | ", result.getToolTitleAcronym()));
-					System.out.print("\t");
+					writeField(resultsWriter, String.join(" | ", result.getToolTitleAcronym()));
+
 					List<String> messages = new ArrayList<>();
 					if (suggestion == null || !suggestion.include()) {
 						messages.add("NOT INCLUDED!");
@@ -2968,6 +3308,7 @@ public final class PubMedApps {
 							break;
 						}
 					}
+
 					List<Description> descriptions = new ArrayList<>();
 					for (String title : result.getTitle()) {
 						String publicationTitleDescription = License.WHITESPACE.matcher(descriptionFromTitle(title, TITLE_SEPARATOR)).replaceAll(" ").trim();
@@ -3016,12 +3357,19 @@ public final class PubMedApps {
 							description += String.join(" | ", abstractDescriptions);
 						}
 					}
-					// TODO check description length once more, just in case, using BIOTOOLS_SCHEMA_DESCRIPTION_MAX
-					System.out.print(description);
-					System.out.print("\t");
-					System.out.print(existing.stream().map(e -> biotools.get(e)).map(q -> q.getDescription().replaceAll("\n", "\\\\n").replaceAll("\r", "\\\\r").replaceAll("\t", "\\\\t")).collect(Collectors.joining(" | ")));
-					System.out.print("\t");
-					List<String> webpageLicenses = new ArrayList<>();
+					String descriptionOriginal = description;
+					if (description.length() < BIOTOOLS_SCHEMA_DESCRIPTION_MIN) {
+						description = fillToMin(description, BIOTOOLS_SCHEMA_DESCRIPTION_MIN);
+						logger.warn("Description filled to min from '{}' to '{}' (for name '{}')", descriptionOriginal, description, name);
+					}
+					if (description.length() > BIOTOOLS_SCHEMA_DESCRIPTION_MAX) {
+						description = pruneToMax(description, BIOTOOLS_SCHEMA_DESCRIPTION_MAX);
+						logger.warn("Description pruned to max from '{}' to '{}' (for name '{}')", descriptionOriginal, description, name);
+					}
+					writeField(resultsWriter, description);
+					writeField(resultsWriter, existing.stream().map(e -> biotools.get(e)).map(q -> q.getDescription().replaceAll("\n", "\\\\n").replaceAll("\r", "\\\\r").replaceAll("\t", "\\\\t")).collect(Collectors.joining(" | ")));
+
+					List<Provenance> webpageLicenses = new ArrayList<>();
 					if (!homepage.isEmpty()) {
 						String homepageLicense = null;
 						if (db.getWebpage(homepage) != null) {
@@ -3030,66 +3378,109 @@ public final class PubMedApps {
 							homepageLicense = db.getDoc(homepage).getLicense();
 						}
 						if (homepageLicense != null && !homepageLicense.isEmpty()) {
-							System.out.print(homepageLicense);
-							webpageLicenses.add(homepageLicense);
+							writeField(resultsWriter, homepageLicense);
+							webpageLicenses.add(new Provenance(homepageLicense, homepage));
+						} else {
+							writeField(resultsWriter, null);
 						}
+					} else {
+						writeField(resultsWriter, null);
 					}
-					System.out.print("\t");
-					List<String> linkLicenses = linkLinks.stream().map(l -> db.getWebpage(l.getUrl()) != null ? db.getWebpage(l.getUrl()).getLicense() : "").collect(Collectors.toList());
-					System.out.print(String.join(" | ", linkLicenses));
-					linkLicenses.removeIf(l -> l.isEmpty());
+
+					List<Provenance> linkLicenses = linkLinks.stream().map(l -> db.getWebpage(l.getUrl()) != null ? new Provenance(db.getWebpage(l.getUrl()).getLicense(), l.getUrl()) : new Provenance()).collect(Collectors.toList());
+					writeField(resultsWriter, linkLicenses.stream().map(p -> p.toString()).collect(Collectors.joining(" | ")));
+					linkLicenses.removeIf(p -> p.isEmpty());
 					webpageLicenses.addAll(linkLicenses);
-					System.out.print("\t");
-					List<String> downloadLicenses = downloadLinks.stream().map(l -> db.getWebpage(l.getUrl()) != null ? db.getWebpage(l.getUrl()).getLicense() : "").collect(Collectors.toList());
-					System.out.print(String.join(" | ", downloadLicenses));
-					downloadLicenses.removeIf(l -> l.isEmpty());
+
+					List<Provenance> downloadLicenses = downloadLinks.stream().map(l -> db.getWebpage(l.getUrl()) != null ? new Provenance(db.getWebpage(l.getUrl()).getLicense(), l.getUrl()) : new Provenance()).collect(Collectors.toList());
+					writeField(resultsWriter, downloadLicenses.stream().map(p -> p.toString()).collect(Collectors.joining(" | ")));
+					downloadLicenses.removeIf(p -> p.isEmpty());
 					webpageLicenses.addAll(downloadLicenses);
-					System.out.print("\t");
-					List<String> documentationLicenses = documentationLinks.stream().map(l -> db.getDoc(l.getUrl()) != null ? db.getDoc(l.getUrl()).getLicense() : "").collect(Collectors.toList());
-					System.out.print(String.join(" | ", documentationLicenses));
-					documentationLicenses.removeIf(l -> l.isEmpty());
+
+					List<Provenance> documentationLicenses = documentationLinks.stream().map(l -> db.getDoc(l.getUrl()) != null ? new Provenance(db.getDoc(l.getUrl()).getLicense(), l.getUrl()) : new Provenance()).collect(Collectors.toList());
+					writeField(resultsWriter, documentationLicenses.stream().map(p -> p.toString()).collect(Collectors.joining(" | ")));
+					documentationLicenses.removeIf(p -> p.isEmpty());
 					webpageLicenses.addAll(documentationLicenses);
-					System.out.print("\t");
-					List<List<String>> abstractLicenses = new ArrayList<>();
-					for (List<String> abstractSentences : result.getAbstractSentences()) {
+
+					List<List<Provenance>> abstractLicenses = new ArrayList<>();
+					for (int i = 0; i < result.getPublicationIds().size(); ++i) {
+						List<String> abstractSentences = result.getAbstractSentences().get(i);
+						String provenance = result.getPublicationIds().get(i).toString();
 						abstractLicenses.add(abstractSentences.stream()
 							.map(s -> new LicenseSearch(s).bestMatch(licenses, false))
 							.filter(l -> l != null)
-							.map(l -> l.getOriginal())
+							.map(l -> new Provenance(l.getOriginal(), provenance))
 							.collect(Collectors.toList()));
 					}
-					System.out.print(abstractLicenses.stream().map(l -> String.join(" ; ", l)).collect(Collectors.joining(" | ")));
-					System.out.print("\t");
-					List<String> allLicenses = webpageLicenses.stream()
-						.map(l -> new LicenseSearch(l).bestMatch(licenses, true))
-						.filter(l -> l != null)
-						.map(l -> l.getOriginal())
-						.collect(Collectors.toList());
-					for (List<String> abstractLicense : abstractLicenses) {
+					writeField(resultsWriter, abstractLicenses.stream().map(lp -> lp.stream().map(p -> p.toString()).collect(Collectors.joining(" ; "))).collect(Collectors.joining(" | ")));
+
+					List<Provenance> allLicenses = new ArrayList<>();
+					for (Provenance webpageLicense : webpageLicenses) {
+						License l = new LicenseSearch(webpageLicense.getObject()).bestMatch(licenses, true);
+						if (l != null) {
+							allLicenses.add(new Provenance(l.getOriginal(), webpageLicense.getProvenances()));
+						}
+					}
+					for (List<Provenance> abstractLicense : abstractLicenses) {
 						allLicenses.addAll(abstractLicense);
 					}
+
+					Map<String, Integer> abstractLicenseCount = new HashMap<>();
+					Map<String, Provenance> abstractLicenseProvenances = new HashMap<>();
+					Provenance bestAbstractLicense = null;
+					int bestAbstractCount = 0;
+					for (List<Provenance> ls : abstractLicenses) {
+						for (Provenance l : ls) {
+							int count = 0;
+							if (abstractLicenseCount.get(l.getObject()) != null) {
+								count = abstractLicenseCount.get(l.getObject());
+							}
+							++count;
+							abstractLicenseCount.put(l.getObject(), count);
+							Provenance provenance;
+							if (abstractLicenseProvenances.get(l.getObject()) != null) {
+								provenance = abstractLicenseProvenances.get(l.getObject());
+								provenance.addProvenances(l.getProvenances());
+							} else {
+								provenance = l;
+								abstractLicenseProvenances.put(l.getObject(), provenance);
+							}
+							if (count > bestAbstractCount) {
+								bestAbstractLicense = provenance;
+								bestAbstractCount = count;
+							}
+						}
+					}
+
 					Map<String, Integer> licenseCount = new HashMap<>();
-					String bestLicense = null;
+					Map<String, Provenance> licenseProvenances = new HashMap<>();
+					Provenance bestLicense = null;
 					int bestCount = 0;
-					for (String l : allLicenses) {
+					for (Provenance l : allLicenses) {
 						int count = 0;
-						if (licenseCount.get(l) != null) {
-							count = licenseCount.get(l);
+						if (licenseCount.get(l.getObject()) != null) {
+							count = licenseCount.get(l.getObject());
 						}
 						++count;
+						licenseCount.put(l.getObject(), count);
+						Provenance provenance;
+						if (licenseProvenances.get(l.getObject()) != null) {
+							provenance = licenseProvenances.get(l.getObject());
+							provenance.addProvenances(l.getProvenances());
+						} else {
+							provenance = l;
+							licenseProvenances.put(l.getObject(), provenance);
+						}
 						if (count > bestCount) {
-							bestLicense = l;
+							bestLicense = provenance;
 							bestCount = count;
 						}
-						licenseCount.put(l, count);
 					}
-					if (bestLicense != null) {
-						System.out.print(bestLicense);
-					}
-					System.out.print("\t");
-					System.out.print(existing.stream().map(e -> biotools.get(e)).map(t -> (t.getLicense() == null ? "" : t.getLicense())).collect(Collectors.joining(" | ")));
-					System.out.print("\t");
-					List<String> webpageLanguages = new ArrayList<>();
+
+					writeField(resultsWriter, bestLicense != null ? bestLicense.toString() : null);
+					writeField(resultsWriter, existing.stream().map(e -> biotools.get(e)).map(t -> (t.getLicense() == null ? "" : t.getLicense())).collect(Collectors.joining(" | ")));
+
+					List<Provenance> webpageLanguages = new ArrayList<>();
 					if (!homepage.isEmpty()) {
 						String homepageLanguage = null;
 						if (db.getWebpage(homepage) != null) {
@@ -3098,75 +3489,356 @@ public final class PubMedApps {
 							homepageLanguage = db.getDoc(homepage).getLanguage();
 						}
 						if (homepageLanguage != null && !homepageLanguage.isEmpty()) {
-							System.out.print(homepageLanguage);
-							webpageLanguages.add(homepageLanguage);
+							writeField(resultsWriter, homepageLanguage);
+							webpageLanguages.add(new Provenance(homepageLanguage, homepage));
+						} else {
+							writeField(resultsWriter, null);
 						}
+					} else {
+						writeField(resultsWriter, null);
 					}
-					System.out.print("\t");
-					List<String> linkLanguages = linkLinks.stream().map(l -> db.getWebpage(l.getUrl()) != null ? db.getWebpage(l.getUrl()).getLanguage() : "").collect(Collectors.toList());
-					System.out.print(String.join(" | ", linkLanguages));
-					linkLanguages.removeIf(l -> l.isEmpty());
+
+					List<Provenance> linkLanguages = linkLinks.stream().map(l -> db.getWebpage(l.getUrl()) != null ? new Provenance(db.getWebpage(l.getUrl()).getLanguage(), l.getUrl()) : new Provenance()).collect(Collectors.toList());
+					writeField(resultsWriter, linkLanguages.stream().map(p -> p.toString()).collect(Collectors.joining(" | ")));
+					linkLanguages.removeIf(p -> p.isEmpty());
 					webpageLanguages.addAll(linkLanguages);
-					System.out.print("\t");
-					List<String> downloadLanguages = downloadLinks.stream().map(l -> db.getWebpage(l.getUrl()) != null ? db.getWebpage(l.getUrl()).getLanguage() : "").collect(Collectors.toList());
-					System.out.print(String.join(" | ", downloadLanguages));
-					downloadLanguages.removeIf(l -> l.isEmpty());
+
+					List<Provenance> downloadLanguages = downloadLinks.stream().map(l -> db.getWebpage(l.getUrl()) != null ? new Provenance(db.getWebpage(l.getUrl()).getLanguage(), l.getUrl()) : new Provenance()).collect(Collectors.toList());
+					writeField(resultsWriter, downloadLanguages.stream().map(p -> p.toString()).collect(Collectors.joining(" | ")));
+					downloadLanguages.removeIf(p -> p.isEmpty());
 					webpageLanguages.addAll(downloadLanguages);
-					System.out.print("\t");
-					List<String> documentationLanguages = documentationLinks.stream().map(l -> db.getDoc(l.getUrl()) != null ? db.getDoc(l.getUrl()).getLanguage() : "").collect(Collectors.toList());
-					System.out.print(String.join(" | ", documentationLanguages));
-					documentationLanguages.removeIf(l -> l.isEmpty());
+
+					List<Provenance> documentationLanguages = documentationLinks.stream().map(l -> db.getDoc(l.getUrl()) != null ? new Provenance(db.getDoc(l.getUrl()).getLanguage(), l.getUrl()) : new Provenance()).collect(Collectors.toList());
+					writeField(resultsWriter, documentationLanguages.stream().map(p -> p.toString()).collect(Collectors.joining(" | ")));
+					documentationLanguages.removeIf(p -> p.isEmpty());
 					webpageLanguages.addAll(documentationLanguages);
-					System.out.print("\t");
-					List<List<String>> abstractLanguages = new ArrayList<>();
-					for (List<String> abstractSentences : result.getAbstractSentences()) {
+
+					List<List<Provenance>> abstractLanguages = new ArrayList<>();
+					for (int i = 0; i < result.getPublicationIds().size(); ++i) {
+						List<String> abstractSentences = result.getAbstractSentences().get(i);
+						String provenance = result.getPublicationIds().get(i).toString();
 						abstractLanguages.add(abstractSentences.stream()
 							.map(s -> new LanguageSearch(s).getMatches(languages, false, languageKeywords))
-							.flatMap(l -> l.stream())
+							.flatMap(l -> l.stream().map(s -> new Provenance(s, provenance)))
 							.collect(Collectors.toList()));
 					}
-					System.out.print(abstractLanguages.stream().map(l -> String.join(" ; ", l)).collect(Collectors.joining(" | ")));
-					System.out.print("\t");
-					webpageLanguages = webpageLanguages.stream()
-						.map(s -> new LanguageSearch(s).getMatches(languages, true, languageKeywords))
-						.flatMap(l -> l.stream())
-						.collect(Collectors.toList());
-					Set<String> allLanguages = new LinkedHashSet<>();
-					allLanguages.addAll(webpageLanguages);
-					for (List<String> abstractLanguage : abstractLanguages) {
-						allLanguages.addAll(abstractLanguage);
+					List<Provenance> abstractLanguagesUnique = new ArrayList<>();
+					for (List<Provenance> ls : abstractLanguages) {
+						for (Provenance l : ls) {
+							boolean found = false;
+							for (Provenance unique : abstractLanguagesUnique) {
+								if (l.getObject().equals(unique.getObject())) {
+									unique.addProvenances(l.getProvenances());
+									found = true;
+									break;
+								}
+							}
+							if (!found) {
+								abstractLanguagesUnique.add(l);
+							}
+						}
 					}
-					System.out.print(String.join(" ; ", allLanguages));
-					System.out.print("\t");
-					System.out.print(existing.stream().map(e -> biotools.get(e)).map(t -> String.join(" ; ", t.getLanguage())).collect(Collectors.joining(" | ")));
-					System.out.print("\t");
-					System.out.print(result.isOa().stream().map(b -> String.valueOf(b)).collect(Collectors.joining(" | ")));
-					System.out.print("\t");
-					System.out.print(String.join(" | ", result.getJournalTitle()));
-					System.out.print("\t");
-					System.out.print(String.join(" | ", result.getPubDateHuman()));
-					System.out.print("\t");
-					System.out.print(result.getCitationsCount().stream().map(i -> String.valueOf(i)).collect(Collectors.joining(" | ")));
-					System.out.print("\t");
-					System.out.print(String.join(" | ", result.getCitationsTimestampHuman()));
-					System.out.print("\t");
-					System.out.print(IntStream.range(0, result.getCitationsCount().size())
+					writeField(resultsWriter, abstractLanguages.stream().map(lp -> lp.stream().map(p -> p.toString()).collect(Collectors.joining(" ; "))).collect(Collectors.joining(" | ")));
+
+					webpageLanguages = webpageLanguages.stream()
+						.flatMap(s -> new LanguageSearch(s.getObject()).getMatches(languages, true, languageKeywords).stream().map(l -> new Provenance(l, s.getProvenances())))
+						.collect(Collectors.toList());
+					List<Provenance> allLanguages = new ArrayList<>();
+					for (Provenance l : webpageLanguages) {
+						boolean found = false;
+						for (Provenance all : allLanguages) {
+							if (l.getObject().equals(all.getObject())) {
+								all.addProvenances(l.getProvenances());
+								found = true;
+								break;
+							}
+						}
+						if (!found) {
+							allLanguages.add(l);
+						}
+					}
+					for (List<Provenance> ls : abstractLanguages) {
+						for (Provenance l : ls) {
+							boolean found = false;
+							for (Provenance all : allLanguages) {
+								if (l.getObject().equals(all.getObject())) {
+									all.addProvenances(l.getProvenances());
+									found = true;
+									break;
+								}
+							}
+							if (!found) {
+								allLanguages.add(l);
+							}
+						}
+					}
+					writeField(resultsWriter, allLanguages.stream().map(p -> p.toString()).collect(Collectors.joining(" ; ")));
+					writeField(resultsWriter, existing.stream().map(e -> biotools.get(e)).map(t -> (t.getLanguage() == null ? "" : String.join(" ; ", t.getLanguage()))).collect(Collectors.joining(" | ")));
+
+					writeField(resultsWriter, result.isOa().stream().map(b -> String.valueOf(b)).collect(Collectors.joining(" | ")));
+					writeField(resultsWriter, String.join(" | ", result.getJournalTitle()));
+					writeField(resultsWriter, IntStream.range(0, result.getPubDate().size()).mapToObj(i -> result.getPubDateHuman().get(i) + " (" + result.getPubDate().get(i) + ")").collect(Collectors.joining(" | ")));
+					writeField(resultsWriter, result.getCitationsCount().stream().map(i -> String.valueOf(i)).collect(Collectors.joining(" | ")));
+					writeField(resultsWriter, IntStream.range(0, result.getCitationsTimestamp().size()).mapToObj(i -> result.getCitationsTimestampHuman().get(i) + " (" + result.getCitationsTimestamp().get(i) + ")").collect(Collectors.joining(" | ")));
+					writeField(resultsWriter, IntStream.range(0, result.getCitationsCount().size())
 						.mapToObj(i -> (result.getCitationsCount().get(i) > -1 && result.getCitationsTimestamp().get(i) > -1 && result.getPubDate().get(i) > -1) ?
 							(result.getCitationsCount().get(i) / (double) (result.getCitationsTimestamp().get(i) - result.getPubDate().get(i)) * 1000000000) : -1)
 						.map(f -> String.valueOf(f))
 						.collect(Collectors.joining(" | ")));
-					System.out.print("\t");
-					System.out.print(result.getCorrespAuthor().stream().map(p -> p.stream().map(ca -> ca.getName()).collect(Collectors.joining(" ; "))).collect(Collectors.joining(" | ")));
-					System.out.print("\t");
-					System.out.print(result.getCorrespAuthor().stream().map(p -> p.stream().map(ca -> ca.getOrcid()).collect(Collectors.joining(" ; "))).collect(Collectors.joining(" | ")));
-					System.out.print("\t");
-					System.out.print(result.getCorrespAuthor().stream().map(p -> p.stream().map(ca -> ca.getEmail()).collect(Collectors.joining(" ; "))).collect(Collectors.joining(" | ")));
-					System.out.print("\t");
-					System.out.print(result.getCorrespAuthor().stream().map(p -> p.stream().map(ca -> ca.getPhone()).collect(Collectors.joining(" ; "))).collect(Collectors.joining(" | ")));
-					System.out.print("\t");
-					System.out.print(result.getCorrespAuthor().stream().map(p -> p.stream().map(ca -> ca.getUri()).collect(Collectors.joining(" ; "))).collect(Collectors.joining(" | ")));
-					System.out.println();
+
+					writeField(resultsWriter, result.getCorrespAuthor().stream().map(p -> p.stream().map(ca -> ca.getName()).collect(Collectors.joining(" ; "))).collect(Collectors.joining(" | ")));
+					writeField(resultsWriter, existing.stream().map(e -> biotools.get(e)).map(t -> (t.getCredit() == null ? "" : t.getCredit().stream().map(c -> (c.getName() == null ? "" : c.getName())).collect(Collectors.joining(" ; ")))).collect(Collectors.joining(" | ")));
+					writeField(resultsWriter, result.getCorrespAuthor().stream().map(p -> p.stream().map(ca -> ca.getOrcid()).collect(Collectors.joining(" ; "))).collect(Collectors.joining(" | ")));
+					writeField(resultsWriter, existing.stream().map(e -> biotools.get(e)).map(t -> (t.getCredit() == null ? "" : t.getCredit().stream().map(c -> (c.getOrcidid() == null ? "" : c.getOrcidid())).collect(Collectors.joining(" ; ")))).collect(Collectors.joining(" | ")));
+					writeField(resultsWriter, result.getCorrespAuthor().stream().map(p -> p.stream().map(ca -> ca.getEmail()).collect(Collectors.joining(" ; "))).collect(Collectors.joining(" | ")));
+					writeField(resultsWriter, existing.stream().map(e -> biotools.get(e)).map(t -> (t.getCredit() == null ? "" : t.getCredit().stream().map(c -> (c.getEmail() == null ? "" : c.getEmail())).collect(Collectors.joining(" ; ")))).collect(Collectors.joining(" | ")));
+					writeField(resultsWriter, result.getCorrespAuthor().stream().map(p -> p.stream().map(ca -> ca.getPhone()).collect(Collectors.joining(" ; "))).collect(Collectors.joining(" | ")));
+					writeField(resultsWriter, result.getCorrespAuthor().stream().map(p -> p.stream().map(ca -> ca.getUri()).collect(Collectors.joining(" ; "))).collect(Collectors.joining(" | ")));
+					writeField(resultsWriter, existing.stream().map(e -> biotools.get(e)).map(t -> (t.getCredit() == null ? "" : t.getCredit().stream().map(c -> (c.getUrl() == null ? "" : c.getUrl())).collect(Collectors.joining(" ; ")))).collect(Collectors.joining(" | ")));
+
+					List<CorrespAuthor> credits = new ArrayList<>();
+					for (List<CorrespAuthor> correspAuthor : result.getCorrespAuthor()) {
+						for (CorrespAuthor ca : correspAuthor) {
+							boolean exist = false;
+							for (CorrespAuthor credit : credits) {
+								if (creditNameEqual(ca.getName(), credit.getName()) || creditOrcidEqual(ca.getOrcid(), credit.getOrcid()) || creditEmailEqual(ca.getEmail(), credit.getEmail())) {
+									if (credit.getName().isEmpty()) {
+										credit.setName(ca.getName());
+									}
+									if (credit.getOrcid().isEmpty()) {
+										credit.setOrcid(ca.getOrcid());
+									}
+									if (credit.getEmail().isEmpty()) {
+										credit.setEmail(ca.getEmail());
+									}
+									if (credit.getUri().isEmpty()) {
+										credit.setUri(ca.getUri());
+									}
+									exist = true;
+									break;
+								}
+							}
+							if (!exist) {
+								CorrespAuthor credit = new CorrespAuthor();
+								credit.setName(ca.getName());
+								credit.setOrcid(ca.getOrcid());
+								credit.setEmail(ca.getEmail());
+								credit.setUri(ca.getUri());
+								credits.add(credit);
+							}
+						}
+					}
+					writeField(resultsWriter, credits.stream().map(ca -> ca.toString()).collect(Collectors.joining(" | ")), true);
+
+					if (suggestion != null) {
+						double scoreScore2 = suggestion.getScore2() < 0 ? suggestion.getScore() + 10000 : suggestion.getScore2();
+
+						Set<Integer> possiblyRelated = new LinkedHashSet<>();
+						if (suggestion.include()) {
+							if (suggestion.getNameExistingPublicationDifferent() != null) {
+								possiblyRelated.addAll(suggestion.getNameExistingPublicationDifferent());
+							}
+							possiblyRelated.addAll(result.getNameMatch());
+							possiblyRelated.addAll(result.getLinkMatch());
+							// result.getNameWordMatch() is omitted
+						}
+
+						List<Diff> diffs = new ArrayList<>();
+
+						List<Integer> publicationAndNameExistingRemoveIndex = new ArrayList<>();
+						List<Integer> nameExistingSomePublicationDifferentRemoveIndex = new ArrayList<>();
+						List<Integer> somePublicationExistingNameDifferentRemoveIndex = new ArrayList<>();
+						List<String> toolTitleOthers = new ArrayList<>();
+						for (List<String> toolTitleOther : result.getToolTitleOthers()) {
+							for (String other : toolTitleOther) {
+								for (String otherPart : TOOL_TITLE_NOT_ALPHANUM.split(other)) {
+									otherPart = TOOL_TITLE_TRIM.matcher(String.join("", preProcessor.process(otherPart))).replaceFirst("");
+									if (otherPart.length() > 1) {
+										toolTitleOthers.add(otherPart);
+										break;
+									}
+								}
+							}
+						}
+						if (!toolTitleOthers.isEmpty()) {
+							String suggestionProcessed = suggestion.getProcessed().replace(" ", "");
+							publicationAndNameExistingRemoveIndex = removeExisting(suggestion.getPublicationAndNameExisting(), biotools, toolTitleOthers, suggestionProcessed);
+							nameExistingSomePublicationDifferentRemoveIndex= removeExisting(suggestion.getNameExistingSomePublicationDifferent(), biotools, toolTitleOthers, suggestionProcessed);
+							somePublicationExistingNameDifferentRemoveIndex = removeExisting(suggestion.getSomePublicationExistingNameDifferent(), biotools, toolTitleOthers, suggestionProcessed);
+						}
+
+						if (suggestion.getPublicationAndNameExisting() != null) {
+							for (int i = 0; i < suggestion.getPublicationAndNameExisting().size(); ++i) {
+								if (publicationAndNameExistingRemoveIndex.contains(i)) {
+									continue;
+								}
+								if (suggestion.include()) {
+									diffs.add(makeDiff(biotools, queryLinks, suggestion.getPublicationAndNameExisting().get(i), result.getPublicationIds(), null, null, homepage, linkLinks, downloadLinks, documentationLinks, bestLicense, allLanguages, credits));
+								} else {
+									diffs.add(makeDiff(biotools, queryLinks, suggestion.getPublicationAndNameExisting().get(i), result.getPublicationIds(), null, null, null, null, null, null, bestAbstractLicense, abstractLanguagesUnique, credits));
+								}
+							}
+						}
+						if (suggestion.getNameExistingSomePublicationDifferent() != null) {
+							for (int i = 0; i < suggestion.getNameExistingSomePublicationDifferent().size(); ++i) {
+								if (nameExistingSomePublicationDifferentRemoveIndex.contains(i)) {
+									continue;
+								}
+								if (suggestion.include()) {
+									diffs.add(makeDiff(biotools, queryLinks, suggestion.getNameExistingSomePublicationDifferent().get(i), result.getPublicationIds(), suggestion.getNameExistingSomePublicationDifferentPublicationIds().get(i), null, homepage, linkLinks, downloadLinks, documentationLinks, bestLicense, allLanguages, credits));
+								} else {
+									diffs.add(makeDiff(biotools, queryLinks, suggestion.getNameExistingSomePublicationDifferent().get(i), result.getPublicationIds(), suggestion.getNameExistingSomePublicationDifferentPublicationIds().get(i), null, null, null, null, null, bestAbstractLicense, abstractLanguagesUnique, credits));
+								}
+							}
+						}
+						if (suggestion.getSomePublicationExistingNameDifferent() != null) {
+							for (int i = 0; i < suggestion.getSomePublicationExistingNameDifferent().size(); ++i) {
+								if (somePublicationExistingNameDifferentRemoveIndex.contains(i)) {
+									continue;
+								}
+								if (suggestion.include()) {
+									diffs.add(makeDiff(biotools, queryLinks, suggestion.getSomePublicationExistingNameDifferent().get(i), result.getPublicationIds(), suggestion.getSomePublicationExistingNameDifferentPublicationIds().get(i), name, homepage, linkLinks, downloadLinks, documentationLinks, bestLicense, allLanguages, credits));
+								} else {
+									diffs.add(makeDiff(biotools, queryLinks, suggestion.getSomePublicationExistingNameDifferent().get(i), result.getPublicationIds(), suggestion.getSomePublicationExistingNameDifferentPublicationIds().get(i), null, null, null, null, null, bestAbstractLicense, abstractLanguagesUnique, credits));
+								}
+							}
+						}
+
+						for (Diff diff : diffs) {
+							if (!diff.include() && possiblyRelated.isEmpty()) {
+								continue;
+							}
+							ToolInput biotool = biotools.get(diff.getExisting());
+							writeField(diffWriter, biotool.getBiotoolsID());
+							writeField(diffWriter, String.valueOf(scoreScore2));
+							String publicationBiotools = null;
+							if (biotool.getPublication() != null && (!diff.getModifyPublications().isEmpty() || diff.getAddPublications() != null && !diff.getAddPublications().isEmpty() || diff.getModifyName() != null && !diff.getModifyName().isEmpty())) {
+								publicationBiotools = biotool.getPublication().stream().map(pubIds -> "[" + PublicationIds.toString(pubIds.getPmid(), pubIds.getPmcid(), pubIds.getDoi(), false) + "]").collect(Collectors.joining(" | "));
+							}
+							writeField(diffWriter, publicationBiotools);
+							writeField(diffWriter, diff.getModifyPublications().stream().map(pubIds -> pubIds.toString()).collect(Collectors.joining(" | ")));
+							writeField(diffWriter, diff.getAddPublications() != null ? diff.getAddPublications().stream().map(pubIds -> pubIds.toString()).collect(Collectors.joining(" | ")) : null);
+							writeField(diffWriter, diff.getModifyName() != null && !diff.getModifyName().isEmpty() ? biotool.getName() : null);
+							writeField(diffWriter, diff.getModifyName());
+							writeField(diffWriter, possiblyRelated.stream().map(e -> biotools.get(e)).map(q -> q.getBiotoolsID() + " (" + q.getName() + ")").collect(Collectors.joining(" | ")));
+							writeField(diffWriter, diff.getModifyHomepage() != null && !diff.getModifyHomepage().isEmpty() ? biotool.getHomepage() : null);
+							writeField(diffWriter, diff.getModifyHomepage());
+							String linkBiotools = null;
+							if (biotool.getLink() != null && !diff.getAddLinks().isEmpty()) {
+								linkBiotools = biotool.getLink().stream().map(l -> l.getUrl() + " (" + l.getType() + ")").collect(Collectors.joining(" | "));
+							}
+							writeField(diffWriter, linkBiotools);
+							writeField(diffWriter, diff.getAddLinks().stream().map(l -> l.getUrl() + " (" + l.getType() + ")").collect(Collectors.joining(" | ")));
+							String downloadBiotools = null;
+							if (biotool.getDownload() != null && !diff.getAddDownloads().isEmpty()) {
+								downloadBiotools = biotool.getDownload().stream().map(l -> l.getUrl() + " (" + l.getType() + ")").collect(Collectors.joining(" | "));
+							}
+							writeField(diffWriter, downloadBiotools);
+							writeField(diffWriter, diff.getAddDownloads().stream().map(l -> l.getUrl() + " (" + l.getType() + ")").collect(Collectors.joining(" | ")));
+							String documentationBiotools = null;
+							if (biotool.getDocumentation() != null && !diff.getAddDocumentations().isEmpty()) {
+								documentationBiotools = biotool.getDocumentation().stream().map(l -> l.getUrl() + " (" + l.getType() + ")").collect(Collectors.joining(" | "));
+							}
+							writeField(diffWriter, documentationBiotools);
+							writeField(diffWriter, diff.getAddDocumentations().stream().map(l -> l.getUrl() + " (" + l.getType() + ")").collect(Collectors.joining(" | ")));
+							writeField(diffWriter, diff.getModifyLicense() != null && !diff.getModifyLicense().isEmpty() ? biotool.getLicense() : null);
+							writeField(diffWriter, diff.getModifyLicense() != null ? diff.getModifyLicense().toString() : null);
+							String languageBiotools = null;
+							if (biotool.getLanguage() != null && !diff.getAddLanguages().isEmpty()) {
+								languageBiotools = String.join(" | ", biotool.getLanguage());
+							}
+							writeField(diffWriter, languageBiotools);
+							writeField(diffWriter, diff.getAddLanguages().stream().map(l -> l.toString()).collect(Collectors.joining(" | ")));
+							String creditBiotools = null;
+							if (biotool.getCredit() != null && (!diff.getModifyCredits().isEmpty() || !diff.getAddCredits().isEmpty())) {
+								creditBiotools = biotool.getCredit().stream().map(c -> Arrays.asList(c.getName(), c.getOrcidid(), c.getEmail(), c.getUrl()).stream().filter(e -> e != null && !e.isEmpty()).collect(Collectors.joining(", "))).collect(Collectors.joining(" | "));
+							}
+							writeField(diffWriter, creditBiotools);
+							writeField(diffWriter, diff.getModifyCredits().stream().map(c -> c.toString()).collect(Collectors.joining(" | ")));
+							writeField(diffWriter, diff.getAddCredits().stream().map(c -> c.toString()).collect(Collectors.joining(" | ")), true);
+						}
+
+						if (diffs.isEmpty() && suggestion.include()) {
+							Tool tool = new Tool();
+
+							tool.setName(name);
+							tool.setDescription(description);
+							tool.setHomepage(suggestion.getHomepage());
+
+							tool.setLanguage(allLanguages.stream().map(p -> p.getObject()).collect(Collectors.toList()));
+							if (bestLicense != null) {
+								tool.setLicense(bestLicense.getObject());
+							}
+
+							List<Link<LinkType>> links = new ArrayList<>();
+							for (BiotoolsLink<LinkType> link : linkLinks) {
+								Link<LinkType> newLink = new Link<>();
+								newLink.setUrl(link.getUrl());
+								newLink.setType(link.getType());
+								links.add(newLink);
+							}
+							tool.setLink(links);
+
+							List<LinkVersion<DownloadType>> downloads = new ArrayList<>();
+							for (BiotoolsLink<DownloadType> download : downloadLinks) {
+								LinkVersion<DownloadType> newDownload = new LinkVersion<>();
+								newDownload.setUrl(download.getUrl());
+								newDownload.setType(download.getType());
+								downloads.add(newDownload);
+							}
+							tool.setDownload(downloads);
+
+							List<Link<DocumentationType>> documentations = new ArrayList<>();
+							for (BiotoolsLink<DocumentationType> documentation : documentationLinks) {
+								Link<DocumentationType> newDocumentation = new Link<>();
+								newDocumentation.setUrl(documentation.getUrl());
+								newDocumentation.setType(documentation.getType());
+								documentations.add(newDocumentation);
+							}
+							tool.setDocumentation(documentations);
+
+							List<org.edamontology.edammap.core.input.json.Publication> publication = new ArrayList<>();
+							for (PublicationIds publicationIds : result.getPublicationIds().stream().filter(id -> !id.isEmpty()).collect(Collectors.toCollection(LinkedHashSet::new))) {
+								org.edamontology.edammap.core.input.json.Publication newPublication = new org.edamontology.edammap.core.input.json.Publication();
+								if (!publicationIds.getDoi().isEmpty()) {
+									newPublication.setDoi(publicationIds.getDoi());
+								}
+								if (!publicationIds.getPmid().isEmpty()) {
+									newPublication.setPmid(publicationIds.getPmid());
+								}
+								if (!publicationIds.getPmcid().isEmpty()) {
+									newPublication.setPmcid(publicationIds.getPmcid());
+								}
+								publication.add(newPublication);
+							}
+							tool.setPublication(publication);
+
+							List<Credit> credit = new ArrayList<>();
+							for (CorrespAuthor ca : credits) {
+								Credit newCredit = new Credit();
+								if (!ca.getName().isEmpty()) {
+									newCredit.setName(ca.getName());
+								}
+								if (!ca.getEmail().isEmpty()) {
+									newCredit.setEmail(ca.getEmail());
+								}
+								if (!ca.getUri().isEmpty()) {
+									newCredit.setUrl(ca.getUri());
+								}
+								if (!ca.getOrcid().isEmpty()) {
+									newCredit.setOrcidid(ca.getOrcid());
+								}
+								newCredit.setTypeEntity(EntityType.PERSON);
+								credit.add(newCredit);
+							}
+							tool.setCredit(credit);
+
+							tools.add(tool);
+						}
+					}
 				}
+
+				org.edamontology.edammap.core.output.Json.outputBiotools(tools, newWriter);
 			}
 		}
 	}
@@ -3296,18 +3968,18 @@ public final class PubMedApps {
 		}
 
 		if (args.pass1 && requiredArgs(new String[] { "idf", "db", "pub", "query", "type", "web", "doc" }, "pass1", args)) {
-			run(args.preProcessorArgs, args.idf, args.db, args.pub, args.query, args.type, args.web, args.doc, args.fetcherArgs, true);
+			run(args.preProcessorArgs, args.idf, args.db, args.pub, args.query, args.type, args.web, args.doc, null, args.fetcherArgs, true);
 		}
 
-		if (args.pass2 && requiredArgs(new String[] { "idf", "db", "pub", "query", "type" }, "pass2", args)) {
-			run(args.preProcessorArgs, args.idf, args.db, args.pub, args.query, args.type, null, null, args.fetcherArgs, false);
+		if (args.pass2 && requiredArgs(new String[] { "idf", "db", "pub", "query", "type", "output" }, "pass2", args)) {
+			run(args.preProcessorArgs, args.idf, args.db, args.pub, args.query, args.type, null, null, args.output, args.fetcherArgs, false);
 		}
 
 		if (args.beforeAfter && requiredArgs(new String[] { "idf", "db", "pub" }, "beforeAfter", args)) {
 			beforeAfter(args.preProcessorArgs, args.idf, args.db, args.pub);
 		}
 
-		// TODO
+		// TODO log
 		logger.info("Ready");
 	}
 

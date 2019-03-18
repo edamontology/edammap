@@ -19,25 +19,51 @@
 
 package org.edamontology.edammap.core.input.json;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public enum DownloadType {
+	@JsonProperty("API specification")
 	API_SPECIFICATION("API specification"),
+	@JsonProperty("Biological data")
 	BIOLOGICAL_DATA("Biological data"),
+	@JsonProperty("Binaries")
 	BINARIES("Binaries"),
+	@JsonProperty("Binary package")
 	BINARY_PACKAGE("Binary package"),
+	@JsonProperty("Command-line specification")
 	COMMAND_LINE_SPECIFICATION("Command-line specification"),
+	@JsonProperty("Container file")
 	CONTAINER_FILE("Container file"),
+	@JsonProperty("CWL file")
 	CWL_FILE("CWL file"),
+	@JsonProperty("Icon")
 	ICON("Icon"),
+	@JsonProperty("Ontology")
 	ONTOLOGY("Ontology"),
+	@JsonProperty("Screenshot")
 	SCREENSHOT("Screenshot"),
+	@JsonProperty("Source code")
 	SOURCE_CODE("Source code"),
+	@JsonProperty("Source package")
 	SOURCE_PACKAGE("Source package"),
+	@JsonProperty("Test data")
 	TEST_DATE("Test data"),
+	@JsonProperty("Test script")
 	TEST_SCRIPT("Test script"),
+	@JsonProperty("Tool wrapper (galaxy)")
 	TOOL_WRAPPER_GALAXY("Tool wrapper (galaxy)"),
+	@JsonProperty("Tool wrapper (taverna)")
 	TOOL_WRAPPER_TAVERNA("Tool wrapper (taverna)"),
+	@JsonProperty("Tool wrapper (other)")
 	TOOL_WRAPPER_OTHER("Tool wrapper (other)"),
-	VM_IMAGE("VM image");
+	@JsonProperty("VM image")
+	VM_IMAGE("VM image"),
+	// TODO hack https://github.com/bio-tools/biotoolsSchema/issues/139
+	@JsonProperty("Downloads page")
+	DOWNLOADS_PAGE("Downloads page"),
+	// TODO hack https://github.com/bio-tools/biotoolsSchema/issues/141
+	@JsonProperty("Other")
+	OTHER("Other");
 
 	private String type;
 
