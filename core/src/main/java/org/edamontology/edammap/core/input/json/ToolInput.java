@@ -27,6 +27,8 @@ public class ToolInput extends Tool implements InputType {
 
 	private String biotoolsID;
 
+	private int homepage_status;
+
 	@Override
 	public void check(int i) throws ParseException {
 		// We are not doing any thorough validation, just checking that the required attributes are present
@@ -94,5 +96,12 @@ public class ToolInput extends Tool implements InputType {
 	}
 	public void setBiotoolsID(String id) {
 		this.biotoolsID = id;
+	}
+
+	public int getHomepage_status() {
+		return homepage_status;
+	}
+	public void setHomepage_status(int homepage_status) {
+		this.homepage_status = homepage_status;
 	}
 }

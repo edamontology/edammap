@@ -32,6 +32,10 @@ import org.edamontology.pubfetcher.core.db.publication.PublicationIds;
 
 public class Diff {
 
+	private double scoreScore2 = -1;
+
+	private Set<Integer> possiblyRelated = null;
+
 	private int existing = -1;
 
 	private Set<PublicationIds> modifyPublications = new LinkedHashSet<>();
@@ -57,11 +61,26 @@ public class Diff {
 	private List<CorrespAuthor> addCredits = new ArrayList<>();
 
 	public boolean include() {
-		return !modifyPublications.isEmpty() || addPublications != null && !addPublications.isEmpty()
+		return possiblyRelated != null && !possiblyRelated.isEmpty()
+			|| !modifyPublications.isEmpty() || addPublications != null && !addPublications.isEmpty()
 			|| modifyName != null && !modifyName.isEmpty() || modifyHomepage != null && !modifyHomepage.isEmpty()
 			|| !addLinks.isEmpty() || !addDownloads.isEmpty() || !addDocumentations.isEmpty()
 			|| modifyLicense != null && !modifyLicense.isEmpty() || !addLanguages.isEmpty()
 			|| !modifyCredits.isEmpty() || !addCredits.isEmpty();
+	}
+
+	public double getScoreScore2() {
+		return scoreScore2;
+	}
+	public void setScoreScore2(double scoreScore2) {
+		this.scoreScore2 = scoreScore2;
+	}
+
+	public Set<Integer> getPossiblyRelated() {
+		return possiblyRelated;
+	}
+	public void setPossiblyRelated(Set<Integer> possiblyRelated) {
+		this.possiblyRelated = possiblyRelated;
 	}
 
 	public int getExisting() {
