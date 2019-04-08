@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016 Erik Jaaniso
+ * Copyright © 2016, 2019 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -21,62 +21,94 @@ package org.edamontology.edammap.core.mapping.args;
 
 import org.edamontology.edammap.core.args.ZeroToOneDouble;
 
+import org.edamontology.pubfetcher.core.common.Arg;
+import org.edamontology.pubfetcher.core.common.Args;
+
 import com.beust.jcommander.Parameter;
 
-public class MultiplierArgs {
+public class MultiplierArgs extends Args {
 
-	public static final String LABEL_MULTIPLIER = "labelMultiplier";
-	@Parameter(names = { "--" + LABEL_MULTIPLIER }, validateWith = ZeroToOneDouble.class, description = "Score multiplier for matching a concept label. Set to 0 to disable matching of labels.")
-	private double labelMultiplier = 1.0;
+	private static final String labelMultiplierId = "labelMultiplier";
+	private static final String labelMultiplierDescription = "Score multiplier for matching a concept label. Set to 0 to disable matching of labels.";
+	private static final Double labelMultiplierDefault = 1.0;
+	@Parameter(names = { "--" + labelMultiplierId }, validateWith = ZeroToOneDouble.class, description = labelMultiplierDescription)
+	private Double labelMultiplier = labelMultiplierDefault;
 
-	public static final String EXACT_SYNONYM_MULTIPLIER = "exactSynonymMultiplier";
-	@Parameter(names = { "--" + EXACT_SYNONYM_MULTIPLIER }, validateWith = ZeroToOneDouble.class, description = "Score multiplier for matching a concept exact synonym. Set to 0 to disable matching of exact synonyms.")
-	private double exactSynonymMultiplier = 1.0;
+	private static final String exactSynonymMultiplierId = "exactSynonymMultiplier";
+	private static final String exactSynonymMultiplierDescription = "Score multiplier for matching a concept exact synonym. Set to 0 to disable matching of exact synonyms.";
+	private static final Double exactSynonymMultiplierDefault = 1.0;
+	@Parameter(names = { "--" + exactSynonymMultiplierId }, validateWith = ZeroToOneDouble.class, description = exactSynonymMultiplierDescription)
+	private Double exactSynonymMultiplier = exactSynonymMultiplierDefault;
 
-	public static final String NARROW_BROAD_SYNONYM_MULTIPLIER = "narrowBroadSynonymMultiplier";
-	@Parameter(names = { "--" + NARROW_BROAD_SYNONYM_MULTIPLIER }, validateWith = ZeroToOneDouble.class, description = "Score multiplier for matching a concept narrow or broad synonym. Set to 0 to disable matching of narrow and broad synonyms.")
-	private double narrowBroadSynonymMultiplier = 1.0;
+	private static final String narrowBroadSynonymMultiplierId = "narrowBroadSynonymMultiplier";
+	private static final String narrowBroadSynonymMultiplierDescription = "Score multiplier for matching a concept narrow or broad synonym. Set to 0 to disable matching of narrow and broad synonyms.";
+	private static final Double narrowBroadSynonymMultiplierDefault = 1.0;
+	@Parameter(names = { "--" + narrowBroadSynonymMultiplierId }, validateWith = ZeroToOneDouble.class, description = narrowBroadSynonymMultiplierDescription)
+	private Double narrowBroadSynonymMultiplier = narrowBroadSynonymMultiplierDefault;
 
-	public static final String DEFINITION_MULTIPLIER = "definitionMultiplier";
-	@Parameter(names = { "--" + DEFINITION_MULTIPLIER }, validateWith = ZeroToOneDouble.class, description = "Score multiplier for matching a concept definition. Set to 0 to disable matching of definitions.")
-	private double definitionMultiplier = 1.0;
+	private static final String definitionMultiplierId = "definitionMultiplier";
+	private static final String definitionMultiplierDescription = "Score multiplier for matching a concept definition. Set to 0 to disable matching of definitions.";
+	private static final Double definitionMultiplierDefault = 1.0;
+	@Parameter(names = { "--" + definitionMultiplierId }, validateWith = ZeroToOneDouble.class, description = definitionMultiplierDescription)
+	private Double definitionMultiplier = definitionMultiplierDefault;
 
-	public static final String COMMENT_MULTIPLIER = "commentMultiplier";
-	@Parameter(names = { "--" + COMMENT_MULTIPLIER }, validateWith = ZeroToOneDouble.class, description = "Score multiplier for matching a concept comment. Set to 0 to disable matching of comments.")
-	private double commentMultiplier = 1.0;
+	private static final String commentMultiplierId = "commentMultiplier";
+	private static final String commentMultiplierDescription = "Score multiplier for matching a concept comment. Set to 0 to disable matching of comments.";
+	private static final Double commentMultiplierDefault = 1.0;
+	@Parameter(names = { "--" + commentMultiplierId }, validateWith = ZeroToOneDouble.class, description = commentMultiplierDescription)
+	private Double commentMultiplier = commentMultiplierDefault;
 
-	public double getLabelMultiplier() {
+	@Override
+	protected void addArgs() {
+		args.add(new Arg<>(this::getLabelMultiplier, this::setLabelMultiplier, labelMultiplierDefault, 0.0, 1.0, labelMultiplierId, "Label multiplier", labelMultiplierDescription, null));
+		args.add(new Arg<>(this::getExactSynonymMultiplier, this::setExactSynonymMultiplier, exactSynonymMultiplierDefault, 0.0, 1.0, exactSynonymMultiplierId, "Exact synonym multiplier", exactSynonymMultiplierDescription, null));
+		args.add(new Arg<>(this::getNarrowBroadSynonymMultiplier, this::setNarrowBroadSynonymMultiplier, narrowBroadSynonymMultiplierDefault, 0.0, 1.0, narrowBroadSynonymMultiplierId, "Narrow/Broad multiplier", narrowBroadSynonymMultiplierDescription, null));
+		args.add(new Arg<>(this::getDefinitionMultiplier, this::setDefinitionMultiplier, definitionMultiplierDefault, 0.0, 1.0, definitionMultiplierId, "Definition multiplier", definitionMultiplierDescription, null));
+		args.add(new Arg<>(this::getCommentMultiplier, this::setCommentMultiplier, commentMultiplierDefault, 0.0, 1.0, commentMultiplierId, "Comment multiplier", commentMultiplierDescription, null));
+	}
+
+	@Override
+	public String getId() {
+		return "multiplierArgs";
+	}
+
+	@Override
+	public String getLabel() {
+		return "Concept multipliers";
+	}
+
+	public Double getLabelMultiplier() {
 		return labelMultiplier;
 	}
-	public void setLabelMultiplier(double labelMultiplier) {
+	public void setLabelMultiplier(Double labelMultiplier) {
 		this.labelMultiplier = labelMultiplier;
 	}
 
-	public double getExactSynonymMultiplier() {
+	public Double getExactSynonymMultiplier() {
 		return exactSynonymMultiplier;
 	}
-	public void setExactSynonymMultiplier(double exactSynonymMultiplier) {
+	public void setExactSynonymMultiplier(Double exactSynonymMultiplier) {
 		this.exactSynonymMultiplier = exactSynonymMultiplier;
 	}
 
-	public double getNarrowBroadSynonymMultiplier() {
+	public Double getNarrowBroadSynonymMultiplier() {
 		return narrowBroadSynonymMultiplier;
 	}
-	public void setNarrowBroadSynonymMultiplier(double narrowBroadSynonymMultiplier) {
+	public void setNarrowBroadSynonymMultiplier(Double narrowBroadSynonymMultiplier) {
 		this.narrowBroadSynonymMultiplier = narrowBroadSynonymMultiplier;
 	}
 
-	public double getDefinitionMultiplier() {
+	public Double getDefinitionMultiplier() {
 		return definitionMultiplier;
 	}
-	public void setDefinitionMultiplier(double definitionMultiplier) {
+	public void setDefinitionMultiplier(Double definitionMultiplier) {
 		this.definitionMultiplier = definitionMultiplier;
 	}
 
-	public double getCommentMultiplier() {
+	public Double getCommentMultiplier() {
 		return commentMultiplier;
 	}
-	public void setCommentMultiplier(double commentMultiplier) {
+	public void setCommentMultiplier(Double commentMultiplier) {
 		this.commentMultiplier = commentMultiplier;
 	}
 }

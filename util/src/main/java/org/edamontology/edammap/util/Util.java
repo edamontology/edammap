@@ -62,7 +62,7 @@ public final class Util {
 		int idfs = processor.makeQueryIdf(QueryLoader.get(queryPath, args.makeIdfType,
 			args.fetcherArgs.getTimeout(), args.fetcherArgs.getPrivateArgs().getUserAgent()),
 			args.makeIdfType, idfPath, args.makeIdfWebpagesDocs, args.makeIdfFulltext,
-			new PreProcessor(stemming), null, args.fetcherArgs);
+			new PreProcessor(stemming), null, args.fetcherArgs, true);
 		logger.info("Wrote {} IDFs to {}", idfs, idfPath);
 
 		processor.closeDatabase();

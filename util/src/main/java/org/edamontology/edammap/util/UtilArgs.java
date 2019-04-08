@@ -27,6 +27,7 @@ import com.beust.jcommander.ParametersDelegate;
 import org.edamontology.pubfetcher.cli.PubFetcherArgs;
 import org.edamontology.pubfetcher.core.common.BasicArgs;
 import org.edamontology.pubfetcher.core.common.FetcherArgs;
+
 import org.edamontology.edammap.core.query.QueryType;
 
 public class UtilArgs extends BasicArgs {

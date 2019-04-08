@@ -1,6 +1,6 @@
 @charset "utf-8";
 /*
- * Copyright © 2018 Erik Jaaniso
+ * Copyright © 2018, 2019 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -101,12 +101,18 @@
 :root {
 	font-size: 112.5%;
 	--publication: rgba(211,211,211,1); /* LightGray */
+	--gray: rgba(128,128,128,1);
+	--gray-half: rgba(128,128,128,0.5);
 	--link: rgba(0,0,255,1);
+	--link-half: rgba(0,0,255,0.5);
 	--good: rgba(0,128,0,1);
 	--red: rgba(255,0,0,1);
 	--medium: rgba(128,128,0,1);
 	--black: rgba(0,0,0,1);
+	--black-half: rgba(0,0,0,0.5);
 	--background: rgba(239,239,239,1);
+	--elixir: rgba(239,117,0,1);
+	--elixir-half: rgba(239,117,0,0.5);
 }
 html {
 	box-sizing: border-box;
@@ -172,6 +178,9 @@ article > section {
 	flex: 1 1 32rem;
 	padding: 0.5rem;
 }
+article > #description-section {
+	flex: 1 1 64rem;
+}
 
 article > section > h3 {
 	display: inline-block;
@@ -197,7 +206,7 @@ article > section > h3 {
 	background-color: var(--publication);
 }
 #annotations-section > h3 {
-	background-color: #EF7500;
+	background-color: var(--elixir);
 	color: rgba(255,255,255,1);
 }
 
@@ -210,39 +219,128 @@ article > section > div {
 	box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
 }
 
-.label, .input, .output {
+.input, .output {
+	flex: 1 1 24rem;
 	margin: 0 0 0.5rem 0.5rem;
 }
 
-.label {
-	width: 18rem;
-	padding: 0.1rem;
-	background-color: rgba(255,255,204,1);
-	border: 1px dashed rgba(0,0,0,0.5);
+.input {
+	position: relative;
+	display: flex;
 }
 
-.ex, .example {
-	color: rgba(63,63,63,1);
+.input > input, .input > textarea {
+	flex-grow: 1;
+	border-width: 1px;
+	padding: 2px;
 }
+
+.more {
+	font-family: 'Font Awesome 5 Free';
+	font-weight: 900;
+	width: 1.5rem;
+	height: 1.5rem;
+	text-align: center;
+	outline: none;
+	cursor: pointer;
+	color: rgba(0,0,0,0.125);
+	background-color: rgba(255,255,255,1);
+	transition: color 250ms, box-shadow 250ms;
+}
+.more::before {
+	content: "\f059";
+}
+.more:hover {
+	z-index: 3;
+	color: rgba(0,0,0,0.25);
+	box-shadow: 2px 2px 3px rgba(0,0,0,0.12), 1px 1px 2px rgba(0,0,0,0.24);
+}
+.more:focus {
+	z-index: 5;
+	color: rgba(0,0,0,0.25);
+	box-shadow: 2px 2px 0 rgba(0,0,0,0.12), 1px 1px 0 rgba(0,0,0,0.24);
+}
+
+#name-section .more {
+	color: var(--black-half);
+}
+#name-section .more:hover, #name-section .more:focus {
+	color: var(--black);
+}
+#webpageUrls-section .more, #docUrls-section .more {
+	color: var(--link-half);
+}
+#webpageUrls-section .more:hover, #webpageUrls-section .more:focus, #docUrls-section .more:hover, #docUrls-section .more:focus {
+	color: var(--link);
+}
+#publicationIds-section .more {
+	color: var(--gray-half);
+}
+#publicationIds-section .more:hover, #publicationIds-section .more:focus {
+	color: var(--gray);
+}
+#annotations-section .more {
+	color: var(--elixir-half);
+}
+#annotations-section .more:hover, #annotations-section .more:focus {
+	color: var(--elixir);
+}
+
+.more-box {
+	display: none;
+	position: absolute;
+	top: 0;
+	left: -0.5rem;
+	right: 1.5rem;
+	padding: 3.2px 3px;
+	outline: none;
+	border-left: 0.5rem solid rgba(0,0,0,0.125);
+	color: rgba(63,63,63,1);
+	background-color: rgba(255,255,255,1);
+	box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+	transition: border-color 250ms;
+}
+.more:focus ~ .more-box, .more-box:focus {
+	z-index: 3;
+	border-color: rgba(0,0,0,0.25);
+	display: block;
+}
+.more:hover ~ .more-box, .more-box:hover {
+	z-index: 4;
+	display: block;
+}
+
+#name-section .more-box {
+	border-color: var(--black-half);
+}
+#name-section .more:focus ~ .more-box, #name-section .more-box:focus {
+	border-color: var(--black);
+}
+#webpageUrls-section .more-box, #docUrls-section .more-box {
+	border-color: var(--link-half);
+}
+#webpageUrls-section .more:focus ~ .more-box, #webpageUrls-section .more-box:focus, #docUrls-section .more:focus ~ .more-box, #docUrls-section .more-box:focus {
+	border-color: var(--link);
+}
+#publicationIds-section .more-box {
+	border-color: var(--gray-half);
+}
+#publicationIds-section .more:focus ~ .more-box, #publicationIds-section .more-box:focus {
+	border-color: var(--gray);
+}
+#annotations-section .more-box {
+	border-color: var(--elixir-half);
+}
+#annotations-section .more:focus ~ .more-box, #annotations-section .more-box:focus {
+	border-color: var(--elixir);
+}
+
 .ex {
 	vertical-align: top;
 }
 .example {
 	display: inline-block;
 	font-style: italic;
-}
-
-.io, .input, .output {
-	flex: 1 1 27rem;
-}
-.io {
-	align-self: center;
-	display: flex;
-	flex-wrap: wrap;
-}
-
-.input > input, .input > textarea {
-	width: 100%;
 }
 
 .input-medium {
@@ -280,7 +378,7 @@ article > section > div {
 #map > span > input {
 	font-family: "Spectral SC";
 	font-weight: 700;
-	font-size: 1.5rem;
+	font-size: 150%;
 }
 
 /* param tabs */

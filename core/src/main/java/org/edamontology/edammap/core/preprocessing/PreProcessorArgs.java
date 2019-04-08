@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016 Erik Jaaniso
+ * Copyright © 2016, 2019 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -19,26 +19,55 @@
 
 package org.edamontology.edammap.core.preprocessing;
 
+import org.edamontology.pubfetcher.core.common.Arg;
+import org.edamontology.pubfetcher.core.common.Args;
+
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.validators.PositiveInteger;
 
-public class PreProcessorArgs {
+public class PreProcessorArgs extends Args {
 
-	public static final String NUMBERS = "numbers";
-	@Parameter(names = { "--" + NUMBERS }, arity = 1, description = "Include/exclude freestanding numbers (i.e., that are not part of a word) in pre-processing")
-	private boolean numbers = true;
+	private static final String numbersId = "numbers";
+	private static final String numbersDescription = "Include/exclude freestanding numbers (i.e., that are not part of a word) in pre-processing";
+	private static final Boolean numbersDefault = true;
+	@Parameter(names = { "--" + numbersId }, arity = 1, description = numbersDescription)
+	private Boolean numbers = numbersDefault;
 
-	public static final String STOPWORDS = "stopwords";
-	@Parameter(names = { "--" + STOPWORDS }, description = "Do stopwords removal as part of pre-processing, using the chosen stopwords list")
-	private Stopwords stopwords = Stopwords.lucene;
+	private static final String stopwordsId = "stopwords";
+	private static final String stopwordsDescription = "Do stopwords removal as part of pre-processing, using the chosen stopwords list";
+	private static final Stopwords stopwordsDefault = Stopwords.lucene;
+	@Parameter(names = { "--" + stopwordsId }, description = stopwordsDescription)
+	private Stopwords stopwords = stopwordsDefault;
 
-	public static final String STEMMING = "stemming";
-	@Parameter(names = { "--" + STEMMING }, arity = 1, description = "Do stemming as part of pre-processing")
-	private boolean stemming = true;
+	private static final String stemmingId = "stemming";
+	private static final String stemmingDescription = "Do stemming as part of pre-processing";
+	private static final Boolean stemmingDefault = true;
+	@Parameter(names = { "--" + stemmingId }, arity = 1, description = stemmingDescription)
+	private Boolean stemming = stemmingDefault;
 
-	public static final String MIN_LENGTH = "minLength";
-	@Parameter(names = { "--" + MIN_LENGTH }, validateWith = PositiveInteger.class, description = "When all pre-processing steps are done, tokens with length less to this length are removed")
-	private int minLength = 1;
+	private static final String minLengthId = "minLength";
+	private static final String minLengthDescription = "When all pre-processing steps are done, tokens with length less to this length are removed";
+	private static final Integer minLengthDefault = 1;
+	@Parameter(names = { "--" + minLengthId }, validateWith = PositiveInteger.class, description = minLengthDescription)
+	private Integer minLength = minLengthDefault;
+
+	@Override
+	protected void addArgs() {
+		args.add(new Arg<>(this::isNumbers, this::setNumbers, numbersDefault, numbersId, "Freestanding numbers", numbersDescription, null));
+		args.add(new Arg<>(this::getStopwords, this::setStopwords, stopwordsDefault, stopwordsId, "Stopword list", stopwordsDescription, Stopwords.class));
+		args.add(new Arg<>(this::isStemming, this::setStemming, stemmingDefault, stemmingId, "Stemming", stemmingDescription, null));
+		args.add(new Arg<>(this::getMinLength, this::setMinLength, minLengthDefault, 0, null, minLengthId, "Remove shorter than", minLengthDescription, null));
+	}
+
+	@Override
+	public String getId() {
+		return "preProcessorArgs";
+	}
+
+	@Override
+	public String getLabel() {
+		return "Preprocessing";
+	}
 
 	public boolean isNumbers() {
 		return numbers;

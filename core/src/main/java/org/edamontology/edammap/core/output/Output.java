@@ -29,6 +29,7 @@ import org.edamontology.pubfetcher.core.common.Version;
 import org.edamontology.pubfetcher.core.db.publication.Publication;
 import org.edamontology.pubfetcher.core.db.webpage.Webpage;
 
+import org.edamontology.edammap.core.args.ArgMain;
 import org.edamontology.edammap.core.args.CoreArgs;
 import org.edamontology.edammap.core.benchmarking.Results;
 import org.edamontology.edammap.core.edam.Concept;
@@ -56,12 +57,12 @@ public class Output {
 		this.existingDirectory = existingDirectory;
 	}
 
-	public void output(CoreArgs args, List<ParamMain> paramsMain, Map<String, String> jsonFields, QueryType type, int reportPageSize, int reportPaginationSize, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Webpage>> webpages, List<List<Webpage>> docs, List<List<Publication>> publications, Results results, long start, long stop, Version version, String jsonVersion) throws IOException {
+	public void output(CoreArgs args, List<ArgMain> argsMain, Map<String, String> jsonFields, QueryType type, int reportPageSize, int reportPaginationSize, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Webpage>> webpages, List<List<Webpage>> docs, List<List<Publication>> publications, Results results, long start, long stop, Version version, String jsonVersion) throws IOException {
 		Txt.output(type, txt, report, concepts, queries, publications, results.getMappings());
-		Report.output(args, paramsMain, type, reportPageSize, reportPaginationSize, report, existingDirectory, concepts, queries, publications, webpages, docs, results, start, stop, version, txt != null, json != null);
+		Report.output(args, argsMain, type, reportPageSize, reportPaginationSize, report, existingDirectory, concepts, queries, publications, webpages, docs, results, start, stop, version, txt != null, json != null);
 		if (json != null) {
 			JsonType jsonType = (type == QueryType.server ? JsonType.full : JsonType.biotools);
-			Json.output(args, paramsMain, jsonFields, jsonType, json, concepts, queries, publications, webpages, docs, results, start, stop, version, jsonVersion);
+			Json.output(args, argsMain, jsonFields, jsonType, json, concepts, queries, publications, webpages, docs, results, start, stop, version, jsonVersion);
 		}
 	}
 }

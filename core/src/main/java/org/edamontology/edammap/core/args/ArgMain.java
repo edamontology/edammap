@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Erik Jaaniso
+ * Copyright © 2019 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -17,28 +17,33 @@
  * along with EDAMmap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.edamontology.edammap.core.output;
+package org.edamontology.edammap.core.args;
 
-public class ParamMain extends Param {
+import org.edamontology.pubfetcher.core.common.Arg;
+
+public class ArgMain {
+
+	private final Object value;
+
+	private final Arg<?, ?> arg;
 
 	private final boolean input;
 
-	public ParamMain(String label, String id, Object value, boolean input) {
-		super(label, id, value);
+	public ArgMain(Object value, Arg<?, ?> arg, boolean input) {
+		this.value = value;
+		this.arg = arg;
 		this.input = input;
 	}
 
-	public ParamMain(String label, String id, Object value, Double min, Double max, boolean input) {
-		super(label, id, value, min, max);
-		this.input = input;
+	public Object getValue() {
+		return value;
 	}
 
-	public ParamMain(String label, String id, Object value, String url, boolean input) {
-		super(label, id, value, url);
-		this.input = input;
+	public Arg<?, ?> getArg() {
+		return arg;
 	}
 
-	public boolean getInput() {
+	public boolean isInput() {
 		return input;
 	}
 }

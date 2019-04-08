@@ -54,7 +54,13 @@ public class Idf {
 		try (BufferedReader br = Files.newBufferedReader(Paths.get(inputPath), StandardCharsets.UTF_8)) {
 			if (top) {
 				this.idfTop = new ArrayList<>();
-				for (String line; (line = br.readLine()) != null; ) {
+				String line = br.readLine();
+				if (line != null) {
+					this.documentCount = Integer.parseInt(line);
+				} else {
+					throw new IOException("First line must be document count!");
+				}
+				while ((line = br.readLine()) != null) {
 					int tab = line.indexOf("\t");
 					String key = line.substring(0, tab);
 					int value = Integer.parseInt(line.substring(tab + 1, line.indexOf("\t", tab + 1)));
@@ -63,7 +69,6 @@ public class Idf {
 				Collections.sort(idfTop);
 				this.idfMap = null;
 				this.countsMap = null;
-				this.documentCount = 0;
 			} else {
 				this.idfMap = new ObjectDoubleScatterMap<>();
 				this.countsMap = new ObjectIntScatterMap<>();

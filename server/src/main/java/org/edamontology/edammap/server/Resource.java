@@ -56,6 +56,9 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.glassfish.grizzly.http.server.Request;
+import org.glassfish.grizzly.http.util.Header;
+
 import org.edamontology.edammap.core.args.CoreArgs;
 import org.edamontology.edammap.core.benchmarking.Benchmark;
 import org.edamontology.edammap.core.benchmarking.Results;
@@ -73,13 +76,12 @@ import org.edamontology.edammap.core.processing.QueryProcessed;
 import org.edamontology.edammap.core.query.Query;
 import org.edamontology.edammap.core.query.QueryLoader;
 import org.edamontology.edammap.core.query.QueryType;
+
 import org.edamontology.pubfetcher.core.common.FetcherArgs;
 import org.edamontology.pubfetcher.core.common.IllegalRequestException;
 import org.edamontology.pubfetcher.core.db.DatabaseEntry;
 import org.edamontology.pubfetcher.core.db.publication.Publication;
 import org.edamontology.pubfetcher.core.db.webpage.Webpage;
-import org.glassfish.grizzly.http.server.Request;
-import org.glassfish.grizzly.http.util.Header;
 
 @Path("/")
 public class Resource {
@@ -113,13 +115,13 @@ public class Resource {
 			ParamParse.parseParams(params, args, false);
 			args.setProcessorArgs(Server.args.getProcessorArgs());
 			args.getFetcherArgs().setPrivateArgs(Server.args.getFetcherPrivateArgs());
-			boolean txt = Server.args.getTxt();
-			boolean json = Server.args.getJson();
+			boolean txt = Server.args.isTxt();
+			boolean json = Server.args.isJson();
 			Boolean valueBoolean;
-			if ((valueBoolean = ParamParse.getParamBoolean(params, ServerArgs.TXT)) != null) {
+			if ((valueBoolean = ParamParse.getParamBoolean(params, ServerArgs.txtId)) != null) {
 				txt = valueBoolean;
 			}
-			if ((valueBoolean = ParamParse.getParamBoolean(params, ServerArgs.JSON)) != null) {
+			if ((valueBoolean = ParamParse.getParamBoolean(params, ServerArgs.jsonId)) != null) {
 				json = valueBoolean;
 			}
 			return Page.get(args, txt, json);
@@ -161,19 +163,19 @@ public class Resource {
 		coreArgs.setProcessorArgs(Server.args.getProcessorArgs());
 		coreArgs.getFetcherArgs().setPrivateArgs(Server.args.getFetcherPrivateArgs());
 
-		boolean txt = (isJson ? false : Server.args.getTxt());
+		boolean txt = (isJson ? false : Server.args.isTxt());
 		boolean html = (isJson ? false : true);
-		boolean json = (isJson ? true : Server.args.getJson());
+		boolean json = (isJson ? true : Server.args.isJson());
 		Boolean valueBoolean;
-		if ((valueBoolean = ParamParse.getParamBoolean(params, ServerArgs.TXT)) != null) {
+		if ((valueBoolean = ParamParse.getParamBoolean(params, ServerArgs.txtId)) != null) {
 			txt = valueBoolean;
 		}
 		if (isJson) {
-			if ((valueBoolean = ParamParse.getParamBoolean(params, Server.HTML_ID)) != null) {
+			if ((valueBoolean = ParamParse.getParamBoolean(params, ServerArgs.htmlId)) != null) {
 				html = valueBoolean;
 			}
 		} else {
-			if ((valueBoolean = ParamParse.getParamBoolean(params, ServerArgs.JSON)) != null) {
+			if ((valueBoolean = ParamParse.getParamBoolean(params, ServerArgs.jsonId)) != null) {
 				json = valueBoolean;
 			}
 		}
@@ -221,7 +223,7 @@ public class Resource {
 			throw new IllegalRequestException("Annotations length (" + serverInput.getAnnotations().length() + ") is greater than maximum allowed (" + MAX_ANNOTATIONS_LENGTH + ")");
 		}
 
-		String uuidDirPrefix = Server.args.getFiles() + "/";
+		String uuidDirPrefix = Server.args.getServerPrivateArgs().getFiles() + "/";
 		String uuidButLast;
 		String uuid;
 		do {
@@ -277,19 +279,19 @@ public class Resource {
 		logger.info("Stop: {}", Instant.ofEpochMilli(stop));
 		logger.info("Mapping took {}s", (stop - start) / 1000.0);
 
-		URI baseLocation = new URI(Server.args.getHttpsProxy() ? "https" : request.getScheme(), null, request.getServerName(), Server.args.getHttpsProxy() ? 443 : request.getServerPort(), null, null, null);
-		URI apiLocation = new URI(baseLocation.getScheme(), null, baseLocation.getHost(), baseLocation.getPort(), "/" + Server.args.getPath() + "/api", null, null);
+		URI baseLocation = new URI(Server.args.getServerPrivateArgs().isHttpsProxy() ? "https" : request.getScheme(), null, request.getServerName(), Server.args.getServerPrivateArgs().isHttpsProxy() ? 443 : request.getServerPort(), null, null, null);
+		URI apiLocation = new URI(baseLocation.getScheme(), null, baseLocation.getHost(), baseLocation.getPort(), "/" + Server.args.getServerPrivateArgs().getPath() + "/api", null, null);
 		URI txtLocation = null;
 		if (txtOutput != null) {
-			txtLocation = new URI(baseLocation.getScheme(), null, baseLocation.getHost(), baseLocation.getPort(), "/" + Server.args.getPath() + "/" + txtOutput, null, null);
+			txtLocation = new URI(baseLocation.getScheme(), null, baseLocation.getHost(), baseLocation.getPort(), "/" + Server.args.getServerPrivateArgs().getPath() + "/" + txtOutput, null, null);
 		}
 		URI htmlLocation = null;
 		if (htmlOutput != null) {
-			htmlLocation = new URI(baseLocation.getScheme(), null, baseLocation.getHost(), baseLocation.getPort(), "/" + Server.args.getPath() + "/" + htmlOutput, null, null);
+			htmlLocation = new URI(baseLocation.getScheme(), null, baseLocation.getHost(), baseLocation.getPort(), "/" + Server.args.getServerPrivateArgs().getPath() + "/" + htmlOutput, null, null);
 		}
 		URI jsonLocation = null;
 		if (jsonOutput != null) {
-			jsonLocation = new URI(baseLocation.getScheme(), null, baseLocation.getHost(), baseLocation.getPort(), "/" + Server.args.getPath() + "/" + jsonOutput, null, null);
+			jsonLocation = new URI(baseLocation.getScheme(), null, baseLocation.getHost(), baseLocation.getPort(), "/" + Server.args.getServerPrivateArgs().getPath() + "/" + jsonOutput, null, null);
 		}
 
 		Map<String, String> jsonFields = new LinkedHashMap<>();
@@ -299,7 +301,7 @@ public class Resource {
 		jsonFields.put("json", jsonLocation != null ? jsonLocation.toString() : null);
 
 		logger.info("Outputting results");
-		output.output(coreArgs, Server.getParamsMain(false, txt, html, json), jsonFields, QueryType.server, 1, 1,
+		output.output(coreArgs, Server.getArgsMain(false, txt, html, json), jsonFields, QueryType.server, 1, 1,
 			Server.concepts, queries, webpages, docs, publications, results, start, stop, Server.version, jsonVersion);
 
 		if (isJson) {
@@ -317,7 +319,7 @@ public class Resource {
 					jsonType = JsonType.full;
 				}
 			}
-			jsonString = Json.output(coreArgs, Server.getParamsMain(false, txt, html, json), jsonFields, jsonType, null,
+			jsonString = Json.output(coreArgs, Server.getArgsMain(false, txt, html, json), jsonFields, jsonType, null,
 				Server.concepts, queries, publications, webpages, docs, results, start, stop, Server.version, jsonVersion);
 		}
 

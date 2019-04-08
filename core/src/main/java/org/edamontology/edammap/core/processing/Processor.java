@@ -444,10 +444,18 @@ public class Processor {
 		return Collections.emptyList();
 	}
 
-	public int makeQueryIdf(List<Query> queries, QueryType type, String outputPath, boolean webpagesDocs, boolean fulltext, PreProcessor preProcessor, Idf queryIdf, FetcherArgs fetcherArgs) throws IOException {
+	public int makeQueryIdf(List<Query> queries, QueryType type, String outputPath, boolean webpagesDocs, boolean fulltext, PreProcessor preProcessor, Idf queryIdf, FetcherArgs fetcherArgs, boolean progress) throws IOException {
 		IdfMake idfMake = new IdfMake(outputPath);
 
-		for (Query query : queries) {
+		long start = System.currentTimeMillis();
+
+		for (int i = 0; i < queries.size(); ++i) {
+			Query query = queries.get(i);
+
+			if (progress) {
+				System.err.print(PubFetcher.progress(i + 1, queries.size(), start) + "\r");
+			}
+
 			QueryProcessed processedQuery = getProcessedQuery(query, type, preProcessor, queryIdf, fetcherArgs);
 
 			if (processedQuery.getNameTokens() != null) {
@@ -499,6 +507,10 @@ public class Processor {
 			}
 
 			idfMake.endDocument();
+		}
+
+		if (progress) {
+			System.err.println();
 		}
 
 		return idfMake.writeOutput();

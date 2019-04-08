@@ -21,28 +21,23 @@ package org.edamontology.edammap.core.args;
 
 import com.beust.jcommander.ParametersDelegate;
 
-import org.edamontology.pubfetcher.core.common.BasicArgs;
 import org.edamontology.pubfetcher.core.common.FetcherArgs;
 
 import org.edamontology.edammap.core.mapping.args.MapperArgs;
 import org.edamontology.edammap.core.preprocessing.PreProcessorArgs;
 import org.edamontology.edammap.core.processing.ProcessorArgs;
 
-public class CoreArgs extends BasicArgs {
+public class CoreArgs {
 
-	public static final String PROCESSOR_ARGS = "processorArgs";
 	@ParametersDelegate
 	private ProcessorArgs processorArgs = new ProcessorArgs();
 
-	public static final String PRE_PROCESSOR_ARGS = "preProcessorArgs";
 	@ParametersDelegate
 	private PreProcessorArgs preProcessorArgs = new PreProcessorArgs();
 
-	public static final String FETCHER_ARGS = "fetcherArgs";
 	@ParametersDelegate
 	private FetcherArgs fetcherArgs = new FetcherArgs();
 
-	public static final String MAPPER_ARGS = "mapperArgs";
 	@ParametersDelegate
 	private MapperArgs mapperArgs = new MapperArgs();
 

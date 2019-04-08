@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016, 2017 Erik Jaaniso
+ * Copyright © 2016, 2017, 2019 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -26,127 +26,183 @@ import org.edamontology.edammap.core.args.PositiveDouble;
 import org.edamontology.edammap.core.args.ZeroToOneDouble;
 import org.edamontology.edammap.core.mapping.MapperStrategy;
 
-public class AlgorithmArgs {
+import org.edamontology.pubfetcher.core.common.Arg;
+import org.edamontology.pubfetcher.core.common.Args;
 
-	public static final String COMPOUND_WORDS = "compoundWords";
-	@Parameter(names = { "--" + COMPOUND_WORDS }, validateWith = PositiveInteger.class, description = "Try to match words that have accidentally been made compound (given number is maximum number of words in an accidental compound minus one)")
-	private int compoundWords = 0;
+public class AlgorithmArgs extends Args {
 
-	public static final String MISMATCH_MULTIPLIER = "mismatchMultiplier";
-	@Parameter(names = { "--" + MISMATCH_MULTIPLIER }, validateWith = PositiveDouble.class, description = "Multiplier for score decrease caused by mismatch")
-	private double mismatchMultiplier = 2.0;
+	private static final String compoundWordsId = "compoundWords";
+	private static final String compoundWordsDescription = "Try to match words that have accidentally been made compound (given number is maximum number of words in an accidental compound minus one)";
+	private static final Integer compoundWordsDefault = 0;
+	@Parameter(names = { "--" + compoundWordsId }, validateWith = PositiveInteger.class, description = compoundWordsDescription)
+	private Integer compoundWords = compoundWordsDefault;
 
-	public static final String MATCH_MINIMUM = "matchMinimum";
-	@Parameter(names = { "--" + MATCH_MINIMUM }, validateWith = ZeroToOneDouble.class, description = "Minimum score allowed for approximate match. Set to 1 to disable approximate matching.")
-	private double matchMinimum = 1.0;
+	private static final String mismatchMultiplierId = "mismatchMultiplier";
+	private static final String mismatchMultiplierDescription = "Multiplier for score decrease caused by mismatch";
+	private static final Double mismatchMultiplierDefault = 2.0;
+	@Parameter(names = { "--" + mismatchMultiplierId }, validateWith = PositiveDouble.class, description = mismatchMultiplierDescription)
+	private Double mismatchMultiplier = mismatchMultiplierDefault;
 
-	public static final String POSITION_OFF_BY_1 = "positionOffBy1";
-	@Parameter(names = { "--" + POSITION_OFF_BY_1 }, validateWith = ZeroToOneDouble.class, description = "Multiplier of a position score component for the case when a word is inserted between matched words or matched words are switched")
-	private double positionOffBy1 = 0.35;
+	private static final String matchMinimumId = "matchMinimum";
+	private static final String matchMinimumDescription = "Minimum score allowed for approximate match. Set to 1 to disable approximate matching.";
+	private static final Double matchMinimumDefault = 1.0;
+	@Parameter(names = { "--" + matchMinimumId }, validateWith = ZeroToOneDouble.class, description = matchMinimumDescription)
+	private Double matchMinimum = matchMinimumDefault;
 
-	public static final String POSITION_OFF_BY_2 = "positionOffBy2";
-	@Parameter(names = { "--" + POSITION_OFF_BY_2 }, validateWith = ZeroToOneDouble.class, description = "Multiplier of a position score component for the case when two words are inserted between matched words or matched words are switched with an additional word between them")
-	private double positionOffBy2 = 0.05;
+	private static final String positionOffBy1Id = "positionOffBy1";
+	private static final String positionOffBy1Description = "Multiplier of a position score component for the case when a word is inserted between matched words or matched words are switched";
+	private static final Double positionOffBy1Default = 0.35;
+	@Parameter(names = { "--" + positionOffBy1Id }, validateWith = ZeroToOneDouble.class, description = positionOffBy1Description)
+	private Double positionOffBy1 = positionOffBy1Default;
 
-	public static final String POSITION_MATCH_SCALING = "positionMatchScaling";
-	@Parameter(names = { "--" + POSITION_MATCH_SCALING }, validateWith = PositiveDouble.class, description = "Set to 0 to not have match score of neighbor influence position score. Setting to 1 means linear influence.")
-	private double positionMatchScaling = 0.5;
+	private static final String positionOffBy2Id = "positionOffBy2";
+	private static final String positionOffBy2Description = "Multiplier of a position score component for the case when two words are inserted between matched words or matched words are switched with an additional word between them";
+	private static final Double positionOffBy2Default = 0.05;
+	@Parameter(names = { "--" + positionOffBy2Id }, validateWith = ZeroToOneDouble.class, description = positionOffBy2Description)
+	private Double positionOffBy2 = positionOffBy2Default;
 
-	public static final String POSITION_LOSS = "positionLoss";
-	@Parameter(names = { "--" + POSITION_LOSS }, validateWith = ZeroToOneDouble.class, description = "Maximum loss caused by wrong positions of matched words")
-	private double positionLoss = 0.4;
+	private static final String positionMatchScalingId = "positionMatchScaling";
+	private static final String positionMatchScalingDescription = "Set to 0 to not have match score of neighbor influence position score. Setting to 1 means linear influence.";
+	private static final Double positionMatchScalingDefault = 0.5;
+	@Parameter(names = { "--" + positionMatchScalingId }, validateWith = PositiveDouble.class, description = positionMatchScalingDescription)
+	private Double positionMatchScaling = positionMatchScalingDefault;
 
-	public static final String SCORE_SCALING = "scoreScaling";
-	@Parameter(names = { "--" + SCORE_SCALING }, validateWith = PositiveDouble.class, description = "Score is scaled before applying multiplier and weighting with other direction match. Setting to 0 or 1 means no scaling.")
-	private double scoreScaling = 0.2;
+	private static final String positionLossId = "positionLoss";
+	private static final String positionLossDescription = "Maximum loss caused by wrong positions of matched words";
+	private static final Double positionLossDefault = 0.4;
+	@Parameter(names = { "--" + positionLossId }, validateWith = ZeroToOneDouble.class, description = positionLossDescription)
+	private Double positionLoss = positionLossDefault;
 
-	public static final String CONCEPT_WEIGHT = "conceptWeight";
-	@Parameter(names = { "--" + CONCEPT_WEIGHT }, validateWith = PositiveDouble.class, description = "Weight of matching a concept (with a query). Set to 0 to disable matching of concepts.")
-	private double conceptWeight = 1.0;
+	private static final String scoreScalingId = "scoreScaling";
+	private static final String scoreScalingDescription = "Score is scaled before applying multiplier and weighting with other direction match. Setting to 0 or 1 means no scaling.";
+	private static final Double scoreScalingDefault = 0.2;
+	@Parameter(names = { "--" + scoreScalingId }, validateWith = PositiveDouble.class, description = scoreScalingDescription)
+	private Double scoreScaling = scoreScalingDefault;
 
-	public static final String QUERY_WEIGHT = "queryWeight";
-	@Parameter(names = { "--" + QUERY_WEIGHT }, validateWith = PositiveDouble.class, description = "Weight of matching a query (with a concept). Set to 0 to disable matching of queries.")
-	private double queryWeight = 1.0;
+	private static final String conceptWeightId = "conceptWeight";
+	private static final String conceptWeightDescription = "Weight of matching a concept (with a query). Set to 0 to disable matching of concepts.";
+	private static final Double conceptWeightDefault = 1.0;
+	@Parameter(names = { "--" + conceptWeightId }, validateWith = PositiveDouble.class, description = conceptWeightDescription)
+	private Double conceptWeight = conceptWeightDefault;
 
-	public static final String MAPPING_STRATEGY = "mappingStrategy";
-	@Parameter(names = { "--" + MAPPING_STRATEGY }, description = "Choose the best or take the average of query parts matches")
-	private MapperStrategy mappingStrategy = MapperStrategy.average;
+	private static final String queryWeightId = "queryWeight";
+	private static final String queryWeightDescription = "Weight of matching a query (with a concept). Set to 0 to disable matching of queries.";
+	private static final Double queryWeightDefault = 1.0;
+	@Parameter(names = { "--" + queryWeightId }, validateWith = PositiveDouble.class, description = queryWeightDescription)
+	private Double queryWeight = queryWeightDefault;
 
-	public static final String PARENT_WEIGHT = "parentWeight";
-	@Parameter(names = { "--" + PARENT_WEIGHT }, validateWith = PositiveDouble.class, description = "Weight of concept's parent when computing path enrichment. Weight of grand-parent is parent-weight times parent-weight, etc. Set to 0 to disable path enrichment.")
-	private double parentWeight = 0.5;
+	private static final String mappingStrategyId = "mappingStrategy";
+	private static final String mappingStrategyDescription = "Choose the best or take the average of query parts matches";
+	private static final MapperStrategy mappingStrategyDefault = MapperStrategy.average;
+	@Parameter(names = { "--" + mappingStrategyId }, description = mappingStrategyDescription)
+	private MapperStrategy mappingStrategy = mappingStrategyDefault;
 
-	public static final String PATH_WEIGHT = "pathWeight";
-	@Parameter(names = { "--" + PATH_WEIGHT }, validateWith = PositiveDouble.class, description = "Weight of path enrichment. Weight of concept is 1. Set to 0 to disable path enrichment.")
-	private double pathWeight = 0.7;
+	private static final String parentWeightId = "parentWeight";
+	private static final String parentWeightDescription = "Weight of concept's parent when computing path enrichment. Weight of grand-parent is parent-weight times parent-weight, etc. Set to 0 to disable path enrichment.";
+	private static final Double parentWeightDefault = 0.5;
+	@Parameter(names = { "--" + parentWeightId }, validateWith = PositiveDouble.class, description = parentWeightDescription)
+	private Double parentWeight = parentWeightDefault;
+
+	private static final String pathWeightId = "pathWeight";
+	private static final String pathWeightDescription = "Weight of path enrichment. Weight of concept is 1. Set to 0 to disable path enrichment.";
+	private static final Double pathWeightDefault = 0.7;
+	@Parameter(names = { "--" + pathWeightId }, validateWith = PositiveDouble.class, description = pathWeightDescription)
+	private Double pathWeight = pathWeightDefault;
+
+	@Override
+	protected void addArgs() {
+		args.add(new Arg<>(this::getCompoundWords, this::setCompoundWords, compoundWordsDefault, 0, null, compoundWordsId, "Compound words", compoundWordsDescription, null));
+		args.add(new Arg<>(this::getMismatchMultiplier, this::setMismatchMultiplier, mismatchMultiplierDefault, 0.0, null, mismatchMultiplierId, "Mismatch multiplier", mismatchMultiplierDescription, null));
+		args.add(new Arg<>(this::getMatchMinimum, this::setMatchMinimum, matchMinimumDefault, 0.0, 1.0, matchMinimumId, "Match minimum", matchMinimumDescription, null));
+		args.add(new Arg<>(this::getPositionOffBy1, this::setPositionOffBy1, positionOffBy1Default, 0.0, 1.0, positionOffBy1Id, "Position off by 1", positionOffBy1Description, null));
+		args.add(new Arg<>(this::getPositionOffBy2, this::setPositionOffBy2, positionOffBy2Default, 0.0, 1.0, positionOffBy2Id, "Position off by 2", positionOffBy2Description, null));
+		args.add(new Arg<>(this::getPositionMatchScaling, this::setPositionMatchScaling, positionMatchScalingDefault, 0.0, null, positionMatchScalingId, "Position match scaling", positionMatchScalingDescription, null));
+		args.add(new Arg<>(this::getPositionLoss, this::setPositionLoss, positionLossDefault, 0.0, 1.0, positionLossId, "Position loss", positionLossDescription, null));
+		args.add(new Arg<>(this::getScoreScaling, this::setScoreScaling, scoreScalingDefault, 0.0, null, scoreScalingId, "Score scaling", scoreScalingDescription, null));
+		args.add(new Arg<>(this::getConceptWeight, this::setConceptWeight, conceptWeightDefault, 0.0, null, conceptWeightId, "Concept weight", conceptWeightDescription, null));
+		args.add(new Arg<>(this::getQueryWeight, this::setQueryWeight, queryWeightDefault, 0.0, null, queryWeightId, "Query weight", queryWeightDescription, null));
+		args.add(new Arg<>(this::getMappingStrategy, this::setMappingStrategy, mappingStrategyDefault, mappingStrategyId, "Mapping strategy", mappingStrategyDescription, MapperStrategy.class));
+		args.add(new Arg<>(this::getParentWeight, this::setParentWeight, parentWeightDefault, 0.0, null, parentWeightId, "Parent weight", parentWeightDescription, null));
+		args.add(new Arg<>(this::getPathWeight, this::setPathWeight, pathWeightDefault, 0.0, null, pathWeightId, "Path weight", pathWeightDescription, null));
+	}
+
+	@Override
+	public String getId() {
+		return "algorithmArgs";
+	}
+
+	@Override
+	public String getLabel() {
+		return "Mapping algorithm";
+	}
 
 	public int getCompoundWords() {
 		return compoundWords;
 	}
-	public void setCompoundWords(int compoundWords) {
+	public void setCompoundWords(Integer compoundWords) {
 		this.compoundWords = compoundWords;
 	}
 
 	public double getMismatchMultiplier() {
 		return mismatchMultiplier;
 	}
-	public void setMismatchMultiplier(double mismatchMultiplier) {
+	public void setMismatchMultiplier(Double mismatchMultiplier) {
 		this.mismatchMultiplier = mismatchMultiplier;
 	}
 
 	public double getMatchMinimum() {
 		return matchMinimum;
 	}
-	public void setMatchMinimum(double matchMinimum) {
+	public void setMatchMinimum(Double matchMinimum) {
 		this.matchMinimum = matchMinimum;
 	}
 
 	public double getPositionOffBy1() {
 		return positionOffBy1;
 	}
-	public void setPositionOffBy1(double positionOffBy1) {
+	public void setPositionOffBy1(Double positionOffBy1) {
 		this.positionOffBy1 = positionOffBy1;
 	}
 
 	public double getPositionOffBy2() {
 		return positionOffBy2;
 	}
-	public void setPositionOffBy2(double positionOffBy2) {
+	public void setPositionOffBy2(Double positionOffBy2) {
 		this.positionOffBy2 = positionOffBy2;
 	}
 
 	public double getPositionMatchScaling() {
 		return positionMatchScaling;
 	}
-	public void setPositionMatchScaling(double positionMatchScaling) {
+	public void setPositionMatchScaling(Double positionMatchScaling) {
 		this.positionMatchScaling = positionMatchScaling;
 	}
 
 	public double getPositionLoss() {
 		return positionLoss;
 	}
-	public void setPositionLoss(double positionLoss) {
+	public void setPositionLoss(Double positionLoss) {
 		this.positionLoss = positionLoss;
 	}
 
 	public double getScoreScaling() {
 		return scoreScaling;
 	}
-	public void setScoreScaling(double scoreScaling) {
+	public void setScoreScaling(Double scoreScaling) {
 		this.scoreScaling = scoreScaling;
 	}
 
 	public double getConceptWeight() {
 		return conceptWeight;
 	}
-	public void setConceptWeight(double conceptWeight) {
+	public void setConceptWeight(Double conceptWeight) {
 		this.conceptWeight = conceptWeight;
 	}
 
 	public double getQueryWeight() {
 		return queryWeight;
 	}
-	public void setQueryWeight(double queryWeight) {
+	public void setQueryWeight(Double queryWeight) {
 		this.queryWeight = queryWeight;
 	}
 
@@ -160,14 +216,14 @@ public class AlgorithmArgs {
 	public double getParentWeight() {
 		return parentWeight;
 	}
-	public void setParentWeight(double parentWeight) {
+	public void setParentWeight(Double parentWeight) {
 		this.parentWeight = parentWeight;
 	}
 
 	public double getPathWeight() {
 		return pathWeight;
 	}
-	public void setPathWeight(double pathWeight) {
+	public void setPathWeight(Double pathWeight) {
 		this.pathWeight = pathWeight;
 	}
 }

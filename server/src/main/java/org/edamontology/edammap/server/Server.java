@@ -19,29 +19,6 @@
 
 package org.edamontology.edammap.server;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.edamontology.edammap.core.edam.Concept;
-import org.edamontology.edammap.core.edam.Edam;
-import org.edamontology.edammap.core.edam.EdamUri;
-import org.edamontology.edammap.core.idf.Idf;
-import org.edamontology.edammap.core.output.ParamMain;
-import org.edamontology.edammap.core.preprocessing.PreProcessor;
-import org.edamontology.edammap.core.preprocessing.Stopwords;
-import org.edamontology.edammap.core.processing.Processor;
-import org.edamontology.pubfetcher.core.common.BasicArgs;
-import org.edamontology.pubfetcher.core.common.Version;
-import org.glassfish.grizzly.http.server.HttpHandler;
-import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.grizzly.http.server.Request;
-import org.glassfish.grizzly.http.server.Response;
-import org.glassfish.grizzly.http.server.StaticHttpHandler;
-import org.glassfish.grizzly.http.server.accesslog.AccessLogBuilder;
-import org.glassfish.grizzly.http.util.ContentType;
-import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
-import org.glassfish.jersey.server.ResourceConfig;
-
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.AccessDeniedException;
@@ -59,6 +36,31 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedHashMap;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.glassfish.grizzly.http.server.HttpHandler;
+import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.http.server.Request;
+import org.glassfish.grizzly.http.server.Response;
+import org.glassfish.grizzly.http.server.StaticHttpHandler;
+import org.glassfish.grizzly.http.server.accesslog.AccessLogBuilder;
+import org.glassfish.grizzly.http.util.ContentType;
+import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
+import org.glassfish.jersey.server.ResourceConfig;
+
+import org.edamontology.edammap.core.args.ArgMain;
+import org.edamontology.edammap.core.edam.Concept;
+import org.edamontology.edammap.core.edam.Edam;
+import org.edamontology.edammap.core.edam.EdamUri;
+import org.edamontology.edammap.core.idf.Idf;
+import org.edamontology.edammap.core.preprocessing.PreProcessor;
+import org.edamontology.edammap.core.preprocessing.Stopwords;
+import org.edamontology.edammap.core.processing.Processor;
+
+import org.edamontology.pubfetcher.core.common.Arg;
+import org.edamontology.pubfetcher.core.common.BasicArgs;
+import org.edamontology.pubfetcher.core.common.Version;
 
 public final class Server {
 
@@ -80,15 +82,18 @@ public final class Server {
 	static Map<EdamUri, Concept> concepts;
 
 	static final String VERSION_ID = "version";
-	static final String HTML_ID = "html";
 
-	static List<ParamMain> getParamsMain(boolean input, boolean txt, boolean html, boolean json) {
-		List<ParamMain> paramsMain = new ArrayList<>();
-		paramsMain.add(new ParamMain("Ontology file", ServerArgs.EDAM, new File(args.getEdam()).getName(), "https://github.com/edamontology/edamontology/tree/master/releases", false));
-		paramsMain.add(new ParamMain("Results to text", ServerArgs.TXT, txt, input));
-		paramsMain.add(new ParamMain("Results to HTML", HTML_ID, html, false));
-		paramsMain.add(new ParamMain("Results to JSON", ServerArgs.JSON, json, input));
-		return paramsMain;
+	static List<ArgMain> getArgsMain(boolean input, Boolean txt, Boolean html, Boolean json) {
+		List<ArgMain> argsMain = new ArrayList<>();
+		for (Arg<?, ?> arg : args.getArgs()) {
+			switch (arg.getId()) {
+				case ServerArgs.txtId: argsMain.add(new ArgMain(txt, arg, input)); break;
+				case ServerArgs.htmlId: argsMain.add(new ArgMain(html, arg, false)); break;
+				case ServerArgs.jsonId: argsMain.add(new ArgMain(json, arg, input)); break;
+				default: argsMain.add(new ArgMain(arg.getValue(), arg, false)); break;
+			}
+		}
+		return argsMain;
 	}
 
 	public static void copyHtmlResources(Path path) throws IOException {
@@ -97,7 +102,7 @@ public final class Server {
 	}
 
 	private static void run() throws IOException, ParseException {
-		Path filesDir = Paths.get(args.getFiles() + "/" + version.getVersion());
+		Path filesDir = Paths.get(args.getServerPrivateArgs().getFiles() + "/" + version.getVersion());
 		if (!Files.isDirectory(filesDir) || !Files.isWritable(filesDir)) {
 			throw new AccessDeniedException(filesDir.toAbsolutePath().normalize() + " is not a writeable directory!");
 		}
@@ -124,9 +129,9 @@ public final class Server {
 
 		final ResourceConfig rc = new ResourceConfig().packages("org.edamontology.edammap.server");
 
-		HttpServer httpServer = GrizzlyHttpServerFactory.createHttpServer(URI.create(args.getBaseUri() + "/" + args.getPath() + "/api"), rc, false);
+		HttpServer httpServer = GrizzlyHttpServerFactory.createHttpServer(URI.create(args.getServerPrivateArgs().getBaseUri() + "/" + args.getServerPrivateArgs().getPath() + "/api"), rc, false);
 
-		final StaticHttpHandler filesHttpHandler = new StaticHttpHandler(args.getFiles()) {
+		final StaticHttpHandler filesHttpHandler = new StaticHttpHandler(args.getServerPrivateArgs().getFiles()) {
 			@Override
 			protected boolean handle(String uri, Request request, Response response) throws Exception {
 				response.getResponse().setCharacterEncoding("utf-8");
@@ -139,7 +144,7 @@ public final class Server {
 			}
 		};
 		filesHttpHandler.setDirectorySlashOff(true);
-		httpServer.getServerConfiguration().addHttpHandler(filesHttpHandler, "/" + args.getPath() + "/*");
+		httpServer.getServerConfiguration().addHttpHandler(filesHttpHandler, "/" + args.getServerPrivateArgs().getPath() + "/*");
 
 		httpServer.getServerConfiguration().addHttpHandler(
 			new HttpHandler() {
@@ -166,7 +171,7 @@ public final class Server {
 					response.getWriter().write(responseText);
 				}
 			},
-			"/" + args.getPath() + "/");
+			"/" + args.getServerPrivateArgs().getPath() + "/");
 
 		if (args.getLog() != null) {
 			Path accessDir = Paths.get(args.getLog() + "/access");

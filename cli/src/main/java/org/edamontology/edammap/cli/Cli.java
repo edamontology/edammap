@@ -19,7 +19,6 @@
 
 package org.edamontology.edammap.cli;
 
-import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.time.Instant;
@@ -31,12 +30,14 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import org.edamontology.pubfetcher.core.common.Arg;
 import org.edamontology.pubfetcher.core.common.BasicArgs;
 import org.edamontology.pubfetcher.core.common.PubFetcher;
 import org.edamontology.pubfetcher.core.common.Version;
 import org.edamontology.pubfetcher.core.db.publication.Publication;
 import org.edamontology.pubfetcher.core.db.webpage.Webpage;
 
+import org.edamontology.edammap.core.args.ArgMain;
 import org.edamontology.edammap.core.benchmarking.Benchmark;
 import org.edamontology.edammap.core.benchmarking.Measure;
 import org.edamontology.edammap.core.benchmarking.Results;
@@ -44,11 +45,9 @@ import org.edamontology.edammap.core.edam.Concept;
 import org.edamontology.edammap.core.edam.Edam;
 import org.edamontology.edammap.core.edam.EdamUri;
 import org.edamontology.edammap.core.idf.Idf;
-import org.edamontology.edammap.core.input.Input;
 import org.edamontology.edammap.core.mapping.Mapper;
 import org.edamontology.edammap.core.mapping.Mapping;
 import org.edamontology.edammap.core.output.Output;
-import org.edamontology.edammap.core.output.ParamMain;
 import org.edamontology.edammap.core.preprocessing.PreProcessor;
 import org.edamontology.edammap.core.processing.ConceptProcessed;
 import org.edamontology.edammap.core.processing.Processor;
@@ -97,7 +96,7 @@ public class Cli implements Runnable {
 			lockDone = true;
 		}
 		try {
-			PreProcessor pp = new PreProcessor(args.getPreProcessorArgs(), stopwords);
+			PreProcessor pp = new PreProcessor(args.getCoreArgs().getPreProcessorArgs(), stopwords);
 			Mapper mapper = new Mapper(processedConcepts, edamBlacklist);
 
 			while (true) {
@@ -114,9 +113,9 @@ public class Cli implements Runnable {
 
 				logger.info(PubFetcher.progress(localIndex + 1, queries.size(), start));
 
-				QueryProcessed processedQuery = processor.getProcessedQuery(query, args.getType(), pp, idf, args.getFetcherArgs());
+				QueryProcessed processedQuery = processor.getProcessedQuery(query, args.getType(), pp, idf, args.getCoreArgs().getFetcherArgs());
 
-				Mapping mapping = mapper.map(query, processedQuery, args.getMapperArgs());
+				Mapping mapping = mapper.map(query, processedQuery, args.getCoreArgs().getMapperArgs());
 
 				synchronized (mappings) {
 					webpages.set(localIndex, processedQuery.getWebpages());
@@ -134,37 +133,27 @@ public class Cli implements Runnable {
 	}
 
 	private static void run(Version version) throws IOException, ParseException {
-		List<ParamMain> paramsMain = new ArrayList<>();
-		paramsMain.add(new ParamMain("Ontology file", CliArgs.EDAM, new File(args.getEdam()).getName(), "https://github.com/edamontology/edamontology/tree/master/releases", false));
-		if (Input.isProtocol(args.getQuery())) {
-			paramsMain.add(new ParamMain("Query file", CliArgs.QUERY, args.getQuery(), args.getQuery(), false));
-		} else {
-			paramsMain.add(new ParamMain("Query file", CliArgs.QUERY, new File(args.getQuery()).getName(), false));
+		List<ArgMain> argsMain = new ArrayList<>();
+		for (Arg<?, ?> arg : args.getArgs()) {
+			argsMain.add(new ArgMain(arg.getValue(), arg, false));
 		}
-		paramsMain.add(new ParamMain("Type", CliArgs.TYPE, args.getType().toString(), false));
-		paramsMain.add(new ParamMain("Output file", CliArgs.OUTPUT, new File(args.getOutput()).getName(), false));
-		paramsMain.add(new ParamMain("Report file", CliArgs.REPORT, new File(args.getReport()).getName(), false));
-		paramsMain.add(new ParamMain("JSON file", CliArgs.JSON, new File(args.getJson()).getName(), false));
-		paramsMain.add(new ParamMain("Report page size", CliArgs.REPORT_PAGE_SIZE, args.getReportPageSize(), 0.0, null, false));
-		paramsMain.add(new ParamMain("Report pagination size", CliArgs.REPORT_PAGINATION_SIZE, args.getReportPaginationSize(), 0.0, null, false));
-		paramsMain.add(new ParamMain("Number of threads", CliArgs.THREADS, args.getThreads(), 0.0, null, false));
 
 		Output output = new Output(args.getOutput(), args.getReport(), args.getJson(), false);
 
-		stopwords = PreProcessor.getStopwords(args.getPreProcessorArgs().getStopwords());
+		stopwords = PreProcessor.getStopwords(args.getCoreArgs().getPreProcessorArgs().getStopwords());
 
 		edamBlacklist = Edam.getBlacklist();
 
-		processor = new Processor(args.getProcessorArgs(), args.getFetcherArgs().getPrivateArgs());
+		processor = new Processor(args.getCoreArgs().getProcessorArgs(), args.getCoreArgs().getFetcherArgs().getPrivateArgs());
 
 		idf = null;
-		if (args.getPreProcessorArgs().isStemming()) {
-			if (args.getProcessorArgs().getIdfStemmed() != null && !args.getProcessorArgs().getIdfStemmed().isEmpty()) {
-				idf = new Idf(args.getProcessorArgs().getIdfStemmed());
+		if (args.getCoreArgs().getPreProcessorArgs().isStemming()) {
+			if (args.getCoreArgs().getProcessorArgs().getIdfStemmed() != null && !args.getCoreArgs().getProcessorArgs().getIdfStemmed().isEmpty()) {
+				idf = new Idf(args.getCoreArgs().getProcessorArgs().getIdfStemmed());
 			}
 		} else {
-			if (args.getProcessorArgs().getIdf() != null && !args.getProcessorArgs().getIdf().isEmpty()) {
-				idf = new Idf(args.getProcessorArgs().getIdf());
+			if (args.getCoreArgs().getProcessorArgs().getIdf() != null && !args.getCoreArgs().getProcessorArgs().getIdf().isEmpty()) {
+				idf = new Idf(args.getCoreArgs().getProcessorArgs().getIdf());
 			}
 		}
 
@@ -172,12 +161,12 @@ public class Cli implements Runnable {
 		Map<EdamUri, Concept> concepts = Edam.load(args.getEdam());
 
 		logger.info("Processing {} concepts", concepts.size());
-		processedConcepts = processor.getProcessedConcepts(concepts, args.getMapperArgs().getIdfArgs(), args.getMapperArgs().getMultiplierArgs(),
-			new PreProcessor(args.getPreProcessorArgs(), stopwords));
+		processedConcepts = processor.getProcessedConcepts(concepts, args.getCoreArgs().getMapperArgs().getIdfArgs(), args.getCoreArgs().getMapperArgs().getMultiplierArgs(),
+			new PreProcessor(args.getCoreArgs().getPreProcessorArgs(), stopwords));
 
 		logger.info("Loading queries");
 		queries = QueryLoader.get(args.getQuery(), args.getType(), concepts,
-			args.getFetcherArgs().getTimeout(), args.getFetcherArgs().getPrivateArgs().getUserAgent());
+			args.getCoreArgs().getFetcherArgs().getTimeout(), args.getCoreArgs().getFetcherArgs().getPrivateArgs().getUserAgent());
 
 		publications = new ArrayList<>(queries.size());
 		webpages = new ArrayList<>(queries.size());
@@ -221,7 +210,7 @@ public class Cli implements Runnable {
 		Results results = Benchmark.calculate(queries, mappings);
 
 		logger.info("Outputting results");
-		output.output(args, paramsMain, null, args.getType(), args.getReportPageSize(), args.getReportPaginationSize(),
+		output.output(args.getCoreArgs(), argsMain, null, args.getType(), args.getReportPageSize(), args.getReportPaginationSize(),
 			concepts, queries, webpages, docs, publications, results, start, stop, version, "1");
 
 		logger.info("{} : {}", results.toStringMeasure(Measure.recall), Measure.recall);

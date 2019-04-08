@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016, 2018 Erik Jaaniso
+ * Copyright © 2016, 2018, 2019 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -23,82 +23,120 @@ import com.beust.jcommander.Parameter;
 
 import org.edamontology.edammap.core.args.PositiveDouble;
 
-public class IdfArgs {
+import org.edamontology.pubfetcher.core.common.Arg;
+import org.edamontology.pubfetcher.core.common.Args;
 
-	public static final String CONCEPT_IDF_SCALING = "conceptIdfScaling";
-	@Parameter(names = { "--" + CONCEPT_IDF_SCALING }, validateWith = PositiveDouble.class, description = "Set to 0 to disable concept IDF. Setting to 1 means linear IDF weighting.")
-	private double conceptIdfScaling = 0.5;
+public class IdfArgs extends Args {
 
-	public static final String QUERY_IDF_SCALING = "queryIdfScaling";
-	@Parameter(names = { "--" + QUERY_IDF_SCALING }, validateWith = PositiveDouble.class, description = "Set to 0 to disable query IDF. Setting to 1 means linear IDF weighting.")
-	private double queryIdfScaling = 0.5;
+	private static final String conceptIdfScalingId = "conceptIdfScaling";
+	private static final String conceptIdfScalingDescription = "Set to 0 to disable concept IDF. Setting to 1 means linear IDF weighting.";
+	private static final Double conceptIdfScalingDefault = 0.5;
+	@Parameter(names = { "--" + conceptIdfScalingId }, validateWith = PositiveDouble.class, description = conceptIdfScalingDescription)
+	private Double conceptIdfScaling = conceptIdfScalingDefault;
 
-	public static final String LABEL_SYNONYMS_IDF = "labelSynonymsIdf";
-	@Parameter(names = { "--" + LABEL_SYNONYMS_IDF }, arity = 1, description = "IDF weighting for concept label and synonyms")
-	private boolean labelSynonymsIdf = false;
+	private static final String queryIdfScalingId = "queryIdfScaling";
+	private static final String queryIdfScalingDescription = "Set to 0 to disable query IDF. Setting to 1 means linear IDF weighting.";
+	private static final Double queryIdfScalingDefault = 0.5;
+	@Parameter(names = { "--" + queryIdfScalingId }, validateWith = PositiveDouble.class, description = queryIdfScalingDescription)
+	private Double queryIdfScaling = queryIdfScalingDefault;
 
-	public static final String NAME_KEYWORDS_IDF = "nameKeywordsIdf";
-	@Parameter(names = { "--" + NAME_KEYWORDS_IDF }, arity = 1, description = "IDF weighting for query name and keywords")
-	private boolean nameKeywordsIdf = true;
+	private static final String labelSynonymsIdfId = "labelSynonymsIdf";
+	private static final String labelSynonymsIdfDescription = "IDF weighting for concept label and synonyms";
+	private static final Boolean labelSynonymsIdfDefault = false;
+	@Parameter(names = { "--" + labelSynonymsIdfId }, arity = 1, description = labelSynonymsIdfDescription)
+	private Boolean labelSynonymsIdf = labelSynonymsIdfDefault;
 
-	public static final String DESCRIPTION_IDF = "descriptionIdf";
-	@Parameter(names = { "--" + DESCRIPTION_IDF }, arity = 1, description = "IDF weighting for query description")
-	private boolean descriptionIdf = true;
+	private static final String nameKeywordsIdfId = "nameKeywordsIdf";
+	private static final String nameKeywordsIdfDescription = "IDF weighting for query name and keywords";
+	private static final Boolean nameKeywordsIdfDefault = true;
+	@Parameter(names = { "--" + nameKeywordsIdfId }, arity = 1, description = nameKeywordsIdfDescription)
+	private Boolean nameKeywordsIdf = nameKeywordsIdfDefault;
 
-	public static final String TITLE_KEYWORDS_IDF = "titleKeywordsIdf";
-	@Parameter(names = { "--" + TITLE_KEYWORDS_IDF }, arity = 1, description = "IDF weighting for publication title and keywords")
-	private boolean titleKeywordsIdf = true;
+	private static final String descriptionIdfId = "descriptionIdf";
+	private static final String descriptionIdfDescription = "IDF weighting for query description";
+	private static final Boolean descriptionIdfDefault = true;
+	@Parameter(names = { "--" + descriptionIdfId }, arity = 1, description = descriptionIdfDescription)
+	private Boolean descriptionIdf = descriptionIdfDefault;
 
-	public static final String ABSTRACT_IDF = "abstractIdf";
-	@Parameter(names = { "--" + ABSTRACT_IDF }, arity = 1, description = "IDF weighting for publication abstract")
-	private boolean abstractIdf = true;
+	private static final String titleKeywordsIdfId = "titleKeywordsIdf";
+	private static final String titleKeywordsIdfDescription = "IDF weighting for publication title and keywords";
+	private static final Boolean titleKeywordsIdfDefault = true;
+	@Parameter(names = { "--" + titleKeywordsIdfId }, arity = 1, description = titleKeywordsIdfDescription)
+	private Boolean titleKeywordsIdf = titleKeywordsIdfDefault;
 
-	public double getConceptIdfScaling() {
+	private static final String abstractIdfId = "abstractIdf";
+	private static final String abstractIdfDescription = "IDF weighting for publication abstract";
+	private static final Boolean abstractIdfDefault = true;
+	@Parameter(names = { "--" + abstractIdfId }, arity = 1, description = abstractIdfDescription)
+	private Boolean abstractIdf = abstractIdfDefault;
+
+	@Override
+	protected void addArgs() {
+		args.add(new Arg<>(this::getConceptIdfScaling, this::setConceptIdfScaling, conceptIdfScalingDefault, 0.0, null, conceptIdfScalingId, "Concept IDF scaling", conceptIdfScalingDescription, null));
+		args.add(new Arg<>(this::getQueryIdfScaling, this::setQueryIdfScaling, queryIdfScalingDefault, 0.0, null, queryIdfScalingId, "Query IDF scaling", queryIdfScalingDescription, null));
+		args.add(new Arg<>(this::isLabelSynonymsIdf, this::setLabelSynonymsIdf, labelSynonymsIdfDefault, labelSynonymsIdfId, "Label/Synonyms IDF", labelSynonymsIdfDescription, null));
+		args.add(new Arg<>(this::isNameKeywordsIdf, this::setNameKeywordsIdf, nameKeywordsIdfDefault, nameKeywordsIdfId, "Name/Keywords IDF", nameKeywordsIdfDescription, null));
+		args.add(new Arg<>(this::isDescriptionIdf, this::setDescriptionIdf, descriptionIdfDefault, descriptionIdfId, "Description IDF", descriptionIdfDescription, null));
+		args.add(new Arg<>(this::isTitleKeywordsIdf, this::setTitleKeywordsIdf, titleKeywordsIdfDefault, titleKeywordsIdfId, "Title/Keywords IDF", titleKeywordsIdfDescription, null));
+		args.add(new Arg<>(this::isAbstractIdf, this::setAbstractIdf, abstractIdfDefault, abstractIdfId, "Abstract IDF", abstractIdfDescription, null));
+	}
+
+	@Override
+	public String getId() {
+		return "idfArgs";
+	}
+
+	@Override
+	public String getLabel() {
+		return "IDF";
+	}
+
+	public Double getConceptIdfScaling() {
 		return conceptIdfScaling;
 	}
-	public void setConceptIdfScaling(double conceptIdfScaling) {
+	public void setConceptIdfScaling(Double conceptIdfScaling) {
 		this.conceptIdfScaling = conceptIdfScaling;
 	}
 
-	public double getQueryIdfScaling() {
+	public Double getQueryIdfScaling() {
 		return queryIdfScaling;
 	}
-	public void setQueryIdfScaling(double queryIdfScaling) {
+	public void setQueryIdfScaling(Double queryIdfScaling) {
 		this.queryIdfScaling = queryIdfScaling;
 	}
 
-	public boolean isLabelSynonymsIdf() {
+	public Boolean isLabelSynonymsIdf() {
 		return labelSynonymsIdf;
 	}
-	public void setLabelSynonymsIdf(boolean labelSynonymsIdf) {
+	public void setLabelSynonymsIdf(Boolean labelSynonymsIdf) {
 		this.labelSynonymsIdf = labelSynonymsIdf;
 	}
 
-	public boolean isNameKeywordsIdf() {
+	public Boolean isNameKeywordsIdf() {
 		return nameKeywordsIdf;
 	}
-	public void setNameKeywordsIdf(boolean nameKeywordsIdf) {
+	public void setNameKeywordsIdf(Boolean nameKeywordsIdf) {
 		this.nameKeywordsIdf = nameKeywordsIdf;
 	}
 
-	public boolean isDescriptionIdf() {
+	public Boolean isDescriptionIdf() {
 		return descriptionIdf;
 	}
-	public void setDescriptionIdf(boolean descriptionIdf) {
+	public void setDescriptionIdf(Boolean descriptionIdf) {
 		this.descriptionIdf = descriptionIdf;
 	}
 
-	public boolean isTitleKeywordsIdf() {
+	public Boolean isTitleKeywordsIdf() {
 		return titleKeywordsIdf;
 	}
-	public void setTitleKeywordsIdf(boolean titleKeywordsIdf) {
+	public void setTitleKeywordsIdf(Boolean titleKeywordsIdf) {
 		this.titleKeywordsIdf = titleKeywordsIdf;
 	}
 
-	public boolean isAbstractIdf() {
+	public Boolean isAbstractIdf() {
 		return abstractIdf;
 	}
-	public void setAbstractIdf(boolean abstractIdf) {
+	public void setAbstractIdf(Boolean abstractIdf) {
 		this.abstractIdf = abstractIdf;
 	}
 }

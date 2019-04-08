@@ -40,6 +40,7 @@ import org.edamontology.pubfetcher.core.db.DatabaseEntry;
 import org.edamontology.pubfetcher.core.db.publication.Publication;
 import org.edamontology.pubfetcher.core.db.webpage.Webpage;
 
+import org.edamontology.edammap.core.args.ArgMain;
 import org.edamontology.edammap.core.args.CoreArgs;
 import org.edamontology.edammap.core.benchmarking.MappingTest;
 import org.edamontology.edammap.core.benchmarking.MatchTest;
@@ -205,7 +206,7 @@ public class Json {
 		generator.writeEndObject();
 	}
 
-	public static String output(CoreArgs args, List<ParamMain> paramsMain, Map<String, String> jsonFields, JsonType type, Path json, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publicationsAll, List<List<Webpage>> webpagesAll, List<List<Webpage>> docsAll, Results results, long start, long stop, Version version, String jsonVersion) throws IOException {
+	public static String output(CoreArgs args, List<ArgMain> argsMain, Map<String, String> jsonFields, JsonType type, Path json, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publicationsAll, List<List<Webpage>> webpagesAll, List<List<Webpage>> docsAll, Results results, long start, long stop, Version version, String jsonVersion) throws IOException {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
 		mapper.enable(SerializationFeature.CLOSE_CLOSEABLE);
@@ -365,21 +366,33 @@ public class Json {
 				generator.writeFieldName("webpages");
 				generator.writeStartArray();
 				for (Webpage webpage : webpages) {
-					webpage.toStringJson(generator, args.getFetcherArgs(), false);
+					if (webpage != null) {
+						webpage.toStringJson(generator, args.getFetcherArgs(), false);
+					} else {
+						generator.writeNull();
+					}
 				}
 				generator.writeEndArray();
 
 				generator.writeFieldName("docs");
 				generator.writeStartArray();
 				for (Webpage doc : docs) {
-					doc.toStringJson(generator, args.getFetcherArgs(), false);
+					if (doc != null) {
+						doc.toStringJson(generator, args.getFetcherArgs(), false);
+					} else {
+						generator.writeNull();
+					}
 				}
 				generator.writeEndArray();
 
 				generator.writeFieldName("publications");
 				generator.writeStartArray();
 				for (Publication publication : publications) {
-					publication.toStringJson(generator, args.getFetcherArgs(), false);
+					if (publication != null) {
+						publication.toStringJson(generator, args.getFetcherArgs(), false);
+					} else {
+						generator.writeNull();
+					}
 				}
 				generator.writeEndArray();
 
@@ -436,11 +449,11 @@ public class Json {
 
 		generator.writeFieldName("args");
 		generator.writeStartObject();
-		Params.writeMain(paramsMain, generator);
-		generator.writeObjectField(CoreArgs.PROCESSOR_ARGS, args.getProcessorArgs());
-		generator.writeObjectField(CoreArgs.PRE_PROCESSOR_ARGS, args.getPreProcessorArgs());
+		Params.writeMain(argsMain, generator);
+		Params.writeProcessing(args.getProcessorArgs(), generator);
+		Params.writePreProcessing(args.getPreProcessorArgs(), generator);
 		Params.writeFetching(args.getFetcherArgs(), !server, generator);
-		generator.writeObjectField(CoreArgs.MAPPER_ARGS, args.getMapperArgs());
+		Params.writeMapping(args.getMapperArgs(), generator);
 		generator.writeEndObject();
 
 		if (full) {

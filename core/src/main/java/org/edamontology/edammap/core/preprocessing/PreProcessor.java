@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.edamontology.edammap.core.cots.Stemmer;
+
 import org.edamontology.pubfetcher.core.common.PubFetcher;
 
 public class PreProcessor {

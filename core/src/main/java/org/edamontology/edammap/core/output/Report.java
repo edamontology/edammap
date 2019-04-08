@@ -41,6 +41,7 @@ import org.edamontology.pubfetcher.core.db.publication.PublicationPart;
 import org.edamontology.pubfetcher.core.db.publication.PublicationPartName;
 import org.edamontology.pubfetcher.core.db.webpage.Webpage;
 
+import org.edamontology.edammap.core.args.ArgMain;
 import org.edamontology.edammap.core.args.CoreArgs;
 import org.edamontology.edammap.core.benchmarking.MappingTest;
 import org.edamontology.edammap.core.benchmarking.MatchTest;
@@ -608,8 +609,8 @@ public class Report {
 		writer.write("</article>\n\n");
 	}
 
-	private static void writeParams(CoreArgs args, List<ParamMain> paramsMain, QueryType type, Writer writer, Map<EdamUri, Concept> concepts, List<Query> queries, Results results) throws IOException {
-		Params.writeMain(paramsMain, writer);
+	private static void writeParams(CoreArgs args, List<ArgMain> argsMain, QueryType type, Writer writer, Map<EdamUri, Concept> concepts, List<Query> queries, Results results) throws IOException {
+		Params.writeMain(argsMain, writer);
 		Params.writeProcessing(args.getProcessorArgs(), writer);
 		Params.writePreProcessing(args.getPreProcessorArgs(), writer, false);
 		Params.writeFetching(args.getFetcherArgs(), writer, type != QueryType.server, false);
@@ -665,7 +666,7 @@ public class Report {
 		writer.write("</ul>\n\n");
 	}
 
-	private static void out(CoreArgs args, List<ParamMain> paramsMain, QueryType type, int reportPageSize, int reportPaginationSize, Writer writer, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publications, List<List<Webpage>> webpages, List<List<Webpage>> docs, Results results, long start, long stop, Version version, int page, boolean txt, boolean json) throws IOException {
+	private static void out(CoreArgs args, List<ArgMain> argsMain, QueryType type, int reportPageSize, int reportPaginationSize, Writer writer, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publications, List<List<Webpage>> webpages, List<List<Webpage>> docs, Results results, long start, long stop, Version version, int page, boolean txt, boolean json) throws IOException {
 		writer.write("<!DOCTYPE html>\n");
 		writer.write("<html lang=\"en\">\n\n");
 
@@ -728,7 +729,7 @@ public class Report {
 
 		writer.write("<section id=\"tabs\">\n");
 		writer.write("\n");
-		writeParams(args, paramsMain, type, writer, concepts, queries, results);
+		writeParams(args, argsMain, type, writer, concepts, queries, results);
 		writer.write("</section>\n\n");
 
 		writePagination(args, reportPageSize, reportPaginationSize, writer, queries.size(), page);
@@ -750,7 +751,7 @@ public class Report {
 		}
 	}
 
-	static void output(CoreArgs args, List<ParamMain> paramsMain, QueryType type, int reportPageSize, int reportPaginationSize, Path report, boolean existingDirectory, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publications, List<List<Webpage>> webpages, List<List<Webpage>> docs, Results results, long start, long stop, Version version, boolean txt, boolean json) throws IOException {
+	static void output(CoreArgs args, List<ArgMain> argsMain, QueryType type, int reportPageSize, int reportPaginationSize, Path report, boolean existingDirectory, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publications, List<List<Webpage>> webpages, List<List<Webpage>> docs, Results results, long start, long stop, Version version, boolean txt, boolean json) throws IOException {
 		if (report != null) {
 			if (!existingDirectory) {
 				Files.createDirectory(report);
@@ -762,7 +763,7 @@ public class Report {
 			int pageMax = (queries.size() - 1) / reportPageSize + 1;
 			for (int page = 1; page <= pageMax; ++page) {
 				try (BufferedWriter writer = Files.newBufferedWriter(report.resolve("index" + (page == 1 ? "" : page) + ".html"), StandardCharsets.UTF_8)) {
-					out(args, paramsMain, type, reportPageSize, reportPaginationSize, writer, concepts, queries, publications, webpages, docs, results, start, stop, version, page, txt, json);
+					out(args, argsMain, type, reportPageSize, reportPaginationSize, writer, concepts, queries, publications, webpages, docs, results, start, stop, version, page, txt, json);
 				} catch (IOException e) {
 					try {
 						Txt.out(type, System.out, concepts, queries, results.getMappings());

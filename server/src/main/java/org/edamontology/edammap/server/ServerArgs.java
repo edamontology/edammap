@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Erik Jaaniso
+ * Copyright © 2018, 2019 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -22,44 +22,48 @@ package org.edamontology.edammap.server;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParametersDelegate;
 
+import java.io.File;
+
 import org.edamontology.edammap.core.processing.ProcessorArgs;
+
+import org.edamontology.pubfetcher.core.common.Arg;
 import org.edamontology.pubfetcher.core.common.BasicArgs;
 import org.edamontology.pubfetcher.core.common.FetcherPrivateArgs;
 
 public class ServerArgs extends BasicArgs {
 
-	public static final String EDAM = "edam";
-	@Parameter(names = { "-e", "--" + EDAM }, required = true, description = "Path of the EDAM ontology file")
+	private static final String edamId = "edam";
+	private static final String edamDescription = "Path of the EDAM ontology file";
+	private static final String edamDefault = "";
+	@Parameter(names = { "-e", "--" + edamId }, required = true, description = edamDescription)
 	private String edam;
 
-	public static final String TXT = "txt";
-	@Parameter(names = { "--" + TXT }, arity = 1, description = "Also output results to text file")
-	private boolean txt = true;
+	static final String txtId = "txt";
+	private static final String txtDescription = "Also output results to text file";
+	private static final Boolean txtDefault = true;
+	@Parameter(names = { "--" + txtId }, arity = 1, description = txtDescription)
+	private Boolean txt = txtDefault;
 
-	public static final String JSON = "json";
-	@Parameter(names = { "--" + JSON }, arity = 1, description = "Also output results to JSON file")
-	private boolean json = false;
+	static final String htmlId = "html";
+	private static final String htmlDescription = "Also output results to HTML file";
+	private static final Boolean htmlDefault = true;
+	private Boolean html = htmlDefault;
 
-	public static final String BASE_URI = "baseUri";
-	@Parameter(names = { "-b", "--" + BASE_URI }, description = "URI where server will be deployed (as schema://host:port)")
-	private String baseUri = "http://localhost:8080";
-
-	public static final String PATH = "path";
-	@Parameter(names = { "-p", "--" + PATH }, description = "Path where server will be deployed (only one single path segment supported)")
-	private String path = "edammap";
-
-	public static final String HTTPS_PROXY = "httpsProxy";
-	@Parameter(names = { "--" + HTTPS_PROXY }, description = "Set if we are behind a HTTPS proxy")
-	private boolean httpsProxy = false;
-
-	public static final String FILES = "files";
-	@Parameter(names = { "-f", "--" + FILES }, required = true, description = "Directory with HTML resources and output results")
-	private String files;
+	static final String jsonId = "json";
+	private static final String jsonDescription = "Also output results to JSON file";
+	private static final Boolean jsonDefault = false;
+	@Parameter(names = { "--" + jsonId }, arity = 1, description = jsonDescription)
+	private Boolean json = jsonDefault;
 
 	// TODO
-	//public static final String THREADS = "threads";
-	//@Parameter(names = { "--" + THREADS }, validateWith = PositiveInteger.class, description = "TODO")
-	//private int threads = 4;
+	//private static final String threadsId = "threads";
+	//private static final String threadsDescription = "";
+	//private static final Integer threadsDefault = 4;
+	//@Parameter(names = { "--" + threadsId }, validateWith = PositiveInteger.class, description = threadsDescription)
+	//private Integer threads = threadsDefault;
+
+	@ParametersDelegate
+	private ServerPrivateArgs serverPrivateArgs = new ServerPrivateArgs();
 
 	@ParametersDelegate
 	private ProcessorArgs processorArgs = new ProcessorArgs();
@@ -67,32 +71,45 @@ public class ServerArgs extends BasicArgs {
 	@ParametersDelegate
 	private FetcherPrivateArgs fetcherPrivateArgs = new FetcherPrivateArgs();
 
+	@Override
+	protected void addArgs() {
+		args.add(new Arg<>(this::getEdamFilename, null, edamDefault, edamId, "Ontology file", edamDescription, null, "https://github.com/edamontology/edamontology/tree/master/releases"));
+		args.add(new Arg<>(this::isTxt, null, txtDefault, txtId, "Results to text", txtDescription, null));
+		args.add(new Arg<>(this::isHtml, null, htmlDefault, htmlId, "Results to HTML", htmlDescription, null));
+		args.add(new Arg<>(this::isJson, null, jsonDefault, jsonId, "Results to JSON", jsonDescription, null));
+	}
+
+	@Override
+	public String getId() {
+		return "serverArgs";
+	}
+
+	@Override
+	public String getLabel() {
+		return "EDAMmap-Server";
+	}
+
 	public String getEdam() {
 		return edam;
 	}
+	public String getEdamFilename() {
+		return new File(edam).getName();
+	}
 
-	public boolean getTxt() {
+	public Boolean isTxt() {
 		return txt;
 	}
 
-	public boolean getJson() {
+	public Boolean isHtml() {
+		return html;
+	}
+
+	public Boolean isJson() {
 		return json;
 	}
 
-	public String getBaseUri() {
-		return baseUri;
-	}
-
-	public String getPath() {
-		return path;
-	}
-
-	public boolean getHttpsProxy() {
-		return httpsProxy;
-	}
-
-	public String getFiles() {
-		return files;
+	public ServerPrivateArgs getServerPrivateArgs() {
+		return serverPrivateArgs;
 	}
 
 	public ProcessorArgs getProcessorArgs() {

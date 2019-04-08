@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016, 2018 Erik Jaaniso
+ * Copyright © 2016, 2018, 2019 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -19,34 +19,69 @@
 
 package org.edamontology.edammap.core.processing;
 
+import java.io.File;
+
+import org.edamontology.pubfetcher.core.common.Arg;
+import org.edamontology.pubfetcher.core.common.Args;
+
 import com.beust.jcommander.Parameter;
 
-public class ProcessorArgs {
-	public static final String FETCHING = "fetching";
-	@Parameter(names = { "--fetch", "--fetcher", "--" + FETCHING }, arity = 1, description = "Fetch publications, webpages and docs")
-	private boolean fetching = true;
+public class ProcessorArgs extends Args {
 
-	public static final String DB = "db";
-	@Parameter(names = { "--" + DB, "--database" }, description = "Use the given database for getting and storing publications, webpages and docs")
-	private String db = "";
+	private static final String fetchingId = "fetching";
+	private static final String fetchingDescription = "Fetch publications, webpages and docs";
+	private static final Boolean fetchingDefault = true;
+	@Parameter(names = { "--fetch", "--fetcher", "--" + fetchingId }, arity = 1, description = fetchingDescription)
+	private Boolean fetching = fetchingDefault;
 
-	public static final String IDF = "idf";
-	@Parameter(names = { "--" + IDF, "--query-" + IDF }, description = "Use the given query IDF file (when stemming is not enabled); if not specified, weighting of queries with IDF scores will be disabled (when stemming is not enabled)")
-	private String idf = "";
+	private static final String dbId = "db";
+	private static final String dbDescription = "Use the given database for getting and storing publications, webpages and docs";
+	private static final String dbDefault = "";
+	@Parameter(names = { "--" + dbId, "--database" }, description = dbDescription)
+	private String db = dbDefault;
 
-	public static final String IDF_STEMMED = "idfStemmed";
-	@Parameter(names = { "--" + IDF_STEMMED, "--query-" + IDF_STEMMED }, description = "Use the given query IDF file (when stemming is enabled); if not specified, weighting of queries with IDF scores will be disabled (when stemming is enabled)")
-	private String idfStemmed = "";
+	private static final String idfId = "idf";
+	private static final String idfDescription = "Use the given query IDF file (when stemming is not enabled); if not specified, weighting of queries with IDF scores will be disabled (when stemming is not enabled)";
+	private static final String idfDefault = "";
+	@Parameter(names = { "--" + idfId, "--query-" + idfId }, description = idfDescription)
+	private String idf = idfDefault;
 
-	public boolean isFetching() {
+	private static final String idfStemmedId = "idfStemmed";
+	private static final String idfStemmedDescription = "Use the given query IDF file (when stemming is enabled); if not specified, weighting of queries with IDF scores will be disabled (when stemming is enabled)";
+	private static final String idfStemmedDefault = "";
+	@Parameter(names = { "--" + idfStemmedId, "--query-" + idfStemmedId }, description = idfStemmedDescription)
+	private String idfStemmed = idfStemmedDefault;
+
+	@Override
+	protected void addArgs() {
+		args.add(new Arg<>(this::isFetching, this::setFetching, fetchingDefault, fetchingId, "Fetching", fetchingDescription, null));
+		args.add(new Arg<>(this::getDbFilename, this::setDb, dbDefault, dbId, "Database file", dbDescription, null));
+		args.add(new Arg<>(this::getIdfFilename, this::setIdf, idfDefault, idfId, "Query IDF file", idfDescription, null));
+		args.add(new Arg<>(this::getIdfStemmedFilename, this::setIdfStemmed, idfStemmedDefault, idfStemmedId, "Stemmed query IDF file", idfStemmedDescription, null));
+	}
+
+	@Override
+	public String getId() {
+		return "processorArgs";
+	}
+
+	@Override
+	public String getLabel() {
+		return "Processing";
+	}
+
+	public Boolean isFetching() {
 		return fetching;
 	}
-	public void setFetching(boolean fetching) {
+	public void setFetching(Boolean fetching) {
 		this.fetching = fetching;
 	}
 
 	public String getDb() {
 		return db;
+	}
+	public String getDbFilename() {
+		return new File(db).getName();
 	}
 	public void setDb(String db) {
 		this.db = db;
@@ -55,12 +90,18 @@ public class ProcessorArgs {
 	public String getIdf() {
 		return idf;
 	}
+	public String getIdfFilename() {
+		return new File(idf).getName();
+	}
 	public void setIdf(String idf) {
 		this.idf = idf;
 	}
 
 	public String getIdfStemmed() {
 		return idfStemmed;
+	}
+	public String getIdfStemmedFilename() {
+		return new File(idfStemmed).getName();
 	}
 	public void setIdfStemmed(String idfStemmed) {
 		this.idfStemmed = idfStemmed;

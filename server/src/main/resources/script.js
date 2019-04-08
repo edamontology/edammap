@@ -8,10 +8,10 @@ var check = function(id, endpoint) {
 		output.innerHTML = '';
 		return;
 	}
-	input.readonly = true;
+	input.readOnly = true;
 	var request = new XMLHttpRequest();
 	request.onreadystatechange = function() {
-		if (request.readyState == 4) {
+		if (request.readyState == 4 && request.status > 0) {
 			input.classList.remove('input-medium');
 			output.classList.remove('output-medium');
 			if (request.status == 200) {
@@ -22,7 +22,7 @@ var check = function(id, endpoint) {
 				output.classList.add('output-bad');
 			}
 			output.innerHTML = '<span>' + escape(request.responseText) + '</span>';
-			input.readonly = false;
+			input.readOnly = false;
 		}
 	}
 	request.open('POST', endpoint, true);

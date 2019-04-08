@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016, 2017, 2018 Erik Jaaniso
+ * Copyright © 2016, 2017, 2018, 2019 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -30,51 +30,77 @@ import com.beust.jcommander.validators.PositiveInteger;
 
 import org.edamontology.edammap.core.edam.Branch;
 
-public class MapperArgs {
+import org.edamontology.pubfetcher.core.common.Arg;
+import org.edamontology.pubfetcher.core.common.Args;
 
-	public static final String BRANCHES = "branches";
-	@Parameter(names = { "--" + BRANCHES }, variableArity = true, description = "Branches to include. Space separated from list [topic, operation, data, format].")
-	private List<Branch> branches = new ArrayList<>(Arrays.asList(Branch.topic, Branch.operation));
+public class MapperArgs extends Args {
 
-	public static final String MATCHES = "matches";
-	@Parameter(names = { "--" + MATCHES }, validateWith = PositiveInteger.class, description = "Number of best matches per branch to output")
-	private int matches = 3;
+	private static final String branchesId = "branches";
+	private static final String branchesDescription = "Branches to include. Space separated from list [topic, operation, data, format].";
+	private static final List<Branch> branchesDefault = new ArrayList<>(Arrays.asList(Branch.topic, Branch.operation));
+	@Parameter(names = { "--" + branchesId }, variableArity = true, description = branchesDescription)
+	private List<Branch> branches = branchesDefault;
 
-	public static final String OBSOLETE = "obsolete";
-	@Parameter(names = { "--" + OBSOLETE }, arity = 1, description = "Include obsolete concepts")
-	private boolean obsolete = false;
+	private static final String matchesId = "matches";
+	private static final String matchesDescription = "Number of best matches per branch to output";
+	private static final Integer matchesDefault = 3;
+	@Parameter(names = { "--" + matchesId }, validateWith = PositiveInteger.class, description = matchesDescription)
+	private Integer matches = matchesDefault;
 
-	public static final String DONE_ANNOTATIONS = "doneAnnotations";
-	@Parameter(names = { "--" + DONE_ANNOTATIONS }, arity = 1, description = "Suggest concepts already used for annotating query. Parents and children of these concepts are not suggested in any case (unless --inferior-parent-child is set to true).")
-	private boolean doneAnnotations = true;
+	private static final String obsoleteId = "obsolete";
+	private static final String obsoleteDescription = "Include obsolete concepts";
+	private static final Boolean obsoleteDefault = false;
+	@Parameter(names = { "--" + obsoleteId }, arity = 1, description = obsoleteDescription)
+	private Boolean obsolete = obsoleteDefault;
 
-	public static final String INFERIOR_PARENTS_CHILDREN = "inferiorParentsChildren";
-	@Parameter(names = { "--" + INFERIOR_PARENTS_CHILDREN }, arity = 1, description = "Include parents and children of a better matched concept in suggestion results")
-	private boolean inferiorParentsChildren = false;
+	private static final String doneAnnotationsId = "doneAnnotations";
+	private static final String doneAnnotationsDescription = "Suggest concepts already used for annotating query. Parents and children of these concepts are not suggested in any case (unless --inferior-parent-child is set to true).";
+	private static final Boolean doneAnnotationsDefault = true;
+	@Parameter(names = { "--" + doneAnnotationsId }, arity = 1, description = doneAnnotationsDescription)
+	private Boolean doneAnnotations = doneAnnotationsDefault;
 
-	public static final String ALGORITHM_ARGS = "algorithmArgs";
+	private static final String inferiorParentsChildrenId = "inferiorParentsChildren";
+	private static final String inferiorParentsChildrenDescription = "Include parents and children of a better matched concept in suggestion results";
+	private static final Boolean inferiorParentsChildrenDefault = false;
+	@Parameter(names = { "--" + inferiorParentsChildrenId }, arity = 1, description = inferiorParentsChildrenDescription)
+	private Boolean inferiorParentsChildren = inferiorParentsChildrenDefault;
+
 	@ParametersDelegate
 	private AlgorithmArgs algorithmArgs = new AlgorithmArgs();
 
-	public static final String IDF_ARGS = "idfArgs";
 	@ParametersDelegate
 	private IdfArgs idfArgs = new IdfArgs();
 
-	public static final String MULTIPLIER_ARGS = "multiplierArgs";
 	@ParametersDelegate
 	private MultiplierArgs multiplierArgs = new MultiplierArgs();
 
-	public static final String NORMALISER_ARGS = "normaliserArgs";
 	@ParametersDelegate
 	private NormaliserArgs normaliserArgs = new NormaliserArgs();
 
-	public static final String WEIGHT_ARGS = "weightArgs";
 	@ParametersDelegate
 	private WeightArgs weightArgs = new WeightArgs();
 
-	public static final String SCORE_ARGS = "scoreArgs";
 	@ParametersDelegate
 	private ScoreArgs scoreArgs = new ScoreArgs();
+
+	@Override
+	protected void addArgs() {
+		args.add(new Arg<>(this::getBranches, this::setBranches, branchesDefault, branchesId, "Branches", branchesDescription, Branch.class, "http://edamontology.org/page#Scope"));
+		args.add(new Arg<>(this::getMatches, this::setMatches, matchesDefault, 0, null, matchesId, "Top matches per branch", matchesDescription, null));
+		args.add(new Arg<>(this::isObsolete, this::setObsolete, obsoleteDefault, obsoleteId, "Obsolete concepts", obsoleteDescription, null));
+		args.add(new Arg<>(this::isDoneAnnotations, this::setDoneAnnotations, doneAnnotationsDefault, doneAnnotationsId, "Done annotations", doneAnnotationsDescription, null));
+		args.add(new Arg<>(this::isInferiorParentsChildren, this::setInferiorParentsChildren, inferiorParentsChildrenDefault, inferiorParentsChildrenId, "Inferior parents & children", inferiorParentsChildrenDescription, null));
+	}
+
+	@Override
+	public String getId() {
+		return "mapperArgs";
+	}
+
+	@Override
+	public String getLabel() {
+		return "Mapping";
+	}
 
 	public List<Branch> getBranches() {
 		return branches;
@@ -83,31 +109,31 @@ public class MapperArgs {
 		this.branches = branches.stream().distinct().collect(Collectors.toList());
 	}
 
-	public int getMatches() {
+	public Integer getMatches() {
 		return matches;
 	}
-	public void setMatches(int matches) {
+	public void setMatches(Integer matches) {
 		this.matches = matches;
 	}
 
-	public boolean isObsolete() {
+	public Boolean isObsolete() {
 		return obsolete;
 	}
-	public void setObsolete(boolean obsolete) {
+	public void setObsolete(Boolean obsolete) {
 		this.obsolete = obsolete;
 	}
 
-	public boolean isDoneAnnotations() {
+	public Boolean isDoneAnnotations() {
 		return doneAnnotations;
 	}
-	public void setDoneAnnotations(boolean doneAnnotations) {
+	public void setDoneAnnotations(Boolean doneAnnotations) {
 		this.doneAnnotations = doneAnnotations;
 	}
 
-	public boolean isInferiorParentsChildren() {
+	public Boolean isInferiorParentsChildren() {
 		return inferiorParentsChildren;
 	}
-	public void setInferiorParentsChildren(boolean inferiorParentsChildren) {
+	public void setInferiorParentsChildren(Boolean inferiorParentsChildren) {
 		this.inferiorParentsChildren = inferiorParentsChildren;
 	}
 
