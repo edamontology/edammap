@@ -34,7 +34,7 @@ public class ServerArgs extends BasicArgs {
 
 	private static final String edamId = "edam";
 	private static final String edamDescription = "Path of the EDAM ontology file";
-	private static final String edamDefault = "";
+	private static final String edamDefault = null;
 	@Parameter(names = { "-e", "--" + edamId }, required = true, description = edamDescription)
 	private String edam;
 
@@ -77,16 +77,6 @@ public class ServerArgs extends BasicArgs {
 		args.add(new Arg<>(this::isTxt, null, txtDefault, txtId, "Results to text", txtDescription, null));
 		args.add(new Arg<>(this::isHtml, null, htmlDefault, htmlId, "Results to HTML", htmlDescription, null));
 		args.add(new Arg<>(this::isJson, null, jsonDefault, jsonId, "Results to JSON", jsonDescription, null));
-	}
-
-	@Override
-	public String getId() {
-		return "serverArgs";
-	}
-
-	@Override
-	public String getLabel() {
-		return "EDAMmap-Server";
 	}
 
 	public String getEdam() {

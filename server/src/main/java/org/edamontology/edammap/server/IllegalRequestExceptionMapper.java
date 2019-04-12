@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Erik Jaaniso
+ * Copyright © 2018, 2019 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -28,6 +28,8 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.edamontology.pubfetcher.core.common.IllegalRequestException;
+import org.edamontology.pubfetcher.core.common.PubFetcher;
+import org.glassfish.grizzly.http.server.util.HtmlHelper;
 
 @Provider
 public class IllegalRequestExceptionMapper implements ExceptionMapper<IllegalRequestException> {
@@ -39,7 +41,9 @@ public class IllegalRequestExceptionMapper implements ExceptionMapper<IllegalReq
 	public Response toResponse(IllegalRequestException e) {
 		boolean json = ExceptionCommon.isJson(headers);
 		return Response.status(Status.BAD_REQUEST)
-			.entity(json ? ExceptionCommon.toJson(Status.BAD_REQUEST, e.getMessage()) : e.getMessage() + "\n" + ExceptionCommon.time())
-			.type(json ? MediaType.APPLICATION_JSON : MediaType.TEXT_PLAIN + ";charset=utf-8").build();
+			.entity(json ?
+				ExceptionCommon.toJson(Status.BAD_REQUEST, e.getMessage()) :
+				HtmlHelper.getErrorPage("IllegalRequestException", PubFetcher.escapeHtml(e.getMessage()) + "<br>" + ExceptionCommon.time(), Server.version.getName() + " " + Server.version.getVersion()))
+			.type(json ? MediaType.APPLICATION_JSON : MediaType.TEXT_HTML + ";charset=utf-8").build();
 	}
 }

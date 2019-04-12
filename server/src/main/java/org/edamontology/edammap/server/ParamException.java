@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Erik Jaaniso
+ * Copyright © 2018, 2019 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -24,6 +24,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.edamontology.pubfetcher.core.common.PubFetcher;
+import org.glassfish.grizzly.http.server.util.HtmlHelper;
+
 public class ParamException extends WebApplicationException {
 
 	private static final long serialVersionUID = 7240254492703489733L;
@@ -38,7 +41,9 @@ public class ParamException extends WebApplicationException {
 
 	ParamException(String key, String value, String reason, boolean json) {
 		super(Response.status(Status.BAD_REQUEST)
-			.entity(json ? ExceptionCommon.toJson(Status.BAD_REQUEST, toTextJson(key, value, reason)) : toText(key, value, reason) + "\n" + ExceptionCommon.time())
-			.type(json ? MediaType.APPLICATION_JSON : MediaType.TEXT_PLAIN + ";charset=utf-8").build());
+			.entity(json ?
+				ExceptionCommon.toJson(Status.BAD_REQUEST, toTextJson(key, value, reason)) :
+				HtmlHelper.getErrorPage("ParamException", PubFetcher.escapeHtml(toText(key, value, reason)) + "<br>" + ExceptionCommon.time(), Server.version.getName() + " " + Server.version.getVersion()))
+			.type(json ? MediaType.APPLICATION_JSON : MediaType.TEXT_HTML + ";charset=utf-8").build());
 	}
 }

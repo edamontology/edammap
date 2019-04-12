@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016, 2017, 2018 Erik Jaaniso
+ * Copyright © 2016, 2017, 2018, 2019 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -96,13 +96,12 @@ public class Report {
 			if (webpageUrl == null || webpageUrl.getUrl() == null || webpageUrl.getUrl().isEmpty()) continue;
 			String status = "";
 			if (webpage == null) {
-				status = "broken";
-			} else if (webpage.isBroken()) {
-				status = "broken";
-			} else if (webpage.isEmpty()) {
-				status = "empty";
-			} else if (!webpage.isFinal(fetcherArgs)) {
-				status = "non-final";
+				status = "missing";
+			} else {
+				status = webpage.getStatusString(fetcherArgs);
+				if (status.equals("final")) {
+					status = "";
+				}
 			}
 			writer.write("\t\t\t\t\t<div class=\"with-meta\"><span" + (status.isEmpty() ? "" : " class=\"" + status + "\"") + ">");
 			writer.write(PubFetcher.getLinkHtml(webpageUrl.getUrl()));
@@ -114,11 +113,11 @@ public class Report {
 			}
 			writer.write("</span><span class=\"spacer\"></span>");
 			if (webpage != null) {
-				writer.write("<span class=\"" + (status.isEmpty() ? "info" : "warning") + "\" tabindex=\"0\"></span>");
+				writer.write("<span class=\"" + (status.isEmpty() ? "info" : (status.equals("non-final") ? "info-warning" : "warning")) + "\" tabindex=\"0\"></span>");
 			}
 			writer.write("\n");
 			if (webpage != null) {
-				writer.write("\t\t\t\t\t\t<div class=\"" + (status.isEmpty() ? "info" : "warning") + "-box\" tabindex=\"0\">\n");
+				writer.write("\t\t\t\t\t\t<div class=\"" + ((status.isEmpty() || status.equals("non-final")) ? "info" : "warning") + "-box\" tabindex=\"0\">\n");
 				writer.write("\t\t\t\t\t\t\t<h4><span" + (status.isEmpty() ? "" : " class=\"" + status + "\"") + ">");
 				writer.write(PubFetcher.getLinkHtml(webpageUrl.getUrl()));
 				if (webpageUrl.getType() != null && !webpageUrl.getType().isEmpty()) {
@@ -146,18 +145,21 @@ public class Report {
 		}
 	}
 
-	private static void writePublicationPartMeta(FetcherArgs fetcherArgs, Writer writer, Publication publication, PublicationPartName name) throws IOException {
+	private static void writePublicationPartMeta(FetcherArgs fetcherArgs, Writer writer, Publication publication, PublicationPartName name, String label, String value) throws IOException {
 		PublicationPart part = publication.getPart(name);
-		String partStatusIcon = "info";
-		if (!part.isUsable(fetcherArgs)) {
-			partStatusIcon = "warning";
-		} else if (!part.isFinal(fetcherArgs)) {
-			partStatusIcon = "info-warning";
+		String partStatus = part.getStatusString(fetcherArgs);
+		if (partStatus.equals("final")) {
+			partStatus = "";
 		}
-		writer.write("\t\t\t\t\t<div class=\"pub-part\"><div class=\"pub-" + partStatusIcon + "\" tabindex=\"0\"><div class=\"pub-" + (partStatusIcon.equals("info-warning") ? "info" : partStatusIcon) + "-box\" tabindex=\"0\">\n");
+		writer.write("\t\t\t\t\t<div class=\"pub-part\"><div class=\"pub-" + (partStatus.isEmpty() ? "info" : (partStatus.equals("non-final") ? "info-warning" : "warning")));
+		writer.write("\" tabindex=\"0\"><div class=\"pub-" + ((partStatus.isEmpty() || partStatus.equals("non-final")) ? "info" : "warning") + "-box\" tabindex=\"0\">\n");
 		writer.write(part.toStringMetaHtml("\t\t\t\t\t\t"));
 		writer.write("\n");
-		writer.write("\t\t\t\t\t</div></div>");
+		writer.write("\t\t\t\t\t</div></div><span class=\"dt\">");
+		if (!partStatus.isEmpty()) {
+			writer.write("<span class=\"pub-part-" + partStatus + "\">" + partStatus + "</span> ");
+		}
+		writer.write(label + ":</span> " + value + "</div>\n");
 	}
 
 	private static void writePublications(FetcherArgs fetcherArgs, Writer writer, List<PublicationIdsQuery> publicationIds, List<Publication> publications) throws IOException {
@@ -167,19 +169,13 @@ public class Report {
 			Publication publication = publications.get(i);
 			if (publicationId == null || publicationId.isEmpty()) continue;
 			String status = "";
-			String statusIcon = "pub-info";
 			if (publication == null) {
 				status = "missing";
-				statusIcon = "pub-warning";
-			} else if (publication.isEmpty()) {
-				status = "empty";
-				statusIcon = "pub-warning";
-			} else if (!publication.isUsable(fetcherArgs)) {
-				status = "non-usable";
-				statusIcon = "pub-warning";
-			} else if (!publication.isFinal(fetcherArgs)) {
-				status = "non-final";
-				statusIcon = "pub-info-warning";
+			} else {
+				status = publication.getStatusString(fetcherArgs);
+				if (status.equals("final") || status.equals("totally final")) {
+					status = "";
+				}
 			}
 			writer.write("\t\t\t<div class=\"publication\">\n");
 			writer.write("\t\t\t\t<div class=\"pub-head");
@@ -188,7 +184,8 @@ public class Report {
 			}
 			writer.write("\">");
 			if (publication != null || !publicationId.isEmpty()) {
-				writer.write("<div class=\"" + statusIcon + "\" tabindex=\"0\"><div class=\"" + (statusIcon.equals("pub-info-warning") ? "pub-info" : statusIcon)  + "-box\" tabindex=\"0\">\n");
+				writer.write("<div class=\"pub-" + (status.isEmpty() ? "info" : (status.equals("non-final") ? "info-warning" : "warning")));
+				writer.write("\" tabindex=\"0\"><div class=\"pub-" +  ((status.isEmpty() || status.equals("non-final")) ? "info" : "warning")  + "-box\" tabindex=\"0\">\n");
 				if (!publicationId.isEmpty()) {
 					writePublicationId(writer, "pmid", publicationId.getPmid(), PubFetcher.getPmidLinkHtml(publicationId.getPmid()), publicationId.getPmidUrl());
 					writePublicationId(writer, "pmcid", publicationId.getPmcid(), PubFetcher.getPmcidLinkHtml(publicationId.getPmcid()), publicationId.getPmcidUrl());
@@ -217,47 +214,37 @@ public class Report {
 			writer.write("\t\t\t\t<div class=\"pub-body\">\n");
 			if (publication != null && (publication.getIdCount() > 0 || !publication.isEmpty())) {
 				if (!publication.getPmid().isEmpty()) {
-					writePublicationPartMeta(fetcherArgs, writer, publication, PublicationPartName.pmid);
-					writer.write("<span class=\"dt\">pmid:</span> " + PubFetcher.getPmidLinkHtml(publication.getPmid().getContent()) + "</div>\n");
+					writePublicationPartMeta(fetcherArgs, writer, publication, PublicationPartName.pmid, "pmid", PubFetcher.getPmidLinkHtml(publication.getPmid().getContent()));
 				}
 				if (!publication.getPmcid().isEmpty()) {
-					writePublicationPartMeta(fetcherArgs, writer, publication, PublicationPartName.pmcid);
-					writer.write("<span class=\"dt\">pmcid:</span> " + PubFetcher.getPmcidLinkHtml(publication.getPmcid().getContent()) + "</div>\n");
+					writePublicationPartMeta(fetcherArgs, writer, publication, PublicationPartName.pmcid, "pmcid", PubFetcher.getPmcidLinkHtml(publication.getPmcid().getContent()));
 				}
 				if (!publication.getDoi().isEmpty()) {
-					writePublicationPartMeta(fetcherArgs, writer, publication, PublicationPartName.doi);
-					writer.write("<span class=\"dt\">doi:</span> " + PubFetcher.getDoiLinkHtml(publication.getDoi().getContent()) + "</div>\n");
+					writePublicationPartMeta(fetcherArgs, writer, publication, PublicationPartName.doi, "doi", PubFetcher.getDoiLinkHtml(publication.getDoi().getContent()));
 				}
 				if (publication.getIdCount() > 0 && !publication.isEmpty()) {
 					writer.write("\t\t\t\t\t<hr>\n");
 				}
 				if (!publication.getTitle().isEmpty()) {
-					writePublicationPartMeta(fetcherArgs, writer, publication, PublicationPartName.title);
-					writer.write("<span class=\"dt\">Title:</span> " + publication.getTitle().toStringPlainHtml() + "</div>\n");
+					writePublicationPartMeta(fetcherArgs, writer, publication, PublicationPartName.title, "Title", publication.getTitle().toStringPlainHtml());
 				}
 				if (!publication.getKeywords().isEmpty()) {
-					writePublicationPartMeta(fetcherArgs, writer, publication, PublicationPartName.keywords);
-					writer.write("<span class=\"dt\">Keywords:</span> " + publication.getKeywords().toStringPlainHtml() + "</div>\n");
+					writePublicationPartMeta(fetcherArgs, writer, publication, PublicationPartName.keywords, "Keywords", publication.getKeywords().toStringPlainHtml());
 				}
 				if (!publication.getMeshTerms().isEmpty()) {
-					writePublicationPartMeta(fetcherArgs, writer, publication, PublicationPartName.mesh);
-					writer.write("<span class=\"dt\">MeSH terms:</span> " + publication.getMeshTerms().toStringPlainHtml() + "</div>\n");
+					writePublicationPartMeta(fetcherArgs, writer, publication, PublicationPartName.mesh, "MeSH terms", publication.getMeshTerms().toStringPlainHtml());
 				}
 				if (!publication.getEfoTerms().isEmpty()) {
-					writePublicationPartMeta(fetcherArgs, writer, publication, PublicationPartName.efo);
-					writer.write("<span class=\"dt\">EFO terms:</span> " + publication.getEfoTerms().toStringPlainHtml() + "</div>\n");
+					writePublicationPartMeta(fetcherArgs, writer, publication, PublicationPartName.efo, "EFO terms", publication.getEfoTerms().toStringPlainHtml());
 				}
 				if (!publication.getGoTerms().isEmpty()) {
-					writePublicationPartMeta(fetcherArgs, writer, publication, PublicationPartName.go);
-					writer.write("<span class=\"dt\">GO terms:</span> " + publication.getGoTerms().toStringPlainHtml() + "</div>\n");
+					writePublicationPartMeta(fetcherArgs, writer, publication, PublicationPartName.go, "GO terms", publication.getGoTerms().toStringPlainHtml());
 				}
 				if (!publication.getAbstract().isEmpty()) {
-					writePublicationPartMeta(fetcherArgs, writer, publication, PublicationPartName.theAbstract);
-					writer.write("<span class=\"dt\">Abstract:</span> " + publication.getAbstract().toStringPlainHtml() + "</div>\n");
+					writePublicationPartMeta(fetcherArgs, writer, publication, PublicationPartName.theAbstract, "Abstract", publication.getAbstract().toStringPlainHtml());
 				}
 				if (!publication.getFulltext().isEmpty()) {
-					writePublicationPartMeta(fetcherArgs, writer, publication, PublicationPartName.fulltext);
-					writer.write("<span class=\"dt\">Full text present:</span> [" + publication.getFulltext().getSize() + " characters]</div>\n");
+					writePublicationPartMeta(fetcherArgs, writer, publication, PublicationPartName.fulltext, "Full text present", "[" + publication.getFulltext().getSize() + " characters]");
 				}
 			}
 			writer.write("\t\t\t\t</div>\n");

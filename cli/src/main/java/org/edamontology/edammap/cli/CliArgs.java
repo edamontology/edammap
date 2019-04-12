@@ -21,7 +21,6 @@ package org.edamontology.edammap.cli;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParametersDelegate;
-import com.beust.jcommander.validators.PositiveInteger;
 
 import java.io.File;
 
@@ -31,18 +30,19 @@ import org.edamontology.edammap.core.query.QueryType;
 
 import org.edamontology.pubfetcher.core.common.Arg;
 import org.edamontology.pubfetcher.core.common.BasicArgs;
+import org.edamontology.pubfetcher.core.common.PositiveInteger;
 
 public class CliArgs extends BasicArgs {
 
 	private static final String edamId = "edam";
 	private static final String edamDescription = "Path of the EDAM ontology file";
-	private static final String edamDefault = "";
+	private static final String edamDefault = null;
 	@Parameter(names = { "-e", "--" + edamId }, required = true, description = edamDescription)
 	private String edam;
 
 	private static final String queryId = "query";
 	private static final String queryDescription = "Path of file containing queries";
-	private static final String queryDefault = "";
+	private static final String queryDefault = null;
 	@Parameter(names = { "-q", "--" + queryId }, required = true, description = queryDescription)
 	private String query;
 
@@ -102,16 +102,6 @@ public class CliArgs extends BasicArgs {
 		args.add(new Arg<>(this::getReportPageSize, null, reportPageSizeDefault, 0, null, reportPageSizeId, "Report page size", reportPageSizeDescription, null));
 		args.add(new Arg<>(this::getReportPaginationSize, null, reportPaginationSizeDefault, 0, null, reportPaginationSizeId, "Report pagination size", reportPaginationSizeDescription, null));
 		args.add(new Arg<>(this::getThreads, null, threadsDefault, 0, null, threadsId, "Number of threads", threadsDescription, null));
-	}
-
-	@Override
-	public String getId() {
-		return "cliArgs";
-	}
-
-	@Override
-	public String getLabel() {
-		return "EDAMmap-CLI";
 	}
 
 	public String getEdam() {

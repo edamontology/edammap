@@ -20,7 +20,6 @@
 package org.edamontology.edammap.core.mapping.args;
 
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.validators.PositiveInteger;
 
 import org.edamontology.edammap.core.args.PositiveDouble;
 import org.edamontology.edammap.core.args.ZeroToOneDouble;
@@ -28,6 +27,7 @@ import org.edamontology.edammap.core.mapping.MapperStrategy;
 
 import org.edamontology.pubfetcher.core.common.Arg;
 import org.edamontology.pubfetcher.core.common.Args;
+import org.edamontology.pubfetcher.core.common.PositiveInteger;
 
 public class AlgorithmArgs extends Args {
 

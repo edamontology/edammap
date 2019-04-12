@@ -86,6 +86,9 @@ public class UtilArgs extends BasicArgs {
 	@Parameter(names = { "--make-server-files" }, description = "String outputPath")
 	String makeServerFiles = null;
 
+	@Parameter(names = { "--make-options-conf" }, description = "String outputPath")
+	String makeOptionsConf = null;
+
 	@ParametersDelegate
 	FetcherArgs fetcherArgs = new FetcherArgs();
 

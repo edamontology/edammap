@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Erik Jaaniso
+ * Copyright © 2018, 2019 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -206,12 +206,11 @@ public class Json {
 		generator.writeEndObject();
 	}
 
-	public static String output(CoreArgs args, List<ArgMain> argsMain, Map<String, String> jsonFields, JsonType type, Path json, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publicationsAll, List<List<Webpage>> webpagesAll, List<List<Webpage>> docsAll, Results results, long start, long stop, Version version, String jsonVersion) throws IOException {
+	private static JsonGenerator createGenerator(StringWriter writer, Path json) throws IOException {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
 		mapper.enable(SerializationFeature.CLOSE_CLOSEABLE);
 		JsonFactory factory = mapper.getFactory();
-		StringWriter writer = new StringWriter();
 		JsonGenerator generator;
 		if (json == null) {
 			generator = factory.createGenerator(writer);
@@ -219,6 +218,12 @@ public class Json {
 			generator = factory.createGenerator(json.toFile(), JsonEncoding.UTF8);
 		}
 		generator.useDefaultPrettyPrinter();
+		return generator;
+	}
+
+	public static String output(CoreArgs args, List<ArgMain> argsMain, Map<String, String> jsonFields, JsonType type, Path json, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publicationsAll, List<List<Webpage>> webpagesAll, List<List<Webpage>> docsAll, Results results, long start, long stop, Version version, String jsonVersion) throws IOException {
+		StringWriter writer = new StringWriter();
+		JsonGenerator generator = createGenerator(writer, json);
 		generator.writeStartObject();
 
 		generator.writeBooleanField("success", true);
@@ -470,20 +475,14 @@ public class Json {
 	}
 
 	public static String fromDatabaseEntries(String key, List<? extends DatabaseEntry<?>> databaseEntries, FetcherArgs fetcherArgs) throws IOException {
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.enable(SerializationFeature.INDENT_OUTPUT);
-		mapper.enable(SerializationFeature.CLOSE_CLOSEABLE);
-		JsonFactory factory = mapper.getFactory();
 		StringWriter writer = new StringWriter();
-		JsonGenerator generator = factory.createGenerator(writer);
-		generator.useDefaultPrettyPrinter();
+		JsonGenerator generator = createGenerator(writer, null);
 		generator.writeStartObject();
 
 		generator.writeBooleanField("success", true);
 
 		generator.writeFieldName(key);
 
-		// TODO allow for choosing more complete output
 		generator.writeStartArray();
 		for (DatabaseEntry<?> databaseEntry : databaseEntries) {
 			generator.writeStartObject();
@@ -499,6 +498,29 @@ public class Json {
 				generator.writeStringField("id", databaseEntry.toStringId());
 			}
 			generator.writeStringField("status", databaseEntry.getStatusString(fetcherArgs));
+			generator.writeEndObject();
+		}
+		generator.writeEndArray();
+
+		generator.writeEndObject();
+		generator.close();
+		return writer.toString();
+	}
+
+	public static String fromAnnotations(Map<EdamUri, Concept> annotations) throws IOException {
+		StringWriter writer = new StringWriter();
+		JsonGenerator generator = createGenerator(writer, null);
+		generator.writeStartObject();
+
+		generator.writeBooleanField("success", true);
+
+		generator.writeFieldName(Query.ANNOTATIONS);
+
+		generator.writeStartArray();
+		for (Map.Entry<EdamUri, Concept> annotation : annotations.entrySet()) {
+			generator.writeStartObject();
+			generator.writeStringField("uri", annotation.getKey().toString());
+			generator.writeStringField("label", annotation.getValue().getLabel());
 			generator.writeEndObject();
 		}
 		generator.writeEndArray();

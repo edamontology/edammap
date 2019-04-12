@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Erik Jaaniso
+ * Copyright © 2018, 2019 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -389,92 +388,22 @@ public class Resource {
 		}
 	}
 
-	private Response patch(MultivaluedMap<String, String> params, String requestString, Request request, String resource, Class<?> clazz, boolean doc, int max, String jsonKey) throws IOException {
-		boolean isJson = (jsonKey != null);
+	private Response patch(JsonObject json, String key, Request request, String resource, Class<?> clazz, boolean doc, int max) throws IOException {
+		logger.info("PATCH JSON {} {} from {}", resource, json, request.getRemoteAddr());
+		MultivaluedHashMap<String, String> params = parseJson(json);
+		List<String> databaseEntryIds = params.get(key);
+		String requestString = "";
+		if (databaseEntryIds != null) {
+			requestString = String.join("\n", databaseEntryIds);
+		}
 		logger.info("PATCH {} {} from {}", resource, requestString, request.getRemoteAddr());
 		FetcherArgs fetcherArgs = new FetcherArgs();
-		if (isJson) {
-			ParamParse.parseFetcherParams(params, fetcherArgs, true);
-		} else {
-			// TODO get param values from HTML form
-		}
+		ParamParse.parseFetcherParams(params, fetcherArgs, true);
 		fetcherArgs.setPrivateArgs(Server.args.getFetcherPrivateArgs());
 		List<? extends DatabaseEntry<?>> databaseEntries = Server.processor.getDatabaseEntries(QueryLoader.fromServerEntry(requestString, clazz, max), fetcherArgs, clazz, doc);
-		String responseText;
-		if (isJson) {
-			responseText = Json.fromDatabaseEntries(jsonKey, databaseEntries, fetcherArgs);
-		} else {
-			responseText = databaseEntries.stream()
-				.map(p -> p.toStringId() + " : " + p.getStatusString(fetcherArgs).toUpperCase(Locale.ROOT))
-				.collect(Collectors.joining("\n"));
-		}
-		Response response = Response.ok(responseText).type(isJson ? MediaType.APPLICATION_JSON : MediaType.TEXT_PLAIN + ";charset=utf-8").build();
+		Response response = Response.ok(Json.fromDatabaseEntries(key, databaseEntries, fetcherArgs)).type(MediaType.APPLICATION_JSON).build();
 		logger.info("PATCHED {} {}", resource, response.getEntity());
 		return response;
-	}
-
-	@Path("web")
-	@POST
-	@Produces(MediaType.TEXT_PLAIN + ";charset=utf-8")
-	public Response patchWeb(String requestString, @Context Request request) throws IOException {
-		try {
-			return patch(null, requestString, request, "/web", Webpage.class, false, MAX_LINKS_SIZE, null);
-		} catch (Throwable e) {
-			logger.error("Exception!", e);
-			throw e;
-		}
-	}
-
-	@Path("doc")
-	@POST
-	@Produces(MediaType.TEXT_PLAIN + ";charset=utf-8")
-	public Response patchDoc(String requestString, @Context Request request) throws IOException {
-		try {
-			return patch(null, requestString, request, "/doc", Webpage.class, true, MAX_LINKS_SIZE, null);
-		} catch (Throwable e) {
-			logger.error("Exception!", e);
-			throw e;
-		}
-	}
-
-	@Path("pub")
-	@POST
-	@Produces(MediaType.TEXT_PLAIN + ";charset=utf-8")
-	public Response patchPub(String requestString, @Context Request request) throws IOException {
-		try {
-			return patch(null, requestString, request, "/pub", Publication.class, false, MAX_PUBLICATION_IDS_SIZE, null);
-		} catch (Throwable e) {
-			logger.error("Exception!", e);
-			throw e;
-		}
-	}
-
-	@Path("edam")
-	@POST
-	@Produces(MediaType.TEXT_PLAIN + ";charset=utf-8")
-	public Response checkEdam(String requestString, @Context Request request) {
-		try {
-			logger.info("POST /edam {} from {}", requestString, request.getRemoteAddr());
-			Response response = Response.ok(QueryLoader.fromServerEdam(requestString, Server.concepts).entrySet().stream()
-				.map(c -> c.getKey() + " : " + c.getValue().getLabel())
-				.collect(Collectors.joining("\n"))).type(MediaType.TEXT_PLAIN + ";charset=utf-8").build();
-			logger.info("POSTED /edam {}", response.getEntity());
-			return response;
-		} catch (Throwable e) {
-			logger.error("Exception!", e);
-			throw e;
-		}
-	}
-
-	private Response patchJson(JsonObject json, String key, Request request, String resource, Class<?> clazz, boolean doc, int max) throws IOException {
-		logger.info("PATCH JSON {} {} from {}", resource, json, request.getRemoteAddr());
-		MultivaluedHashMap<String, String> jsonParsed = parseJson(json);
-		List<String> databaseEntries = jsonParsed.get(key);
-		String patchString = "";
-		if (databaseEntries != null) {
-			patchString = String.join("\n", databaseEntries);
-		}
-		return patch(jsonParsed, patchString, request, resource, clazz, doc, max, key);
 	}
 
 	@Path("web")
@@ -483,7 +412,7 @@ public class Resource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response patchWeb(JsonObject json, @Context Request request) throws IOException {
 		try {
-			return patchJson(json, Query.WEBPAGE_URLS, request, "/web", Webpage.class, false, MAX_LINKS_SIZE);
+			return patch(json, Query.WEBPAGE_URLS, request, "/web", Webpage.class, false, MAX_LINKS_SIZE);
 		} catch (Throwable e) {
 			logger.error("Exception!", e);
 			throw e;
@@ -496,7 +425,7 @@ public class Resource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response patchDoc(JsonObject json, @Context Request request) throws IOException {
 		try {
-			return patchJson(json, Query.DOC_URLS, request, "/doc", Webpage.class, true, MAX_LINKS_SIZE);
+			return patch(json, Query.DOC_URLS, request, "/doc", Webpage.class, true, MAX_LINKS_SIZE);
 		} catch (Throwable e) {
 			logger.error("Exception!", e);
 			throw e;
@@ -509,7 +438,30 @@ public class Resource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response patchPub(JsonObject json, @Context Request request) throws IOException {
 		try {
-			return patchJson(json, Query.PUBLICATION_IDS, request, "/pub", Publication.class, false, MAX_PUBLICATION_IDS_SIZE);
+			return patch(json, Query.PUBLICATION_IDS, request, "/pub", Publication.class, false, MAX_PUBLICATION_IDS_SIZE);
+		} catch (Throwable e) {
+			logger.error("Exception!", e);
+			throw e;
+		}
+	}
+
+	@Path("edam")
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response checkEdam(JsonObject json, @Context Request request) throws IOException {
+		try {
+			logger.info("CHECK JSON /edam {} from {}", json, request.getRemoteAddr());
+			MultivaluedHashMap<String, String> params = parseJson(json);
+			List<String> annotations = params.get(Query.ANNOTATIONS);
+			String requestString = "";
+			if (annotations != null) {
+				requestString = String.join("\n", annotations);
+			}
+			logger.info("CHECK /edam {} from {}", requestString, request.getRemoteAddr());
+			Response response = Response.ok(Json.fromAnnotations(QueryLoader.fromServerEdam(requestString, Server.concepts))).type(MediaType.APPLICATION_JSON).build();
+			logger.info("CHECKED /edam {}", response.getEntity());
+			return response;
 		} catch (Throwable e) {
 			logger.error("Exception!", e);
 			throw e;

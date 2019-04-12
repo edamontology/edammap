@@ -151,7 +151,6 @@ public final class Server {
 				@Override
 				public void service(Request request, Response response) throws Exception {
 					String responseText = null;
-					String mediaType = MediaType.TEXT_HTML;
 					try {
 						responseText = Resource.runGet(request.getParameterMap().entrySet().stream()
 							.collect(Collectors.toMap(Map.Entry::getKey, e -> Arrays.asList(e.getValue()), (k, v) -> { throw new AssertionError(); }, MultivaluedHashMap<String, String>::new)), request);
@@ -161,12 +160,10 @@ public final class Server {
 						} else {
 							responseText = "400 Bad Request\n" + ExceptionCommon.time();
 						}
-						mediaType = MediaType.TEXT_PLAIN;
 					} catch (Throwable e) {
 						responseText = "500 Internal Server Error\n" + ExceptionCommon.time();
-						mediaType = MediaType.TEXT_PLAIN;
 					}
-					response.setContentType(ContentType.newContentType(mediaType, "utf-8"));
+					response.setContentType(ContentType.newContentType(MediaType.TEXT_HTML, "utf-8"));
 					response.setContentLength(responseText.getBytes().length);
 					response.getWriter().write(responseText);
 				}

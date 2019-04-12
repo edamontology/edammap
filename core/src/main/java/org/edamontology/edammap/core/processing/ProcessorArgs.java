@@ -21,10 +21,10 @@ package org.edamontology.edammap.core.processing;
 
 import java.io.File;
 
+import com.beust.jcommander.Parameter;
+
 import org.edamontology.pubfetcher.core.common.Arg;
 import org.edamontology.pubfetcher.core.common.Args;
-
-import com.beust.jcommander.Parameter;
 
 public class ProcessorArgs extends Args {
 

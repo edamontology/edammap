@@ -21,7 +21,6 @@ package org.edamontology.edammap.core.output;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -74,15 +73,19 @@ public class Params {
 
 	private static void write(Writer writer, Object value, Arg<?, ?> arg, boolean input) throws IOException {
 		if (arg.getEnumClass() != null) {
-			if (value instanceof List) {
-				writeEnum(writer, arg.getId(), arg.getLabel(), arg.getEnumClass(), (List<?>) value, arg.getUrl(), input);
+			if (!input) {
+				write(writer, arg.getId(), arg.getLabel(), arg.getDescription(), value.toString(), arg.getDefault() != null ? arg.getDefault().toString() : null, null, null, arg.getUrl(), input);
 			} else {
-				writeEnum(writer, arg.getId(), arg.getLabel(), arg.getEnumClass(), value, arg.getUrl(), input);
+				if (value instanceof List) {
+					writeEnum(true, writer, arg.getId(), arg.getLabel(), arg.getDescription(), arg.getEnumClass(), value, arg.getDefault(), arg.getUrl());
+				} else {
+					writeEnum(false, writer, arg.getId(), arg.getLabel(), arg.getDescription(), arg.getEnumClass(), value, arg.getDefault(), arg.getUrl());
+				}
 			}
 		} else if (value instanceof Boolean) {
-			writeBoolean(writer, arg.getId(), arg.getLabel(), (Boolean) value, arg.getUrl(), input);
+			writeBoolean(writer, arg.getId(), arg.getLabel(), arg.getDescription(), (Boolean) value, (Boolean) arg.getDefault(), arg.getUrl(), input);
 		} else if ((value instanceof Integer) || (value instanceof Double) || (value instanceof String)) {
-			write(writer, arg.getId(), arg.getLabel(), value, arg.getMin(), arg.getMax(), arg.getUrl(), input);
+			write(writer, arg.getId(), arg.getLabel(), arg.getDescription(), value, arg.getDefault(), arg.getMin(), arg.getMax(), arg.getUrl(), input);
 		} else {
 			throw new IllegalArgumentException("Param with id " + arg.getId() + " is of illegal class " + value.getClass().getName() + "!");
 		}
@@ -91,12 +94,38 @@ public class Params {
 		write(writer, arg.getValue(), arg, input);
 	}
 
-	private static <T> void write(Writer writer, String id, String label, T value, T min, T max, String url, boolean input) throws IOException {
-		writer.write("\t\t<div class=\"param\">\n");
+	private static <T> void writeTooltip(Writer writer, String id, String description, T defaultValue) throws IOException {
+		writer.write("\t\t\t\t<span class=\"tooltip\" tabindex=\"0\"></span>\n");
+		writer.write("\t\t\t\t<div class=\"tooltip-box\" tabindex=\"0\">\n");
+		writer.write("\t\t\t\t\t<span class=\"description\">");
+		writer.write(description);
+		writer.write("</span>");
+		if (defaultValue != null) {
+			writer.write("<br><span class=\"def\">Default:</span> <span class=\"value\">");
+			if (!defaultValue.toString().isEmpty()) {
+				writer.write(defaultValue.toString());
+			} else {
+				writer.write("&lt;empty string&gt;");
+			}
+			writer.write("</span>");
+		}
+		writer.write("<br><span class=\"def\">API key:</span> <span class=\"value\">");
+		writer.write(id);
+		writer.write("</span>\n");
+		writer.write("\t\t\t\t</div>\n");
+	}
+
+	private static <T> void write(Writer writer, String id, String label, String description, T value, T defaultValue, T min, T max, String url, boolean input) throws IOException {
+		writer.write("\t\t<div class=\"param");
+		if (!input) {
+			writer.write(" param-disabled");
+		}
+		writer.write("\">\n");
 		writer.write("\t\t\t<label for=\"" + id + "\">");
 		writer.write(PubFetcher.getLinkHtml(url, label));
 		writer.write("</label>\n");
-		writer.write("\t\t\t<input");
+		writer.write("\t\t\t<div>\n");
+		writer.write("\t\t\t\t<input");
 		if (value instanceof Integer || value instanceof Double) {
 			writer.write(" type=\"number\"");
 		} else {
@@ -125,16 +154,27 @@ public class Params {
 			writer.write(" step=\"any\"");
 		}
 		writer.write(" value=\"" + PubFetcher.escapeHtmlAttribute(value.toString()) + "\"");
-		if (!input) {
+		if (input) {
+			if (defaultValue != null) {
+				writer.write(" data-default=\"" + PubFetcher.escapeHtmlAttribute(defaultValue.toString()) + "\"");
+			}
+			writer.write(" onchange=\"param()\"");
+		} else {
 			writer.write(" readonly");
 		}
 		writer.write(">\n");
+		writeTooltip(writer, id, description, defaultValue);
+		writer.write("\t\t\t</div>\n");
 		writer.write("\t\t</div>\n");
 	}
 
-	private static void writeBoolean(Writer writer, String id, String label, Boolean value, String url, boolean input) throws IOException {
-		writer.write("\t\t<div class=\"param\">\n");
-		writer.write("\t\t\t<span>");
+	private static void writeBoolean(Writer writer, String id, String label, String description, Boolean value, Boolean defaultValue, String url, boolean input) throws IOException {
+		writer.write("\t\t<div class=\"param");
+		if (!input) {
+			writer.write(" param-disabled");
+		}
+		writer.write("\">\n");
+		writer.write("\t\t\t<span class=\"label\">");
 		writer.write(PubFetcher.getLinkHtml(url, label));
 		writer.write("</span>\n");
 		writer.write("\t\t\t<div>\n");
@@ -153,32 +193,23 @@ public class Params {
 				writer.write(" class=\"checked\"");
 			}
 		}
-		if (!input) {
+		if (input) {
+			if (defaultValue != null) {
+				writer.write(" data-default=\"" + defaultValue + "\"");
+			}
+			writer.write(" onchange=\"param()\"");
+		} else {
 			writer.write(" disabled");
 		}
 		writer.write(">\n");
 		writer.write("\t\t\t\t<label for=\"" + id + "\"></label>\n");
+		writeTooltip(writer, id, description, defaultValue);
 		writer.write("\t\t\t</div>\n");
 		writer.write("\t\t</div>\n");
 	}
 
-	private static <T, E extends Enum<E>> void writeEnum(Writer writer, String id, String label, Class<E> enumClass, T enumValue, String url, boolean input) throws IOException {
-		if (!input) {
-			write(writer, id, label, enumValue.toString(), null, null, url, input);
-		} else {
-			writeEnum(false, writer, id, label, enumClass, Collections.singletonList(enumValue), url);
-		}
-	}
-
-	private static <T, E extends Enum<E>> void writeEnum(Writer writer, String id, String label, Class<E> enumClass, List<T> enumValues, String url, boolean input) throws IOException {
-		if (!input) {
-			write(writer, id, label, enumValues.toString(), null, null, url, input);
-		} else {
-			writeEnum(true, writer, id, label, enumClass, enumValues, url);
-		}
-	}
-
-	private static <T, E extends Enum<E>> void writeEnum(boolean multiple, Writer writer, String id, String label, Class<E> enumClass, List<T> enumValues, String url) throws IOException {
+	@SuppressWarnings("unchecked")
+	private static <T, E extends Enum<E>> void writeEnum(boolean multiple, Writer writer, String id, String label, String description, Class<E> enumClass, T value, T defaultValue, String url) throws IOException {
 		writer.write("\t\t<div class=\"param");
 		if (multiple) {
 			writer.write(" param-multiple");
@@ -187,20 +218,40 @@ public class Params {
 		writer.write("\t\t\t<label for=\"" + id + "\">");
 		writer.write(PubFetcher.getLinkHtml(url, label));
 		writer.write("</label>\n");
-		writer.write("\t\t\t<select");
+		writer.write("\t\t\t<div>\n");
+		writer.write("\t\t\t\t<select");
 		writer.write(" id=\"" + id + "\" name=\"" + id + "\"");
 		if (multiple) {
 			writer.write(" multiple");
 		}
+		writer.write(" onchange=\"param()\"");
 		writer.write(">\n");
 		for (Enum<E> enumValue : enumClass.getEnumConstants()) {
-			writer.write("\t\t\t\t<option");
-			if (enumValues.contains(enumValue)) {
-				writer.write(" selected");
+			writer.write("\t\t\t\t\t<option");
+			if (multiple) {
+				if (((List<Enum<E>>) value).contains(enumValue)) {
+					writer.write(" selected");
+				}
+				if (defaultValue != null) {
+					if (((List<Enum<E>>) defaultValue).contains(enumValue)) {
+						writer.write(" data-default=\"selected\"");
+					}
+				}
+			} else {
+				if ((Enum<E>) value == enumValue) {
+					writer.write(" selected");
+				}
+				if (defaultValue != null) {
+					if ((Enum<E>) defaultValue == enumValue) {
+						writer.write(" data-default=\"selected\"");
+					}
+				}
 			}
 			writer.write(">" + enumValue.name() + "</option>\n");
 		}
-		writer.write("\t\t\t</select>\n");
+		writer.write("\t\t\t\t</select>\n");
+		writeTooltip(writer, id, description, defaultValue);
+		writer.write("\t\t\t</div>\n");
 		writer.write("\t\t</div>\n");
 	}
 
@@ -222,7 +273,7 @@ public class Params {
 
 	private static void writeOutput(Writer writer, String id, String label, String value, String url) throws IOException {
 		writer.write("\t\t<div class=\"param\">\n");
-		writer.write("\t\t\t<label for=\"" + id + "\">");
+		writer.write("\t\t\t<label for=\"" + id + "\" class=\"param-disabled\">");
 		writer.write(PubFetcher.getLinkHtml(url, label));
 		writer.write("</label>\n");
 		writer.write("\t\t\t<output id=\"" + id + "\">" + PubFetcher.escapeHtml(value) + "</output>\n");

@@ -52,6 +52,11 @@
     </dependency>
     <dependency>
       <groupId>org.edamontology.edammap</groupId>
+      <artifactId>edammap-cli</artifactId>
+      <version>${edammap.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.edamontology.edammap</groupId>
       <artifactId>edammap-server</artifactId>
       <version>${edammap.version}</version>
     </dependency>
@@ -85,7 +90,7 @@
               <mainClass>org.edamontology.edammap.util.UtilMain</mainClass>
             </manifest>
             <manifestEntries>
-              <Class-Path>edammap-core-${edammap.version}.jar edammap-server-${edammap.version}.jar</Class-Path>
+              <Class-Path>edammap-core-${edammap.version}.jar edammap-cli-${edammap.version}.jar edammap-server-${edammap.version}.jar</Class-Path>
             </manifestEntries>
           </archive>
         </configuration>

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Erik Jaaniso
+ * Copyright © 2018, 2019 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -27,6 +27,8 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import org.glassfish.grizzly.http.server.util.HtmlHelper;
+
 @Provider
 public class ThrowableMapper implements ExceptionMapper<Throwable> {
 
@@ -37,7 +39,9 @@ public class ThrowableMapper implements ExceptionMapper<Throwable> {
 	public Response toResponse(Throwable e) {
 		boolean json = ExceptionCommon.isJson(headers);
 		return Response.status(Status.INTERNAL_SERVER_ERROR)
-			.entity(json ? ExceptionCommon.toJson(Status.INTERNAL_SERVER_ERROR, null) : "500 Internal Server Error\n" + ExceptionCommon.time())
-			.type(json ? MediaType.APPLICATION_JSON : MediaType.TEXT_PLAIN + ";charset=utf-8").build();
+			.entity(json ?
+				ExceptionCommon.toJson(Status.INTERNAL_SERVER_ERROR, null) :
+				HtmlHelper.getErrorPage("Exception", "500 Internal Server Error<br>" + ExceptionCommon.time(), Server.version.getName() + " " + Server.version.getVersion()))
+			.type(json ? MediaType.APPLICATION_JSON : MediaType.TEXT_HTML + ";charset=utf-8").build();
 	}
 }

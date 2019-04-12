@@ -19,11 +19,11 @@
 
 package org.edamontology.edammap.core.preprocessing;
 
+import com.beust.jcommander.Parameter;
+
 import org.edamontology.pubfetcher.core.common.Arg;
 import org.edamontology.pubfetcher.core.common.Args;
-
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.validators.PositiveInteger;
+import org.edamontology.pubfetcher.core.common.PositiveInteger;
 
 public class PreProcessorArgs extends Args {
 

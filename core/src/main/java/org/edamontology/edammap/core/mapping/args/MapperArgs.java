@@ -26,17 +26,17 @@ import java.util.stream.Collectors;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParametersDelegate;
-import com.beust.jcommander.validators.PositiveInteger;
 
 import org.edamontology.edammap.core.edam.Branch;
 
 import org.edamontology.pubfetcher.core.common.Arg;
 import org.edamontology.pubfetcher.core.common.Args;
+import org.edamontology.pubfetcher.core.common.PositiveInteger;
 
 public class MapperArgs extends Args {
 
 	private static final String branchesId = "branches";
-	private static final String branchesDescription = "Branches to include. Space separated from list [topic, operation, data, format].";
+	private static final String branchesDescription = "Branches to include. Can choose multiple at once from possible values.";
 	private static final List<Branch> branchesDefault = new ArrayList<>(Arrays.asList(Branch.topic, Branch.operation));
 	@Parameter(names = { "--" + branchesId }, variableArity = true, description = branchesDescription)
 	private List<Branch> branches = branchesDefault;

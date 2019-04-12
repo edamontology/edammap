@@ -48,7 +48,7 @@ public class ServerPrivateArgs extends Args {
 
 	private static final String filesId = "files";
 	private static final String filesDescription = "Directory with HTML resources and output results";
-	private static final String filesDefault = "";
+	private static final String filesDefault = null;
 	@Parameter(names = { "-f", "--" + filesId }, required = true, description = filesDescription)
 	private String files;
 

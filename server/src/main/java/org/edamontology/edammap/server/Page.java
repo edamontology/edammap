@@ -80,10 +80,10 @@ public final class Page {
 		writer.write("\t\t<h3>Keywords</h3>\n");
 		writer.write("\t\t<div>\n");
 		writer.write("\t\t\t<div class=\"input\">\n");
-		writer.write("\t\t\t\t<textarea id=\"" + Query.KEYWORDS + "\" name=\"" + Query.KEYWORDS + "\" rows=\"3\" maxlength=\"" + Resource.MAX_KEYWORDS_LENGTH + "\" placeholder=\"Keywords, tags, etc\"></textarea>\n");
+		writer.write("\t\t\t\t<textarea id=\"" + Query.KEYWORDS + "\" name=\"" + Query.KEYWORDS + "\" rows=\"3\" maxlength=\"" + Resource.MAX_KEYWORDS_LENGTH + "\" placeholder=\"Keywords, tags, etc. One per line.\"></textarea>\n");
 		writer.write("\t\t\t\t<span class=\"more\" tabindex=\"0\"></span>\n");
 		writer.write("\t\t\t\t<div class=\"more-box\" tabindex=\"0\">\n");
-		writer.write("\t\t\t\t\tKeywords, tags, etc. One per line.<br>Lines beginning with '#' are ignored.\n");
+		writer.write("\t\t\t\t\tKeywords, tags, etc. One per line.<br>Lines beginning with '#' are ignored.<br><span class=\"ex\">Ex:</span> <span class=\"example\">gene set enrichment analysis<br>Gene Ontology</span>\n");
 		writer.write("\t\t\t\t</div>\n");
 		writer.write("\t\t\t</div>\n");
 		writer.write("\t\t</div>\n");
@@ -96,7 +96,7 @@ public final class Page {
 		writer.write("\t\t\t\t<textarea id=\"" + Query.DESCRIPTION + "\" name=\"" + Query.DESCRIPTION + "\" rows=\"3\" maxlength=\"" + Resource.MAX_DESCRIPTION_LENGTH + "\" placeholder=\"Short description of tool or service\"></textarea>\n");
 		writer.write("\t\t\t\t<span class=\"more\" tabindex=\"0\"></span>\n");
 		writer.write("\t\t\t\t<div class=\"more-box\" tabindex=\"0\">\n");
-		writer.write("\t\t\t\t\tShort description of tool or service\n");
+		writer.write("\t\t\t\t\tShort description of tool or service<br><span class=\"ex\">Ex:</span> <span class=\"example\">A web server for functional enrichment analysis and conversions of gene lists.</span>\n");
 		writer.write("\t\t\t\t</div>\n");
 		writer.write("\t\t\t</div>\n");
 		writer.write("\t\t</div>\n");

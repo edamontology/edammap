@@ -19,12 +19,12 @@
 
 package org.edamontology.edammap.core.mapping.args;
 
+import com.beust.jcommander.Parameter;
+
 import org.edamontology.edammap.core.args.ZeroToOneDouble;
 
 import org.edamontology.pubfetcher.core.common.Arg;
 import org.edamontology.pubfetcher.core.common.Args;
-
-import com.beust.jcommander.Parameter;
 
 public class ScoreArgs extends Args {
 

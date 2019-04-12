@@ -1,6 +1,6 @@
 @charset "utf-8";
 /*
- * Copyright © 2018 Erik Jaaniso
+ * Copyright © 2018, 2019 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -110,6 +110,8 @@
 	--format-half: rgba(216,191,216,0.5);
 	--publication: rgba(211,211,211,1); /* LightGray */
 	--publication-half: rgba(211,211,211,0.5);
+	--gray: rgba(128,128,128,1);
+	--gray-half: rgba(128,128,128,0.5);
 	--link: rgba(0,0,255,1);
 	--link-half: rgba(0,0,255,0.5);
 	--good: rgba(0,128,0,1);
@@ -349,6 +351,7 @@ article > h2:target .current::before {
 	border: 0.25rem solid var(--link);
 }
 .misc > div.links > div {
+	min-width: 21rem;
 	padding-right: 0;
 	position: relative;
 }
@@ -553,18 +556,30 @@ article > h2:target .current::before {
 	align-items: center;
 	height: 3rem;
 }
-.param > label, .param > span {
+
+.param > label, .param > .label {
 	width: 15rem;
 	padding-right: 0.4rem;
 	text-align: right;
 	line-height: 1;
 }
-.param > label::after, .param > span::after {
+.param > label::after, .param > .label::after {
 	content: " :";
 }
-.param > input, .param > output, .param > div {
+.param-disabled > label, .param-disabled > .label, .param-disabled > label > a, .param-disabled > .label > a {
+	color: gray;
+}
+
+.param > div {
 	width: calc(100% - 15rem);
 	min-width: 15rem;
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+.param > div > input, .param > div > output {
+	width: calc(100% - 1.5rem);
 }
 
 .param > div > input[type=checkbox] {
@@ -593,6 +608,97 @@ article > h2:target .current::before {
 }
 .param > div > input[type=checkbox].checked + label::after {
 	content: " true";
+}
+.param > div > input[type=checkbox]:disabled + label::before, .param > div > input[type=checkbox]:disabled + label::after {
+	cursor: not-allowed;
+}
+
+.tooltip {
+	font-family: 'Font Awesome 5 Free';
+	font-weight: 900;
+	width: 1.5rem;
+	height: 1.5rem;
+	text-align: center;
+	outline: none;
+	cursor: pointer;
+	background-color: rgba(255,255,255,1);
+	transition: color 250ms, box-shadow 250ms;
+	border: 1px solid transparent;
+	color: var(--black-half);
+}
+.tooltip::before {
+	content: "\f059";
+}
+.tooltip:hover {
+	z-index: 3;
+	box-shadow: 2px 2px 3px rgba(0,0,0,0.12), 1px 1px 2px rgba(0,0,0,0.24);
+}
+.tooltip:hover, .tooltip:focus {
+	color: var(--black);
+}
+.tooltip:focus {
+	z-index: 5;
+	box-shadow: 2px 2px 0 rgba(0,0,0,0.12), 1px 1px 0 rgba(0,0,0,0.24);
+	border-left-color: rgba(255,255,255,1);
+	border-top-color: var(--black);
+	border-right-color: var(--black);
+	border-bottom-color: var(--black);
+}
+
+.param-disabled .tooltip {
+	color: var(--gray-half);
+}
+.param-disabled .tooltip:hover, .param-disabled .tooltip:focus {
+	color: var(--gray);
+}
+.param-disabled .tooltip:focus {
+	border-top-color: var(--gray);
+	border-right-color: var(--gray);
+	border-bottom-color: var(--gray);
+}
+
+.tooltip-box {
+	display: none;
+	position: absolute;
+	outline: none;
+	color: rgba(63,63,63,1);
+	background-color: rgba(255,255,255,1);
+	box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+	transition: border-color 250ms;
+	top: 0;
+	left: 0;
+	right: calc(1.5rem - 1px);
+	padding: 2.5px 1px;
+	border: 1px solid var(--black-half);
+}
+.tooltip:focus ~ .tooltip-box, .tooltip-box:focus {
+	z-index: 3;
+	display: block;
+	border-color: var(--black);
+}
+.tooltip:hover ~ .tooltip-box, .tooltip-box:hover {
+	z-index: 4;
+	display: block;
+}
+
+.param-disabled .tooltip-box {
+	border-color: var(--gray-half);
+}
+.param-disabled .tooltip:focus ~ .tooltip-box, .param-disabled .tooltip-box:focus {
+	border-color: var(--gray);
+}
+
+.description::before {
+	font-family: 'Font Awesome 5 Free';
+	font-weight: 900;
+	content: "\f105\ ";
+	color: black;
+}
+.def {
+	color: black;
+}
+.value {
+	font-style: italic;
 }
 
 input {
@@ -912,17 +1018,20 @@ input {
 	margin-left: -0.5rem;
 }
 
-.broken > a, .empty > a {
+.missing > a, .broken > a, .empty > a, .non-usable > a {
 	color: var(--red);
 }
-.broken > a {
+.missing > a, .broken > a {
 	text-decoration: line-through;
 }
-.broken > a:hover {
+.missing > a:hover, .broken > a:hover {
 	text-decoration: none;
 }
+.non-final > a {
+	color: var(--medium);
+}
 
-.pub-missing > span, .pub-empty > span, .pub-non-usable > span, .pub-non-final > span {
+.pub-missing > span, .pub-empty > span, .pub-non-usable > span {
 	font-weight: 700;
 	color: var(--red);
 }
@@ -932,6 +1041,17 @@ input {
 }
 .pub-empty ~ div > div > a:hover {
 	text-decoration: none;
+}
+.pub-non-final > span {
+	font-weight: 700;
+	color: var(--medium);
+}
+
+.pub-part-non-usable {
+	color: var(--red);
+}
+.pub-part-non-final {
+	color: var(--medium);
 }
 
 .link-type {
