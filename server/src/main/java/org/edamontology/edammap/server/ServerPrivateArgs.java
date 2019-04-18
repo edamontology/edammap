@@ -25,6 +25,7 @@ import java.io.File;
 
 import org.edamontology.pubfetcher.core.common.Arg;
 import org.edamontology.pubfetcher.core.common.Args;
+import org.edamontology.pubfetcher.core.common.PositiveInteger;
 
 public class ServerPrivateArgs extends Args {
 
@@ -52,12 +53,19 @@ public class ServerPrivateArgs extends Args {
 	@Parameter(names = { "-f", "--" + filesId }, required = true, description = filesDescription)
 	private String files;
 
+	private static final String fetchingThreadsId = "fetchingThreads";
+	private static final String fetchingThreadsDescription = "How many threads to create (maximum) for fetching individual database entries of one query";
+	private static final Integer fetchingThreadsDefault = 8;
+	@Parameter(names = { "--" + fetchingThreadsId }, validateWith = PositiveInteger.class, description = fetchingThreadsDescription)
+	private Integer fetchingThreads = fetchingThreadsDefault;
+
 	@Override
 	protected void addArgs() {
 		args.add(new Arg<>(this::getBaseUri, null, baseUriDefault, baseUriId, "", baseUriDescription, null));
 		args.add(new Arg<>(this::getPath, null, pathDefault, pathId, "", pathDescription, null));
 		args.add(new Arg<>(this::isHttpsProxy, null, httpsProxyDefault, httpsProxyId, "", httpsProxyDescription, null));
 		args.add(new Arg<>(this::getFilesFilename, null, filesDefault, filesId, "", filesDescription, null));
+		args.add(new Arg<>(this::getFetchingThreads, null, 0, null, fetchingThreadsDefault, fetchingThreadsId, "", fetchingThreadsDescription, null));
 	}
 
 	@Override
@@ -87,5 +95,9 @@ public class ServerPrivateArgs extends Args {
 	}
 	public String getFilesFilename() {
 		return new File(files).getName();
+	}
+
+	public Integer getFetchingThreads() {
+		return fetchingThreads;
 	}
 }

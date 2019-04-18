@@ -42,8 +42,8 @@ import org.apache.logging.log4j.Logger;
 
 import org.edamontology.pubfetcher.core.common.IllegalRequestException;
 import org.edamontology.pubfetcher.core.common.PubFetcher;
+import org.edamontology.pubfetcher.core.db.DatabaseEntryType;
 import org.edamontology.pubfetcher.core.db.publication.PublicationIds;
-import org.edamontology.pubfetcher.core.db.webpage.Webpage;
 
 import org.edamontology.edammap.core.edam.Branch;
 import org.edamontology.edammap.core.edam.Concept;
@@ -586,12 +586,12 @@ public class QueryLoader {
 			edamUris(parseServer(input.getAnnotations()), concepts));
 	}
 
-	public static List<Object> fromServerEntry(String input, Class<?> clazz, int max) {
+	public static List<Object> fromServerEntry(String input, DatabaseEntryType type, int max) {
 		if (input == null) return Collections.emptyList();
 		List<Object> list = Collections.emptyList();
-		if (clazz.getName().equals(Webpage.class.getName())) {
+		if (type == DatabaseEntryType.webpage || type == DatabaseEntryType.doc) {
 			list = parseServer(input).map(s -> PubFetcher.getUrl(s, true)).collect(Collectors.toList());
-		} else if (clazz.getName().equals(org.edamontology.pubfetcher.core.db.publication.Publication.class.getName())) {
+		} else if (type == DatabaseEntryType.publication) {
 			list = parseServerPublicationIds(input).stream().map(s -> {
 				PublicationIds publicationIds;
 				if (s.size() == 1) {
@@ -603,6 +603,8 @@ public class QueryLoader {
 				}
 				return publicationIds;
 			}).collect(Collectors.toList());
+		} else {
+			throw new IllegalArgumentException("Unknown database entry type: " + type);
 		}
 		if (max > 0 && list.size() > max) {
 			throw new IllegalRequestException("Number of entries (" + list.size() + ") is greater than maximum allowed (" + max + ")");

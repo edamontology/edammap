@@ -36,7 +36,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import org.edamontology.pubfetcher.core.common.FetcherArgs;
 import org.edamontology.pubfetcher.core.common.PubFetcher;
 import org.edamontology.pubfetcher.core.common.Version;
-import org.edamontology.pubfetcher.core.db.DatabaseEntry;
+import org.edamontology.pubfetcher.core.db.DatabaseEntryType;
 import org.edamontology.pubfetcher.core.db.publication.Publication;
 import org.edamontology.pubfetcher.core.db.webpage.Webpage;
 
@@ -474,7 +474,7 @@ public class Json {
 		}
 	}
 
-	public static String fromDatabaseEntries(String key, List<? extends DatabaseEntry<?>> databaseEntries, FetcherArgs fetcherArgs) throws IOException {
+	public static String fromDatabaseEntries(String key, List<DatabaseEntryEntry> databaseEntries, FetcherArgs fetcherArgs) throws IOException {
 		StringWriter writer = new StringWriter();
 		JsonGenerator generator = createGenerator(writer, null);
 		generator.writeStartObject();
@@ -484,10 +484,10 @@ public class Json {
 		generator.writeFieldName(key);
 
 		generator.writeStartArray();
-		for (DatabaseEntry<?> databaseEntry : databaseEntries) {
+		for (DatabaseEntryEntry databaseEntry : databaseEntries) {
 			generator.writeStartObject();
-			if (databaseEntry instanceof Publication) {
-				Publication publication = (Publication) databaseEntry;
+			if (databaseEntry.getType() == DatabaseEntryType.publication) {
+				Publication publication = (Publication) databaseEntry.getEntry();
 				generator.writeFieldName("id");
 				generator.writeStartObject();
 				generator.writeStringField("pmid", publication.getPmid().getContent());
@@ -495,9 +495,9 @@ public class Json {
 				generator.writeStringField("doi", publication.getDoi().getContent());
 				generator.writeEndObject();
 			} else {
-				generator.writeStringField("id", databaseEntry.toStringId());
+				generator.writeStringField("id", databaseEntry.getEntry().toStringId());
 			}
-			generator.writeStringField("status", databaseEntry.getStatusString(fetcherArgs));
+			generator.writeStringField("status", databaseEntry.getEntry().getStatusString(fetcherArgs));
 			generator.writeEndObject();
 		}
 		generator.writeEndArray();

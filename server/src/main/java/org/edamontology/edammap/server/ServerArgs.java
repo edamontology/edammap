@@ -55,13 +55,6 @@ public class ServerArgs extends BasicArgs {
 	@Parameter(names = { "--" + jsonId }, arity = 1, description = jsonDescription)
 	private Boolean json = jsonDefault;
 
-	// TODO
-	//private static final String threadsId = "threads";
-	//private static final String threadsDescription = "";
-	//private static final Integer threadsDefault = 4;
-	//@Parameter(names = { "--" + threadsId }, validateWith = PositiveInteger.class, description = threadsDescription)
-	//private Integer threads = threadsDefault;
-
 	@ParametersDelegate
 	private ServerPrivateArgs serverPrivateArgs = new ServerPrivateArgs();
 

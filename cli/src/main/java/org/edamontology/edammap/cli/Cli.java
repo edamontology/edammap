@@ -113,7 +113,7 @@ public class Cli implements Runnable {
 
 				logger.info(PubFetcher.progress(localIndex + 1, queries.size(), start));
 
-				QueryProcessed processedQuery = processor.getProcessedQuery(query, args.getType(), pp, idf, args.getCoreArgs().getFetcherArgs());
+				QueryProcessed processedQuery = processor.getProcessedQuery(query, args.getType(), pp, idf, args.getCoreArgs().getFetcherArgs(), null);
 
 				Mapping mapping = mapper.map(query, processedQuery, args.getCoreArgs().getMapperArgs());
 

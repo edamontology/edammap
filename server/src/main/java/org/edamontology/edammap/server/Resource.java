@@ -63,9 +63,11 @@ import org.edamontology.edammap.core.benchmarking.Benchmark;
 import org.edamontology.edammap.core.benchmarking.Results;
 import org.edamontology.edammap.core.edam.EdamUri;
 import org.edamontology.edammap.core.idf.Idf;
+import org.edamontology.edammap.core.input.DatabaseEntryId;
 import org.edamontology.edammap.core.input.ServerInput;
 import org.edamontology.edammap.core.mapping.Mapper;
 import org.edamontology.edammap.core.mapping.Mapping;
+import org.edamontology.edammap.core.output.DatabaseEntryEntry;
 import org.edamontology.edammap.core.output.Json;
 import org.edamontology.edammap.core.output.JsonType;
 import org.edamontology.edammap.core.output.Output;
@@ -78,7 +80,7 @@ import org.edamontology.edammap.core.query.QueryType;
 
 import org.edamontology.pubfetcher.core.common.FetcherArgs;
 import org.edamontology.pubfetcher.core.common.IllegalRequestException;
-import org.edamontology.pubfetcher.core.db.DatabaseEntry;
+import org.edamontology.pubfetcher.core.db.DatabaseEntryType;
 import org.edamontology.pubfetcher.core.db.publication.Publication;
 import org.edamontology.pubfetcher.core.db.webpage.Webpage;
 
@@ -248,10 +250,15 @@ public class Resource {
 		PreProcessor preProcessor = new PreProcessor(coreArgs.getPreProcessorArgs(), Server.stopwordsAll.get(coreArgs.getPreProcessorArgs().getStopwords()));
 
 		logger.info("Processing {} concepts", Server.concepts.size());
+		long startConcepts = System.currentTimeMillis();
+
 		Map<EdamUri, ConceptProcessed> processedConcepts = Server.processor.getProcessedConcepts(Server.concepts,
 			coreArgs.getMapperArgs().getIdfArgs(), coreArgs.getMapperArgs().getMultiplierArgs(), preProcessor);
 
+		logger.info("Processing concepts took {}s", (System.currentTimeMillis() - startConcepts) / 1000.0);
+
 		logger.info("Loading query");
+		long startQuery = System.currentTimeMillis();
 
 		Query query = QueryLoader.fromServer(serverInput, Server.concepts, MAX_KEYWORDS_SIZE, MAX_LINKS_SIZE, MAX_PUBLICATION_IDS_SIZE);
 
@@ -262,9 +269,13 @@ public class Resource {
 			idf = Server.idf;
 		}
 
-		QueryProcessed processedQuery = Server.processor.getProcessedQuery(query, QueryType.server, preProcessor, idf, coreArgs.getFetcherArgs());
+		QueryProcessed processedQuery = Server.processor.getProcessedQuery(query, QueryType.server, preProcessor, idf, coreArgs.getFetcherArgs(), Server.args.getServerPrivateArgs().getFetchingThreads());
+
+		logger.info("Loading query took {}s", (System.currentTimeMillis() - startQuery) / 1000.0);
 
 		logger.info("Mapping query");
+		long startMapping = System.currentTimeMillis();
+
 		Mapping mapping = new Mapper(processedConcepts, Server.edamBlacklist).map(query, processedQuery, coreArgs.getMapperArgs());
 
 		List<Query> queries = Collections.singletonList(query);
@@ -274,9 +285,7 @@ public class Resource {
 		List<Mapping> mappings = Collections.singletonList(mapping);
 		Results results = Benchmark.calculate(queries, mappings);
 
-		long stop = System.currentTimeMillis();
-		logger.info("Stop: {}", Instant.ofEpochMilli(stop));
-		logger.info("Mapping took {}s", (stop - start) / 1000.0);
+		logger.info("Mapping query took {}s", (System.currentTimeMillis() - startMapping) / 1000.0);
 
 		URI baseLocation = new URI(Server.args.getServerPrivateArgs().isHttpsProxy() ? "https" : request.getScheme(), null, request.getServerName(), Server.args.getServerPrivateArgs().isHttpsProxy() ? 443 : request.getServerPort(), null, null, null);
 		URI apiLocation = new URI(baseLocation.getScheme(), null, baseLocation.getHost(), baseLocation.getPort(), "/" + Server.args.getServerPrivateArgs().getPath() + "/api", null, null);
@@ -299,15 +308,14 @@ public class Resource {
 		jsonFields.put("html", htmlLocation != null ? htmlLocation.toString() : null);
 		jsonFields.put("json", jsonLocation != null ? jsonLocation.toString() : null);
 
+		long stop = System.currentTimeMillis();
+		logger.info("Stop: {}", Instant.ofEpochMilli(stop));
+		logger.info("Total time is {}s", (stop - start) / 1000.0);
+
 		logger.info("Outputting results");
+
 		output.output(coreArgs, Server.getArgsMain(false, txt, html, json), jsonFields, QueryType.server, 1, 1,
 			Server.concepts, queries, webpages, docs, publications, results, start, stop, Server.version, jsonVersion);
-
-		if (isJson) {
-			logger.info("POSTED JSON {}", jsonLocation);
-		} else {
-			logger.info("POSTED {}", htmlLocation);
-		}
 
 		String jsonString = null;
 		if (isJson) {
@@ -320,6 +328,12 @@ public class Resource {
 			}
 			jsonString = Json.output(coreArgs, Server.getArgsMain(false, txt, html, json), jsonFields, jsonType, null,
 				Server.concepts, queries, publications, webpages, docs, results, start, stop, Server.version, jsonVersion);
+		}
+
+		if (isJson) {
+			logger.info("POSTED JSON {}", jsonLocation);
+		} else {
+			logger.info("POSTED {}", htmlLocation);
 		}
 
 		return new PostResult(jsonString, htmlLocation);
@@ -388,7 +402,7 @@ public class Resource {
 		}
 	}
 
-	private Response patch(JsonObject json, String key, Request request, String resource, Class<?> clazz, boolean doc, int max) throws IOException {
+	private Response patch(JsonObject json, String key, Request request, String resource, DatabaseEntryType type, int max) throws IOException {
 		logger.info("PATCH JSON {} {} from {}", resource, json, request.getRemoteAddr());
 		MultivaluedHashMap<String, String> params = parseJson(json);
 		List<String> databaseEntryIds = params.get(key);
@@ -400,7 +414,11 @@ public class Resource {
 		FetcherArgs fetcherArgs = new FetcherArgs();
 		ParamParse.parseFetcherParams(params, fetcherArgs, true);
 		fetcherArgs.setPrivateArgs(Server.args.getFetcherPrivateArgs());
-		List<? extends DatabaseEntry<?>> databaseEntries = Server.processor.getDatabaseEntries(QueryLoader.fromServerEntry(requestString, clazz, max), fetcherArgs, clazz, doc);
+		List<DatabaseEntryId> ids = new ArrayList<>();
+		for (Object id : QueryLoader.fromServerEntry(requestString, type, max)) {
+			ids.add(new DatabaseEntryId(id, type));
+		}
+		List<DatabaseEntryEntry> databaseEntries = Server.processor.getDatabaseEntries(ids, fetcherArgs, Server.args.getServerPrivateArgs().getFetchingThreads());
 		Response response = Response.ok(Json.fromDatabaseEntries(key, databaseEntries, fetcherArgs)).type(MediaType.APPLICATION_JSON).build();
 		logger.info("PATCHED {} {}", resource, response.getEntity());
 		return response;
@@ -412,7 +430,7 @@ public class Resource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response patchWeb(JsonObject json, @Context Request request) throws IOException {
 		try {
-			return patch(json, Query.WEBPAGE_URLS, request, "/web", Webpage.class, false, MAX_LINKS_SIZE);
+			return patch(json, Query.WEBPAGE_URLS, request, "/web", DatabaseEntryType.webpage, MAX_LINKS_SIZE);
 		} catch (Throwable e) {
 			logger.error("Exception!", e);
 			throw e;
@@ -425,7 +443,7 @@ public class Resource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response patchDoc(JsonObject json, @Context Request request) throws IOException {
 		try {
-			return patch(json, Query.DOC_URLS, request, "/doc", Webpage.class, true, MAX_LINKS_SIZE);
+			return patch(json, Query.DOC_URLS, request, "/doc", DatabaseEntryType.doc, MAX_LINKS_SIZE);
 		} catch (Throwable e) {
 			logger.error("Exception!", e);
 			throw e;
@@ -438,7 +456,7 @@ public class Resource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response patchPub(JsonObject json, @Context Request request) throws IOException {
 		try {
-			return patch(json, Query.PUBLICATION_IDS, request, "/pub", Publication.class, false, MAX_PUBLICATION_IDS_SIZE);
+			return patch(json, Query.PUBLICATION_IDS, request, "/pub", DatabaseEntryType.publication, MAX_PUBLICATION_IDS_SIZE);
 		} catch (Throwable e) {
 			logger.error("Exception!", e);
 			throw e;
