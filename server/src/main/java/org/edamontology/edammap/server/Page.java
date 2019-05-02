@@ -43,6 +43,7 @@ public final class Page {
 		writer.write("\t<meta charset=\"utf-8\">\n");
 		writer.write("\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n");
 		writer.write("\t<meta name=\"author\" content=\"Erik Jaaniso\">\n");
+		writer.write("\t<meta name=\"description\" content=\"A tool for mapping various text input to EDAM ontology concepts. It is designed to assist not replace a curator.\">\n");
 		writer.write("\t<title>" + Server.version.getName() + " " + Server.version.getVersion() + "</title>\n");
 		writer.write("\t<link rel=\"stylesheet\" href=\"/" + Server.args.getServerPrivateArgs().getPath() + "/style.css\">\n");
 		writer.write("</head>\n\n");
@@ -154,7 +155,7 @@ public final class Page {
 		writer.write("\t\t\t\t<textarea id=\"" + Query.ANNOTATIONS + "\" name=\"" + Query.ANNOTATIONS + "\" rows=\"4\" onblur=\"check('" + Query.ANNOTATIONS + "','/" + Server.args.getServerPrivateArgs().getPath() + "/api/edam')\" maxlength=\"" + Resource.MAX_ANNOTATIONS_LENGTH + "\" placeholder=\"Existing annotations from EDAM\"></textarea>\n");
 		writer.write("\t\t\t\t<span class=\"more\" tabindex=\"0\"></span>\n");
 		writer.write("\t\t\t\t<div class=\"more-box\" tabindex=\"0\">\n");
-		writer.write("\t\t\t\t\tExisting annotations from EDAM<br><span class=\"ex\">Ex:</span> <span class=\"example\">http://edamontology.org/topic_1775<br>operation_2436<br>data_3021<br>format_1964</span>\n");
+		writer.write("\t\t\t\t\tExisting annotations from EDAM<br><span class=\"ex\">Ex:</span> <span class=\"example\">http://edamontology.org/topic_1775<br>operation_2436<br>data_3021<br>http://edamontology.org/format_1964</span>\n");
 		writer.write("\t\t\t\t</div>\n");
 		writer.write("\t\t\t</div>\n");
 		writer.write("\t\t\t<div id=\"" + Query.ANNOTATIONS + "-output\" class=\"output\"></div>\n");

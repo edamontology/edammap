@@ -41,7 +41,7 @@ public class CliArgs extends BasicArgs {
 	private String edam;
 
 	private static final String queryId = "query";
-	private static final String queryDescription = "Path of file containing queries";
+	private static final String queryDescription = "Path or URL of file containing input queries of QueryType --type";
 	private static final String queryDefault = null;
 	@Parameter(names = { "-q", "--" + queryId }, required = true, description = queryDescription)
 	private String query;
@@ -59,7 +59,7 @@ public class CliArgs extends BasicArgs {
 	private String output = outputDefault;
 
 	private static final String reportId = "report";
-	private static final String reportDescription = "Directory to write a HTML report to. In addition to detailed results, it will contain used parameters, metrics, comparisons to manual mapping, extended information about queries and nice formatting.";
+	private static final String reportDescription = "Directory to write a HTML report to. In addition to detailed results, it will contain used parameters, metrics, comparisons to manual mapping, extended information about queries and nice formatting. The specified directory will be created and must not be an existing directory.";
 	private static final String reportDefault = "";
 	@Parameter(names = { "-r", "--" + reportId, "--results" }, description = reportDescription)
 	private String report = reportDefault;
@@ -83,7 +83,7 @@ public class CliArgs extends BasicArgs {
 	private Integer reportPaginationSize = reportPaginationSizeDefault;
 
 	private static final String threadsId = "threads";
-	private static final String threadsDescription = "How many threads to use for mapping (one query is processed by one thread)";
+	private static final String threadsDescription = "How many threads to use for mapping (one thread processes one query at a time)";
 	private static final Integer threadsDefault = 4;
 	@Parameter(names = { "--" + threadsId }, validateWith = PositiveInteger.class, description = threadsDescription)
 	private Integer threads = threadsDefault;

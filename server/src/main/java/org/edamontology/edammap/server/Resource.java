@@ -326,7 +326,7 @@ public class Resource {
 					jsonType = JsonType.full;
 				}
 			}
-			jsonString = Json.output(coreArgs, Server.getArgsMain(false, txt, html, json), jsonFields, jsonType, null,
+			jsonString = Json.output(coreArgs, Server.getArgsMain(false, txt, html, json), jsonFields, QueryType.server, jsonType, null,
 				Server.concepts, queries, publications, webpages, docs, results, start, stop, Server.version, jsonVersion);
 		}
 

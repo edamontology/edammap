@@ -42,7 +42,7 @@ public class MapperArgs extends Args {
 	private List<Branch> branches = branchesDefault;
 
 	private static final String matchesId = "matches";
-	private static final String matchesDescription = "Number of best matches per branch to output";
+	private static final String matchesDescription = "Number of best matches per branch to output. Output amount can be less than requested if not enough match final scores fulfill score limits requirement.";
 	private static final Integer matchesDefault = 3;
 	@Parameter(names = { "--" + matchesId }, validateWith = PositiveInteger.class, description = matchesDescription)
 	private Integer matches = matchesDefault;

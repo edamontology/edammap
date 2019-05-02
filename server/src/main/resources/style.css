@@ -140,6 +140,12 @@ a:active {
 	color: rgba(0,0,128,1);
 }
 
+form {
+	max-width: 80rem;
+	margin-left: auto;
+	margin-right: auto;
+}
+
 /* title */
 
 header > h1, footer > h2 {

@@ -275,7 +275,7 @@ public final class PubMedApps {
 	private static final Pattern BIOTOOLS_SCHEMA_DOI_PATTERN = Pattern.compile("^10.[0-9]{4,9}[A-Za-z0-9:;)(_/.-]+$");
 	private static final int BIOTOOLS_SCHEMA_CREDIT_NAME_MIN = 1;
 	private static final int BIOTOOLS_SCHEMA_CREDIT_NAME_MAX = 100;
-	// TODO too restrictive (last character can be 'X')
+	// TODO too restrictive (last character can be 'X') https://github.com/bio-tools/biotoolsSchema/issues/142
 	private static final Pattern BIOTOOLS_SCHEMA_CREDIT_ORCIDID_PATTERN = Pattern.compile("^https?://orcid.org/[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}$");
 	private static final Pattern BIOTOOLS_SCHEMA_CREDIT_EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9_]+([-+.'][A-Za-z0-9_]+)*@[A-Za-z0-9_]+([-.][A-Za-z0-9_]+)*\\.[A-Za-z0-9_]+([-.][A-Za-z0-9_]+)*$");
 

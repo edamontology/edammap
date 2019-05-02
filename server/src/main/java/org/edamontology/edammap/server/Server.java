@@ -45,6 +45,7 @@ import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.server.StaticHttpHandler;
 import org.glassfish.grizzly.http.server.accesslog.AccessLogBuilder;
+import org.glassfish.grizzly.http.server.accesslog.ApacheLogFormat;
 import org.glassfish.grizzly.http.util.ContentType;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -177,7 +178,8 @@ public final class Server {
 			}
 			final AccessLogBuilder builder = new AccessLogBuilder(accessDir + "/edammap-access.log");
 			builder.rotatedDaily();
-			//builder.format(ApacheLogFormat.COMBINED); // TODO change from default ApacheLogFormat.COMBINED?
+			// Default access log format is ApacheLogFormat.COMBINED
+			builder.format(ApacheLogFormat.COMBINED);
 			builder.instrument(httpServer.getServerConfiguration());
 		}
 

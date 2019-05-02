@@ -107,7 +107,6 @@ public class PreProcessor {
 	private final Pattern KNOWN_SCHEMA = Pattern.compile("(?i)(http://|https://|ftp://)");
 	private final Pattern TILDE = Pattern.compile("[\\u223C\\u02DC]");
 	private final Pattern HYPHEN = Pattern.compile("[\\u2010]");
-	//private final List<String> INVALID_DOMAINS = Arrays.asList("js", "py", "go", "bio", "seq", "app", "hmm", "db", "txt"); // TODO
 
 	// Freestanding number (not part of a word)
 	private final Pattern NUMBER = Pattern.compile("^[\\p{N}]+$");

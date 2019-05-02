@@ -57,7 +57,7 @@ public class Csv {
 		settings.setReadInputOnSeparateThread(false); // disabling is (slightly) more efficient if your input is small
 		settings.setSkipEmptyLines(true);
 		settings.trimValues(true);
-		settings.setMaxCharsPerColumn(65536);
+		settings.setMaxCharsPerColumn(100000);
 		settings.getFormat().setDelimiter(',');
 		settings.getFormat().setQuote('"');
 		settings.getFormat().setQuoteEscape('"');

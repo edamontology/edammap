@@ -61,6 +61,7 @@ import org.edamontology.edammap.core.query.Link;
 import org.edamontology.edammap.core.query.PublicationIdsQuery;
 import org.edamontology.edammap.core.query.Query;
 import org.edamontology.edammap.core.query.QueryLoader;
+import org.edamontology.edammap.core.query.QueryType;
 
 public class Json {
 
@@ -84,7 +85,7 @@ public class Json {
 	private static void concept(Map<EdamUri, Concept> concepts, Match match, JsonGenerator generator) throws IOException {
 		EdamUri edamUri = match.getEdamUri();
 		generator.writeStringField("edamUri", edamUri.toString());
-		Concept concept = concepts.get(edamUri); // TODO if edamUri not in concepts
+		Concept concept = concepts.get(edamUri);
 		generator.writeStringField("label", concept.getLabel());
 		generator.writeBooleanField("obsolete", concept.isObsolete());
 
@@ -221,7 +222,8 @@ public class Json {
 		return generator;
 	}
 
-	public static String output(CoreArgs args, List<ArgMain> argsMain, Map<String, String> jsonFields, JsonType type, Path json, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publicationsAll, List<List<Webpage>> webpagesAll, List<List<Webpage>> docsAll, Results results, long start, long stop, Version version, String jsonVersion) throws IOException {
+	// concepts must contain the key match.getEdamUri(), but also all keys match.getParents(), match.getChildren(), etc
+	public static String output(CoreArgs args, List<ArgMain> argsMain, Map<String, String> jsonFields, QueryType type, JsonType jsonType, Path json, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publicationsAll, List<List<Webpage>> webpagesAll, List<List<Webpage>> docsAll, Results results, long start, long stop, Version version, String jsonVersion) throws IOException {
 		StringWriter writer = new StringWriter();
 		JsonGenerator generator = createGenerator(writer, json);
 		generator.writeStartObject();
@@ -232,13 +234,13 @@ public class Json {
 			generator.writeStringField(VERSION_ID, jsonVersion);
 		}
 
-		generator.writeStringField(TYPE_ID, type.name());
+		generator.writeStringField(TYPE_ID, jsonType.name());
 
-		boolean server = (type == JsonType.core || type == JsonType.full);
+		boolean server = (type == QueryType.server);
 		if (server && queries.size() != 1) {
-			throw new IllegalArgumentException("Number of queries must be 1 for type \"core\" and \"full\"");
+			throw new IllegalArgumentException("Number of queries must be 1");
 		}
-		boolean full = (type == JsonType.full || type == JsonType.biotools);
+		boolean full = (jsonType == JsonType.full || jsonType == JsonType.cli);
 
 		if (jsonFields != null) {
 			for (Map.Entry<String, String> jsonField : jsonFields.entrySet()) {
@@ -420,7 +422,7 @@ public class Json {
 					Match match = matchTest.getMatch();
 					concept(concepts, match, generator);
 					queryMatch(query, publications, match.getQueryMatch(), true, generator);
-					Concept concept = concepts.get(match.getEdamUri()); // TODO if edamUri not in concepts
+					Concept concept = concepts.get(match.getEdamUri());
 					conceptMatch(concept, match.getConceptMatch(), true, generator);
 					score(args.getMapperArgs().getScoreArgs(), branch, match, generator);
 					generator.writeStringField("test", matchTest.getTest().name());

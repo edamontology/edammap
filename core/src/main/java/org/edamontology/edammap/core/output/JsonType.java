@@ -22,5 +22,5 @@ package org.edamontology.edammap.core.output;
 public enum JsonType {
 	core,
 	full,
-	biotools
+	cli
 }

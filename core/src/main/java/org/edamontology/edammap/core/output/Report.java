@@ -276,7 +276,7 @@ public class Report {
 
 	private static void writeConcept(Writer writer, Map<EdamUri, Concept> concepts, Match match) throws IOException {
 		EdamUri edamUri = match.getEdamUri();
-		Concept concept = concepts.get(edamUri); // TODO
+		Concept concept = concepts.get(edamUri);
 		writer.write("\t\t\t\t\t<div class=\"concept\">");
 		if (concept.isObsolete()) {
 			writer.write("<span class=\"obsolete\">");
@@ -405,6 +405,7 @@ public class Report {
 		writer.write("<span>" + percent(match.getScore()) + "</span></div>\n");
 	}
 
+	// concepts must contain the key match.getEdamUri(), but also all keys match.getParents(), match.getChildren(), etc
 	private static void writeMatches(ScoreArgs scoreArgs, Writer writer, Map<EdamUri, Concept> concepts, Query query, List<Publication> publications, MappingTest mapping) throws IOException {
 		for (Branch branch : Branch.values()) {
 			List<MatchTest> matches = mapping.getMatches(branch);
@@ -422,7 +423,7 @@ public class Report {
 				writer.write("\t\t\t\t</div>\n");
 				List<MatchAverageStats> matchAverageStats = match.getMatchAverageStats();
 				if (matchAverageStats != null && !matchAverageStats.isEmpty()) {
-					Concept concept = concepts.get(match.getEdamUri()); // TODO
+					Concept concept = concepts.get(match.getEdamUri());
 					writer.write("\t\t\t\t<div class=\"details-div\">\n");
 					writer.write("\t\t\t\t\t<div class=\"details\" tabindex=\"0\"></div>\n");
 					writer.write("\t\t\t\t\t<div class=\"details-box\" tabindex=\"0\">\n");

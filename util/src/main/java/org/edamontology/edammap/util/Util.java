@@ -83,8 +83,11 @@ public final class Util {
 			.limit(n).forEach(e -> System.out.println(e.getTerm() + "\t" + e.getCount()));
 	}
 
-	private static void printIdf(String inputPath, String term, boolean stemming) throws IOException {
-		System.out.println(new Idf(inputPath).getIdf(new PreProcessor(stemming).process(term)));
+	private static void printIdf(String inputPath, List<String> terms, boolean stemming) throws IOException {
+		Idf idf = new Idf(inputPath);
+		for (String termProcessed : new PreProcessor(stemming).process(String.join(" ", terms))) {
+			System.out.println(termProcessed + "\t" + idf.getIdf(termProcessed));
+		}
 	}
 
 	private static void biotoolsFull(String outputPath, FetcherArgs fetcherArgs, boolean dev) throws IOException {
@@ -276,11 +279,13 @@ public final class Util {
 		if (args.printIdfTop != null) {
 			printIdfTop(args.printIdfTop.get(0), Long.parseLong(args.printIdfTop.get(1)));
 		}
-		if (args.printIdf != null) {
-			printIdf(args.printIdf.get(0), args.printIdf.get(1), false);
+		if (args.printIdf != null && args.printIdf.size() > 0) {
+			String idfPath = args.printIdf.remove(0);
+			printIdf(idfPath, args.printIdf, false);
 		}
-		if (args.printIdfStemmed != null) {
-			printIdf(args.printIdfStemmed.get(0), args.printIdfStemmed.get(1), true);
+		if (args.printIdfStemmed != null && args.printIdfStemmed.size() > 0) {
+			String idfPath = args.printIdfStemmed.remove(0);
+			printIdf(idfPath, args.printIdfStemmed, true);
 		}
 
 		if (args.biotoolsFull != null) {

@@ -51,9 +51,9 @@ public final class Input {
 			logger.info("Opened URL {}", con.getURL().toString());
 		} else if (allowFile) {
 			is = new FileInputStream(path);
-			logger.info("Opened file {}", path); // TODO new File(path).getName()
+			logger.info("Opened file {}", path);
 		} else {
-			throw new IOException("Unsupported protocol or opening of local files not allowed: " + path); // TODO new File(path).getName()
+			throw new IOException("Unsupported protocol or opening of local files not allowed: " + path);
 		}
 		return is;
 	}

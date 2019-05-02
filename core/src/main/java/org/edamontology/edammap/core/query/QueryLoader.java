@@ -71,12 +71,12 @@ public class QueryLoader {
 
 	private static final Logger logger = LogManager.getLogger();
 
-	private static final String GENERIC = QueryType.generic.name(); // TODO something better, like file name
+	private static final String GENERIC = QueryType.generic.name();
 	private static final String SEQWIKI = "http://seqanswers.com/wiki/";
 	private static final String MSUTILS = "http://www.ms-utils.org/";
 	private static final String BIOC_VIEWS = "https://bioconductor.org/packages/release/BiocViews.html#___";
 	public static final String BIOTOOLS = "https://bio.tools/";
-	private static final String SERVER = QueryType.server.name(); // TODO maybe add version
+	private static final String SERVER = QueryType.server.name();
 
 	private static final Pattern INTERNAL_SEPARATOR_BAR = Pattern.compile("\\|");
 	private static final Pattern INTERNAL_SEPARATOR_COMMA = Pattern.compile(",");

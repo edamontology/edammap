@@ -42,13 +42,13 @@ public class ServerPrivateArgs extends Args {
 	private String path = pathDefault;
 
 	private static final String httpsProxyId = "httpsProxy";
-	private static final String httpsProxyDescription = "Set if we are behind a HTTPS proxy";
+	private static final String httpsProxyDescription = "Use if we are behind a HTTPS proxy";
 	private static final Boolean httpsProxyDefault = false;
 	@Parameter(names = { "--" + httpsProxyId }, description = httpsProxyDescription)
 	private Boolean httpsProxy = httpsProxyDefault;
 
 	private static final String filesId = "files";
-	private static final String filesDescription = "Directory with HTML resources and output results";
+	private static final String filesDescription = "Existing directory with HTML resources where results will be output";
 	private static final String filesDefault = null;
 	@Parameter(names = { "-f", "--" + filesId }, required = true, description = filesDescription)
 	private String files;

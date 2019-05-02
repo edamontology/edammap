@@ -57,6 +57,8 @@ import org.edamontology.edammap.core.query.QueryLoader;
 
 public class Cli implements Runnable {
 
+	private static final String JSON_VERSION = "1";
+
 	private static Logger logger;
 
 	private static Object lock = new Object();
@@ -211,7 +213,7 @@ public class Cli implements Runnable {
 
 		logger.info("Outputting results");
 		output.output(args.getCoreArgs(), argsMain, null, args.getType(), args.getReportPageSize(), args.getReportPaginationSize(),
-			concepts, queries, webpages, docs, publications, results, start, stop, version, "1");
+			concepts, queries, webpages, docs, publications, results, start, stop, version, JSON_VERSION);
 
 		logger.info("{} : {}", results.toStringMeasure(Measure.recall), Measure.recall);
 		logger.info("{} : {}", results.toStringMeasure(Measure.AveP), Measure.AveP);

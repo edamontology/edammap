@@ -61,8 +61,8 @@ public class Output {
 		Txt.output(type, txt, report, concepts, queries, publications, results.getMappings());
 		Report.output(args, argsMain, type, reportPageSize, reportPaginationSize, report, existingDirectory, concepts, queries, publications, webpages, docs, results, start, stop, version, txt != null, json != null);
 		if (json != null) {
-			JsonType jsonType = (type == QueryType.server ? JsonType.full : JsonType.biotools);
-			Json.output(args, argsMain, jsonFields, jsonType, json, concepts, queries, publications, webpages, docs, results, start, stop, version, jsonVersion);
+			JsonType jsonType = (type == QueryType.server ? JsonType.full : JsonType.cli);
+			Json.output(args, argsMain, jsonFields, type, jsonType, json, concepts, queries, publications, webpages, docs, results, start, stop, version, jsonVersion);
 		}
 	}
 }
