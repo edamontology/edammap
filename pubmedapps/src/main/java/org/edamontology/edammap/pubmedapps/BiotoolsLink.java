@@ -28,8 +28,8 @@ public class BiotoolsLink<T> {
 	private final T type;
 
 	public BiotoolsLink(String url, T type) {
-		this.url = PubMedApps.prependHttp(url);
-		this.urlTrimmed = PubMedApps.trimUrl(url);
+		this.url = Common.prependHttp(url);
+		this.urlTrimmed = Common.trimUrl(url);
 		this.type = type;
 	}
 

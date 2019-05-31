@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Erik Jaaniso
+ * Copyright © 2018, 2019 Erik Jaaniso
  *
  * This file is part of PubMedApps.
  *
@@ -19,58 +19,108 @@
 
 package org.edamontology.edammap.pubmedapps;
 
-import java.util.List;
-
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParametersDelegate;
 
 import org.edamontology.pubfetcher.core.common.BasicArgs;
 import org.edamontology.pubfetcher.core.common.FetcherArgs;
-
+import org.edamontology.edammap.core.mapping.args.MapperArgs;
 import org.edamontology.edammap.core.preprocessing.PreProcessorArgs;
-import org.edamontology.edammap.core.query.QueryType;
 
 public class PubMedAppsArgs extends BasicArgs {
 
-	@Parameter(names = { "-db", "-database" }, description = "TODO")
-	String db = null;
+	@Parameter(names = { "-copy-edam" }, description = "TODO")
+	String copyEdam = null;
 
-	@Parameter(names = { "-pub", "-pub-file" }, variableArity = true, description = "TODO")
-	List<String> pub = null;
+	@Parameter(names = { "-copy-idf" }, description = "TODO")
+	String copyIdf = null;
 
-	@Parameter(names = { "-idf", "-query-idf" }, description = "Use the given query IDF file")
+	@Parameter(names = { "-get-biotools" }, description = "TODO")
+	String getBiotools = null;
+
+	@Parameter(names = { "-copy-biotools" }, description = "TODO")
+	String copyBiotools = null;
+
+	@Parameter(names = { "-select-pub" }, description = "TODO")
+	String selectPub = null;
+
+	@Parameter(names = { "-copy-pub" }, description = "TODO")
+	String copyPub = null;
+
+	@Parameter(names = { "-init-db" }, description = "TODO")
+	String initDb = null;
+
+	@Parameter(names = { "-copy-db" }, description = "TODO")
+	String copyDb = null;
+
+	@Parameter(names = { "-fetch-pub" }, description = "TODO")
+	String fetchPub = null;
+
+	@Parameter(names = { "-pass1" }, description = "TODO")
+	String pass1 = null;
+
+	@Parameter(names = { "-fetch-web" }, description = "TODO")
+	String fetchWeb = null;
+
+	@Parameter(names = { "-pass2" }, description = "TODO")
+	String pass2 = null;
+
+	@Parameter(names = { "-map", "-edammap" }, description = "TODO")
+	String map = null;
+
+	@Parameter(names = { "-all" }, description = "TODO")
+	String all = null;
+
+	@Parameter(names = { "-resume" }, description = "TODO")
+	String resume = null;
+
+	@Parameter(names = { "--edam", "--edam-owl" }, description = "TODO")
+	String edam = null;
+
+	@Parameter(names = { "--idf", "--query-idf" }, description = "Use the given (not stemmed) query IDF file")
 	String idf = null;
 
-	@Parameter(names = { "-query", "-query-path" }, description = "TODO")
-	String query = null;
+	@Parameter(names = { "--idf-stemmed", "--query-idf-stemmed" }, description = "Use the given (stemmed) query IDF file")
+	String idfStemmed = null;
 
-	@Parameter(names = { "-type", "-query-type" }, description = "TODO")
-	QueryType type = QueryType.biotools;
+	@Parameter(names = { "--biotools", "--biotools-json" }, description = "TODO")
+	String biotools = null;
 
-	@Parameter(names = { "-web", "-web-file" }, description = "TODO")
-	String web = null;
+	@Parameter(names = { "--pub", "--pub-ids", "--pub-file" }, description = "TODO")
+	String pub = null;
 
-	@Parameter(names = { "-doc", "-doc-file" }, description = "TODO")
-	String doc = null;
+	@Parameter(names = { "--db", "--database" }, description = "TODO")
+	String db = null;
 
-	@Parameter(names = { "-output", "-output-dir" }, description = "TODO")
-	String output = null;
+	@Parameter(names = { "--fetcher-threads", "--fetch-threads" }, description = "TODO")
+	int fetcherThreads = 8;
 
-	@Parameter(names = { "--mesh-query" }, description = "TODO")
+	@Parameter(names = { "--mapper-threads",  "--map-threads" }, description = "TODO")
+	int mapperThreads = 4;
+
+	@Parameter(names = { "--verbose" }, description = "TODO")
+	LogLevel verbose = LogLevel.OFF;
+
+	// TODO remove
+	@Parameter(names = { "-mesh-query" }, description = "TODO")
 	boolean meshQuery = false;
 
-	@Parameter(names = { "--pass1" }, description = "TODO")
-	boolean pass1 = false;
+	// TODO remove
+	@Parameter(names = { "-journal-query" }, description = "TODO")
+	boolean journalQuery = false;
 
-	@Parameter(names = { "--pass2" }, description = "TODO")
-	boolean pass2 = false;
-
-	@Parameter(names = { "--before-after" }, description = "TODO")
+	@Parameter(names = { "-before-after" }, description = "TODO")
 	boolean beforeAfter = false;
+
+	@Parameter(names = { "-europepmc-abstract" }, description = "TODO")
+	Integer europepmcAbstract = null;
+
+	@ParametersDelegate
+	PreProcessorArgs preProcessorArgs = new PreProcessorArgs();
 
 	@ParametersDelegate
 	FetcherArgs fetcherArgs = new FetcherArgs();
 
 	@ParametersDelegate
-	PreProcessorArgs preProcessorArgs = new PreProcessorArgs();
+	MapperArgs mapperArgs = new MapperArgs();
 }

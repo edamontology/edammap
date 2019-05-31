@@ -24,12 +24,16 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class License {
+
+	private static final Logger logger = LogManager.getLogger();
 
 	private static final String VERSION = "(\\p{N}+)([^\\p{N}]+(\\p{N}+)([^\\p{N}]+(\\p{N}+))?)?";
 	private static final Pattern VERSION_SPDX = Pattern.compile("^" + VERSION);
 	private static final Pattern VERSION_SEARCH = Pattern.compile("[vV(>=≥]*" + VERSION);
-	static final Pattern WHITESPACE = Pattern.compile("[\\p{Z}\\p{Cc}\\p{Cf}]+");
 	private static final Pattern LGPL = Pattern.compile("(?i) *(Lesser|Library) (General Public Licen[sc]e|GPL)");
 	private static final Pattern AGPL = Pattern.compile("(?i) *Affero (General Public Licen[sc]e|GPL|Licen[sc]e)");
 	private static final Pattern GPL = Pattern.compile("(?i) *(General|GNU) Public Licen[sc]e");
@@ -52,7 +56,7 @@ public class License {
 		private List<List<Integer>> versions = new ArrayList<>();
 
 		public LicenseSearch(String licenseSearch) {
-			licenseSearch = WHITESPACE.matcher(licenseSearch).replaceAll(" ");
+			licenseSearch = Common.WHITESPACE.matcher(licenseSearch).replaceAll(" ");
 			licenseSearch = LGPL.matcher(licenseSearch).replaceAll(" LGPL");
 			licenseSearch = AGPL.matcher(licenseSearch).replaceAll(" AGPL");
 			licenseSearch = GPL.matcher(licenseSearch).replaceAll(" GPL");
@@ -96,7 +100,7 @@ public class License {
 					}
 					return true;
 				} catch (NumberFormatException e) {
-					// TODO log
+					logger.debug("License part {} has version number format exception: {}", part, e.getMessage());
 				}
 			}
 			return false;
@@ -188,7 +192,7 @@ public class License {
 					parts.add(part.substring(versionMatcher.end()));
 				}
 			} catch (NumberFormatException e) {
-				// TODO log
+				logger.debug("License part {} has version number format exception: {}", part, e.getMessage());
 				version[0] = -1;
 				version[1] = -1;
 				version[2] = -1;

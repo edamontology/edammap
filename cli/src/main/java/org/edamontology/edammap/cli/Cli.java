@@ -31,7 +31,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import org.edamontology.pubfetcher.core.common.Arg;
-import org.edamontology.pubfetcher.core.common.BasicArgs;
 import org.edamontology.pubfetcher.core.common.PubFetcher;
 import org.edamontology.pubfetcher.core.common.Version;
 import org.edamontology.pubfetcher.core.db.publication.Publication;
@@ -59,7 +58,7 @@ public class Cli implements Runnable {
 
 	private static final String JSON_VERSION = "1";
 
-	private static Logger logger;
+	private static final Logger logger = LogManager.getLogger();
 
 	private static Object lock = new Object();
 
@@ -70,6 +69,8 @@ public class Cli implements Runnable {
 	private static int index = 0;
 
 	private static long start;
+
+	private static boolean stderr;
 
 	private static CliArgs args;
 
@@ -113,11 +114,15 @@ public class Cli implements Runnable {
 					++index;
 				}
 
-				logger.info(PubFetcher.progress(localIndex + 1, queries.size(), start));
+				logger.info("Map {}", PubFetcher.progress(localIndex + 1, queries.size(), start));
 
 				QueryProcessed processedQuery = processor.getProcessedQuery(query, args.getType(), pp, idf, args.getCoreArgs().getFetcherArgs(), null);
 
 				Mapping mapping = mapper.map(query, processedQuery, args.getCoreArgs().getMapperArgs());
+
+				if (stderr) {
+					System.err.print("Map " + PubFetcher.progress(localIndex + 1, queries.size(), start) + "  \r");
+				}
 
 				synchronized (mappings) {
 					webpages.set(localIndex, processedQuery.getWebpages());
@@ -134,13 +139,15 @@ public class Cli implements Runnable {
 		}
 	}
 
-	private static void run(Version version) throws IOException, ParseException {
+	public static int run(CliArgs cliArgs, Version version, boolean progressToStderr) throws IOException, ParseException {
+		args = cliArgs;
+
 		List<ArgMain> argsMain = new ArrayList<>();
 		for (Arg<?, ?> arg : args.getArgs()) {
 			argsMain.add(new ArgMain(arg.getValue(), arg, false));
 		}
 
-		Output output = new Output(args.getOutput(), args.getReport(), args.getJson(), false);
+		Output output = new Output(args.getOutput(), args.getReport(), args.getJson(), args.getBiotools(), args.getType(), false);
 
 		stopwords = PreProcessor.getStopwords(args.getCoreArgs().getPreProcessorArgs().getStopwords());
 
@@ -184,6 +191,8 @@ public class Cli implements Runnable {
 		start = System.currentTimeMillis();
 		logger.info("Start: {}", Instant.ofEpochMilli(start));
 
+		stderr = progressToStderr;
+
 		logger.info("Starting mapper threads");
 		for (int i = 0; i < args.getThreads(); ++i) {
 			Thread t = new Thread(new Cli());
@@ -212,30 +221,16 @@ public class Cli implements Runnable {
 		Results results = Benchmark.calculate(queries, mappings);
 
 		logger.info("Outputting results");
-		output.output(args.getCoreArgs(), argsMain, null, args.getType(), args.getReportPageSize(), args.getReportPaginationSize(),
+		output.output(args.getCoreArgs(), argsMain, args.getQuery(), null, args.getReportPageSize(), args.getReportPaginationSize(),
 			concepts, queries, webpages, docs, publications, results, start, stop, version, JSON_VERSION);
 
 		logger.info("{} : {}", results.toStringMeasure(Measure.recall), Measure.recall);
 		logger.info("{} : {}", results.toStringMeasure(Measure.AveP), Measure.AveP);
+
+		return results.getMappings().size();
 	}
 
-	public static void main(String[] argv) throws IOException, ReflectiveOperationException {
-		Version version = new Version(Cli.class);
-
-		args = BasicArgs.parseArgs(argv, CliArgs.class, version);
-
-		// logger must be called only after configuration changes have been made in BasicArgs.parseArgs()
-		// otherwise invalid.log will be created if arg --log is null
-		logger = LogManager.getLogger();
-		logger.debug(String.join(" ", argv));
-		logger.info("This is {} {}", version.getName(), version.getVersion());
-
-		try {
-			run(version);
-		} catch (Throwable e) {
-			logger.error("Exception!", e);
-		}
-
+	public static void closeDatabase() throws IOException {
 		if (processor != null) {
 			processor.closeDatabase();
 		}

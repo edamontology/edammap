@@ -70,6 +70,12 @@ public class CliArgs extends BasicArgs {
 	@Parameter(names = { "-j", "--" + jsonId }, description = jsonDescription)
 	private String json = jsonDefault;
 
+	private static final String biotoolsId = "biotools";
+	private static final String biotoolsDescription = "File to write results to, in bio.tools JSON format, confirming to biotoolsSchema. Available only for '--type biotools', where the input JSON is copied to the output, but with new annotations found by EDAMmap added. New annotations from the topic branch will be added to the 'topic' and new annotations from the operation branch will all be added under a new 'function' of a bio.tools entry. New annotations from the data and format branches will be added as strings in the form 'EDAM URI (label)' separated by ' | ' to the 'note' of the latest 'function', because EDAMmap can't differentiate inputs and outputs."; // TODO to documentation
+	private static final String biotoolsDefault = "";
+	@Parameter(names = { "-b", "--" + biotoolsId }, description = biotoolsDescription)
+	private String biotools = biotoolsDefault;
+
 	private static final String reportPageSizeId = "reportPageSize";
 	private static final String reportPageSizeDescription = "Number of results in a HTML report page. Setting to 0 will output all results to a single HTML page.";
 	private static final Integer reportPageSizeDefault = 100;
@@ -99,6 +105,7 @@ public class CliArgs extends BasicArgs {
 		args.add(new Arg<>(this::getOutputFilename, null, outputDefault, outputId, "Output file", outputDescription, null));
 		args.add(new Arg<>(this::getReportFilename, null, reportDefault, reportId, "Report file", reportDescription, null));
 		args.add(new Arg<>(this::getJsonFilename, null, jsonDefault, jsonId, "JSON file", jsonDescription, null));
+		args.add(new Arg<>(this::getBiotoolsFilename, null, biotoolsDefault, biotoolsId, "bio.tools file", biotoolsDescription, null));
 		args.add(new Arg<>(this::getReportPageSize, null, reportPageSizeDefault, 0, null, reportPageSizeId, "Report page size", reportPageSizeDescription, null));
 		args.add(new Arg<>(this::getReportPaginationSize, null, reportPaginationSizeDefault, 0, null, reportPaginationSizeId, "Report pagination size", reportPaginationSizeDescription, null));
 		args.add(new Arg<>(this::getThreads, null, threadsDefault, 0, null, threadsId, "Number of threads", threadsDescription, null));
@@ -109,6 +116,9 @@ public class CliArgs extends BasicArgs {
 	}
 	public String getEdamFilename() {
 		return new File(edam).getName();
+	}
+	public void setEdam(String edam) {
+		this.edam = edam;
 	}
 
 	public String getQuery() {
@@ -121,9 +131,15 @@ public class CliArgs extends BasicArgs {
 			return new File(query).getName();
 		}
 	}
+	public void setQuery(String query) {
+		this.query = query;
+	}
 
 	public QueryType getType() {
 		return type;
+	}
+	public void setType(QueryType type) {
+		this.type = type;
 	}
 
 	public String getOutput() {
@@ -132,12 +148,18 @@ public class CliArgs extends BasicArgs {
 	public String getOutputFilename() {
 		return new File(output).getName();
 	}
+	public void setOutput(String output) {
+		this.output = output;
+	}
 
 	public String getReport() {
 		return report;
 	}
 	public String getReportFilename() {
 		return new File(report).getName();
+	}
+	public void setReport(String report) {
+		this.report = report;
 	}
 
 	public String getJson() {
@@ -146,17 +168,39 @@ public class CliArgs extends BasicArgs {
 	public String getJsonFilename() {
 		return new File(json).getName();
 	}
+	public void setJson(String json) {
+		this.json = json;
+	}
+
+	public String getBiotools() {
+		return biotools;
+	}
+	public String getBiotoolsFilename() {
+		return new File(biotools).getName();
+	}
+	public void setBiotools(String biotools) {
+		this.biotools = biotools;
+	}
 
 	public Integer getReportPageSize() {
 		return reportPageSize;
+	}
+	public void setReportPageSize(Integer reportPageSize) {
+		this.reportPageSize = reportPageSize;
 	}
 
 	public Integer getReportPaginationSize() {
 		return reportPaginationSize;
 	}
+	public void setReportPaginationSize(Integer reportPaginationSize) {
+		this.reportPaginationSize = reportPaginationSize;
+	}
 
 	public Integer getThreads() {
 		return threads;
+	}
+	public void setThreads(Integer threads) {
+		this.threads = threads;
 	}
 
 	public CoreArgs getCoreArgs() {

@@ -20,10 +20,12 @@
 package org.edamontology.edammap.core.output;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -48,7 +50,13 @@ import org.edamontology.edammap.core.benchmarking.Results;
 import org.edamontology.edammap.core.edam.Branch;
 import org.edamontology.edammap.core.edam.Concept;
 import org.edamontology.edammap.core.edam.EdamUri;
+import org.edamontology.edammap.core.input.Input;
+import org.edamontology.edammap.core.input.json.Biotools;
+import org.edamontology.edammap.core.input.json.Edam;
+import org.edamontology.edammap.core.input.json.Function;
+import org.edamontology.edammap.core.input.json.InputOutput;
 import org.edamontology.edammap.core.input.json.Tool;
+import org.edamontology.edammap.core.input.json.ToolInput;
 import org.edamontology.edammap.core.mapping.ConceptMatch;
 import org.edamontology.edammap.core.mapping.ConceptMatchType;
 import org.edamontology.edammap.core.mapping.Match;
@@ -67,6 +75,10 @@ public class Json {
 
 	public static final String VERSION_ID = "version";
 	public static final String TYPE_ID = "type";
+
+	// TODO merge with biotoolsSchema restrictions in Pub2Tools
+	private static final int FUNCTION_NOTE_MIN = 10;
+	private static final int FUNCTION_NOTE_MAX = 1000;
 
 	private static void parentsChildren(Map<EdamUri, Concept> concepts, List<EdamUri> pc, String field, JsonGenerator generator) throws IOException {
 		if (!pc.isEmpty()) {
@@ -532,7 +544,7 @@ public class Json {
 		return writer.toString();
 	}
 
-	public static void outputBiotools(List<Tool> tools, Writer writer) throws IOException {
+	public static void outputBiotools(Writer writer, List<Tool> tools) throws IOException {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
 		mapper.enable(SerializationFeature.CLOSE_CLOSEABLE);
@@ -540,5 +552,207 @@ public class Json {
 		jsonBiotools.setCount(tools.size());
 		jsonBiotools.setList(tools);
 		mapper.writeValue(writer, jsonBiotools);
+	}
+
+	private static boolean existingAnnotation(List<Edam> annotations, EdamUri edamUri) {
+		for (Edam annotation : annotations) {
+			if (annotation.getUri().equals(edamUri.getUri())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static Edam getEdam(EdamUri edamUri, Map<EdamUri, Concept> concepts) {
+		Edam edam = new Edam();
+		edam.setUri(edamUri.toString());
+		edam.setTerm(concepts.get(edamUri).getLabel());
+		return edam;
+	}
+
+	private static String getEdamString(EdamUri edamUri, Map<EdamUri, Concept> concepts) {
+		return edamUri.toString() + " (" + concepts.get(edamUri).getLabel() + ")";
+	}
+
+	public static void outputBiotools(CoreArgs args, String queryPath, Path biotoolsPath, Map<EdamUri, Concept> concepts, Results results) throws IOException {
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.enable(SerializationFeature.INDENT_OUTPUT);
+		mapper.enable(SerializationFeature.CLOSE_CLOSEABLE);
+
+		Biotools biotools = null;
+		try (InputStream is = Input.newInputStream(queryPath, true, args.getFetcherArgs().getTimeout(), args.getFetcherArgs().getPrivateArgs().getUserAgent())) {
+			biotools = mapper.readValue(is, Biotools.class);
+		}
+
+		if (biotools.getList().size() != results.getMappings().size()) {
+			throw new RuntimeException("Number of results (" + results.getMappings().size() + ") does not correspond to number of tools (" + biotools.getList().size() + ") from " + queryPath);
+		}
+
+		for (int i = 0; i < biotools.getList().size(); ++i) {
+			ToolInput tool = biotools.getList().get(i);
+			MappingTest mapping = results.getMappings().get(i);
+			if (tool.getBiotoolsID() != null && !tool.getBiotoolsID().equals(mapping.getId())) {
+				throw new RuntimeException("Tool ID from " + queryPath + " (" + tool.getBiotoolsID() + ") does not correspond to ID from results (" + mapping.getId() + ")");
+			}
+			if (!tool.getName().equals(mapping.getName())) {
+				throw new RuntimeException("Tool name from " + queryPath + " (" + tool.getName() + ") does not correspond to name from results (" + mapping.getName() + ")");
+			}
+		}
+
+		for (int i = 0; i < biotools.getList().size(); ++i) {
+			ToolInput tool = biotools.getList().get(i);
+			MappingTest mapping = results.getMappings().get(i);
+
+			if (args.getMapperArgs().getBranches().contains(Branch.topic)) {
+				List<Edam> topic = tool.getTopic();
+				for (MatchTest match : mapping.getMatches(Branch.topic)) {
+					EdamUri edamUri = match.getMatch().getEdamUri();
+					if (!existingAnnotation(topic, edamUri)) {
+						topic.add(getEdam(edamUri, concepts));
+					}
+				}
+			}
+
+			if (args.getMapperArgs().getBranches().contains(Branch.operation)) {
+				Function newFunction = new Function();
+
+				for (MatchTest match : mapping.getMatches(Branch.operation)) {
+					EdamUri edamUri = match.getMatch().getEdamUri();
+					boolean existing = false;
+					for (Function function : tool.getFunction()) {
+						if (existingAnnotation(function.getOperation(), edamUri)) {
+							existing = true;
+							break;
+						}
+					}
+					if (!existing) {
+						newFunction.getOperation().add(getEdam(edamUri, concepts));
+					}
+				}
+
+				if (!newFunction.getOperation().isEmpty()) {
+					tool.getFunction().add(newFunction);
+				}
+
+				if (!tool.getFunction().isEmpty()) {
+					Function lastFunction = tool.getFunction().get(tool.getFunction().size() - 1);
+
+					String note = lastFunction.getNote();
+					if (note == null) {
+						note = "";
+					}
+					List<String> data = new ArrayList<>();
+					List<String> format = new ArrayList<>();
+
+					if (args.getMapperArgs().getBranches().contains(Branch.data)) {
+						for (MatchTest match : mapping.getMatches(Branch.data)) {
+							EdamUri edamUri = match.getMatch().getEdamUri();
+							boolean existing = false;
+							for (Function function : tool.getFunction()) {
+								for (InputOutput input : function.getInput()) {
+									if (input.getData().getUri().equals(edamUri.getUri())) {
+										existing = true;
+										break;
+									}
+								}
+								if (existing) {
+									break;
+								}
+								for (InputOutput output : function.getOutput()) {
+									if (output.getData().getUri().equals(edamUri.getUri())) {
+										existing = true;
+										break;
+									}
+								}
+								if (existing) {
+									break;
+								}
+							}
+							if (!existing) {
+								data.add(getEdamString(edamUri, concepts));
+							}
+						}
+					}
+
+					if (args.getMapperArgs().getBranches().contains(Branch.format)) {
+						for (MatchTest match : mapping.getMatches(Branch.format)) {
+							EdamUri edamUri = match.getMatch().getEdamUri();
+							boolean existing = false;
+							for (Function function : tool.getFunction()) {
+								for (InputOutput input : function.getInput()) {
+									if (existingAnnotation(input.getFormat(), edamUri)) {
+										existing = true;
+										break;
+									}
+								}
+								if (existing) {
+									break;
+								}
+								for (InputOutput output : function.getOutput()) {
+									if (existingAnnotation(output.getFormat(), edamUri)) {
+										existing = true;
+										break;
+									}
+								}
+								if (existing) {
+									break;
+								}
+							}
+							if (!existing) {
+								format.add(getEdamString(edamUri, concepts));
+							}
+						}
+					}
+
+					boolean exceeded = false;
+					if (note.length() + (note.isEmpty() ? 0 : 3) + 3 > FUNCTION_NOTE_MAX) {
+						exceeded = true;
+					}
+					if (!exceeded) {
+						for (String d : data) {
+							if (note.length() + (note.isEmpty() ? 0 : 3) + d.length() + 3 + 3 > FUNCTION_NOTE_MAX) {
+								if (!note.isEmpty()) {
+									note += " | ";
+								}
+								note += "...";
+								exceeded = true;
+								break;
+							} else {
+								if (!note.isEmpty()) {
+									note += " | ";
+								}
+								note += d;
+							}
+						}
+					}
+					if (!exceeded) {
+						for (String f : format) {
+							if (note.length() + (note.isEmpty() ? 0 : 3) + f.length() + 3 + 3 > FUNCTION_NOTE_MAX) {
+								if (!note.isEmpty()) {
+									note += " | ";
+								}
+								note += "...";
+								exceeded = true;
+								break;
+							} else {
+								if (!note.isEmpty()) {
+									note += " | ";
+								}
+								note += f;
+							}
+						}
+					}
+
+					if (note.length() >= FUNCTION_NOTE_MIN) {
+						if (note.length() > FUNCTION_NOTE_MAX) {
+							note = note.substring(0, FUNCTION_NOTE_MAX);
+						}
+						lastFunction.setNote(note);
+					}
+				}
+			}
+		}
+
+		mapper.writeValue(biotoolsPath.toFile(), biotools);
 	}
 }

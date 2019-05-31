@@ -207,7 +207,7 @@ public final class Server {
 	public static void main(String[] argv) throws IOException, ReflectiveOperationException {
 		version = new Version(Server.class);
 
-		args = BasicArgs.parseArgs(argv, ServerArgs.class, version);
+		args = BasicArgs.parseArgs(argv, ServerArgs.class, version, false);
 
 		// logger must be called only after configuration changes have been made in BasicArgs.parseArgs()
 		// otherwise invalid.log will be created if arg --log is null

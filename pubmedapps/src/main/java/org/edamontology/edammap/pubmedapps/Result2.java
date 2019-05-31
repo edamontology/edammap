@@ -23,15 +23,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.edamontology.pubfetcher.core.db.publication.CorrespAuthor;
-import org.edamontology.pubfetcher.core.db.publication.PublicationIds;
 
-public class Result implements Comparable<Result> {
+public class Result2 implements Comparable<Result2> {
 
-	private List<PublicationIds> publicationIds = new ArrayList<>();
+	private List<PubIds> pubIds = new ArrayList<>();
 
-	private List<PublicationIds> sameSuggestions = new ArrayList<>();
+	private List<PubIds> sameSuggestions = new ArrayList<>();
 
-	private List<Suggestion> suggestions = new ArrayList<>();
+	private List<Suggestion2> suggestions = new ArrayList<>();
 
 	private List<List<String>> leftoverLinksAbstract = new ArrayList<>();
 
@@ -75,63 +74,62 @@ public class Result implements Comparable<Result> {
 
 	private List<List<CorrespAuthor>> correspAuthor = new ArrayList<>();
 
-	public Result(PublicationIds publicationIds) {
-		this.publicationIds.add(publicationIds);
-	}
-
-	private boolean hasSuggestionLink(String link) {
-		for (Suggestion suggestion : suggestions) {
-			if (suggestion.getLinksAbstract().contains(link) || suggestion.getLinksFulltext().contains(link)) {
-				return true;
-			}
+	public Result2(Result1 result1) {
+		pubIds.add(result1.getPubIds());
+		for (Suggestion1 suggestion : result1.getSuggestions()) {
+			suggestions.add(new Suggestion2(suggestion));
 		}
-		return false;
+		leftoverLinksAbstract.add(result1.getLeftoverLinksAbstract());
+		leftoverLinksFulltext.add(result1.getLeftoverLinksFulltext());
+		title.add(result1.getTitle());
+		toolTitleOthers.add(result1.getToolTitleOthers());
+		toolTitleExtractedOriginal.add(result1.getToolTitleExtractedOriginal());
+		toolTitle.add(result1.getToolTitle());
+		toolTitlePruned.add(result1.getToolTitlePruned());
+		toolTitleAcronym.add(result1.getToolTitleAcronym());
+		abstractSentences.add(result1.getAbstractSentences());
+		oa.add(result1.isOa());
+		journalTitle.add(result1.getJournalTitle());
+		pubDate.add(result1.getPubDate());
+		pubDateHuman.add(result1.getPubDateHuman());
+		citationsCount.add(result1.getCitationsCount());
+		citationsTimestamp.add(result1.getCitationsTimestamp());
+		citationsTimestampHuman.add(result1.getCitationsTimestampHuman());
+		correspAuthor.add(result1.getCorrespAuthor());
 	}
 
-	public List<PublicationIds> getPublicationIds() {
-		return publicationIds;
+	public List<PubIds> getPubIds() {
+		return pubIds;
 	}
-	public void addPublicationIds(PublicationIds publicationIds) {
-		this.publicationIds.add(publicationIds);
+	public void addPubIds(PubIds pubIds) {
+		this.pubIds.add(pubIds);
 	}
 
-	public List<PublicationIds> getSameSuggestions() {
+	public List<PubIds> getSameSuggestions() {
 		return sameSuggestions;
 	}
-	public void addSameSuggestion(PublicationIds sameSuggestion) {
+	public void addSameSuggestion(PubIds sameSuggestion) {
 		sameSuggestions.add(sameSuggestion);
 	}
 
-	public List<Suggestion> getSuggestions() {
+	public List<Suggestion2> getSuggestions() {
 		return suggestions;
 	}
-	public void addSuggestion(Suggestion suggestion) {
+	public void addSuggestion(Suggestion2 suggestion) {
 		suggestions.add(suggestion);
 	}
 
 	public List<List<String>> getLeftoverLinksAbstract() {
 		return leftoverLinksAbstract;
 	}
-	public void addLeftoverLinksAbstract(List<String> linksAbstract) {
-		List<String> leftoverLinksAbstract = new ArrayList<>();
-		for (String link : linksAbstract) {
-			if (!hasSuggestionLink(link)) {
-				leftoverLinksAbstract.add(link);
-			}
-		}
+	public void addLeftoverLinksAbstract(List<String> leftoverLinksAbstract) {
 		this.leftoverLinksAbstract.add(leftoverLinksAbstract);
 	}
 
 	public List<List<String>> getLeftoverLinksFulltext() {
 		return leftoverLinksFulltext;
 	}
-	public void addLeftoverLinksFulltext(List<String> linksFulltext) {
-		List<String> leftoverLinksFulltext = new ArrayList<>();
-		for (String link : linksFulltext) {
-			if (!hasSuggestionLink(link)) {
-				leftoverLinksFulltext.add(link);
-			}
-		}
+	public void addLeftoverLinksFulltext(List<String> leftoverLinksFulltext) {
 		this.leftoverLinksFulltext.add(leftoverLinksFulltext);
 	}
 
@@ -267,7 +265,7 @@ public class Result implements Comparable<Result> {
 	}
 
 	@Override
-	public int compareTo(Result o) {
+	public int compareTo(Result2 o) {
 		if (o == null) return -1;
 		if ((o.suggestions.isEmpty() || o.suggestions.get(0) == null) && (this.suggestions.isEmpty() || this.suggestions.get(0) == null)) return 0;
 		if (o.suggestions.isEmpty() || o.suggestions.get(0) == null) return -1;

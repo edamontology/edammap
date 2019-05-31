@@ -245,7 +245,7 @@ public class Resource {
 		Output output = new Output(
 			txtOutput != null ? uuidDirPrefix + txtOutput : null,
 			htmlOutput != null ? uuidDirPrefix + htmlOutput : null,
-			jsonOutput != null ? uuidDirPrefix + jsonOutput : null, true);
+			jsonOutput != null ? uuidDirPrefix + jsonOutput : null, null, QueryType.server, true);
 
 		PreProcessor preProcessor = new PreProcessor(coreArgs.getPreProcessorArgs(), Server.stopwordsAll.get(coreArgs.getPreProcessorArgs().getStopwords()));
 
@@ -314,7 +314,7 @@ public class Resource {
 
 		logger.info("Outputting results");
 
-		output.output(coreArgs, Server.getArgsMain(false, txt, html, json), jsonFields, QueryType.server, 1, 1,
+		output.output(coreArgs, Server.getArgsMain(false, txt, html, json), null, jsonFields, 1, 1,
 			Server.concepts, queries, webpages, docs, publications, results, start, stop, Server.version, jsonVersion);
 
 		String jsonString = null;

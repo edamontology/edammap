@@ -29,7 +29,7 @@ public class Edam {
 
 	public void check(ToolInput tool, int i, String index) throws ParseException {
 		if ((uri == null || uri.equals("")) && (term == null || term.equals(""))) {
-			throw new ParseException("EDAM not present for " + tool.getBiotoolsID() + "! (record " + index + ")", i);
+			throw new ParseException("EDAM not present for " + tool.getName() + "! (record " + index + ")", i);
 		}
 	}
 

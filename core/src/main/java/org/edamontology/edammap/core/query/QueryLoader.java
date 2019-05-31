@@ -510,7 +510,7 @@ public class QueryLoader {
 		}
 
 		return new Query(
-			tool.getBiotoolsID().trim(),
+			tool.getBiotoolsID() != null ? tool.getBiotoolsID().trim() : null,
 			tool.getName().trim(),
 			null,
 			tool.getDescription().trim(),

@@ -492,7 +492,7 @@ public class Processor {
 			Query query = queries.get(i);
 
 			if (progress) {
-				System.err.print(PubFetcher.progress(i + 1, queries.size(), start) + "\r");
+				System.err.print(PubFetcher.progress(i + 1, queries.size(), start) + "  \r");
 			}
 
 			QueryProcessed processedQuery = getProcessedQuery(query, type, preProcessor, queryIdf, fetcherArgs, null);

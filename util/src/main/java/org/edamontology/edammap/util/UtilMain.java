@@ -109,7 +109,7 @@ public final class UtilMain {
 	public static void main(String[] argv) throws IOException, ReflectiveOperationException {
 		Version version = new Version(UtilMain.class);
 
-		UtilArgs args = BasicArgs.parseArgs(argv, UtilArgs.class, version);
+		UtilArgs args = BasicArgs.parseArgs(argv, UtilArgs.class, version, false);
 
 		// logger must be called only after configuration changes have been made in BasicArgs.parseArgs()
 		// otherwise invalid.log will be created if arg --log is null
@@ -121,6 +121,7 @@ public final class UtilMain {
 			run(args, version, argv);
 		} catch (Throwable e) {
 			logger.error("Exception!", e);
+			System.exit(1);
 		}
 	}
 }

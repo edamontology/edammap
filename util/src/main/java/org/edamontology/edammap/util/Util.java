@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016, 2017, 2018 Erik Jaaniso
+ * Copyright © 2016, 2017, 2018, 2019 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -21,7 +21,6 @@ package org.edamontology.edammap.util;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -31,23 +30,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import org.edamontology.pubfetcher.core.common.Arg;
 import org.edamontology.pubfetcher.core.common.Args;
 import org.edamontology.pubfetcher.core.common.BasicArgs;
-import org.edamontology.pubfetcher.core.common.FetcherArgs;
 import org.edamontology.pubfetcher.core.common.PubFetcher;
 import org.edamontology.pubfetcher.core.common.Version;
 
 import org.edamontology.edammap.cli.CliArgs;
 import org.edamontology.edammap.core.idf.Idf;
-import org.edamontology.edammap.core.input.Input;
-import org.edamontology.edammap.core.input.json.Biotools;
+import org.edamontology.edammap.core.input.BiotoolsFull;
 import org.edamontology.edammap.core.output.Report;
 import org.edamontology.edammap.core.preprocessing.PreProcessor;
 import org.edamontology.edammap.core.processing.Processor;
@@ -60,7 +54,7 @@ public final class Util {
 	private static final Logger logger = LogManager.getLogger();
 
 	private static void makeIdf(String queryPath, String database, String idfPath, UtilArgs args, boolean stemming) throws IOException, ParseException {
-		logger.info("Make query IDF from file {} of type {} to {}{}", queryPath, args.makeIdfType, idfPath, database != null ? " using database " + database : "");
+		logger.info("Make {}stemmed query IDF from file {} of type {} to {}{}", stemming ? "" : "not ", queryPath, args.makeIdfType, idfPath, database != null ? " using database " + database : "");
 
 		ProcessorArgs processorArgs = new ProcessorArgs();
 		processorArgs.setFetching(false);
@@ -88,43 +82,6 @@ public final class Util {
 		for (String termProcessed : new PreProcessor(stemming).process(String.join(" ", terms))) {
 			System.out.println(termProcessed + "\t" + idf.getIdf(termProcessed));
 		}
-	}
-
-	private static void biotoolsFull(String outputPath, FetcherArgs fetcherArgs, boolean dev) throws IOException {
-		logger.info("Make full {}bio.tools JSON to {}", dev ? "dev." : "", outputPath);
-		String api = "https://" + (dev ? "dev." : "") + "bio.tools/api/tool";
-
-		Path output = PubFetcher.outputPath(outputPath);
-
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.enable(SerializationFeature.INDENT_OUTPUT);
-		mapper.enable(SerializationFeature.CLOSE_CLOSEABLE);
-
-		Biotools biotoolsFull = new Biotools();
-		int count = 0;
-
-		String next = "?page=1";
-		while (next != null) {
-			try (InputStream is = Input.newInputStream(api + next + "&format=json", false, fetcherArgs.getTimeout(), fetcherArgs.getPrivateArgs().getUserAgent())) {
-				Biotools biotools = mapper.readValue(is, Biotools.class);
-
-				biotoolsFull.addTools(biotools.getList());
-				biotoolsFull.setCount(biotools.getCount());
-				count += biotools.getList().size();
-
-				next = biotools.getNext();
-			} catch (Exception e) {
-				logger.error("Exception!", e);
-				break;
-			}
-		}
-
-		mapper.writeValue(output.toFile(), biotoolsFull);
-
-		if (count != biotoolsFull.getCount()) {
-			logger.error("Got {} entries instead of advertised {}", count, biotoolsFull.getCount());
-		}
-		logger.info("Made bio.tools JSON with {} entries", count);
 	}
 
 	private static void makeServerFiles(String outputPath, Version version) throws IOException {
@@ -289,10 +246,10 @@ public final class Util {
 		}
 
 		if (args.biotoolsFull != null) {
-			biotoolsFull(args.biotoolsFull, args.fetcherArgs, false);
+			BiotoolsFull.get(args.biotoolsFull, args.fetcherArgs, false, false);
 		}
 		if (args.biotoolsDevFull != null) {
-			biotoolsFull(args.biotoolsDevFull, args.fetcherArgs, true);
+			BiotoolsFull.get(args.biotoolsDevFull, args.fetcherArgs, true, false);
 		}
 
 		if (args.makeServerFiles != null) {

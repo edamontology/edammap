@@ -28,14 +28,30 @@ import org.edamontology.edammap.core.edam.Branch;
 
 public class MappingTest {
 
+	final String id;
+
+	final String name;
+
 	final Map<Branch, List<MatchTest>> matches;
 
-	public MappingTest() {
+	public MappingTest(String id, String name) {
+		this.id = id;
+
+		this.name = name;
+
 		matches = new EnumMap<>(Branch.class);
 
 		for (Branch branch : Branch.values()) {
 			matches.put(branch, new ArrayList<MatchTest>());
 		}
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public String getName() {
+		return name;
 	}
 
 	public List<MatchTest> getMatches(Branch branch) {

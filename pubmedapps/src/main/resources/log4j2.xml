@@ -10,7 +10,9 @@
   </Appenders>
   <Loggers>
     <Root level="info">
-      <AppenderRef ref="Console" level="info"/>
+      <AppenderRef ref="Console" level="info">
+        <MarkerFilter marker="MAIN" onMatch="ACCEPT" onMismatch="DENY"/>
+      </AppenderRef>
     </Root>
     <Logger name="org.edamontology" level="debug">
       <AppenderRef ref="Log"/>

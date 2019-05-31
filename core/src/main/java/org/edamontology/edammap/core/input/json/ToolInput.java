@@ -27,13 +27,14 @@ public class ToolInput extends Tool implements InputType {
 
 	private String biotoolsID;
 
-	private int homepage_status;
+	private Integer homepage_status;
 
 	@Override
 	public void check(int i) throws ParseException {
 		// We are not doing any thorough validation, just checking that the required attributes are present
 		// TODO add length (accounting for potential whitespace collapse) and regex validations, possibly in a separate class/package
-		if (biotoolsID == null || biotoolsID.equals("")) {
+		// if homepage_status is not null, then checked bio.tools content is probably from https://bio.tools, where biotoolsID must be present
+		if (homepage_status != null && (biotoolsID == null || biotoolsID.equals(""))) {
 			parseException("biotoolsID", i);
 		}
 		if (name == null || name.equals("")) {
@@ -84,10 +85,10 @@ public class ToolInput extends Tool implements InputType {
 
 	@Override
 	public void parseException(String attribute, int i, String index) throws ParseException {
-		if (biotoolsID == null || biotoolsID.equals("")) {
+		if (name == null || name.equals("")) {
 			InputType.super.parseException(attribute, i, index);
 		} else {
-			throw new ParseException("Attribute \"" + attribute + "\" missing or empty for " + biotoolsID + "! (record " + index + ")", i);
+			throw new ParseException("Attribute \"" + attribute + "\" missing or empty for " + name + "! (record " + index + ")", i);
 		}
 	}
 
@@ -98,10 +99,10 @@ public class ToolInput extends Tool implements InputType {
 		this.biotoolsID = id;
 	}
 
-	public int getHomepage_status() {
+	public Integer getHomepage_status() {
 		return homepage_status;
 	}
-	public void setHomepage_status(int homepage_status) {
+	public void setHomepage_status(Integer homepage_status) {
 		this.homepage_status = homepage_status;
 	}
 }

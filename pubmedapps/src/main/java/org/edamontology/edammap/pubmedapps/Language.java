@@ -41,7 +41,7 @@ public class Language {
 		private List<String> parts = new ArrayList<>();
 
 		public LanguageSearch(String languageSearch) {
-			languageSearch = License.WHITESPACE.matcher(languageSearch).replaceAll(" ");
+			languageSearch = Common.WHITESPACE.matcher(languageSearch).replaceAll(" ");
 			languageSearch = CPP.matcher(languageSearch).replaceAll("$1C++$2");
 			languageSearch = SQL.matcher(languageSearch).replaceAll("$1SQL$3");
 			languageSearch = HYPHEN_CDR.matcher(languageSearch).replaceAll("$1$2");

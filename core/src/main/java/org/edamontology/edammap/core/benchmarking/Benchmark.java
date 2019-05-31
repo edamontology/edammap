@@ -39,10 +39,10 @@ public class Benchmark {
 		}
 
 		for (int i = 0; i < queries.size(); ++i) {
-			MappingTest mappingTest = new MappingTest();
-
 			Query query = queries.get(i);
 			Mapping mapping = mappings.get(i);
+
+			MappingTest mappingTest = new MappingTest(query.getId(), query.getName());
 
 			for (Branch branch : mapping.getBranches()) {
 

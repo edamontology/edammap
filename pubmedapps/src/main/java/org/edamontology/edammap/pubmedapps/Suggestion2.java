@@ -19,7 +19,6 @@
 
 package org.edamontology.edammap.pubmedapps;
 
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,9 +26,8 @@ import java.util.Set;
 import org.edamontology.edammap.core.input.json.DocumentationType;
 import org.edamontology.edammap.core.input.json.DownloadType;
 import org.edamontology.edammap.core.input.json.LinkType;
-import org.edamontology.pubfetcher.core.db.publication.PublicationIds;
 
-public class Suggestion implements Comparable<Suggestion> {
+public class Suggestion2 extends Suggestion1 {
 
 	private static final double SCORE_MIN = 1000;
 
@@ -37,35 +35,23 @@ public class Suggestion implements Comparable<Suggestion> {
 
 	private static final double SCORE2_LOW_CONFIDENCE = 1750;
 
-	private double score = 0;
-
 	private double score2 = -1;
 
 	private Double[] score2Parts = { 0d, 0d, 0d, 0d };
-
-	private String original = "";
-
-	private String extracted = "";
-
-	private String processed = "";
 
 	private List<Integer> publicationAndNameExisting = null;
 
 	private List<Integer> nameExistingSomePublicationDifferent = null;
 
-	private List<Set<PublicationIds>> nameExistingSomePublicationDifferentPublicationIds = null;
+	private List<Set<PubIds>> nameExistingSomePublicationDifferentPubIds = null;
 
 	private List<Integer> somePublicationExistingNameDifferent = null;
 
-	private List<Set<PublicationIds>> somePublicationExistingNameDifferentPublicationIds = null;
+	private List<Set<PubIds>> somePublicationExistingNameDifferentPubIds = null;
 
 	private List<Integer> nameExistingPublicationDifferent = null;
 
-	private List<Set<PublicationIds>> nameExistingPublicationDifferentPublicationIds = null;
-
-	private List<String> linksAbstract = new ArrayList<>();
-
-	private List<String> linksFulltext = new ArrayList<>();
+	private List<Set<PubIds>> nameExistingPublicationDifferentPubIds = null;
 
 	private String homepage = "";
 
@@ -81,7 +67,15 @@ public class Suggestion implements Comparable<Suggestion> {
 
 	private Set<BiotoolsLink<?>> brokenLinks = new LinkedHashSet<>();
 
-	private boolean fromAbstractLink = false;
+	public Suggestion2(Suggestion1 suggestion1) {
+		setScore(suggestion1.getScore());
+		setOriginal(suggestion1.getOriginal());
+		setExtracted(suggestion1.getExtracted());
+		setProcessed(suggestion1.getProcessed());
+		setLinksAbstract(suggestion1.getLinksAbstract());
+		setLinksFulltext(suggestion1.getLinksFulltext());
+		setFromAbstractLink(suggestion1.isFromAbstractLink());
+	}
 
 	public boolean calculateScore2() {
 		return score < SCORE_MIN;
@@ -95,13 +89,6 @@ public class Suggestion implements Comparable<Suggestion> {
 		return score < SCORE_MIN && score2 >= SCORE2_MIN && score2 <= SCORE2_LOW_CONFIDENCE;
 	}
 
-	public double getScore() {
-		return score;
-	}
-	public void setScore(double score) {
-		this.score = score;
-	}
-
 	public double getScore2() {
 		return score2;
 	}
@@ -111,27 +98,6 @@ public class Suggestion implements Comparable<Suggestion> {
 
 	public Double[] getScore2Parts() {
 		return score2Parts;
-	}
-
-	public String getOriginal() {
-		return original;
-	}
-	public void setOriginal(String original) {
-		this.original = original;
-	}
-
-	public String getExtracted() {
-		return extracted;
-	}
-	public void setExtracted(String extracted) {
-		this.extracted = extracted;
-	}
-
-	public String getProcessed() {
-		return processed;
-	}
-	public void setProcessed(String processed) {
-		this.processed = processed;
 	}
 
 	public List<Integer> getPublicationAndNameExisting() {
@@ -148,11 +114,11 @@ public class Suggestion implements Comparable<Suggestion> {
 		this.nameExistingSomePublicationDifferent = nameExistingSomePublicationDifferent;
 	}
 
-	public List<Set<PublicationIds>> getNameExistingSomePublicationDifferentPublicationIds() {
-		return nameExistingSomePublicationDifferentPublicationIds;
+	public List<Set<PubIds>> getNameExistingSomePublicationDifferentPubIds() {
+		return nameExistingSomePublicationDifferentPubIds;
 	}
-	public void setNameExistingSomePublicationDifferentPublicationIds(List<Set<PublicationIds>> nameExistingSomePublicationDifferentPublicationIds) {
-		this.nameExistingSomePublicationDifferentPublicationIds = nameExistingSomePublicationDifferentPublicationIds;
+	public void setNameExistingSomePublicationDifferentPubIds(List<Set<PubIds>> nameExistingSomePublicationDifferentPubIds) {
+		this.nameExistingSomePublicationDifferentPubIds = nameExistingSomePublicationDifferentPubIds;
 	}
 
 	public List<Integer> getSomePublicationExistingNameDifferent() {
@@ -162,11 +128,11 @@ public class Suggestion implements Comparable<Suggestion> {
 		this.somePublicationExistingNameDifferent = somePublicationExistingNameDifferent;
 	}
 
-	public List<Set<PublicationIds>> getSomePublicationExistingNameDifferentPublicationIds() {
-		return somePublicationExistingNameDifferentPublicationIds;
+	public List<Set<PubIds>> getSomePublicationExistingNameDifferentPubIds() {
+		return somePublicationExistingNameDifferentPubIds;
 	}
-	public void setSomePublicationExistingNameDifferentPublicationIds(List<Set<PublicationIds>> somePublicationExistingNameDifferentPublicationIds) {
-		this.somePublicationExistingNameDifferentPublicationIds = somePublicationExistingNameDifferentPublicationIds;
+	public void setSomePublicationExistingNameDifferentPubIds(List<Set<PubIds>> somePublicationExistingNameDifferentPubIds) {
+		this.somePublicationExistingNameDifferentPubIds = somePublicationExistingNameDifferentPubIds;
 	}
 
 	public List<Integer> getNameExistingPublicationDifferent() {
@@ -176,37 +142,11 @@ public class Suggestion implements Comparable<Suggestion> {
 		this.nameExistingPublicationDifferent = nameExistingPublicationDifferent;
 	}
 
-	public List<Set<PublicationIds>> getNameExistingPublicationDifferentPublicationIds() {
-		return nameExistingPublicationDifferentPublicationIds;
+	public List<Set<PubIds>> getNameExistingPublicationDifferentPubIds() {
+		return nameExistingPublicationDifferentPubIds;
 	}
-	public void setNameExistingPublicationDifferentPublicationIds(List<Set<PublicationIds>> nameExistingPublicationDifferentPublicationIds) {
-		this.nameExistingPublicationDifferentPublicationIds = nameExistingPublicationDifferentPublicationIds;
-	}
-
-	public List<String> getLinksAbstract() {
-		return linksAbstract;
-	}
-	public void setLinksAbstract(List<String> linksAbstract) {
-		this.linksAbstract = linksAbstract;
-	}
-	public void addLinkAbstract(String linkAbstract) {
-		linksAbstract.add(linkAbstract);
-	}
-	public void addLinksAbstract(List<String> linksAbstract) {
-		this.linksAbstract.addAll(linksAbstract);
-	}
-
-	public List<String> getLinksFulltext() {
-		return linksFulltext;
-	}
-	public void setLinksFulltext(List<String> linksFulltext) {
-		this.linksFulltext = linksFulltext;
-	}
-	public void addLinkFulltext(String linkFulltext) {
-		linksFulltext.add(linkFulltext);
-	}
-	public void addLinksFulltext(List<String> linksFulltext) {
-		this.linksFulltext.addAll(linksFulltext);
+	public void setNameExistingPublicationDifferentPubIds(List<Set<PubIds>> nameExistingPublicationDifferentPubIds) {
+		this.nameExistingPublicationDifferentPubIds = nameExistingPublicationDifferentPubIds;
 	}
 
 	public String getHomepage() {
@@ -252,7 +192,7 @@ public class Suggestion implements Comparable<Suggestion> {
 	}
 
 	public void removeHomepageFromLinks() {
-		String homepageTrimmed = PubMedApps.trimUrl(homepage);
+		String homepageTrimmed = Common.trimUrl(homepage);
 		linkLinks.removeIf(l -> l.getUrlTrimmed().equals(homepageTrimmed));
 		downloadLinks.removeIf(l -> l.getUrlTrimmed().equals(homepageTrimmed));
 		documentationLinks.removeIf(l -> l.getUrlTrimmed().equals(homepageTrimmed));
@@ -262,19 +202,17 @@ public class Suggestion implements Comparable<Suggestion> {
 		return brokenLinks;
 	}
 
-	public boolean isFromAbstractLink() {
-		return fromAbstractLink;
-	}
-	public void setFromAbstractLink(boolean fromAbstractLink) {
-		this.fromAbstractLink = fromAbstractLink;
-	}
-
 	@Override
-	public int compareTo(Suggestion o) {
+	public int compareTo(Suggestion1 o) {
 		if (o == null) return -1;
-		if (this.score < SCORE_MIN && o.score < SCORE_MIN) {
-			if (this.score2 > o.score2) return -1;
-			if (this.score2 < o.score2) return 1;
+		if (o instanceof Suggestion2) {
+			if (this.score < SCORE_MIN && o.score < SCORE_MIN) {
+				if (this.score2 > ((Suggestion2) o).score2) return -1;
+				if (this.score2 < ((Suggestion2) o).score2) return 1;
+			} else {
+				if (this.score > o.score) return -1;
+				if (this.score < o.score) return 1;
+			}
 		} else {
 			if (this.score > o.score) return -1;
 			if (this.score < o.score) return 1;

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016, 2017, 2018 Erik Jaaniso
+ * Copyright © 2016, 2017, 2018, 2019 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -45,24 +45,39 @@ public class Output {
 
 	private final Path json;
 
+	private final Path biotools;
+
+	private final QueryType type;
+
 	private final boolean existingDirectory;
 
-	public Output(String txt, String report, String json, boolean existingDirectory) throws IOException {
+	public Output(String txt, String report, String json, String biotools, QueryType type, boolean existingDirectory) throws IOException {
 		this.txt = (txt == null || txt.isEmpty()) ? null : PubFetcher.outputPath(txt);
 
 		this.report = (report == null || report.isEmpty()) ? null : PubFetcher.outputPath(report, true, existingDirectory);
 
 		this.json = (json == null || json.isEmpty()) ? null : PubFetcher.outputPath(json);
 
+		if (biotools != null && !biotools.isEmpty() && type != QueryType.biotools) {
+			throw new IllegalArgumentException("bio.tools JSON output is only available for QueryType " + QueryType.biotools + "!");
+		}
+
+		this.biotools = (biotools == null || biotools.isEmpty()) ? null : PubFetcher.outputPath(biotools);
+
+		this.type = type;
+
 		this.existingDirectory = existingDirectory;
 	}
 
-	public void output(CoreArgs args, List<ArgMain> argsMain, Map<String, String> jsonFields, QueryType type, int reportPageSize, int reportPaginationSize, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Webpage>> webpages, List<List<Webpage>> docs, List<List<Publication>> publications, Results results, long start, long stop, Version version, String jsonVersion) throws IOException {
+	public void output(CoreArgs args, List<ArgMain> argsMain, String queryPath, Map<String, String> jsonFields, int reportPageSize, int reportPaginationSize, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Webpage>> webpages, List<List<Webpage>> docs, List<List<Publication>> publications, Results results, long start, long stop, Version version, String jsonVersion) throws IOException {
 		Txt.output(type, txt, report, concepts, queries, publications, results.getMappings());
 		Report.output(args, argsMain, type, reportPageSize, reportPaginationSize, report, existingDirectory, concepts, queries, publications, webpages, docs, results, start, stop, version, txt != null, json != null);
 		if (json != null) {
 			JsonType jsonType = (type == QueryType.server ? JsonType.full : JsonType.cli);
 			Json.output(args, argsMain, jsonFields, type, jsonType, json, concepts, queries, publications, webpages, docs, results, start, stop, version, jsonVersion);
+		}
+		if (biotools != null) {
+			Json.outputBiotools(args, queryPath, biotools, concepts, results);
 		}
 	}
 }

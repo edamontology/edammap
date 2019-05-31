@@ -24,11 +24,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.edamontology.pubfetcher.core.db.publication.CorrespAuthor;
+
 import org.edamontology.edammap.core.input.json.DocumentationType;
 import org.edamontology.edammap.core.input.json.DownloadType;
 import org.edamontology.edammap.core.input.json.LinkType;
-import org.edamontology.pubfetcher.core.db.publication.CorrespAuthor;
-import org.edamontology.pubfetcher.core.db.publication.PublicationIds;
 
 public class Diff {
 
@@ -38,9 +38,9 @@ public class Diff {
 
 	private int existing = -1;
 
-	private Set<PublicationIds> modifyPublications = new LinkedHashSet<>();
+	private Set<PubIds> modifyPublications = new LinkedHashSet<>();
 
-	private Set<PublicationIds> addPublications = null;
+	private Set<PubIds> addPublications = null;
 
 	private String modifyName = null;
 
@@ -90,17 +90,17 @@ public class Diff {
 		this.existing = existing;
 	}
 
-	public Set<PublicationIds> getModifyPublications() {
+	public Set<PubIds> getModifyPublications() {
 		return modifyPublications;
 	}
-	public void addModifyPublication(PublicationIds publication) {
+	public void addModifyPublication(PubIds publication) {
 		modifyPublications.add(publication);
 	}
 
-	public Set<PublicationIds> getAddPublications() {
+	public Set<PubIds> getAddPublications() {
 		return addPublications;
 	}
-	public void setAddPublications(Set<PublicationIds> addPublications) {
+	public void setAddPublications(Set<PubIds> addPublications) {
 		this.addPublications = addPublications;
 	}
 

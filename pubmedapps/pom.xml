@@ -41,8 +41,18 @@
       <version>${pubfetcher.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.edamontology.pubfetcher</groupId>
+      <artifactId>pubfetcher-cli</artifactId>
+      <version>${pubfetcher.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.edamontology.edammap</groupId>
       <artifactId>edammap-core</artifactId>
+      <version>${edammap.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.edamontology.edammap</groupId>
+      <artifactId>edammap-cli</artifactId>
       <version>${edammap.version}</version>
     </dependency>
     <dependency>
@@ -65,7 +75,7 @@
               <mainClass>org.edamontology.edammap.pubmedapps.PubMedApps</mainClass>
             </manifest>
             <manifestEntries>
-              <Class-Path>edammap-core-${edammap.version}.jar</Class-Path>
+              <Class-Path>edammap-core-${edammap.version}.jar edammap-cli-${edammap.version}.jar</Class-Path>
             </manifestEntries>
           </archive>
         </configuration>
