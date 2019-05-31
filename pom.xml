@@ -64,7 +64,6 @@
     <module>util</module>
     <module>cli</module>
     <module>server</module>
-    <module>pubmedapps</module>
   </modules>
 
   <dependencies>
