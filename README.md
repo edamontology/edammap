@@ -11,3 +11,7 @@ EDAMmap can be run on the command line, but also as a web server. For the latter
 ## Documentation
 
 Documentation for EDAMmap can be found in the [wiki](https://github.com/edamontology/edammap/wiki).
+
+## Support
+
+Should you need help installing or using EDAMmap, please get in touch with Erik Janniso (the lead developer) directly via the [tracker](https://github.com/edamontology/edammap/issues).
