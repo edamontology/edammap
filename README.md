@@ -14,4 +14,4 @@ Documentation for EDAMmap can be found in the [wiki](https://github.com/edamonto
 
 ## Support
 
-Should you need help installing or using EDAMmap, please get in touch with Erik Janniso (the lead developer) directly via the [tracker](https://github.com/edamontology/edammap/issues).
+Should you need help installing or using EDAMmap, please get in touch with Erik Jaaniso (the lead developer) directly via the [tracker](https://github.com/edamontology/edammap/issues).
