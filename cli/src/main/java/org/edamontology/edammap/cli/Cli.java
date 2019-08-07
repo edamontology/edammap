@@ -139,7 +139,7 @@ public class Cli implements Runnable {
 		}
 	}
 
-	public static int run(CliArgs cliArgs, Version version, boolean progressToStderr) throws IOException, ParseException {
+	public static int run(CliArgs cliArgs, Version version, boolean progressToStderr, boolean trimBiotools) throws IOException, ParseException {
 		args = cliArgs;
 
 		List<ArgMain> argsMain = new ArrayList<>();
@@ -221,7 +221,7 @@ public class Cli implements Runnable {
 		Results results = Benchmark.calculate(queries, mappings);
 
 		logger.info("Outputting results");
-		output.output(args.getCoreArgs(), argsMain, args.getQuery(), null, args.getReportPageSize(), args.getReportPaginationSize(),
+		output.output(args.getCoreArgs(), argsMain, args.getQuery(), trimBiotools, null, args.getReportPageSize(), args.getReportPaginationSize(),
 			concepts, queries, webpages, docs, publications, results, start, stop, version, JSON_VERSION);
 
 		logger.info("{} : {}", results.toStringMeasure(Measure.recall), Measure.recall);

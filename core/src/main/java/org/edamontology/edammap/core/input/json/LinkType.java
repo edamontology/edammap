@@ -22,6 +22,7 @@ package org.edamontology.edammap.core.input.json;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public enum LinkType {
+	// TODO not in schema, remove
 	@JsonProperty("Browser")
 	BROWSER("Browser"),
 	@JsonProperty("Helpdesk")
@@ -42,13 +43,13 @@ public enum LinkType {
 	SCIENTIFIC_BENCHMARK("Scientific benchmark"),
 	@JsonProperty("Technical monitoring")
 	TECHNICAL_MONITORING("Technical monitoring"),
-	// TODO hack https://github.com/bio-tools/biotoolsSchema/issues/129
+	// TODO not in schema, remove
 	@JsonProperty("Galaxy service")
 	GALAXY_SERVICE("Galaxy service"),
-	// TODO hack https://github.com/bio-tools/biotoolsSchema/issues/128
+	@JsonProperty("Service")
+	SERVICE("Service"),
 	@JsonProperty("Other")
 	OTHER("Other"),
-	// TODO hack https://github.com/bio-tools/biotoolsSchema/issues/138
 	@JsonProperty("Discussion forum")
 	DISCUSSION_FORUM("Discussion forum");
 

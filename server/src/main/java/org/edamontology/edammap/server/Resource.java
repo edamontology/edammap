@@ -314,7 +314,7 @@ public class Resource {
 
 		logger.info("Outputting results");
 
-		output.output(coreArgs, Server.getArgsMain(false, txt, html, json), null, jsonFields, 1, 1,
+		output.output(coreArgs, Server.getArgsMain(false, txt, html, json), null, false, jsonFields, 1, 1,
 			Server.concepts, queries, webpages, docs, publications, results, start, stop, Server.version, jsonVersion);
 
 		String jsonString = null;

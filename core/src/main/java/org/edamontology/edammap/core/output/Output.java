@@ -69,7 +69,7 @@ public class Output {
 		this.existingDirectory = existingDirectory;
 	}
 
-	public void output(CoreArgs args, List<ArgMain> argsMain, String queryPath, Map<String, String> jsonFields, int reportPageSize, int reportPaginationSize, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Webpage>> webpages, List<List<Webpage>> docs, List<List<Publication>> publications, Results results, long start, long stop, Version version, String jsonVersion) throws IOException {
+	public void output(CoreArgs args, List<ArgMain> argsMain, String queryPath, boolean trimBiotools, Map<String, String> jsonFields, int reportPageSize, int reportPaginationSize, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Webpage>> webpages, List<List<Webpage>> docs, List<List<Publication>> publications, Results results, long start, long stop, Version version, String jsonVersion) throws IOException {
 		Txt.output(type, txt, report, concepts, queries, publications, results.getMappings());
 		Report.output(args, argsMain, type, reportPageSize, reportPaginationSize, report, existingDirectory, concepts, queries, publications, webpages, docs, results, start, stop, version, txt != null, json != null);
 		if (json != null) {
@@ -77,7 +77,7 @@ public class Output {
 			Json.output(args, argsMain, jsonFields, type, jsonType, json, concepts, queries, publications, webpages, docs, results, start, stop, version, jsonVersion);
 		}
 		if (biotools != null) {
-			Json.outputBiotools(args, queryPath, biotools, concepts, results);
+			Json.outputBiotools(args, queryPath, biotools, concepts, results, trimBiotools);
 		}
 	}
 }

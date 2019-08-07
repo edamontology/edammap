@@ -58,10 +58,8 @@ public enum DownloadType {
 	TOOL_WRAPPER_OTHER("Tool wrapper (other)"),
 	@JsonProperty("VM image")
 	VM_IMAGE("VM image"),
-	// TODO hack https://github.com/bio-tools/biotoolsSchema/issues/139
 	@JsonProperty("Downloads page")
 	DOWNLOADS_PAGE("Downloads page"),
-	// TODO hack https://github.com/bio-tools/biotoolsSchema/issues/141
 	@JsonProperty("Other")
 	OTHER("Other");
 

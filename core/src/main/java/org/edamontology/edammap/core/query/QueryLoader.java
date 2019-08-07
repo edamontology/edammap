@@ -461,6 +461,7 @@ public class QueryLoader {
 				LinkType.BROWSER.toString(),
 				LinkType.REGISTRY.toString(),
 				LinkType.GALAXY_SERVICE.toString(),
+				LinkType.SERVICE.toString(),
 				LinkType.OTHER.toString()
 			), false));
 		webpageUrls.addAll(linksJson(tool.getLink().stream(), Arrays.asList(

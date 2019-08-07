@@ -55,6 +55,23 @@ public class Tool {
 
 	protected Map<String, Object> others = new LinkedHashMap<>();
 
+	public Tool trim() {
+		Tool tool = new Tool();
+		tool.setName(name);
+		tool.setDescription(description);
+		tool.setHomepage(homepage);
+		tool.setFunction(function);
+		tool.setTopic(topic);
+		tool.setLanguage(language);
+		tool.setLicense(license);
+		tool.setLink(link);
+		tool.setDownload(download);
+		tool.setDocumentation(documentation);
+		tool.setPublication(publication);
+		tool.setCredit(credit);
+		return tool;
+	}
+
 	public String getName() {
 		return name;
 	}

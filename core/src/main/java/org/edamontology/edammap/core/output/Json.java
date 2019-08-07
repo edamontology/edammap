@@ -28,6 +28,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactory;
@@ -574,7 +575,7 @@ public class Json {
 		return edamUri.toString() + " (" + concepts.get(edamUri).getLabel() + ")";
 	}
 
-	public static void outputBiotools(CoreArgs args, String queryPath, Path biotoolsPath, Map<EdamUri, Concept> concepts, Results results) throws IOException {
+	public static void outputBiotools(CoreArgs args, String queryPath, Path biotoolsPath, Map<EdamUri, Concept> concepts, Results results, boolean trim) throws IOException {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
 		mapper.enable(SerializationFeature.CLOSE_CLOSEABLE);
@@ -753,6 +754,13 @@ public class Json {
 			}
 		}
 
-		mapper.writeValue(biotoolsPath.toFile(), biotools);
+		if (trim) {
+			JsonBiotools jsonBiotools = new JsonBiotools();
+			jsonBiotools.setCount(biotools.getCount());
+			jsonBiotools.setList(biotools.getList().stream().map(t -> t.trim()).collect(Collectors.toList()));
+			mapper.writeValue(biotoolsPath.toFile(), jsonBiotools);
+		} else {
+			mapper.writeValue(biotoolsPath.toFile(), biotools);
+		}
 	}
 }

@@ -44,13 +44,10 @@ public enum DocumentationType {
 	TUTORIAL("Tutorial"),
 	@JsonProperty("Other")
 	OTHER("Other"),
-	// TODO hack https://github.com/bio-tools/biotoolsSchema/issues/132
 	@JsonProperty("FAQ")
 	FAQ("FAQ"),
-	// TODO hack https://github.com/bio-tools/biotoolsSchema/issues/112
 	@JsonProperty("Release notes")
 	RELEASE_NOTES("Release notes"),
-	// TODO hack https://github.com/bio-tools/biotoolsSchema/issues/140
 	@JsonProperty("Command-line options")
 	COMMAND_LINE_OPTIONS("Command-line options");
 
