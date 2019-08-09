@@ -38,7 +38,7 @@ public class Credit {
 
 	private String note;
 
-	public void check(ToolInput tool, int i, String index) throws ParseException {
+	public void check(Tool tool, int i, String index) throws ParseException {
 		if ((name == null || name.equals("")) && (email == null || email.equals("")) && (url == null || url.equals(""))) {
 			tool.parseException("name and email and url", i, index);
 		}

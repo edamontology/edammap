@@ -30,7 +30,7 @@ public class Biotools {
 
 	private String next;
 
-	private List<ToolInput> list = new ArrayList<>();
+	private List<Tool> list = new ArrayList<>();
 
 	public int getCount() {
 		return count;
@@ -53,14 +53,14 @@ public class Biotools {
 		this.next = next;
 	}
 
-	public List<ToolInput> getList() {
+	public List<Tool> getList() {
 		return list;
 	}
-	public void setList(List<ToolInput> list) {
+	public void setList(List<Tool> list) {
 		this.list = list;
 	}
 
-	public void addTools(List<ToolInput> list) {
+	public void addTools(List<Tool> list) {
 		this.list.addAll(list);
 	}
 }

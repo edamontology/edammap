@@ -64,7 +64,7 @@ import org.edamontology.edammap.core.input.json.Function;
 import org.edamontology.edammap.core.input.json.InputOutput;
 import org.edamontology.edammap.core.input.json.LinkType;
 import org.edamontology.edammap.core.input.json.Publication;
-import org.edamontology.edammap.core.input.json.ToolInput;
+import org.edamontology.edammap.core.input.json.Tool;
 import org.edamontology.edammap.core.input.xml.Biotools14;
 
 public class QueryLoader {
@@ -452,7 +452,7 @@ public class QueryLoader {
 			annotations);
 	}
 
-	private static Query getBiotools(ToolInput tool, Map<EdamUri, Concept> concepts) {
+	private static Query getBiotools(Tool tool, Map<EdamUri, Concept> concepts) {
 		List<Link> webpageUrls = new ArrayList<>();
 		addLink(tool.getHomepage(), "Homepage", false, webpageUrls);
 		webpageUrls.addAll(linksJson(tool.getLink().stream(), Arrays.asList(
@@ -544,7 +544,7 @@ public class QueryLoader {
 				case msutils: queries.add(getMsutils((Msutils) input, concepts)); break;
 				case Bioconductor: queries.add(getBioconductor((Bioconductor) input, concepts)); break;
 				case biotools14: queries.add(getBiotools14((Biotools14) input, concepts)); break;
-				case biotools: queries.add(getBiotools((ToolInput) input, concepts)); break;
+				case biotools: queries.add(getBiotools((Tool) input, concepts)); break;
 				case server: break;
 			}
 		}

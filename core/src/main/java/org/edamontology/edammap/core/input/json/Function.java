@@ -35,7 +35,7 @@ public class Function {
 
 	private String cmd;
 
-	public void check(ToolInput tool, int i, String index) throws ParseException {
+	public void check(Tool tool, int i, String index) throws ParseException {
 		if (operation == null || operation.isEmpty()) {
 			tool.parseException("operation", i, index);
 		} else {

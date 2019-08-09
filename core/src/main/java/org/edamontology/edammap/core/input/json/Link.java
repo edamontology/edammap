@@ -29,7 +29,7 @@ public class Link<T> {
 
 	private String note;
 
-	public void check(ToolInput tool, int i, String index) throws ParseException {
+	public void check(Tool tool, int i, String index) throws ParseException {
 		if (url == null || url.equals("")) {
 			tool.parseException("url", i, index);
 		}

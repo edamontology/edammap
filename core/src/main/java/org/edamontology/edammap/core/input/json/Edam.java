@@ -27,7 +27,7 @@ public class Edam {
 
 	private String term;
 
-	public void check(ToolInput tool, int i, String index) throws ParseException {
+	public void check(Tool tool, int i, String index) throws ParseException {
 		if ((uri == null || uri.equals("")) && (term == null || term.equals(""))) {
 			throw new ParseException("EDAM not present for " + tool.getName() + "! (record " + index + ")", i);
 		}

@@ -36,7 +36,7 @@ public class Publication {
 	// TODO not in schema
 	private PublicationMetadata metadata;
 
-	public void check(ToolInput tool, int i, String index) throws ParseException {
+	public void check(Tool tool, int i, String index) throws ParseException {
 		if ((doi == null || doi.equals("")) && (pmid == null || pmid.equals("")) && (pmcid == null || pmcid.equals(""))) {
 			tool.parseException("doi and pmid and pmcid", i, index);
 		}

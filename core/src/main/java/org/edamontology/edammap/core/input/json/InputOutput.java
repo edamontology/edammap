@@ -29,7 +29,7 @@ public class InputOutput {
 
 	private List<Edam> format = new ArrayList<>();
 
-	public void check(ToolInput tool, int i, String index) throws ParseException {
+	public void check(Tool tool, int i, String index) throws ParseException {
 		if (data == null) {
 			tool.parseException("data", i, index);
 		} else {

@@ -19,57 +19,117 @@
 
 package org.edamontology.edammap.core.input.json;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.edamontology.edammap.core.input.InputType;
+
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 
-public class Tool {
+public class Tool implements InputType {
 
-	protected String name;
+	private String biotoolsID;
 
-	protected String description;
+	private String name;
 
-	protected String homepage;
+	private String description;
 
-	protected List<Function> function = new ArrayList<>();
+	private String homepage;
 
-	protected List<Edam> topic = new ArrayList<>();
+	private List<Function> function = new ArrayList<>();
 
-	protected List<String> language = new ArrayList<>();
+	private List<Edam> topic = new ArrayList<>();
 
-	protected String license;
+	private List<String> language = new ArrayList<>();
 
-	protected List<Link<LinkType>> link = new ArrayList<>();
+	private String license;
 
-	protected List<LinkVersion<DownloadType>> download = new ArrayList<>();
+	private List<Link<LinkType>> link = new ArrayList<>();
 
-	protected List<Link<DocumentationType>> documentation = new ArrayList<>();
+	private List<LinkVersion<DownloadType>> download = new ArrayList<>();
 
-	protected List<Publication> publication = new ArrayList<>();
+	private List<Link<DocumentationType>> documentation = new ArrayList<>();
 
-	protected List<Credit> credit = new ArrayList<>();
+	private List<Publication> publication = new ArrayList<>();
 
-	protected Map<String, Object> others = new LinkedHashMap<>();
+	private List<Credit> credit = new ArrayList<>();
 
-	public Tool trim() {
-		Tool tool = new Tool();
-		tool.setName(name);
-		tool.setDescription(description);
-		tool.setHomepage(homepage);
-		tool.setFunction(function);
-		tool.setTopic(topic);
-		tool.setLanguage(language);
-		tool.setLicense(license);
-		tool.setLink(link);
-		tool.setDownload(download);
-		tool.setDocumentation(documentation);
-		tool.setPublication(publication);
-		tool.setCredit(credit);
-		return tool;
+	private Integer homepage_status;
+
+	private Map<String, Object> others = new LinkedHashMap<>();
+
+	@Override
+	public void check(int i) throws ParseException {
+		// We are not doing any thorough validation, just checking that the required attributes are present
+		// TODO add length (accounting for potential whitespace collapse) and regex validations, possibly in a separate class/package
+		// if homepage_status is not null, then checked bio.tools content is probably from https://bio.tools, where biotoolsID must be present
+		if (homepage_status != null && (biotoolsID == null || biotoolsID.equals(""))) {
+			parseException("biotoolsID", i);
+		}
+		if (name == null || name.equals("")) {
+			parseException("name", i);
+		}
+		if (description == null || description.equals("")) {
+			parseException("description", i);
+		}
+		if (homepage == null || homepage.equals("")) {
+			parseException("homepage", i);
+		}
+		if (function != null) {
+			for (int j = 0; j < function.size(); ++j) {
+				function.get(j).check(this, i, i + ", function " + j);
+			}
+		}
+		if (topic != null) {
+			for (int j = 0; j < topic.size(); ++j) {
+				topic.get(j).check(this, i, i + ", topic " + j);
+			}
+		}
+		if (link != null) {
+			for (int j = 0; j < link.size(); ++j) {
+				link.get(j).check(this, i, i + ", link " + j);
+			}
+		}
+		if (download != null) {
+			for (int j = 0; j < download.size(); ++j) {
+				download.get(j).check(this, i, i + ", download " + j);
+			}
+		}
+		if (documentation != null) {
+			for (int j = 0; j < documentation.size(); ++j) {
+				documentation.get(j).check(this, i, i + ", documentation " + j);
+			}
+		}
+		if (publication != null) {
+			for (int j = 0; j < publication.size(); ++j) {
+				publication.get(j).check(this, i, i + ", publication " + j);
+			}
+		}
+		if (credit != null) {
+			for (int j = 0; j < credit.size(); ++j) {
+				credit.get(j).check(this, i, i + ", credit " + j);
+			}
+		}
+	}
+
+	@Override
+	public void parseException(String attribute, int i, String index) throws ParseException {
+		if (name == null || name.equals("")) {
+			InputType.super.parseException(attribute, i, index);
+		} else {
+			throw new ParseException("Attribute \"" + attribute + "\" missing or empty for " + name + "! (record " + index + ")", i);
+		}
+	}
+
+	public String getBiotoolsID() {
+		return biotoolsID;
+	}
+	public void setBiotoolsID(String id) {
+		this.biotoolsID = id;
 	}
 
 	public String getName() {
@@ -154,6 +214,13 @@ public class Tool {
 	}
 	public void setCredit(List<Credit> credit) {
 		this.credit = credit;
+	}
+
+	public Integer getHomepage_status() {
+		return homepage_status;
+	}
+	public void setHomepage_status(Integer homepage_status) {
+		this.homepage_status = homepage_status;
 	}
 
 	@JsonAnyGetter
