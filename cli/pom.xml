@@ -57,7 +57,7 @@
             <manifest>
               <addClasspath>true</addClasspath>
               <classpathPrefix>lib/</classpathPrefix>
-              <mainClass>org.edamontology.edammap.cli.Cli</mainClass>
+              <mainClass>org.edamontology.edammap.cli.CliMain</mainClass>
             </manifest>
             <manifestEntries>
               <Class-Path>edammap-core-${edammap.version}.jar</Class-Path>
