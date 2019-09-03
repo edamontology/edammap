@@ -40,3 +40,6 @@ http://edamontology.org/operation_0226
 http://edamontology.org/operation_0227
 # Classification
 http://edamontology.org/operation_2990
+
+### Block also "Literature and language", as it causes too many FPs
+http://edamontology.org/topic_3068
