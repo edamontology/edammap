@@ -385,7 +385,7 @@ public class PreProcessor {
 				link = link.substring(knownSchema.start());
 			}
 
-			if (!EMAIL_ONLY.matcher(link).matches()) {
+			if (!EMAIL_ONLY.matcher(link).matches() && !link.isEmpty()) {
 				output.add(HYPHEN.matcher(TILDE.matcher(link).replaceAll("~")).replaceAll("-"));
 			}
 		}
