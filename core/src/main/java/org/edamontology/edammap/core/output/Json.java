@@ -676,6 +676,9 @@ public class Json {
 				}
 				generator.writeEndArray();
 			}
+			if (tool.getConfidence_flag() != null && !tool.getConfidence_flag().isEmpty()) {
+				generator.writeStringField("confidence_flag", tool.getConfidence_flag());
+			}
 			generator.writeEndObject();
 		}
 		generator.writeEndArray();

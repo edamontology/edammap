@@ -60,6 +60,8 @@ public class Tool implements InputType {
 
 	private Integer homepage_status;
 
+	private String confidence_flag;
+
 	private Map<String, Object> others = new LinkedHashMap<>();
 
 	@Override
@@ -221,6 +223,13 @@ public class Tool implements InputType {
 	}
 	public void setHomepage_status(Integer homepage_status) {
 		this.homepage_status = homepage_status;
+	}
+
+	public String getConfidence_flag() {
+		return confidence_flag;
+	}
+	public void setConfidence_flag(String confidence_flag) {
+		this.confidence_flag = confidence_flag;
 	}
 
 	@JsonAnyGetter
