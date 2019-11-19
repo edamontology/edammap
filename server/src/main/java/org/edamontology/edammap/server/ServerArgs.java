@@ -39,18 +39,18 @@ public class ServerArgs extends BasicArgs {
 	private String edam;
 
 	static final String txtId = "txt";
-	private static final String txtDescription = "Output results to plain text file for queries made through the web application. The value can be changed in the web application itself.";
+	private static final String txtDescription = "Output results to a plain text file for queries made through the web application. The value can be changed in the web application itself.";
 	private static final Boolean txtDefault = true;
 	@Parameter(names = { "--" + txtId }, arity = 1, description = txtDescription)
 	private Boolean txt = txtDefault;
 
 	static final String htmlId = "html";
-	private static final String htmlDescription = "Output results to HTML file for queries made through the web application. Always true.";
+	private static final String htmlDescription = "Output results to a HTML file for queries made through the web application. Always true.";
 	private static final Boolean htmlDefault = true;
 	private Boolean html = htmlDefault;
 
 	static final String jsonId = "json";
-	private static final String jsonDescription = "Output results to JSON file for queries made through the web application. The value can be changed in the web application itself.";
+	private static final String jsonDescription = "Output results to a JSON file for queries made through the web application. The value can be changed in the web application itself.";
 	private static final Boolean jsonDefault = false;
 	@Parameter(names = { "--" + jsonId }, arity = 1, description = jsonDescription)
 	private Boolean json = jsonDefault;

@@ -30,13 +30,13 @@ import org.edamontology.pubfetcher.core.common.PositiveInteger;
 public class ServerPrivateArgs extends Args {
 
 	private static final String baseUriId = "baseUri";
-	private static final String baseUriDescription = "URI where server will be deployed (as schema://host:port)";
+	private static final String baseUriDescription = "URI where the server will be deployed (as schema://host:port)";
 	private static final String baseUriDefault = "http://localhost:8080";
 	@Parameter(names = { "-b", "--" + baseUriId }, description = baseUriDescription)
 	private String baseUri = baseUriDefault;
 
 	private static final String pathId = "path";
-	private static final String pathDescription = "Path where server will be deployed (only one single path segment supported)";
+	private static final String pathDescription = "Path where the server will be deployed (only one single path segment supported)";
 	private static final String pathDefault = "edammap";
 	@Parameter(names = { "-p", "--" + pathId }, description = pathDescription)
 	private String path = pathDefault;
@@ -48,7 +48,7 @@ public class ServerPrivateArgs extends Args {
 	private Boolean httpsProxy = httpsProxyDefault;
 
 	private static final String filesId = "files";
-	private static final String filesDescription = "Existing directory with HTML resources where results will be output";
+	private static final String filesDescription = "An existing directory where the results will be output. It must contain required CSS, JavaScript and font resources pre-generated with EDAMmap-Util.";
 	private static final String filesDefault = null;
 	@Parameter(names = { "-f", "--" + filesId }, required = true, description = filesDescription)
 	private String files;

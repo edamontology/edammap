@@ -53,7 +53,7 @@ public class CliArgs extends BasicArgs {
 	private QueryType type = typeDefault;
 
 	private static final String outputId = "output";
-	private static final String outputDescription = "File to write results to, one per line. If missing (and HTML report also not specified), then results will be written to standard output.";
+	private static final String outputDescription = "Text file to write results to, one per line. If missing (and HTML report also not specified), then results will be written to standard output.";
 	private static final String outputDefault = "";
 	@Parameter(names = { "-o", "--" + outputId }, description = outputDescription)
 	private String output = outputDefault;
@@ -65,7 +65,7 @@ public class CliArgs extends BasicArgs {
 	private String report = reportDefault;
 
 	private static final String jsonId = "json";
-	private static final String jsonDescription = "File to write results to, in JSON format. Will include same info as HTML report.";
+	private static final String jsonDescription = "File to write results to, in JSON format. Will include the same info as the HTML report.";
 	private static final String jsonDefault = "";
 	@Parameter(names = { "-j", "--" + jsonId }, description = jsonDescription)
 	private String json = jsonDefault;

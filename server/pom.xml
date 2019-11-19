@@ -31,8 +31,7 @@
   <packaging>jar</packaging>
 
   <name>EDAMmap-Server</name>
-  <url>https://github.com/edamontology/edammap/tree/master/server</url>
-  <description></description>
+  <url>https://github.com/edamontology/edammap</url>
 
   <dependencyManagement>
     <dependencies>

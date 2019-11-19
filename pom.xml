@@ -28,7 +28,7 @@
 
   <name>EDAMmap</name>
   <url>https://github.com/edamontology/edammap</url>
-  <description></description>
+  <description>A tool for mapping various text input to EDAM ontology concepts</description>
 
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>

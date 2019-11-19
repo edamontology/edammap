@@ -213,7 +213,7 @@ public final class Server {
 		// otherwise invalid.log will be created if arg --log is null
 		logger = LogManager.getLogger();
 		logger.debug(String.join(" ", argv));
-		logger.info("This is {} {}", version.getName(), version.getVersion());
+		logger.info("This is {} {} ({})", version.getName(), version.getVersion(), version.getUrl());
 
 		try {
 			run();

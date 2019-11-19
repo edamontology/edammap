@@ -29,13 +29,13 @@ import org.edamontology.pubfetcher.core.common.Args;
 public class ProcessorArgs extends Args {
 
 	private static final String fetchingId = "fetching";
-	private static final String fetchingDescription = "Fetch publications, webpages and docs (corresponding to given publication IDs, webpage URLs and doc URLs); if false, then only the database is used for getting them (if a database is given)";
+	private static final String fetchingDescription = "Fetch publications, webpages and docs (corresponding to given publication IDs, webpage URLs and doc URLs); if false, then only the database is used for getting them (if a database is given with --db)";
 	private static final Boolean fetchingDefault = true;
 	@Parameter(names = { "--fetch", "--fetcher", "--" + fetchingId }, arity = 1, description = fetchingDescription)
 	private Boolean fetching = fetchingDefault;
 
 	private static final String dbId = "db";
-	private static final String dbDescription = "Use the given database for getting and storing publications, webpages and docs (corresponding to given publication IDs, webpage URLs and doc URLs); if a database is given, then it is queried first even if fetching is enabled (and fetching is done only if required and possible for found database entry)";
+	private static final String dbDescription = "Use the given database for getting and storing publications, webpages and docs (corresponding to given publication IDs, webpage URLs and doc URLs); if a database is given, then it is queried first even if fetching is enabled with --fetching (and fetching is done only if required and possible for found database entry)";
 	private static final String dbDefault = "";
 	@Parameter(names = { "--" + dbId, "--database" }, description = dbDescription)
 	private String db = dbDefault;
