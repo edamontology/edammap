@@ -25,8 +25,8 @@ public enum Measure {
 	f1("F1 score", "https://en.wikipedia.org/wiki/F1_score"),
 	f2("F2 score", "https://en.wikipedia.org/wiki/F1_score"),
 	Jaccard("Jaccard index", "https://en.wikipedia.org/wiki/Jaccard_index"),
-	AveP("Average precision", "https://en.wikipedia.org/wiki/Information_retrieval#Average_precision"),
-	RP("R-precision", "https://en.wikipedia.org/wiki/Information_retrieval#R-Precision"),
+	AveP("Average precision", "https://en.wikipedia.org/wiki/Evaluation_measures_(information_retrieval)#Average_precision"),
+	RP("R-precision", "https://en.wikipedia.org/wiki/Evaluation_measures_(information_retrieval)#R-Precision"),
 	DCG("Discounted cumulative gain", "https://en.wikipedia.org/wiki/Discounted_cumulative_gain"),
 	DCGa("DCG (alternative)", "https://en.wikipedia.org/wiki/Discounted_cumulative_gain");
 

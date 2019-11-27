@@ -51,6 +51,9 @@ or alternatively, with a single command:
 
   $ java -jar edammap-util-<version>.jar -all-query biotools.json --query-type biotools -db-fetch db.db --log all.log
 
+.. note::
+  Fetching of content could be repeated multiple times in the span of a few days to get more complete content of publications, webpages and docs, as some absent information could be filled in subsequent fetches, when for example resources that were temporarily unavailable will be up again (while on the other hand, ``-db-fetch`` will not try to re-fetch content that is already deemed to be final in the database, thus saving time and resources).
+
 And as last step, the wanted IDF files are generated:
 
 .. code-block:: bash
@@ -122,7 +125,7 @@ Parameter         Default   Description
 ================  ========  ===========
 
 
-.. _results:
+.. _results_section:
 
 *******
 Results
@@ -205,6 +208,9 @@ Another example is the mapping of the whole content of bio.tools:
   $ java -jar edammap-cli-<version>.jar -e EDAM_1.21.owl -q biotools.json -t biotools -o results.txt -r results -j results.json --threads 8 --fetching false --db db.db --idfStemmed biotools.stemmed.idf --branches topic operation data format --matches 5 --obsolete true --log biotools.log
 
 The query ``biotools.json`` is the whole content of bio.tools as obtained with the ``-biotools-full`` command of `EDAMmap-Util`_. Contents of webpages, docs and publications has been pre-fetched to the database file ``db.db`` (as described under IDF_), thus ``--fetching`` is disabled. Results will be output as plain text to ``results.txt``, as HTML files to the directory ``results`` and as JSON to ``results.json``. Results will contain 5 term matches from each EDAM branch and can include obsolete concepts. As EDAMmap was run on the whole content of bio.tools, then the benchmarking results can be consulted to assess the performance and as webpages, docs and publications have been stored on disk, then EDAMmap can easily be re-run while varying the parameters to tune these results.
+
+.. note::
+  The measures in the benchmarking results assume, that the annotations in bio.tools are correct, which is not always the case. The performacne of EDAMmap can still be assumed to be correlated with the benchmarking results, however care should be taken when looking at individual mapping results.
 
 Instead of specifying the parameters as part of the command line, they could be stored in a configuration file. An initial configuration file, with all parameters commented out, can be generated with:
 

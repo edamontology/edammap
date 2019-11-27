@@ -109,6 +109,8 @@ _`parentWeight`       ``0.5``        ``0.0``           Weight of concept's paren
 _`pathWeight`         ``0.7``        ``0.0``           Weight of path enrichment. Weight of concept is ``1``. Set to ``0`` to disable path enrichment.
 ====================  =============  =======  =======  ===========
 
+.. _idf_parameters:
+
 IDF
 ^^^
 
@@ -137,6 +139,8 @@ definitionMultiplier          ``1.0``  ``0.0``  ``1.0``  Score multiplier for ma
 commentMultiplier             ``1.0``  ``0.0``  ``1.0``  Score multiplier for matching a concept comment. Set to ``0`` to disable matching of comments.
 ============================  =======  =======  =======  ===========
 
+.. _query_normalisers:
+
 Query normalisers
 ^^^^^^^^^^^^^^^^^
 
@@ -155,6 +159,8 @@ publicationFulltextNormaliser   ``1.0``    ``0.0``  ``1.0``  Score normaliser fo
 docNormaliser                   ``1.0``    ``0.0``  ``1.0``  Score normaliser for matching a query `doc <https://pubfetcher.readthedocs.io/en/latest/output.html#content-of-docs>`_. Set to ``0`` to disable matching of docs.
 webpageNormaliser               ``1.0``    ``0.0``  ``1.0``  Score normaliser for matching a query `webpage <https://pubfetcher.readthedocs.io/en/latest/output.html#content-of-webpages>`_. Set to ``0`` to disable matching of webpages.
 ==============================  =========  =======  =======  ===========
+
+.. _query_weights:
 
 Query weights
 ^^^^^^^^^^^^^
@@ -175,6 +181,8 @@ publicationFulltextWeight   ``0.5``   ``0.0``  Weight of publication fulltext_ i
 docWeight                   ``0.5``   ``0.0``  Weight of query doc_ in average strategy. Set to ``0`` to disable matching of docs in average strategy.
 webpageWeight               ``0.5``   ``0.0``  Weight of query webpage_ in average strategy. Set to ``0`` to disable matching of webpages in average strategy.
 ==========================  ========  =======  ===========
+
+.. _score_limits:
 
 Score limits
 ^^^^^^^^^^^^
@@ -462,9 +470,9 @@ _`measures`
   Jaccard
     `Jaccard index <https://en.wikipedia.org/wiki/Jaccard_index>`_. Same structure as in precision_.
   AveP
-    `Average precision <https://en.wikipedia.org/wiki/Information_retrieval#Average_precision>`_. Same structure as in precision_.
+    `Average precision <https://en.wikipedia.org/wiki/Evaluation_measures_(information_retrieval)#Average_precision>`_. Same structure as in precision_.
   RP
-    `R-precision <https://en.wikipedia.org/wiki/Information_retrieval#R-Precision>`_. Same structure as in precision_.
+    `R-precision <https://en.wikipedia.org/wiki/Evaluation_measures_(information_retrieval)#R-Precision>`_. Same structure as in precision_.
   DCG
     `Discounted cumulative gain <https://en.wikipedia.org/wiki/Discounted_cumulative_gain>`_. Same structure as in precision_.
   DCGa
