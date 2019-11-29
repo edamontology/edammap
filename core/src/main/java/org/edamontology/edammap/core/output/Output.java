@@ -34,6 +34,7 @@ import org.edamontology.edammap.core.args.CoreArgs;
 import org.edamontology.edammap.core.benchmarking.Results;
 import org.edamontology.edammap.core.edam.Concept;
 import org.edamontology.edammap.core.edam.EdamUri;
+import org.edamontology.edammap.core.input.json.Tool;
 import org.edamontology.edammap.core.query.Query;
 import org.edamontology.edammap.core.query.QueryType;
 
@@ -59,9 +60,8 @@ public class Output {
 		this.json = (json == null || json.isEmpty()) ? null : PubFetcher.outputPath(json);
 
 		if (biotools != null && !biotools.isEmpty() && type != QueryType.biotools) {
-			throw new IllegalArgumentException("bio.tools JSON output is only available for QueryType " + QueryType.biotools + "!");
+			throw new IllegalArgumentException("bio.tools (--biotools) JSON output is only available for QueryType (--type) " + QueryType.biotools + "!");
 		}
-
 		this.biotools = (biotools == null || biotools.isEmpty()) ? null : PubFetcher.outputPath(biotools);
 
 		this.type = type;
@@ -69,15 +69,15 @@ public class Output {
 		this.existingDirectory = existingDirectory;
 	}
 
-	public void output(CoreArgs args, List<ArgMain> argsMain, String queryPath, boolean trimBiotools, Map<String, String> jsonFields, int reportPageSize, int reportPaginationSize, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Webpage>> webpages, List<List<Webpage>> docs, List<List<Publication>> publications, Results results, long start, long stop, Version version, String jsonVersion) throws IOException {
+	public void output(CoreArgs args, List<ArgMain> argsMain, String queryPath, Map<String, String> jsonFields, int reportPageSize, int reportPaginationSize, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Webpage>> webpages, List<List<Webpage>> docs, List<List<Publication>> publications, Results results, Tool tool, long start, long stop, Version version, String jsonVersion) throws IOException {
 		Txt.output(type, txt, report, concepts, queries, publications, results.getMappings());
 		Report.output(args, argsMain, type, reportPageSize, reportPaginationSize, report, existingDirectory, concepts, queries, publications, webpages, docs, results, start, stop, version, txt != null, json != null);
 		if (json != null) {
 			JsonType jsonType = (type == QueryType.server ? JsonType.full : JsonType.cli);
-			Json.output(args, argsMain, jsonFields, type, jsonType, json, concepts, queries, publications, webpages, docs, results, start, stop, version, jsonVersion);
+			Json.output(args, argsMain, jsonFields, type, jsonType, json, concepts, queries, publications, webpages, docs, results, tool, start, stop, version, jsonVersion);
 		}
 		if (biotools != null) {
-			Json.outputBiotools(args, queryPath, biotools, concepts, results, trimBiotools);
+			Json.outputBiotools(args, queryPath, biotools, concepts, results);
 		}
 	}
 }

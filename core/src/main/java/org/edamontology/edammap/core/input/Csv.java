@@ -26,6 +26,9 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.univocity.parsers.common.processor.BeanListProcessor;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
@@ -37,6 +40,8 @@ import org.edamontology.edammap.core.input.csv.SEQwiki;
 import org.edamontology.edammap.core.query.QueryType;
 
 public class Csv {
+
+	private static final Logger logger = LogManager.getLogger();
 
 	public static List<InputType> load(String queryPath, QueryType type, int timeout, String userAgent) throws IOException, ParseException {
 		List<InputType> inputs = new ArrayList<>();
@@ -75,6 +80,8 @@ public class Csv {
 			inputType.check(++i);
 			inputs.add(inputType);
 		}
+
+		logger.debug("Loaded {} CSV entries from {} of type {}", inputs.size(), queryPath, type);
 
 		return inputs;
 	}

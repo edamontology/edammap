@@ -117,13 +117,15 @@ public final class Server {
 		processor = new Processor(args.getProcessorArgs(), args.getFetcherPrivateArgs());
 
 		if (args.getProcessorArgs().getIdf() != null && !args.getProcessorArgs().getIdf().isEmpty()) {
+			logger.info("Loading IDF from {}", args.getProcessorArgs().getIdf());
 			idf = new Idf(args.getProcessorArgs().getIdf());
 		}
 		if (args.getProcessorArgs().getIdfStemmed() != null && !args.getProcessorArgs().getIdfStemmed().isEmpty()) {
+			logger.info("Loading IDF from {}", args.getProcessorArgs().getIdfStemmed());
 			idfStemmed = new Idf(args.getProcessorArgs().getIdfStemmed());
 		}
 
-		logger.info("Loading concepts");
+		logger.info("Loading concepts from {}", args.getEdam());
 		concepts = Edam.load(args.getEdam());
 
 		logger.info("Configuring server");

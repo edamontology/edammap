@@ -65,6 +65,7 @@ import org.edamontology.edammap.core.edam.EdamUri;
 import org.edamontology.edammap.core.idf.Idf;
 import org.edamontology.edammap.core.input.DatabaseEntryId;
 import org.edamontology.edammap.core.input.ServerInput;
+import org.edamontology.edammap.core.input.json.Tool;
 import org.edamontology.edammap.core.mapping.Mapper;
 import org.edamontology.edammap.core.mapping.Mapping;
 import org.edamontology.edammap.core.output.DatabaseEntryEntry;
@@ -99,6 +100,8 @@ public class Resource {
 	private static final int MAX_KEYWORDS_SIZE = 100;
 	private static final int MAX_LINKS_SIZE = 10;
 	private static final int MAX_PUBLICATION_IDS_SIZE = 10;
+
+	private static final int MAX_JSON_TOOL_LENGTH = 1000000;
 
 	private class PostResult {
 		private final String jsonString;
@@ -139,7 +142,7 @@ public class Resource {
 		return Response.ok(responseText).header(Header.ContentLength.toString(), responseText.getBytes().length).build();
 	}
 
-	private PostResult runPost(MultivaluedMap<String, String> params, Request request, boolean isJson) throws IOException, URISyntaxException {
+	private PostResult runPost(MultivaluedMap<String, String> params, Tool tool, Request request, boolean isJson) throws IOException, URISyntaxException {
 		logger.info("POST {} from {}", params, request.getRemoteAddr());
 
 		long start = System.currentTimeMillis();
@@ -181,16 +184,18 @@ public class Resource {
 			}
 		}
 
-		ServerInput serverInput;
+		ServerInput serverInput = null;
 		if (isJson) {
-			serverInput = new ServerInput(
-				ParamParse.getParamStrings(params, Query.NAME),
-				ParamParse.getParamStrings(params, Query.KEYWORDS),
-				ParamParse.getParamStrings(params, Query.DESCRIPTION),
-				ParamParse.getParamStrings(params, Query.WEBPAGE_URLS),
-				ParamParse.getParamStrings(params, Query.DOC_URLS),
-				ParamParse.getParamStrings(params, Query.PUBLICATION_IDS),
-				ParamParse.getParamStrings(params, Query.ANNOTATIONS));
+			if (tool == null) {
+				serverInput = new ServerInput(
+					ParamParse.getParamStrings(params, Query.NAME),
+					ParamParse.getParamStrings(params, Query.KEYWORDS),
+					ParamParse.getParamStrings(params, Query.DESCRIPTION),
+					ParamParse.getParamStrings(params, Query.WEBPAGE_URLS),
+					ParamParse.getParamStrings(params, Query.DOC_URLS),
+					ParamParse.getParamStrings(params, Query.PUBLICATION_IDS),
+					ParamParse.getParamStrings(params, Query.ANNOTATIONS));
+			}
 		} else {
 			serverInput = new ServerInput(
 				ParamParse.getParamString(params, Query.NAME),
@@ -202,26 +207,35 @@ public class Resource {
 				ParamParse.getParamString(params, Query.ANNOTATIONS));
 		}
 
-		if (serverInput.getName() != null && serverInput.getName().length() > MAX_NAME_LENGTH) {
-			throw new IllegalRequestException("Name length (" + serverInput.getName().length() + ") is greater than maximum allowed (" + MAX_NAME_LENGTH + ")");
-		}
-		if (serverInput.getKeywords() != null && serverInput.getKeywords().length() > MAX_KEYWORDS_LENGTH) {
-			throw new IllegalRequestException("Keywords length (" + serverInput.getKeywords().length() + ") is greater than maximum allowed (" + MAX_KEYWORDS_LENGTH + ")");
-		}
-		if (serverInput.getDescription() != null && serverInput.getDescription().length() > MAX_DESCRIPTION_LENGTH) {
-			throw new IllegalRequestException("Description length (" + serverInput.getDescription().length() + ") is greater than maximum allowed (" + MAX_DESCRIPTION_LENGTH + ")");
-		}
-		if (serverInput.getWebpageUrls() != null && serverInput.getWebpageUrls().length() > MAX_LINKS_LENGTH) {
-			throw new IllegalRequestException("Webpage URLs length (" + serverInput.getWebpageUrls().length() + ") is greater than maximum allowed (" + MAX_LINKS_LENGTH + ")");
-		}
-		if (serverInput.getDocUrls() != null && serverInput.getDocUrls().length() > MAX_LINKS_LENGTH) {
-			throw new IllegalRequestException("Doc URLs length (" + serverInput.getDocUrls().length() + ") is greater than maximum allowed (" + MAX_LINKS_LENGTH + ")");
-		}
-		if (serverInput.getPublicationIds() != null && serverInput.getPublicationIds().length() > MAX_PUBLICATION_IDS_LENGTH) {
-			throw new IllegalRequestException("Publication IDs length (" + serverInput.getPublicationIds().length() + ") is greater than maximum allowed (" + MAX_PUBLICATION_IDS_LENGTH + ")");
-		}
-		if (serverInput.getAnnotations() != null && serverInput.getAnnotations().length() > MAX_ANNOTATIONS_LENGTH) {
-			throw new IllegalRequestException("Annotations length (" + serverInput.getAnnotations().length() + ") is greater than maximum allowed (" + MAX_ANNOTATIONS_LENGTH + ")");
+		if (serverInput != null) {
+			if (serverInput.getName() != null && serverInput.getName().length() > MAX_NAME_LENGTH) {
+				throw new IllegalRequestException("Name length (" + serverInput.getName().length() + ") is greater than maximum allowed (" + MAX_NAME_LENGTH + ")");
+			}
+			if (serverInput.getKeywords() != null && serverInput.getKeywords().length() > MAX_KEYWORDS_LENGTH) {
+				throw new IllegalRequestException("Keywords length (" + serverInput.getKeywords().length() + ") is greater than maximum allowed (" + MAX_KEYWORDS_LENGTH + ")");
+			}
+			if (serverInput.getDescription() != null && serverInput.getDescription().length() > MAX_DESCRIPTION_LENGTH) {
+				throw new IllegalRequestException("Description length (" + serverInput.getDescription().length() + ") is greater than maximum allowed (" + MAX_DESCRIPTION_LENGTH + ")");
+			}
+			if (serverInput.getWebpageUrls() != null && serverInput.getWebpageUrls().length() > MAX_LINKS_LENGTH) {
+				throw new IllegalRequestException("Webpage URLs length (" + serverInput.getWebpageUrls().length() + ") is greater than maximum allowed (" + MAX_LINKS_LENGTH + ")");
+			}
+			if (serverInput.getDocUrls() != null && serverInput.getDocUrls().length() > MAX_LINKS_LENGTH) {
+				throw new IllegalRequestException("Doc URLs length (" + serverInput.getDocUrls().length() + ") is greater than maximum allowed (" + MAX_LINKS_LENGTH + ")");
+			}
+			if (serverInput.getPublicationIds() != null && serverInput.getPublicationIds().length() > MAX_PUBLICATION_IDS_LENGTH) {
+				throw new IllegalRequestException("Publication IDs length (" + serverInput.getPublicationIds().length() + ") is greater than maximum allowed (" + MAX_PUBLICATION_IDS_LENGTH + ")");
+			}
+			if (serverInput.getAnnotations() != null && serverInput.getAnnotations().length() > MAX_ANNOTATIONS_LENGTH) {
+				throw new IllegalRequestException("Annotations length (" + serverInput.getAnnotations().length() + ") is greater than maximum allowed (" + MAX_ANNOTATIONS_LENGTH + ")");
+			}
+		} else {
+			if (tool.getName() != null && tool.getName().length() > MAX_NAME_LENGTH) {
+				throw new IllegalRequestException("Name length (" + tool.getName().length() + ") is greater than maximum allowed (" + MAX_NAME_LENGTH + ")");
+			}
+			if (tool.getDescription() != null && tool.getDescription().length() > MAX_DESCRIPTION_LENGTH) {
+				throw new IllegalRequestException("Description length (" + tool.getDescription().length() + ") is greater than maximum allowed (" + MAX_DESCRIPTION_LENGTH + ")");
+			}
 		}
 
 		String uuidDirPrefix = Server.args.getServerPrivateArgs().getFiles() + "/";
@@ -236,7 +250,13 @@ public class Resource {
 		} while (Files.exists(Paths.get(uuidDirPrefix + uuid)));
 		Files.createDirectories(Paths.get(uuidDirPrefix + uuidButLast));
 		Files.createDirectory(Paths.get(uuidDirPrefix + uuid));
-		serverInput.setId(uuid);
+		boolean toolMissingId = false;
+		if (serverInput != null) {
+			serverInput.setId(uuid);
+		} else if (tool.getBiotoolsID() == null || tool.getBiotoolsID().isEmpty()) {
+			toolMissingId = true;
+			tool.setBiotoolsID(uuid);
+		}
 		logger.info("UUID: {}", uuid);
 
 		String txtOutput = (txt ? uuid + "/results.txt" : null);
@@ -260,7 +280,15 @@ public class Resource {
 		logger.info("Loading query");
 		long startQuery = System.currentTimeMillis();
 
-		Query query = QueryLoader.fromServer(serverInput, Server.concepts, MAX_KEYWORDS_SIZE, MAX_LINKS_SIZE, MAX_PUBLICATION_IDS_SIZE);
+		Query query;
+		if (serverInput != null) {
+			query = QueryLoader.fromServer(serverInput, Server.concepts, MAX_KEYWORDS_SIZE, MAX_LINKS_SIZE, MAX_PUBLICATION_IDS_SIZE);
+		} else {
+			query = QueryLoader.getBiotools(tool, Server.concepts, MAX_LINKS_SIZE, MAX_PUBLICATION_IDS_SIZE);
+			if (toolMissingId) {
+				tool.setBiotoolsID(null);
+			}
+		}
 
 		Idf idf;
 		if (coreArgs.getPreProcessorArgs().isStemming()) {
@@ -314,8 +342,8 @@ public class Resource {
 
 		logger.info("Outputting results");
 
-		output.output(coreArgs, Server.getArgsMain(false, txt, html, json), null, false, jsonFields, 1, 1,
-			Server.concepts, queries, webpages, docs, publications, results, start, stop, Server.version, jsonVersion);
+		output.output(coreArgs, Server.getArgsMain(false, txt, html, json), null, jsonFields, 1, 1,
+			Server.concepts, queries, webpages, docs, publications, results, tool, start, stop, Server.version, jsonVersion);
 
 		String jsonString = null;
 		if (isJson) {
@@ -327,7 +355,7 @@ public class Resource {
 				}
 			}
 			jsonString = Json.output(coreArgs, Server.getArgsMain(false, txt, html, json), jsonFields, QueryType.server, jsonType, null,
-				Server.concepts, queries, publications, webpages, docs, results, start, stop, Server.version, jsonVersion);
+				Server.concepts, queries, publications, webpages, docs, results, tool, start, stop, Server.version, jsonVersion);
 		}
 
 		if (isJson) {
@@ -343,7 +371,7 @@ public class Resource {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public Response post(MultivaluedMap<String, String> params, @Context Request request) throws IOException, URISyntaxException {
 		try {
-			return Response.seeOther(runPost(params, request, false).htmlLocation).build();
+			return Response.seeOther(runPost(params, null, request, false).htmlLocation).build();
 		} catch (Throwable e) {
 			logger.error("Exception!", e);
 			throw e;
@@ -393,7 +421,21 @@ public class Resource {
 		try {
 			logger.info("POST JSON {} from {}", json, request.getRemoteAddr());
 
-			PostResult postResult = runPost(parseJson(json), request, true);
+			JsonObject tool;
+			try {
+				tool = json.getJsonObject("tool");
+			} catch (ClassCastException e) {
+				throw new IllegalRequestException(e);
+			}
+			String toolString = null;
+			if (tool != null) {
+				toolString = tool.toString();
+				if (toolString.length() > MAX_JSON_TOOL_LENGTH) {
+					throw new IllegalRequestException("\"tool\" length (" + toolString.length() + ") is greater than maximum allowed (" + MAX_JSON_TOOL_LENGTH + ")");
+				}
+			}
+
+			PostResult postResult = runPost(parseJson(json), toolString != null ? Tool.fromString(toolString) : null, request, true);
 
 			return postResult.jsonString;
 		} catch (Throwable e) {

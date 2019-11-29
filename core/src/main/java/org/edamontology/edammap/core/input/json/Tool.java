@@ -19,16 +19,22 @@
 
 package org.edamontology.edammap.core.input.json;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.edamontology.edammap.core.input.InputType;
-
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.edamontology.pubfetcher.core.common.IllegalRequestException;
+
+import org.edamontology.edammap.core.input.InputType;
 
 public class Tool implements InputType {
 
@@ -124,6 +130,16 @@ public class Tool implements InputType {
 			InputType.super.parseException(attribute, i, index);
 		} else {
 			throw new ParseException("Attribute \"" + attribute + "\" missing or empty for " + name + "! (record " + index + ")", i);
+		}
+	}
+
+	public static Tool fromString(String toolString) throws IOException {
+		try {
+			Tool tool = new ObjectMapper().readValue(toolString, Tool.class);
+			tool.check(1);
+			return tool;
+		} catch (JsonParseException | JsonMappingException | ParseException e) {
+			throw new IllegalRequestException(e);
 		}
 	}
 

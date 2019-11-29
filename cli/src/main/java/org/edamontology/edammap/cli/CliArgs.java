@@ -71,7 +71,7 @@ public class CliArgs extends BasicArgs {
 	private String json = jsonDefault;
 
 	private static final String biotoolsId = "biotools";
-	private static final String biotoolsDescription = "File to write results to, in bio.tools JSON format, confirming to biotoolsSchema. Available only for '--type biotools', where the input JSON is copied to the output, but with new annotations found by EDAMmap added. New annotations from the topic branch will be added to the 'topic' and new annotations from the operation branch will all be added under a new 'function' of a bio.tools entry. New annotations from the data and format branches will be added as strings in the form 'EDAM URI (label)' separated by ' | ' to the 'note' of the latest 'function', because EDAMmap can't differentiate inputs and outputs."; // TODO to documentation
+	private static final String biotoolsDescription = "File to write results to, in bio.tools JSON format, confirming to biotoolsSchema. Available only for '--type biotools', where the input JSON is copied to the output, but with new annotations found by EDAMmap added to the 'topic' and 'function' attributes.";
 	private static final String biotoolsDefault = "";
 	@Parameter(names = { "-b", "--" + biotoolsId }, description = biotoolsDescription)
 	private String biotools = biotoolsDefault;

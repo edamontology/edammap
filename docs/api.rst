@@ -7,7 +7,7 @@ API
 
 The EDAMmap API is consumed by sending a JSON request with HTTP POST. The main endpoint is `/api`_, which on the public instance translates to https://biit.cs.ut.ee/edammap/api.
 
-JSON numbers and booleans are converted to strings internally. JSON objects are ignored, meaning there is no hierarchy in the request JSON structure.
+JSON numbers and booleans are converted to strings internally. JSON objects are ignored (except under `bio.tools input`_), meaning there is no hierarchy in the request JSON structure.
 
 
 .. _api_endpoint:
@@ -21,6 +21,13 @@ The main endpoint is used for performing one mapping. The key-value pairs in the
 Query data
 ==========
 
+The query data to be mapped can be supplied in two different ways: as strings or arrays of strings under field names mirroring the usual `EDAMmap input`_ names or as a `bio.tools input`_ JSON object (like a bio.tools entry in JSON format). In case data is specified using both ways, only data under the `bio.tools input`_ is used.
+
+EDAMmap input
+-------------
+
+The following data can be given, with only the "name" being mandatory.
+
 ==============  ========================  ===========
 Key             Type                      Description
 ==============  ========================  ===========
@@ -31,9 +38,14 @@ webpageUrls     array of strings          URLs of homepage, etc
 docUrls         array of strings          URLs of documentations
 publicationIds  array of strings/objects  PMID/PMCID/DOI of journal article
 
-                                          Note: an article ID can be specified as a string ``"<PMID>\t<PMCID>\t<DOI>"`` or as an object (the only place where a JSON object is not ignored), wherein keys ``"pmid"``, ``"pmcid"``, ``"doi"`` can be used
+                                          Note: an article ID can be specified as a string ``"<PMID>\t<PMCID>\t<DOI>"`` or as an object (the only place besides `bio.tools input`_ where a JSON object is not ignored), wherein keys ``"pmid"``, ``"pmcid"``, ``"doi"`` can be used
 annotations     array of strings          Existing annotations from EDAM
 ==============  ========================  ===========
+
+bio.tools input
+---------------
+
+Under the field name "tool", a JSON object adhering to `biotoolsSchema <https://biotoolsschema.readthedocs.io/>`_ can be specified. All values possible in bio.tools can be specified, but only values relevant to EDAMmap will be used. A few attributes are mandatory: `name <https://biotools.readthedocs.io/en/latest/curators_guide.html#name-tool>`_, `description <https://biotools.readthedocs.io/en/latest/curators_guide.html#description>`_ and `homepage <https://biotools.readthedocs.io/en/latest/curators_guide.html#homepage>`_. The input will be mirrored under tool_ in the response_, but with found EDAM terms added to it.
 
 .. _api_parameters:
 
@@ -326,11 +338,11 @@ mapping
           Final score of the match
       _`test`
         ``"tp"``, if term was matched and also specified as existing annotation in the query; ``"fp"``, if term was matched, but not specified as existing annotation in query; ``"fn"``, if term was not matched, but was specified as existing annotation in query
-    operation
+    _`operation`
       Same structure as in topic_, but for terms matched from the operation branch
-    data
+    _`data`
       Same structure as in topic_, but for terms matched from the data branch
-    format
+    _`format`
       Same structure as in topic_, but for terms matched from the format branch
 _`args`
   The Parameters_
@@ -376,6 +388,8 @@ _`args`
       `Query weights`_ parameters
     scoreArgs
       `Score limits`_ parameters
+_`tool`
+  Present, if `query data`_ was supplied as `bio.tools input`_. The structure and content of this object is the same as in the object supplied as part of the query, except that ``null`` and empty values are removed. In addition, results_ from the topic_ branch are added to the `topic attribute <https://biotools.readthedocs.io/en/latest/curators_guide.html#topic>`_ and results_ from the operation_ branch are added under a new `function group <https://biotools.readthedocs.io/en/latest/curators_guide.html#function-group>`_ object. Results from the data_ and format_ branches should be added under the ``"input"`` and ``"output"`` attributes of a function group, however EDAMmap can't differentiate between inputs and outputs. Thus, new terms from the data_ and format_ branches will be added as strings (in the form ``"EDAM URI (label)"``, separated by ``" | "``) to the `note <https://biotools.readthedocs.io/en/latest/curators_guide.html#note-function>`_ of the last function group object.
 
 full
 ----
@@ -478,6 +492,8 @@ _`measures`
   DCGa
     `DCG (alternative) <https://en.wikipedia.org/wiki/Discounted_cumulative_gain>`_. Same structure as in precision_.
 
+.. _api_examples:
+
 Examples
 ========
 
@@ -544,6 +560,56 @@ For testing, this input could be saved in a file, e.g. ``input.json``, and then 
 .. code-block:: bash
 
   $ curl -H "Content-Type: application/json" -X POST -d '@/path/to/input.json' https://biit.cs.ut.ee/edammap/api
+
+To supply the same data (except the "keywords") as `bio.tools input`_, the following could be used:
+
+.. code-block:: json
+
+  {
+    "tool": {
+      "name": "g:Profiler",
+      "description": "A web server for functional enrichment analysis and conversions of gene lists.",
+      "homepage": "https://biit.cs.ut.ee/gprofiler/",
+      "documentation": [{
+        "url": "https://biit.cs.ut.ee/gprofiler/help.cgi",
+        "type": "General",
+        "note": null
+      }],
+      "publication": [{
+        "pmid": "17478515",
+        "pmcid": null,
+        "doi": "10.1093/nar/gkm226"
+      },{
+        "pmcid": "PMC3125778"
+      },{
+        "pmid": "27098042",
+        "pmcid": null,
+        "doi": "10.1093/nar/gkw199"
+      }],
+      "topic": [{
+        "term": "Function analysis",
+        "uri": "http://edamontology.org/topic_1775"
+      }],
+      "function": [{
+        "operation": [{
+          "term": "Gene-set enrichment analysis",
+          "uri": "http://edamontology.org/operation_2436"
+        }],
+        "input": [{
+          "data": {
+            "uri": "http://edamontology.org/data_3021"
+          },
+          "format": [{
+            "uri": "http://edamontology.org/format_1964"
+          }]
+        }],
+        "output": null
+      }]
+    },
+    "branches": [ "topic", "operation", "data", "format" ],
+    "matches": 5,
+    "obsolete": true
+  }
 
 
 .. _prefetching:

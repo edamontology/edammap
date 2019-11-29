@@ -452,62 +452,89 @@ public class QueryLoader {
 			annotations);
 	}
 
-	private static Query getBiotools(Tool tool, Map<EdamUri, Concept> concepts) {
+	public static Query getBiotools(Tool tool, Map<EdamUri, Concept> concepts, int maxLinks, int maxPublicationIds) {
 		List<Link> webpageUrls = new ArrayList<>();
 		addLink(tool.getHomepage(), "Homepage", false, webpageUrls);
-		webpageUrls.addAll(linksJson(tool.getLink().stream(), Arrays.asList(
-				LinkType.MIRROR.toString(),
-				LinkType.REPOSITORY.toString(),
-				LinkType.BROWSER.toString(),
-				LinkType.REGISTRY.toString(),
-				LinkType.GALAXY_SERVICE.toString(),
-				LinkType.SERVICE.toString(),
-				LinkType.OTHER.toString()
-			), false));
-		webpageUrls.addAll(linksJson(tool.getLink().stream(), Arrays.asList(
-				DownloadType.API_SPECIFICATION.toString(),
-				DownloadType.BIOLOGICAL_DATA.toString(),
-				DownloadType.COMMAND_LINE_SPECIFICATION.toString(),
-				DownloadType.CWL_FILE.toString(),
-				DownloadType.SOURCE_CODE.toString(),
-				DownloadType.TEST_SCRIPT.toString(),
-				DownloadType.DOWNLOADS_PAGE.toString(),
-				DownloadType.OTHER.toString()
-			), false));
+		if (tool.getLink() != null) {
+			webpageUrls.addAll(linksJson(tool.getLink().stream(), Arrays.asList(
+					LinkType.MIRROR.toString(),
+					LinkType.REPOSITORY.toString(),
+					LinkType.BROWSER.toString(),
+					LinkType.REGISTRY.toString(),
+					LinkType.GALAXY_SERVICE.toString(),
+					LinkType.SERVICE.toString(),
+					LinkType.OTHER.toString()
+				), false));
+		}
+		if (tool.getLink() != null) {
+			webpageUrls.addAll(linksJson(tool.getLink().stream(), Arrays.asList(
+					DownloadType.API_SPECIFICATION.toString(),
+					DownloadType.BIOLOGICAL_DATA.toString(),
+					DownloadType.COMMAND_LINE_SPECIFICATION.toString(),
+					DownloadType.CWL_FILE.toString(),
+					DownloadType.SOURCE_CODE.toString(),
+					DownloadType.TEST_SCRIPT.toString(),
+					DownloadType.DOWNLOADS_PAGE.toString(),
+					DownloadType.OTHER.toString()
+				), false));
+		}
 
-		List<Link> docUrls = linksJson(tool.getDocumentation().stream(), Arrays.asList(
-				DocumentationType.GENERAL.toString(),
-				DocumentationType.MANUAL.toString(),
-				DocumentationType.API_DOCUMENTATION.toString(),
-				DocumentationType.TRAINING_MATERIAL.toString(),
-				DocumentationType.TUTORIAL.toString(),
-				DocumentationType.INSTALLATION_INSTRUCTIONS.toString(),
-				DocumentationType.OTHER.toString(),
-				DocumentationType.FAQ.toString(),
-				DocumentationType.COMMAND_LINE_OPTIONS.toString()
-			), false);
+		List<Link> docUrls = new ArrayList<>();
+		if (tool.getDocumentation() != null) {
+			docUrls.addAll(linksJson(tool.getDocumentation().stream(), Arrays.asList(
+					DocumentationType.GENERAL.toString(),
+					DocumentationType.MANUAL.toString(),
+					DocumentationType.API_DOCUMENTATION.toString(),
+					DocumentationType.TRAINING_MATERIAL.toString(),
+					DocumentationType.TUTORIAL.toString(),
+					DocumentationType.INSTALLATION_INSTRUCTIONS.toString(),
+					DocumentationType.OTHER.toString(),
+					DocumentationType.FAQ.toString(),
+					DocumentationType.COMMAND_LINE_OPTIONS.toString()
+				), false));
+		}
 
 		List<PublicationIdsQuery> publicationIds = new ArrayList<>();
-		for (Publication publication : tool.getPublication()) {
-			addPublicationId(publication.getPmid(), publication.getPmcid(), publication.getDoi(), BIOTOOLS, publication.getType(), false, false, publicationIds);
+		if (tool.getPublication() != null) {
+			for (Publication publication : tool.getPublication()) {
+				addPublicationId(publication.getPmid(), publication.getPmcid(), publication.getDoi(), BIOTOOLS, publication.getType(), false, false, publicationIds);
+			}
 		}
 
 		Set<EdamUri> annotations = new LinkedHashSet<>();
-		annotations.addAll(edamUrisJson(tool.getTopic().stream(), concepts));
-		for (Function function : tool.getFunction()) {
-			annotations.addAll(edamUrisJson(function.getOperation().stream(), concepts));
-			for (InputOutput input : function.getInput()) {
-				annotations.addAll(edamUrisJson(Collections.singletonList(input.getData()).stream(), concepts));
-				if (input.getFormat() != null) {
-					annotations.addAll(edamUrisJson(input.getFormat().stream(), concepts));
+		if (tool.getTopic() != null) {
+			annotations.addAll(edamUrisJson(tool.getTopic().stream(), concepts));
+		}
+		if (tool.getFunction() != null) {
+			for (Function function : tool.getFunction()) {
+				annotations.addAll(edamUrisJson(function.getOperation().stream(), concepts));
+				if (function.getInput() != null) {
+					for (InputOutput input : function.getInput()) {
+						annotations.addAll(edamUrisJson(Collections.singletonList(input.getData()).stream(), concepts));
+						if (input.getFormat() != null) {
+							annotations.addAll(edamUrisJson(input.getFormat().stream(), concepts));
+						}
+					}
+				}
+				if (function.getOutput() != null) {
+					for (InputOutput output : function.getOutput()) {
+						annotations.addAll(edamUrisJson(Collections.singletonList(output.getData()).stream(), concepts));
+						if (output.getFormat() != null) {
+							annotations.addAll(edamUrisJson(output.getFormat().stream(), concepts));
+						}
+					}
 				}
 			}
-			for (InputOutput output : function.getOutput()) {
-				annotations.addAll(edamUrisJson(Collections.singletonList(output.getData()).stream(), concepts));
-				if (output.getFormat() != null) {
-					annotations.addAll(edamUrisJson(output.getFormat().stream(), concepts));
-				}
-			}
+		}
+
+		if (maxLinks > 0 && webpageUrls.size() > maxLinks) {
+			throw new IllegalRequestException("Number of links (" + webpageUrls.size() + ") is greater than maximum allowed (" + maxLinks + ")");
+		}
+		if (maxLinks > 0 && docUrls.size() > maxLinks) {
+			throw new IllegalRequestException("Number of documentation links (" + docUrls.size() + ") is greater than maximum allowed (" + maxLinks + ")");
+		}
+		if (maxPublicationIds > 0 && publicationIds.size() > maxPublicationIds) {
+			throw new IllegalRequestException("Number of publication IDs (" + publicationIds.size() + ") is greater than maximum allowed (" + maxPublicationIds + ")");
 		}
 
 		return new Query(
@@ -544,7 +571,7 @@ public class QueryLoader {
 				case msutils: queries.add(getMsutils((Msutils) input, concepts)); break;
 				case Bioconductor: queries.add(getBioconductor((Bioconductor) input, concepts)); break;
 				case biotools14: queries.add(getBiotools14((Biotools14) input, concepts)); break;
-				case biotools: queries.add(getBiotools((Tool) input, concepts)); break;
+				case biotools: queries.add(getBiotools((Tool) input, concepts, 0, 0)); break;
 				case server: break;
 			}
 		}

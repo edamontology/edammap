@@ -25,6 +25,9 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -32,6 +35,8 @@ import org.edamontology.edammap.core.input.json.Biotools;
 import org.edamontology.edammap.core.query.QueryType;
 
 public class Json {
+
+	private static final Logger logger = LogManager.getLogger();
 
 	public static List<? extends InputType> load(String queryPath, QueryType type, int timeout, String userAgent) throws IOException, ParseException {
 		List<? extends InputType> inputs = new ArrayList<>();
@@ -50,6 +55,8 @@ public class Json {
 		for (InputType inputType : inputs) {
 			inputType.check(++i);
 		}
+
+		logger.debug("Loaded {} JSON entries from {} of type {}", inputs.size(), queryPath, type);
 
 		return inputs;
 	}

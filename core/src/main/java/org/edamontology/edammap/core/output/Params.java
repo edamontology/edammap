@@ -94,7 +94,7 @@ public class Params {
 		write(writer, arg.getValue(), arg, input);
 	}
 
-	private static <T> void writeTooltip(Writer writer, String id, String description, T defaultValue) throws IOException {
+	private static <T> void writeTooltip(Writer writer, String id, String description, T defaultValue, boolean input) throws IOException {
 		writer.write("\t\t\t\t<span class=\"tooltip\" tabindex=\"0\"></span>\n");
 		writer.write("\t\t\t\t<div class=\"tooltip-box\" tabindex=\"0\">\n");
 		writer.write("\t\t\t\t\t<span class=\"description\">");
@@ -109,9 +109,12 @@ public class Params {
 			}
 			writer.write("</span>");
 		}
-		writer.write("<br><span class=\"def\">API key:</span> <span class=\"value\">");
-		writer.write(id);
-		writer.write("</span>\n");
+		if (input) {
+			writer.write("<br><span class=\"def\">API key:</span> <span class=\"value\">");
+			writer.write(id);
+			writer.write("</span>");
+		}
+		writer.write("\n");
 		writer.write("\t\t\t\t</div>\n");
 	}
 
@@ -163,7 +166,7 @@ public class Params {
 			writer.write(" readonly");
 		}
 		writer.write(">\n");
-		writeTooltip(writer, id, description, defaultValue);
+		writeTooltip(writer, id, description, defaultValue, input);
 		writer.write("\t\t\t</div>\n");
 		writer.write("\t\t</div>\n");
 	}
@@ -203,7 +206,7 @@ public class Params {
 		}
 		writer.write(">\n");
 		writer.write("\t\t\t\t<label for=\"" + id + "\"></label>\n");
-		writeTooltip(writer, id, description, defaultValue);
+		writeTooltip(writer, id, description, defaultValue, input);
 		writer.write("\t\t\t</div>\n");
 		writer.write("\t\t</div>\n");
 	}
@@ -250,7 +253,7 @@ public class Params {
 			writer.write(">" + enumValue.name() + "</option>\n");
 		}
 		writer.write("\t\t\t\t</select>\n");
-		writeTooltip(writer, id, description, defaultValue);
+		writeTooltip(writer, id, description, defaultValue, true);
 		writer.write("\t\t\t</div>\n");
 		writer.write("\t\t</div>\n");
 	}

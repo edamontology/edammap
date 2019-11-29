@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -36,6 +38,9 @@ import org.semanticweb.owlapi.search.EntitySearcher;
 import org.edamontology.pubfetcher.core.common.PubFetcher;
 
 public class Edam {
+
+	private static final Logger logger = LogManager.getLogger();
+
 	public static Map<EdamUri, Concept> load(String edamPath) throws IOException {
 
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
@@ -48,7 +53,7 @@ public class Edam {
 
 		String prefix = ontology.getOntologyID().getOntologyIRI().get().toString();
 
-		return ontology.classesInSignature()
+		Map<EdamUri, Concept> concepts = ontology.classesInSignature()
 			.filter(c -> EdamUri.isEdamUri(c.getIRI().toString(), prefix))
 			.collect(Collectors.toMap(
 				c -> new EdamUri(c.getIRI().toString(), prefix),
@@ -85,6 +90,9 @@ public class Edam {
 				(u, v) -> { throw new IllegalStateException(String.format("Duplicate key %s", u)); },
 				LinkedHashMap::new
 			));
+		logger.debug("Loaded EDAM {} with {} concepts", edamPath, concepts.size());
+
+		return concepts;
 	}
 
 	public static Map<Branch, Integer> branchCounts(Map<EdamUri, Concept> concepts) {

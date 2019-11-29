@@ -58,6 +58,8 @@ Use the public web application at https://biit.cs.ut.ee/edammap/ by filling in t
 
 For command-line usage, some simple examples can be found under :ref:`cli`.
 
+And for using the API, there are also a few :ref:`api_examples`.
+
 
 ****
 Repo

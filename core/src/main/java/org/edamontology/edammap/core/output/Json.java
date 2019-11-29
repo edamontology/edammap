@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -52,13 +53,9 @@ import org.edamontology.edammap.core.edam.Concept;
 import org.edamontology.edammap.core.edam.EdamUri;
 import org.edamontology.edammap.core.input.Input;
 import org.edamontology.edammap.core.input.json.Biotools;
-import org.edamontology.edammap.core.input.json.Credit;
-import org.edamontology.edammap.core.input.json.DocumentationType;
-import org.edamontology.edammap.core.input.json.DownloadType;
 import org.edamontology.edammap.core.input.json.Edam;
 import org.edamontology.edammap.core.input.json.Function;
 import org.edamontology.edammap.core.input.json.InputOutput;
-import org.edamontology.edammap.core.input.json.LinkType;
 import org.edamontology.edammap.core.input.json.Tool;
 import org.edamontology.edammap.core.mapping.ConceptMatch;
 import org.edamontology.edammap.core.mapping.ConceptMatchType;
@@ -222,8 +219,7 @@ public class Json {
 		generator.writeEndObject();
 	}
 
-	private static JsonGenerator createGenerator(Writer writer, Path json) throws IOException {
-		ObjectMapper mapper = new ObjectMapper();
+	private static JsonGenerator createGenerator(Writer writer, Path json, ObjectMapper mapper) throws IOException {
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
 		mapper.enable(SerializationFeature.CLOSE_CLOSEABLE);
 		JsonFactory factory = mapper.getFactory();
@@ -238,9 +234,10 @@ public class Json {
 	}
 
 	// concepts must contain the key match.getEdamUri(), but also all keys match.getParents(), match.getChildren(), etc
-	public static String output(CoreArgs args, List<ArgMain> argsMain, Map<String, String> jsonFields, QueryType type, JsonType jsonType, Path json, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publicationsAll, List<List<Webpage>> webpagesAll, List<List<Webpage>> docsAll, Results results, long start, long stop, Version version, String jsonVersion) throws IOException {
+	public static String output(CoreArgs args, List<ArgMain> argsMain, Map<String, String> jsonFields, QueryType type, JsonType jsonType, Path json, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publicationsAll, List<List<Webpage>> webpagesAll, List<List<Webpage>> docsAll, Results results, Tool tool, long start, long stop, Version version, String jsonVersion) throws IOException {
 		StringWriter writer = new StringWriter();
-		JsonGenerator generator = createGenerator(writer, json);
+		ObjectMapper mapper = new ObjectMapper();
+		JsonGenerator generator = createGenerator(writer, json, mapper);
 		generator.writeStartObject();
 
 		generator.writeBooleanField("success", true);
@@ -482,6 +479,14 @@ public class Json {
 			Params.writeBenchmarking(concepts, queries, results, generator);
 		}
 
+		if (tool != null) {
+			mapper.setSerializationInclusion(Include.NON_EMPTY);
+			generator.writeFieldName("tool");
+			addAnnotations(args, tool, results.getMappings().get(0), concepts);
+			generator.writeObject(tool);
+			mapper.setSerializationInclusion(Include.USE_DEFAULTS);
+		}
+
 		generator.writeEndObject();
 		generator.close();
 		if (json == null) {
@@ -493,7 +498,7 @@ public class Json {
 
 	public static String fromDatabaseEntries(String key, List<DatabaseEntryEntry> databaseEntries, FetcherArgs fetcherArgs) throws IOException {
 		StringWriter writer = new StringWriter();
-		JsonGenerator generator = createGenerator(writer, null);
+		JsonGenerator generator = createGenerator(writer, null, new ObjectMapper());
 		generator.writeStartObject();
 
 		generator.writeBooleanField("success", true);
@@ -526,7 +531,7 @@ public class Json {
 
 	public static String fromAnnotations(Map<EdamUri, Concept> annotations) throws IOException {
 		StringWriter writer = new StringWriter();
-		JsonGenerator generator = createGenerator(writer, null);
+		JsonGenerator generator = createGenerator(writer, null, new ObjectMapper());
 		generator.writeStartObject();
 
 		generator.writeBooleanField("success", true);
@@ -547,148 +552,9 @@ public class Json {
 		return writer.toString();
 	}
 
-	public static void outputTrimmedBiotools(Writer writer, Path json, List<Tool> tools) throws IOException {
-		JsonGenerator generator = createGenerator(writer, json);
-		generator.writeStartObject();
-		generator.writeNumberField("count", tools.size());
-		generator.writeFieldName("list");
-		generator.writeStartArray();
-		for (Tool tool : tools) {
-			generator.writeStartObject();
-			generator.writeStringField("name", tool.getName());
-			generator.writeStringField("description", tool.getDescription());
-			generator.writeStringField("homepage", tool.getHomepage());
-			if (!tool.getFunction().isEmpty()) {
-				generator.writeFieldName("function");
-				generator.writeStartArray();
-				for (Function function : tool.getFunction()) {
-					generator.writeStartObject();
-					generator.writeFieldName("operation");
-					generator.writeStartArray();
-					for (Edam operation : function.getOperation()) {
-						generator.writeObject(operation);
-					}
-					generator.writeEndArray();
-					if (function.getNote() != null && !function.getNote().isEmpty()) {
-						generator.writeStringField("note", function.getNote());
-					}
-					generator.writeEndObject();
-				}
-				generator.writeEndArray();
-			}
-			if (!tool.getTopic().isEmpty()) {
-				generator.writeFieldName("topic");
-				generator.writeStartArray();
-				for (Edam topic : tool.getTopic()) {
-					generator.writeObject(topic);
-				}
-				generator.writeEndArray();
-			}
-			if (!tool.getLanguage().isEmpty()) {
-				generator.writeFieldName("language");
-				generator.writeStartArray();
-				for (String language : tool.getLanguage()) {
-					generator.writeString(language);
-				}
-				generator.writeEndArray();
-			}
-			if (tool.getLicense() != null && !tool.getLicense().isEmpty()) {
-				generator.writeStringField("license", tool.getLicense());
-			}
-			if (!tool.getLink().isEmpty()) {
-				generator.writeFieldName("link");
-				generator.writeStartArray();
-				for (org.edamontology.edammap.core.input.json.Link<LinkType> link : tool.getLink()) {
-					generator.writeStartObject();
-					generator.writeStringField("url", link.getUrl());
-					if (link.getType() != null) {
-						generator.writeStringField("type", link.getType().toString());
-					}
-					generator.writeEndObject();
-				}
-				generator.writeEndArray();
-			}
-			if (!tool.getDownload().isEmpty()) {
-				generator.writeFieldName("download");
-				generator.writeStartArray();
-				for (org.edamontology.edammap.core.input.json.LinkVersion<DownloadType> download : tool.getDownload()) {
-					generator.writeStartObject();
-					generator.writeStringField("url", download.getUrl());
-					if (download.getType() != null) {
-						generator.writeStringField("type", download.getType().toString());
-					}
-					generator.writeEndObject();
-				}
-				generator.writeEndArray();
-			}
-			if (!tool.getDocumentation().isEmpty()) {
-				generator.writeFieldName("documentation");
-				generator.writeStartArray();
-				for (org.edamontology.edammap.core.input.json.Link<DocumentationType> documentation : tool.getDocumentation()) {
-					generator.writeStartObject();
-					generator.writeStringField("url", documentation.getUrl());
-					if (documentation.getType() != null) {
-						generator.writeStringField("type", documentation.getType().toString());
-					}
-					generator.writeEndObject();
-				}
-				generator.writeEndArray();
-			}
-			if (!tool.getPublication().isEmpty()) {
-				generator.writeFieldName("publication");
-				generator.writeStartArray();
-				for (org.edamontology.edammap.core.input.json.Publication publication : tool.getPublication()) {
-					generator.writeStartObject();
-					if (publication.getDoi() != null && !publication.getDoi().isEmpty()) {
-						generator.writeStringField("doi", publication.getDoi());
-					}
-					if (publication.getPmid() != null && !publication.getPmid().isEmpty()) {
-						generator.writeStringField("pmid", publication.getPmid());
-					}
-					if (publication.getPmcid() != null && !publication.getPmcid().isEmpty()) {
-						generator.writeStringField("pmcid", publication.getPmcid());
-					}
-					generator.writeEndObject();
-				}
-				generator.writeEndArray();
-			}
-			if (!tool.getCredit().isEmpty()) {
-				generator.writeFieldName("credit");
-				generator.writeStartArray();
-				for (Credit credit : tool.getCredit()) {
-					generator.writeStartObject();
-					if (credit.getName() != null && !credit.getName().isEmpty()) {
-						generator.writeStringField("name", credit.getName());
-					}
-					if (credit.getEmail() != null && !credit.getEmail().isEmpty()) {
-						generator.writeStringField("email", credit.getEmail());
-					}
-					if (credit.getUrl() != null && !credit.getUrl().isEmpty()) {
-						generator.writeStringField("url", credit.getUrl());
-					}
-					if (credit.getOrcidid() != null && !credit.getOrcidid().isEmpty()) {
-						generator.writeStringField("orcidid", credit.getOrcidid());
-					}
-					if (credit.getTypeEntity() != null) {
-						generator.writeStringField("typeEntity", credit.getTypeEntity().toString());
-					}
-					generator.writeEndObject();
-				}
-				generator.writeEndArray();
-			}
-			if (tool.getConfidence_flag() != null && !tool.getConfidence_flag().isEmpty()) {
-				generator.writeStringField("confidence_flag", tool.getConfidence_flag());
-			}
-			generator.writeEndObject();
-		}
-		generator.writeEndArray();
-		generator.writeEndObject();
-		generator.close();
-	}
-
 	private static boolean existingAnnotation(List<Edam> annotations, EdamUri edamUri) {
 		for (Edam annotation : annotations) {
-			if (annotation.getUri().equals(edamUri.getUri())) {
+			if (annotation.getUri() != null && annotation.getUri().equals(edamUri.getUri())) {
 				return true;
 			}
 		}
@@ -706,10 +572,178 @@ public class Json {
 		return edamUri.toString() + " (" + concepts.get(edamUri).getLabel() + ")";
 	}
 
-	public static void outputBiotools(CoreArgs args, String queryPath, Path biotoolsPath, Map<EdamUri, Concept> concepts, Results results, boolean trim) throws IOException {
+	private static void addAnnotations(CoreArgs args, Tool tool, MappingTest mapping, Map<EdamUri, Concept> concepts) {
+		if (args.getMapperArgs().getBranches().contains(Branch.topic)) {
+			List<Edam> topic = tool.getTopic();
+			if (topic == null) {
+				topic = new ArrayList<>();
+			}
+			for (MatchTest match : mapping.getMatches(Branch.topic)) {
+				EdamUri edamUri = match.getMatch().getEdamUri();
+				if (!existingAnnotation(topic, edamUri)) {
+					topic.add(getEdam(edamUri, concepts));
+				}
+			}
+		}
+
+		if (args.getMapperArgs().getBranches().contains(Branch.operation)) {
+			List<Function> functions = tool.getFunction();
+			if (functions == null) {
+				functions = new ArrayList<>();
+			}
+
+			Function newFunction = new Function();
+
+			for (MatchTest match : mapping.getMatches(Branch.operation)) {
+				EdamUri edamUri = match.getMatch().getEdamUri();
+				boolean existing = false;
+				for (Function function : functions) {
+					if (existingAnnotation(function.getOperation(), edamUri)) {
+						existing = true;
+						break;
+					}
+				}
+				if (!existing) {
+					newFunction.getOperation().add(getEdam(edamUri, concepts));
+				}
+			}
+
+			if (!newFunction.getOperation().isEmpty()) {
+				functions.add(newFunction);
+			}
+
+			if (!functions.isEmpty()) {
+				Function lastFunction = functions.get(functions.size() - 1);
+
+				String note = lastFunction.getNote();
+				if (note == null) {
+					note = "";
+				}
+				List<String> data = new ArrayList<>();
+				List<String> format = new ArrayList<>();
+
+				if (args.getMapperArgs().getBranches().contains(Branch.data)) {
+					for (MatchTest match : mapping.getMatches(Branch.data)) {
+						EdamUri edamUri = match.getMatch().getEdamUri();
+						boolean existing = false;
+						for (Function function : functions) {
+							if (function.getInput() != null) {
+								for (InputOutput input : function.getInput()) {
+									if (input.getData().getUri() != null && input.getData().getUri().equals(edamUri.getUri())) {
+										existing = true;
+										break;
+									}
+								}
+							}
+							if (existing) {
+								break;
+							}
+							if (function.getOutput() != null) {
+								for (InputOutput output : function.getOutput()) {
+									if (output.getData().getUri() != null && output.getData().getUri().equals(edamUri.getUri())) {
+										existing = true;
+										break;
+									}
+								}
+							}
+							if (existing) {
+								break;
+							}
+						}
+						if (!existing) {
+							data.add(getEdamString(edamUri, concepts));
+						}
+					}
+				}
+
+				if (args.getMapperArgs().getBranches().contains(Branch.format)) {
+					for (MatchTest match : mapping.getMatches(Branch.format)) {
+						EdamUri edamUri = match.getMatch().getEdamUri();
+						boolean existing = false;
+						for (Function function : functions) {
+							if (function.getInput() != null) {
+								for (InputOutput input : function.getInput()) {
+									if (existingAnnotation(input.getFormat(), edamUri)) {
+										existing = true;
+										break;
+									}
+								}
+							}
+							if (existing) {
+								break;
+							}
+							if (function.getOutput() != null) {
+								for (InputOutput output : function.getOutput()) {
+									if (existingAnnotation(output.getFormat(), edamUri)) {
+										existing = true;
+										break;
+									}
+								}
+							}
+							if (existing) {
+								break;
+							}
+						}
+						if (!existing) {
+							format.add(getEdamString(edamUri, concepts));
+						}
+					}
+				}
+
+				boolean exceeded = false;
+				if (note.length() + (note.isEmpty() ? 0 : 3) + 3 > FUNCTION_NOTE_MAX) {
+					exceeded = true;
+				}
+				if (!exceeded) {
+					for (String d : data) {
+						if (note.length() + (note.isEmpty() ? 0 : 3) + d.length() + 3 + 3 > FUNCTION_NOTE_MAX) {
+							if (!note.isEmpty()) {
+								note += " | ";
+							}
+							note += "...";
+							exceeded = true;
+							break;
+						} else {
+							if (!note.isEmpty()) {
+								note += " | ";
+							}
+							note += d;
+						}
+					}
+				}
+				if (!exceeded) {
+					for (String f : format) {
+						if (note.length() + (note.isEmpty() ? 0 : 3) + f.length() + 3 + 3 > FUNCTION_NOTE_MAX) {
+							if (!note.isEmpty()) {
+								note += " | ";
+							}
+							note += "...";
+							exceeded = true;
+							break;
+						} else {
+							if (!note.isEmpty()) {
+								note += " | ";
+							}
+							note += f;
+						}
+					}
+				}
+
+				if (note.length() >= FUNCTION_NOTE_MIN) {
+					if (note.length() > FUNCTION_NOTE_MAX) {
+						note = note.substring(0, FUNCTION_NOTE_MAX);
+					}
+					lastFunction.setNote(note);
+				}
+			}
+		}
+	}
+
+	public static void outputBiotools(CoreArgs args, String queryPath, Path biotoolsPath, Map<EdamUri, Concept> concepts, Results results) throws IOException {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
 		mapper.enable(SerializationFeature.CLOSE_CLOSEABLE);
+		mapper.setSerializationInclusion(Include.NON_EMPTY);
 
 		Biotools biotools = null;
 		try (InputStream is = Input.newInputStream(queryPath, true, args.getFetcherArgs().getTimeout(), args.getFetcherArgs().getPrivateArgs().getUserAgent())) {
@@ -735,160 +769,25 @@ public class Json {
 			Tool tool = biotools.getList().get(i);
 			MappingTest mapping = results.getMappings().get(i);
 
-			if (args.getMapperArgs().getBranches().contains(Branch.topic)) {
-				List<Edam> topic = tool.getTopic();
-				for (MatchTest match : mapping.getMatches(Branch.topic)) {
-					EdamUri edamUri = match.getMatch().getEdamUri();
-					if (!existingAnnotation(topic, edamUri)) {
-						topic.add(getEdam(edamUri, concepts));
-					}
-				}
-			}
-
-			if (args.getMapperArgs().getBranches().contains(Branch.operation)) {
-				Function newFunction = new Function();
-
-				for (MatchTest match : mapping.getMatches(Branch.operation)) {
-					EdamUri edamUri = match.getMatch().getEdamUri();
-					boolean existing = false;
-					for (Function function : tool.getFunction()) {
-						if (existingAnnotation(function.getOperation(), edamUri)) {
-							existing = true;
-							break;
-						}
-					}
-					if (!existing) {
-						newFunction.getOperation().add(getEdam(edamUri, concepts));
-					}
-				}
-
-				if (!newFunction.getOperation().isEmpty()) {
-					tool.getFunction().add(newFunction);
-				}
-
-				if (!tool.getFunction().isEmpty()) {
-					Function lastFunction = tool.getFunction().get(tool.getFunction().size() - 1);
-
-					String note = lastFunction.getNote();
-					if (note == null) {
-						note = "";
-					}
-					List<String> data = new ArrayList<>();
-					List<String> format = new ArrayList<>();
-
-					if (args.getMapperArgs().getBranches().contains(Branch.data)) {
-						for (MatchTest match : mapping.getMatches(Branch.data)) {
-							EdamUri edamUri = match.getMatch().getEdamUri();
-							boolean existing = false;
-							for (Function function : tool.getFunction()) {
-								for (InputOutput input : function.getInput()) {
-									if (input.getData().getUri().equals(edamUri.getUri())) {
-										existing = true;
-										break;
-									}
-								}
-								if (existing) {
-									break;
-								}
-								for (InputOutput output : function.getOutput()) {
-									if (output.getData().getUri().equals(edamUri.getUri())) {
-										existing = true;
-										break;
-									}
-								}
-								if (existing) {
-									break;
-								}
-							}
-							if (!existing) {
-								data.add(getEdamString(edamUri, concepts));
-							}
-						}
-					}
-
-					if (args.getMapperArgs().getBranches().contains(Branch.format)) {
-						for (MatchTest match : mapping.getMatches(Branch.format)) {
-							EdamUri edamUri = match.getMatch().getEdamUri();
-							boolean existing = false;
-							for (Function function : tool.getFunction()) {
-								for (InputOutput input : function.getInput()) {
-									if (existingAnnotation(input.getFormat(), edamUri)) {
-										existing = true;
-										break;
-									}
-								}
-								if (existing) {
-									break;
-								}
-								for (InputOutput output : function.getOutput()) {
-									if (existingAnnotation(output.getFormat(), edamUri)) {
-										existing = true;
-										break;
-									}
-								}
-								if (existing) {
-									break;
-								}
-							}
-							if (!existing) {
-								format.add(getEdamString(edamUri, concepts));
-							}
-						}
-					}
-
-					boolean exceeded = false;
-					if (note.length() + (note.isEmpty() ? 0 : 3) + 3 > FUNCTION_NOTE_MAX) {
-						exceeded = true;
-					}
-					if (!exceeded) {
-						for (String d : data) {
-							if (note.length() + (note.isEmpty() ? 0 : 3) + d.length() + 3 + 3 > FUNCTION_NOTE_MAX) {
-								if (!note.isEmpty()) {
-									note += " | ";
-								}
-								note += "...";
-								exceeded = true;
-								break;
-							} else {
-								if (!note.isEmpty()) {
-									note += " | ";
-								}
-								note += d;
-							}
-						}
-					}
-					if (!exceeded) {
-						for (String f : format) {
-							if (note.length() + (note.isEmpty() ? 0 : 3) + f.length() + 3 + 3 > FUNCTION_NOTE_MAX) {
-								if (!note.isEmpty()) {
-									note += " | ";
-								}
-								note += "...";
-								exceeded = true;
-								break;
-							} else {
-								if (!note.isEmpty()) {
-									note += " | ";
-								}
-								note += f;
-							}
-						}
-					}
-
-					if (note.length() >= FUNCTION_NOTE_MIN) {
-						if (note.length() > FUNCTION_NOTE_MAX) {
-							note = note.substring(0, FUNCTION_NOTE_MAX);
-						}
-						lastFunction.setNote(note);
-					}
-				}
-			}
+			addAnnotations(args, tool, mapping, concepts);
 		}
 
-		if (trim) {
-			outputTrimmedBiotools(null, biotoolsPath, biotools.getList());
-		} else {
-			mapper.writeValue(biotoolsPath.toFile(), biotools);
+		mapper.writeValue(biotoolsPath.toFile(), biotools);
+	}
+
+	public static void outputBiotools(Writer writer, List<Tool> tools) throws IOException {
+		ObjectMapper mapper = new ObjectMapper();
+		JsonGenerator generator = createGenerator(writer, null, mapper);
+		mapper.setSerializationInclusion(Include.NON_EMPTY);
+		generator.writeStartObject();
+		generator.writeNumberField("count", tools.size());
+		generator.writeFieldName("list");
+		generator.writeStartArray();
+		for (Tool tool : tools) {
+			generator.writeObject(tool);
 		}
+		generator.writeEndArray();
+		generator.writeEndObject();
+		generator.close();
 	}
 }

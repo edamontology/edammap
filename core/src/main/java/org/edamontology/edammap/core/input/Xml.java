@@ -31,10 +31,15 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.edamontology.edammap.core.input.xml.Biotools14;
 import org.edamontology.edammap.core.query.QueryType;
 
 public class Xml {
+
+	private static final Logger logger = LogManager.getLogger();
 
 	public static List<InputType> load(String queryPath, QueryType type, int timeout, String userAgent) throws IOException, ParseException {
 		List<InputType> inputs = new ArrayList<>();
@@ -97,6 +102,8 @@ public class Xml {
 		for (InputType inputType : inputs) {
 			inputType.check(++i);
 		}
+
+		logger.debug("Loaded {} XML entries from {} of type {}", inputs.size(), queryPath, type);
 
 		return inputs;
 	}

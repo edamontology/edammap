@@ -30,10 +30,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.carrotsearch.hppc.ObjectDoubleScatterMap;
 import com.carrotsearch.hppc.ObjectIntScatterMap;
 
 public class Idf {
+
+	private static final Logger logger = LogManager.getLogger();
 
 	private final ObjectDoubleScatterMap<String> idfMap;
 
@@ -78,7 +83,9 @@ public class Idf {
 				} else {
 					throw new IOException("First line must be document count!");
 				}
+				long entries = 0;
 				while ((line = br.readLine()) != null) {
+					++entries;
 					int tab = line.indexOf("\t");
 					String key = line.substring(0, tab);
 					int tab2 = line.indexOf("\t", tab + 1);
@@ -87,6 +94,7 @@ public class Idf {
 					double idf = Double.parseDouble(line.substring(tab2 + 1));
 					this.idfMap.put(key, idf);
 				}
+				logger.debug("Loaded IDF {} with {} entries", inputPath, entries);
 				this.idfTop = null;
 			}
 		}

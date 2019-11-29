@@ -158,24 +158,27 @@ public class Cli implements Runnable {
 		idf = null;
 		if (args.getCoreArgs().getPreProcessorArgs().isStemming()) {
 			if (args.getCoreArgs().getProcessorArgs().getIdfStemmed() != null && !args.getCoreArgs().getProcessorArgs().getIdfStemmed().isEmpty()) {
+				logger.info("Loading IDF from {}", args.getCoreArgs().getProcessorArgs().getIdfStemmed());
 				idf = new Idf(args.getCoreArgs().getProcessorArgs().getIdfStemmed());
 			}
 		} else {
 			if (args.getCoreArgs().getProcessorArgs().getIdf() != null && !args.getCoreArgs().getProcessorArgs().getIdf().isEmpty()) {
+				logger.info("Loading IDF from {}", args.getCoreArgs().getProcessorArgs().getIdf());
 				idf = new Idf(args.getCoreArgs().getProcessorArgs().getIdf());
 			}
 		}
 
-		logger.info("Loading concepts");
+		logger.info("Loading concepts from {}", args.getEdam());
 		Map<EdamUri, Concept> concepts = Edam.load(args.getEdam());
 
 		logger.info("Processing {} concepts", concepts.size());
 		processedConcepts = processor.getProcessedConcepts(concepts, args.getCoreArgs().getMapperArgs().getIdfArgs(), args.getCoreArgs().getMapperArgs().getMultiplierArgs(),
 			new PreProcessor(args.getCoreArgs().getPreProcessorArgs(), stopwords));
 
-		logger.info("Loading queries");
+		logger.info("Loading queries from {}", args.getQuery());
 		queries = QueryLoader.get(args.getQuery(), args.getType(), concepts,
 			args.getCoreArgs().getFetcherArgs().getTimeout(), args.getCoreArgs().getFetcherArgs().getPrivateArgs().getUserAgent());
+		logger.info("Loaded {} queries", queries.size());
 
 		publications = new ArrayList<>(queries.size());
 		webpages = new ArrayList<>(queries.size());
@@ -221,8 +224,8 @@ public class Cli implements Runnable {
 		Results results = Benchmark.calculate(queries, mappings);
 
 		logger.info("Outputting results");
-		output.output(args.getCoreArgs(), argsMain, args.getQuery(), trimBiotools, null, args.getReportPageSize(), args.getReportPaginationSize(),
-			concepts, queries, webpages, docs, publications, results, start, stop, version, JSON_VERSION);
+		output.output(args.getCoreArgs(), argsMain, args.getQuery(), null, args.getReportPageSize(), args.getReportPaginationSize(),
+			concepts, queries, webpages, docs, publications, results, null, start, stop, version, JSON_VERSION);
 
 		logger.info("{} : {}", results.toStringMeasure(Measure.recall), Measure.recall);
 		logger.info("{} : {}", results.toStringMeasure(Measure.AveP), Measure.AveP);

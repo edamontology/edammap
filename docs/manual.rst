@@ -41,15 +41,15 @@ Next, content for publications, webpages and docs is fetched (``-db-fetch`` is d
 
 .. code-block:: bash
 
-  $ java -jar edammap-util-<version>.jar -pub-query biotools.json --query-type biotools -db-fetch db.db --log pub.log
-  $ java -jar edammap-util-<version>.jar -web-query biotools.json --query-type biotools -db-fetch db.db --log web.log
-  $ java -jar edammap-util-<version>.jar -doc-query biotools.json --query-type biotools -db-fetch db.db --log doc.log
+  $ java -jar edammap-util-<version>.jar -pub-query biotools.json --type biotools -db-fetch db.db --log pub.log
+  $ java -jar edammap-util-<version>.jar -web-query biotools.json --type biotools -db-fetch db.db --log web.log
+  $ java -jar edammap-util-<version>.jar -doc-query biotools.json --type biotools -db-fetch db.db --log doc.log
 
 or alternatively, with a single command:
 
 .. code-block:: bash
 
-  $ java -jar edammap-util-<version>.jar -all-query biotools.json --query-type biotools -db-fetch db.db --log all.log
+  $ java -jar edammap-util-<version>.jar -all-query biotools.json --type biotools -db-fetch db.db --log all.log
 
 .. note::
   Fetching of content could be repeated multiple times in the span of a few days to get more complete content of publications, webpages and docs, as some absent information could be filled in subsequent fetches, when for example resources that were temporarily unavailable will be up again (while on the other hand, ``-db-fetch`` will not try to re-fetch content that is already deemed to be final in the database, thus saving time and resources).
@@ -74,16 +74,16 @@ An input query fed to EDAMmap can have the following parts: *id*, *name*, *list 
 
 .. _QueryType:
 
-How query parts are read from an input file depends on the type of the input file (specified with ``--query-type``).
+How query parts are read from an input file depends on the query type of the input file (specified with ``--type``).
 
-For example, using ``--query-type biotools`` means that the input file is a JSON file containing entries adhering to the `biotoolsSchema <https://biotoolsschema.readthedocs.io/>`_ (as returned by https://bio.tools/api/tool?format=json). The tool *name* is found from ``"name"``, *publication IDs* are picked from ``"publication"``, *existing annotation* are found in ``"topic"`` and ``"function"``, etc. Other, non-relevant fields in the JSON are ignored.
+For example, using ``--type biotools`` means that the input file is a JSON file containing entries adhering to the `biotoolsSchema <https://biotoolsschema.readthedocs.io/>`_ (as returned by https://bio.tools/api/tool?format=json). The tool *name* is found from ``"name"``, *publication IDs* are picked from ``"publication"``, *existing annotation* are found in ``"topic"`` and ``"function"``, etc. Other, non-relevant fields in the JSON are ignored.
 
 .. _csv:
 
 CSV
 ===
 
-For self-generated input, using a generic CSV file should be easier. This can be specified with ``--query-type generic`` (or it can also be omitted, as it is the default).
+For self-generated input, using a generic CSV file should be easier. This can be specified with ``--type generic`` (or it can also be omitted, as it is the default).
 
 The field delimiter character in the CSV file is ``,``, the character used for escaping values where the field delimiter is part of the value is ``"`` and the character used for escaping quotes inside an already quoted value is also ``"``. Lines are separated with ``\n`` (Unix end-of-line) and empty lines and lines beginning with ``#`` are skipped. The maximum number of characters allowed for any given value is 100000. Within fields, multiple *keywords*, *webpage URLs*, *documentation URLs*, *publication IDs* and *existing annotation* can be separated with ``|`` (which means this character can't be used as part of the values of these query parts).
 
@@ -162,6 +162,8 @@ score
 test
   ``tp``, if term was matched and also specified as existing annotation in the query; ``fp``, if term was matched, but not specified as existing annotation in query; ``fn``, if term was not matched, but was specified as existing annotation in query
 
+In addition to these detailed results, when ``--type biotools`` is used to input_ a bio.tools JSON file (adhering to biotoolsSchema_), then there is a supplementary option (``--biotools``) to output this bio.tools JSON file with the matched terms added to it (but without any extra information about the results). All values present in the input JSON will also be present in the output JSON, except for ``null`` and empty value which will be removed. New annotations from the topic branch will be added to the `topic attribute <https://biotools.readthedocs.io/en/latest/curators_guide.html#topic>`_ of the output JSON and new annotations from the operation branch will be added under a new `function group <https://biotools.readthedocs.io/en/latest/curators_guide.html#function-group>`_ object. New annotations from the data and format branches should be added under the ``"input"`` and ``"output"`` attributes of a function group, however EDAMmap can't differentiate between inputs and outputs. Thus, new terms from the data and format branches will be added as strings (in the form ``"EDAM URI (label)"``, separated by ``" | "``) to the `note <https://biotools.readthedocs.io/en/latest/curators_guide.html#note-function>`_ of the last function group object.
+
 
 .. _cli:
 
@@ -188,6 +190,7 @@ Parameter                   Parameter args              Default      Description
 ``--output`` or ``-o``      *<file path>*                            Text file to write results to, one per line. If missing (and HTML report also not specified), then results will be written to standard output.
 ``--report`` or ``-r``      *<directory path>*                       Directory to write a HTML report to. In addition to detailed results, it will contain used parameters, metrics, comparisons to manual mapping, extended information about queries and nice formatting. The specified directory will be created and must not be an existing directory.
 ``--json`` or ``-j``        *<file path>*                            File to write results to, in JSON format. Will include the same info as the HTML report.
+``--biotools`` or ``-b``    *<file path>*                            File to write results to, in bio.tools JSON format, confirming to biotoolsSchema_. Available only for ``--type biotools``, where the input JSON is copied to the output, but with new annotations found by EDAMmap added to the ``"topic"`` and ``"function"`` attributes.
 ``--reportPageSize``        *<positive integer>*        ``100``      Number of results in a HTML report page. Setting to 0 will output all results to a single HTML page.
 ``--reportPaginationSize``  *<positive integer>*        ``11``       Number of pagination links visible before/after the current page link in a HTML report page. Setting to 0 will make all pagination links visible.
 ``--threads``               *<positive integer>*        ``4``        How many threads to use for mapping (one thread processes one query at a time)
