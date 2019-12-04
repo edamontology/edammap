@@ -1155,7 +1155,9 @@ public class Mapper {
 			} else if (score >= badScore && score <= goodScore) {
 				if (!args.getScoreArgs().isOutputMediumScores()) continue;
 			} else if (score < badScore) {
-				if (!args.getScoreArgs().isOutputBadScores()) continue;
+				if (!args.getScoreArgs().isOutputBadScores()
+					&& !(score >= badScore - args.getScoreArgs().getPassableBadScoreInterval() &&
+						mapping.getMatches(match.getEdamUri().getBranch()).size() + 1 <= args.getScoreArgs().getPassableBadScoresInTopN())) continue;
 			}
 
 			if (!args.isInferiorParentsChildren()) {

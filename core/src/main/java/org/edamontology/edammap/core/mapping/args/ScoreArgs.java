@@ -25,6 +25,7 @@ import org.edamontology.edammap.core.args.ZeroToOneDouble;
 
 import org.edamontology.pubfetcher.core.common.Arg;
 import org.edamontology.pubfetcher.core.common.Args;
+import org.edamontology.pubfetcher.core.common.PositiveInteger;
 
 public class ScoreArgs extends Args {
 
@@ -94,6 +95,18 @@ public class ScoreArgs extends Args {
 	@Parameter(names = { "--" + outputBadScoresId }, arity = 1, description = outputBadScoresDescription)
 	private Boolean outputBadScores = outputBadScoresDefault;
 
+	private static final String passableBadScoreIntervalId = "passableBadScoreInterval";
+	private static final String passableBadScoreIntervalDescription = "Defines the passable bad scores (the best bad scores) as scores falling inside a score interval of given length, where the upper bound is fixed to the bad score limit";
+	private static final Double passableBadScoreIntervalDefault = 0.04;
+	@Parameter(names = { "--" + passableBadScoreIntervalId }, validateWith = ZeroToOneDouble.class, description = passableBadScoreIntervalDescription)
+	private Double passableBadScoreInterval = passableBadScoreIntervalDefault;
+
+	private static final String passableBadScoresInTopNId = "passableBadScoresInTopN";
+	private static final String passableBadScoresInTopNDescription = "If a match with passable bad score would be among the top given number of matches, then it is included among the suggested matches (note that matches with any bad score are always included if --outputBadScores is true)";
+	private static final Integer passableBadScoresInTopNDefault = 3;
+	@Parameter(names = { "--" + passableBadScoresInTopNId }, validateWith = PositiveInteger.class, description = passableBadScoresInTopNDescription)
+	private Integer passableBadScoresInTopN = passableBadScoresInTopNDefault;
+
 	@Override
 	protected void addArgs() {
 		args.add(new Arg<>(this::getGoodScoreTopic, this::setGoodScoreTopic, goodScoreTopicDefault, 0.0, 1.0, goodScoreTopicId, "Good score for topic", goodScoreTopicDescription, null));
@@ -107,6 +120,8 @@ public class ScoreArgs extends Args {
 		args.add(new Arg<>(this::isOutputGoodScores, this::setOutputGoodScores, outputGoodScoresDefault, outputGoodScoresId, "Matches with good scores", outputGoodScoresDescription, null));
 		args.add(new Arg<>(this::isOutputMediumScores, this::setOutputMediumScores, outputMediumScoresDefault, outputMediumScoresId, "Matches with medium scores", outputMediumScoresDescription, null));
 		args.add(new Arg<>(this::isOutputBadScores, this::setOutputBadScores, outputBadScoresDefault, outputBadScoresId, "Matches with bad scores", outputBadScoresDescription, null));
+		args.add(new Arg<>(this::getPassableBadScoreInterval, this::setPassableBadScoreInterval, passableBadScoreIntervalDefault, passableBadScoreIntervalId, "Passable bad score interval", passableBadScoreIntervalDescription, null));
+		args.add(new Arg<>(this::getPassableBadScoresInTopN, this::setPassableBadScoresInTopN, passableBadScoresInTopNDefault, passableBadScoresInTopNId, "Passable bad scores in top n", passableBadScoresInTopNDescription, null));
 	}
 
 	@Override
@@ -194,5 +209,19 @@ public class ScoreArgs extends Args {
 	}
 	public void setOutputBadScores(Boolean outputBadScores) {
 		this.outputBadScores = outputBadScores;
+	}
+
+	public Double getPassableBadScoreInterval() {
+		return passableBadScoreInterval;
+	}
+	public void setPassableBadScoreInterval(Double passableBadScoreInterval) {
+		this.passableBadScoreInterval = passableBadScoreInterval;
+	}
+
+	public Integer getPassableBadScoresInTopN() {
+		return passableBadScoresInTopN;
+	}
+	public void setPassableBadScoresInTopN(Integer passableBadScoresInTopN) {
+		this.passableBadScoresInTopN = passableBadScoresInTopN;
 	}
 }

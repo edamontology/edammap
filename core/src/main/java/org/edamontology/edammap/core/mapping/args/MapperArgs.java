@@ -43,7 +43,7 @@ public class MapperArgs extends Args {
 
 	private static final String matchesId = "matches";
 	private static final String matchesDescription = "Number of best matches per branch to output. Output amount can be less than requested if not enough match final scores fulfill score limits requirement.";
-	private static final Integer matchesDefault = 3;
+	private static final Integer matchesDefault = 5;
 	@Parameter(names = { "--" + matchesId }, validateWith = PositiveInteger.class, description = matchesDescription)
 	private Integer matches = matchesDefault;
 
@@ -54,7 +54,7 @@ public class MapperArgs extends Args {
 	private Boolean obsolete = obsoleteDefault;
 
 	private static final String doneAnnotationsId = "doneAnnotations";
-	private static final String doneAnnotationsDescription = "Suggest concepts already used for annotating query. Parents and children of these concepts are not suggested in any case (unless --inferior-parent-child is set to true).";
+	private static final String doneAnnotationsDescription = "Suggest concepts already used for annotating query. Parents and children of these concepts are not suggested in any case (unless --inferiorParentsChildren is set to true).";
 	private static final Boolean doneAnnotationsDefault = true;
 	@Parameter(names = { "--" + doneAnnotationsId }, arity = 1, description = doneAnnotationsDescription)
 	private Boolean doneAnnotations = doneAnnotationsDefault;

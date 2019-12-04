@@ -90,15 +90,15 @@ The fetching parameters are implemented in `PubFetcher <https://github.com/edamo
 Mapping
 -------
 
-==========================  ==========================  =====  ===========
-Parameter                   Default                     Min    Description
-==========================  ==========================  =====  ===========
-_`branches`                 ``["topic", "operation"]``         Branches to include. Can choose multiple at once from possible values: ``"topic"``, ``"operation"``, ``"data"``, ``"format"``.
-_`matches`                  ``3``                       ``0``  Number of best matches per branch to output. Output amount can be less than requested if not enough match final scores fulfill `score limits`_ requirement.
-obsolete                    ``false``                          Include obsolete concepts
-doneAnnotations             ``true``                           Suggest concepts already used for annotating query. Parents and children of these concepts are not suggested in any case (unless inferiorParentsChildren_ is set to ``true``).
-_`inferiorParentsChildren`  ``false``                          Include parents and children of a better matched concept in suggestion results
-==========================  ==========================  =====  ===========
+=======================  ==========================  =====  ===========
+Parameter                Default                     Min    Description
+=======================  ==========================  =====  ===========
+_`branches`              ``["topic", "operation"]``         Branches to include. Can choose multiple at once from possible values: ``"topic"``, ``"operation"``, ``"data"``, ``"format"``.
+_`matches`               ``5``                       ``0``  Number of best matches per branch to output. Output amount can be less than requested if not enough match final scores fulfill `score limits`_ requirement.
+obsolete                 ``false``                          Include obsolete concepts
+doneAnnotations          ``true``                           Suggest concepts already used for annotating query. Parents and children of these concepts are not suggested in any case (unless ``inferiorParentsChildren`` is set to ``true``).
+inferiorParentsChildren  ``false``                          Include parents and children of a better matched concept in suggestion results
+=======================  ==========================  =====  ===========
 
 Mapping algorithm
 ^^^^^^^^^^^^^^^^^
@@ -199,21 +199,23 @@ webpageWeight               ``0.5``   ``0.0``  Weight of query webpage_ in avera
 Score limits
 ^^^^^^^^^^^^
 
-==================  =========  =======  =======  ===========
-Parameter           Default    Min      Max      Description
-==================  =========  =======  =======  ===========
-goodScoreTopic      ``0.63``   ``0.0``  ``1.0``  Final scores over this are considered good (in topic branch)
-goodScoreOperation  ``0.63``   ``0.0``  ``1.0``  Final scores over this are considered good (in operation branch)
-goodScoreData       ``0.63``   ``0.0``  ``1.0``  Final scores over this are considered good (in data branch)
-goodScoreFormat     ``0.63``   ``0.0``  ``1.0``  Final scores over this are considered good (in format branch)
-badScoreTopic       ``0.57``   ``0.0``  ``1.0``  Final scores under this are considered bad (in topic branch)
-badScoreOperation   ``0.57``   ``0.0``  ``1.0``  Final scores under this are considered bad (in operation branch)
-badScoreData        ``0.57``   ``0.0``  ``1.0``  Final scores under this are considered bad (in data branch)
-badScoreFormat      ``0.57``   ``0.0``  ``1.0``  Final scores under this are considered bad (in format branch)
-outputGoodScores    ``true``                     Output matches with good scores
-outputMediumScores  ``true``                     Output matches with medium scores
-outputBadScores     ``false``                    Output matches with bad scores
-==================  =========  =======  =======  ===========
+========================  =========  =======  =======  ===========
+Parameter                 Default    Min      Max      Description
+========================  =========  =======  =======  ===========
+goodScoreTopic            ``0.63``   ``0.0``  ``1.0``  Final scores over this are considered good (in topic branch)
+goodScoreOperation        ``0.63``   ``0.0``  ``1.0``  Final scores over this are considered good (in operation branch)
+goodScoreData             ``0.63``   ``0.0``  ``1.0``  Final scores over this are considered good (in data branch)
+goodScoreFormat           ``0.63``   ``0.0``  ``1.0``  Final scores over this are considered good (in format branch)
+badScoreTopic             ``0.57``   ``0.0``  ``1.0``  Final scores under this are considered bad (in topic branch)
+badScoreOperation         ``0.57``   ``0.0``  ``1.0``  Final scores under this are considered bad (in operation branch)
+badScoreData              ``0.57``   ``0.0``  ``1.0``  Final scores under this are considered bad (in data branch)
+badScoreFormat            ``0.57``   ``0.0``  ``1.0``  Final scores under this are considered bad (in format branch)
+outputGoodScores          ``true``                     Output matches with good scores
+outputMediumScores        ``true``                     Output matches with medium scores
+outputBadScores           ``false``                    Output matches with bad scores
+passableBadScoreInterval  ``0.04``   ``0.0``  ``1.0``  Defines the passable bad scores (the best bad scores) as scores falling inside a score interval of given length, where the upper bound is fixed to the bad score limit
+passableBadScoresInTopN   ``3``      ``0``             If a match with passable bad score would be among the top given number of matches, then it is included among the suggested matches (note that matches with any bad score are always included if ``outputBadScores`` is ``true``)
+========================  =========  =======  =======  ===========
 
 .. _response:
 
