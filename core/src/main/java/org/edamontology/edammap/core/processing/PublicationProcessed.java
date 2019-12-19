@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016 Erik Jaaniso
+ * Copyright © 2016, 2019 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -41,11 +41,11 @@ public class PublicationProcessed {
 	private List<List<Double>> goTermsIdfs = new ArrayList<>();
 	private List<Double> goTermFrequencies = new ArrayList<>();
 
-	private List<String> abstractTokens = null;
-	private List<Double> abstractIdfs = null;
+	private List<List<String>> abstractTokens = new ArrayList<>();
+	private List<List<Double>> abstractIdfs = null;
 
-	private List<String> fulltextTokens = null;
-	private List<Double> fulltextIdfs = null;
+	private List<List<String>> fulltextTokens = new ArrayList<>();
+	private List<List<Double>> fulltextIdfs = null;
 
 	public List<String> getTitleTokens() {
 		return titleTokens;
@@ -124,29 +124,35 @@ public class PublicationProcessed {
 		this.goTermFrequencies.add(goTermFrequency);
 	}
 
-	public List<String> getAbstractTokens() {
+	public List<List<String>> getAbstractTokens() {
 		return abstractTokens;
 	}
-	public void setAbstractTokens(List<String> abstractTokens) {
-		this.abstractTokens = abstractTokens;
+	public void addAbstractTokens(List<String> abstractTokens) {
+		this.abstractTokens.add(abstractTokens);
 	}
-	public List<Double> getAbstractIdfs() {
+	public List<List<Double>> getAbstractIdfs() {
 		return abstractIdfs;
 	}
-	public void setAbstractIdfs(List<Double> abstractIdfs) {
-		this.abstractIdfs = abstractIdfs;
+	public void addAbstractIdfs(List<Double> abstractIdfs) {
+		if (this.abstractIdfs == null) {
+			this.abstractIdfs = new ArrayList<>();
+		}
+		this.abstractIdfs.add(abstractIdfs);
 	}
 
-	public List<String> getFulltextTokens() {
+	public List<List<String>> getFulltextTokens() {
 		return fulltextTokens;
 	}
-	public void setFulltextTokens(List<String> fulltextTokens) {
-		this.fulltextTokens = fulltextTokens;
+	public void addFulltextTokens(List<String> fulltextTokens) {
+		this.fulltextTokens.add(fulltextTokens);
 	}
-	public List<Double> getFulltextIdfs() {
+	public List<List<Double>> getFulltextIdfs() {
 		return fulltextIdfs;
 	}
-	public void setFulltextIdfs(List<Double> fulltextIdfs) {
-		this.fulltextIdfs = fulltextIdfs;
+	public void addFulltextIdfs(List<Double> fulltextIdfs) {
+		if (this.fulltextIdfs == null) {
+			this.fulltextIdfs = new ArrayList<>();
+		}
+		this.fulltextIdfs.add(fulltextIdfs);
 	}
 }

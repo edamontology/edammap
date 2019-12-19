@@ -90,15 +90,17 @@ The fetching parameters are implemented in `PubFetcher <https://github.com/edamo
 Mapping
 -------
 
-=======================  ==========================  =====  ===========
-Parameter                Default                     Min    Description
-=======================  ==========================  =====  ===========
-_`branches`              ``["topic", "operation"]``         Branches to include. Can choose multiple at once from possible values: ``"topic"``, ``"operation"``, ``"data"``, ``"format"``.
-_`matches`               ``5``                       ``0``  Number of best matches per branch to output. Output amount can be less than requested if not enough match final scores fulfill `score limits`_ requirement.
-obsolete                 ``false``                          Include obsolete concepts
-doneAnnotations          ``true``                           Suggest concepts already used for annotating query. Parents and children of these concepts are not suggested in any case (unless ``inferiorParentsChildren`` is set to ``true``).
-inferiorParentsChildren  ``false``                          Include parents and children of a better matched concept in suggestion results
-=======================  ==========================  =====  ===========
+=======================  ==========================  =======  =======  ===========
+Parameter                Default                     Min      Max      Description
+=======================  ==========================  =======  =======  ===========
+_`branches`              ``["topic", "operation"]``                    Branches to include. Can choose multiple at once from possible values: ``"topic"``, ``"operation"``, ``"data"``, ``"format"``.
+_`matches`               ``5``                       ``0``             Number of best matches per branch to output. Output amount can be less than requested if not enough match final scores fulfill `score limits`_ requirement.
+obsolete                 ``false``                                     Include matched obsolete concepts
+_`replaceObsolete`       ``true``                                      Replace matched obsolete concepts with their best matched replacement defined in EDAM (with "replacedBy" or "consider")
+obsoletePenalty          ``0.5``                     ``0.0``  ``1.0``  The fraction of the final score that included or replaced obsolete concepts will get
+doneAnnotations          ``true``                                      Suggest concepts already used for annotating query. Parents and children of these concepts are not suggested in any case (unless ``inferiorParentsChildren`` is set to ``true``).
+inferiorParentsChildren  ``false``                                     Include parents and children of a better matched concept in suggestion results
+=======================  ==========================  =======  =======  ===========
 
 Mapping algorithm
 ^^^^^^^^^^^^^^^^^
@@ -106,9 +108,9 @@ Mapping algorithm
 ====================  =============  =======  =======  ===========
 Parameter             Default        Min      Max      Description
 ====================  =============  =======  =======  ===========
-compoundWords         ``0``          ``0``             Try to match words that have accidentally been made compound (given number is maximum number of words in an accidental compound minus one)
+compoundWords         ``1``          ``0``             Try to match words that have accidentally been made compound (given number is maximum number of words in an accidental compound minus one). Not done for tokens from `fulltext <https://pubfetcher.readthedocs.io/en/latest/fetcher.html#fulltext>`_, `doc <https://pubfetcher.readthedocs.io/en/latest/output.html#content-of-docs>`_ and `webpage <https://pubfetcher.readthedocs.io/en/latest/output.html#content-of-webpages>`_. Set to 0 to disable (for a slight speed increase with only slight changes to the results).
 mismatchMultiplier    ``2.0``        ``0.0``           Multiplier for score decrease caused by mismatch
-matchMinimum          ``1.0``        ``0.0``  ``1.0``  Minimum score allowed for approximate match. Set to ``1`` to disable approximate matching.
+matchMinimum          ``1.0``        ``0.0``  ``1.0``  Minimum score allowed for approximate match. Not done for tokens from fulltext_, doc_ and webpage_. Set to ``1`` to disable approximate matching.
 positionOffBy1        ``0.35``       ``0.0``  ``1.0``  Multiplier of a position score component for the case when a word is inserted between matched words or matched words are switched
 positionOffBy2        ``0.05``       ``0.0``  ``1.0``  Multiplier of a position score component for the case when two words are inserted between matched words or matched words are switched with an additional word between them
 positionMatchScaling  ``0.5``        ``0.0``           Set to ``0`` to not have match score of neighbor influence position score. Setting to ``1`` means linear influence.
@@ -117,7 +119,7 @@ scoreScaling          ``0.2``        ``0.0``           Score is scaled before ap
 conceptWeight         ``1.0``        ``0.0``           Weight of matching a concept (with a query). Set to ``0`` to disable matching of concepts.
 queryWeight           ``1.0``        ``0.0``           Weight of matching a query (with a concept). Set to ``0`` to disable matching of queries.
 _`mappingStrategy`    ``"average"``                    Choose the best or take the average of query parts matches. Possible value: ``"best"``, ``"average"``.
-_`parentWeight`       ``0.5``        ``0.0``           Weight of concept's parent when computing path enrichment. Weight of grand-parent is parent-weight times parent-weight, etc. Set to ``0`` to disable path enrichment.
+_`parentWeight`       ``0.5``        ``0.0``           Weight of concept's parent when computing path enrichment. Weight of grand-parent is ``parentWeight`` times ``parentWeight``, etc. Set to ``0`` to disable path enrichment.
 _`pathWeight`         ``0.7``        ``0.0``           Weight of path enrichment. Weight of concept is ``1``. Set to ``0`` to disable path enrichment.
 ====================  =============  =======  =======  ===========
 
@@ -215,6 +217,7 @@ outputMediumScores        ``true``                     Output matches with mediu
 outputBadScores           ``false``                    Output matches with bad scores
 passableBadScoreInterval  ``0.04``   ``0.0``  ``1.0``  Defines the passable bad scores (the best bad scores) as scores falling inside a score interval of given length, where the upper bound is fixed to the bad score limit
 passableBadScoresInTopN   ``3``      ``0``             If a match with passable bad score would be among the top given number of matches, then it is included among the suggested matches (note that matches with any bad score are always included if ``outputBadScores`` is ``true``)
+topScorePartOutlier       ``42.0``   ``0.0``           If mappingStrategy_ ``average`` is used, then each non-disabled and non-empty query part will have a corresponding score part. If the score of the top score part is more than the given number of times larger than the score of the next largest score part, then the entire match will be discarded. Only done in topic and operation branches and only when there are at least two score parts and only if the publication fulltext_, doc_ or webpage_ query part is the top score part. Set to a value less than 1 to disable in all cases.
 ========================  =========  =======  =======  ===========
 
 .. _response:
@@ -290,31 +293,33 @@ mapping
     _`topic`
       Array of objects representing a matched term from the topic branch for the given query_, ordered by score. If no results in topic branch, then empty array. If results in topic branch were not asked for in mapping_ parameters, then ``null``.
 
-      edamUri
+      _`edamUri`
         EDAM URI of the matched term
+      _`edamUriReplaced`
+        If replaceObsolete_ is ``true`` and this is a concept replacing a matched obsolete concept, then this contains the EDAM URI of that obsolete concept (that is replaced with the concept specified in edamUri_)
       label
-        EDAM label of the matched term
+        EDAM label of the matched term in edamUri_
       obsolete
-        ``true``, if the term is obsolete; ``false`` otherwise
+        ``true``, if the term in edamUri_ is obsolete; ``false`` otherwise
       _`childOf`
-        Array of objects that are parents of the current matched term and that test_ ``"fp"``. Absent if there are no such parents.
+        Array of objects that are parents of the current matched term in edamUri_ and that test_ ``"fp"``. Absent if there are no such parents.
 
         edamUri
           EDAM URI of a parent described above
         label
           EDAM label of such parent
       childOfAnnotation
-        Array of objects that are parents of the current matched term and that test_ ``"tp"``. Same structure as in childOf_.
+        Array of objects that are parents of the current matched term in edamUri_ and that test_ ``"tp"``. Same structure as in childOf_.
       childOfExcludedAnnotation
-        Array of objects that are parents of the current matched term and that test_ ``"fn"``. Same structure as in childOf_.
+        Array of objects that are parents of the current matched term in edamUri_ and that test_ ``"fn"``. Same structure as in childOf_.
       parentOf
-        Array of objects that are children of the current matched term and that test_ ``"fp"``. Same structure as in childOf_.
+        Array of objects that are children of the current matched term in edamUri_ and that test_ ``"fp"``. Same structure as in childOf_.
       parentOfAnnotation
-        Array of objects that are children of the current matched term and that test_ ``"tp"``. Same structure as in childOf_.
+        Array of objects that are children of the current matched term in edamUri_ and that test_ ``"tp"``. Same structure as in childOf_.
       parentOfExcludedAnnotation
-        Array of objects that are children of the current matched term and that test_ ``"fn"``. Same structure as in childOf_.
+        Array of objects that are children of the current matched term in edamUri_ and that test_ ``"fn"``. Same structure as in childOf_.
       _`bestOneQuery`
-        Best matched query part. Basis for bestOneScore_ calculation and score class_ determination using `Score limits`_ parameters. Basis for final score_ calculation if mappingStrategy_ is ``"best"``. Otherwise (if mappingStrategy_ is ``"average"``), all query parts will be used for calculating final score (use type_ ``"full"`` to see these partial scores).
+        Best matched query part. Basis for bestOneScore_ calculation and score class_ determination using `Score limits`_ parameters. Basis for final score_ calculation if mappingStrategy_ is ``"best"``. Otherwise (if mappingStrategy_ is ``"average"``), all query parts will be used for calculating final score (use type_ ``"full"`` to see these partial scores). If replaceObsolete_ is ``true`` and this is a concept replacing a matched obsolete concept, then will contain match information of the obsolete concept specified in edamUriReplaced_ and not the actually suggested concept in edamUri_.
 
         type
           Name of the type of the query part
@@ -337,7 +342,7 @@ mapping
         withoutPathScore
           If parentWeight_ and pathWeight_ are above ``0``, then the non path enriched score will be stored here. Otherwise will have negative value.
         _`score`
-          Final score of the match
+          Final score of the match (to edamUriReplaced_, if it exists, or to edamUri_ otherwise)
       _`test`
         ``"tp"``, if term was matched and also specified as existing annotation in the query; ``"fp"``, if term was matched, but not specified as existing annotation in query; ``"fn"``, if term was not matched, but was specified as existing annotation in query
     _`operation`
@@ -609,8 +614,8 @@ To supply the same data (except the "keywords") as `bio.tools input`_, the follo
       }]
     },
     "branches": [ "topic", "operation", "data", "format" ],
-    "matches": 5,
-    "obsolete": true
+    "compoundWords": 0,
+    "outputBadScores": true
   }
 
 

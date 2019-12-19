@@ -115,14 +115,13 @@ public class Cli implements Runnable {
 				}
 
 				logger.info("Map {}", PubFetcher.progress(localIndex + 1, queries.size(), start));
+				if (stderr) {
+					System.err.print("Map " + PubFetcher.progress(localIndex + 1, queries.size(), start) + "  \r");
+				}
 
 				QueryProcessed processedQuery = processor.getProcessedQuery(query, args.getType(), pp, idf, args.getCoreArgs().getFetcherArgs(), null);
 
 				Mapping mapping = mapper.map(query, processedQuery, args.getCoreArgs().getMapperArgs());
-
-				if (stderr) {
-					System.err.print("Map " + PubFetcher.progress(localIndex + 1, queries.size(), start) + "  \r");
-				}
 
 				synchronized (mappings) {
 					webpages.set(localIndex, processedQuery.getWebpages());
@@ -139,7 +138,7 @@ public class Cli implements Runnable {
 		}
 	}
 
-	public static int run(CliArgs cliArgs, Version version, boolean progressToStderr, boolean trimBiotools) throws IOException, ParseException {
+	public static int run(CliArgs cliArgs, Version version, boolean progressToStderr) throws IOException, ParseException {
 		args = cliArgs;
 
 		List<ArgMain> argsMain = new ArrayList<>();

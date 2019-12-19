@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016, 2017 Erik Jaaniso
+ * Copyright © 2016, 2017, 2019 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -24,8 +24,6 @@ import java.util.List;
 
 public class Concept {
 
-	private boolean obsolete = false;
-
 	private String label = null;
 
 	private List<String> exactSynonyms = new ArrayList<>();
@@ -38,12 +36,8 @@ public class Concept {
 	private List<EdamUri> directParents = new ArrayList<>();
 	private List<EdamUri> directChildren = new ArrayList<>();
 
-	public boolean isObsolete() {
-		return obsolete;
-	}
-	public void setObsolete(boolean obsolete) {
-		this.obsolete = obsolete;
-	}
+	private boolean obsolete = false;
+	private List<EdamUri> replacedBy = new ArrayList<>();
 
 	public String getLabel() {
 		return label;
@@ -83,8 +77,15 @@ public class Concept {
 	public String getComment() {
 		return comment;
 	}
-	public void setComment(String comment) {
-		this.comment = comment;
+	public void addComment(String comment) {
+		if (!this.comment.isEmpty()) {
+			if (this.comment.charAt(this.comment.length() - 1) != '.') {
+				this.comment += ".";
+			}
+			this.comment += " " + comment;
+		} else {
+			this.comment = comment;
+		}
 	}
 
 	public List<EdamUri> getDirectParents() {
@@ -101,11 +102,24 @@ public class Concept {
 		this.directChildren = directChildren;
 	}
 
+	public boolean isObsolete() {
+		return obsolete;
+	}
+	public void setObsolete(boolean obsolete) {
+		this.obsolete = obsolete;
+	}
+
+	public List<EdamUri> getReplacedBy() {
+		return replacedBy;
+	}
+	public void addReplacedBy(EdamUri replacedBy) {
+		this.replacedBy.add(replacedBy);
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("LABEL: ").append(label).append("\n");
-		sb.append("OBSOLETE: ").append(obsolete).append("\n");
 		sb.append("EXACT SYNONYMS: ").append(exactSynonyms).append("\n");
 		sb.append("NARROW SYNONYMS: ").append(narrowSynonyms).append("\n");
 		sb.append("BROAD SYNONYMS: ").append(broadSynonyms).append("\n");
@@ -113,6 +127,8 @@ public class Concept {
 		sb.append("COMMENT: ").append(comment).append("\n");
 		sb.append("PARENTS: ").append(directParents).append("\n");
 		sb.append("CHILDREN: ").append(directChildren).append("\n");
+		sb.append("OBSOLETE: ").append(obsolete).append("\n");
+		sb.append("REPLACED BY: ").append(replacedBy).append("\n");
 		return sb.toString();
 	}
 }

@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParametersDelegate;
 
+import org.edamontology.edammap.core.args.ZeroToOneDouble;
 import org.edamontology.edammap.core.edam.Branch;
 
 import org.edamontology.pubfetcher.core.common.Arg;
@@ -48,10 +49,22 @@ public class MapperArgs extends Args {
 	private Integer matches = matchesDefault;
 
 	private static final String obsoleteId = "obsolete";
-	private static final String obsoleteDescription = "Include obsolete concepts";
+	private static final String obsoleteDescription = "Include matched obsolete concepts";
 	private static final Boolean obsoleteDefault = false;
 	@Parameter(names = { "--" + obsoleteId }, arity = 1, description = obsoleteDescription)
 	private Boolean obsolete = obsoleteDefault;
+
+	private static final String replaceObsoleteId = "replaceObsolete";
+	private static final String replaceObsoleteDescription = "Replace matched obsolete concepts with their best matched replacement defined in EDAM (with \"replacedBy\" or \"consider\")";
+	private static final Boolean replaceObsoleteDefault = true;
+	@Parameter(names = { "--" + replaceObsoleteId }, arity = 1, description = replaceObsoleteDescription)
+	private Boolean replaceObsolete = replaceObsoleteDefault;
+
+	private static final String obsoletePenaltyId = "obsoletePenalty";
+	private static final String obsoletePenaltyDescription = "The fraction of the final score that included or replaced obsolete concepts will get";
+	private static final Double obsoletePenaltyDefault = 0.5;
+	@Parameter(names = { "--" + obsoletePenaltyId }, validateWith = ZeroToOneDouble.class, description = obsoletePenaltyDescription)
+	private Double obsoletePenalty = obsoletePenaltyDefault;
 
 	private static final String doneAnnotationsId = "doneAnnotations";
 	private static final String doneAnnotationsDescription = "Suggest concepts already used for annotating query. Parents and children of these concepts are not suggested in any case (unless --inferiorParentsChildren is set to true).";
@@ -88,6 +101,8 @@ public class MapperArgs extends Args {
 		args.add(new Arg<>(this::getBranches, this::setBranches, branchesDefault, branchesId, "Branches", branchesDescription, Branch.class, "http://edamontology.org/page#Scope"));
 		args.add(new Arg<>(this::getMatches, this::setMatches, matchesDefault, 0, null, matchesId, "Top matches per branch", matchesDescription, null));
 		args.add(new Arg<>(this::isObsolete, this::setObsolete, obsoleteDefault, obsoleteId, "Obsolete concepts", obsoleteDescription, null));
+		args.add(new Arg<>(this::isReplaceObsolete, this::setReplaceObsolete, replaceObsoleteDefault, replaceObsoleteId, "Replace obsolete concepts", replaceObsoleteDescription, null));
+		args.add(new Arg<>(this::getObsoletePenalty, this::setObsoletePenalty, obsoletePenaltyDefault, obsoletePenaltyId, "Penalty for obsolete concepts", obsoletePenaltyDescription, null));
 		args.add(new Arg<>(this::isDoneAnnotations, this::setDoneAnnotations, doneAnnotationsDefault, doneAnnotationsId, "Done annotations", doneAnnotationsDescription, null));
 		args.add(new Arg<>(this::isInferiorParentsChildren, this::setInferiorParentsChildren, inferiorParentsChildrenDefault, inferiorParentsChildrenId, "Inferior parents & children", inferiorParentsChildrenDescription, null));
 	}
@@ -121,6 +136,20 @@ public class MapperArgs extends Args {
 	}
 	public void setObsolete(Boolean obsolete) {
 		this.obsolete = obsolete;
+	}
+
+	public Boolean isReplaceObsolete() {
+		return replaceObsolete;
+	}
+	public void setReplaceObsolete(Boolean replaceObsolete) {
+		this.replaceObsolete = replaceObsolete;
+	}
+
+	public Double getObsoletePenalty() {
+		return obsoletePenalty;
+	}
+	public void setObsoletePenalty(Double obsoletePenalty) {
+		this.obsoletePenalty = obsoletePenalty;
 	}
 
 	public Boolean isDoneAnnotations() {

@@ -284,7 +284,7 @@ public class Resource {
 		if (serverInput != null) {
 			query = QueryLoader.fromServer(serverInput, Server.concepts, MAX_KEYWORDS_SIZE, MAX_LINKS_SIZE, MAX_PUBLICATION_IDS_SIZE);
 		} else {
-			query = QueryLoader.getBiotools(tool, Server.concepts, MAX_LINKS_SIZE, MAX_PUBLICATION_IDS_SIZE);
+			query = QueryLoader.getBiotools(tool, Server.concepts, MAX_LINKS_SIZE, MAX_PUBLICATION_IDS_SIZE, QueryType.server.name());
 			if (toolMissingId) {
 				tool.setBiotoolsID(null);
 			}

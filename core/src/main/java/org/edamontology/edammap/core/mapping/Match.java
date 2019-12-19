@@ -40,6 +40,8 @@ public class Match implements Comparable<Match> {
 
 	private EdamUri edamUri = null;
 
+	private EdamUri edamUriReplaced = null;
+
 	private boolean removed = false;
 
 	private boolean existingAnnotation = false;
@@ -97,7 +99,17 @@ public class Match implements Comparable<Match> {
 		return edamUri;
 	}
 	public void setEdamUri(EdamUri edamUri) {
+		if (edamUriReplaced == null) {
+			edamUriReplaced = this.edamUri;
+		}
 		this.edamUri = edamUri;
+	}
+
+	public EdamUri getEdamUriReplaced() {
+		return edamUriReplaced;
+	}
+	public EdamUri getEdamUriOriginal() {
+		return edamUriReplaced != null ? edamUriReplaced : edamUri;
 	}
 
 	public boolean isRemoved() {

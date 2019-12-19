@@ -37,6 +37,7 @@ import org.edamontology.pubfetcher.core.common.FetcherArgs;
 import org.edamontology.pubfetcher.core.common.PubFetcher;
 import org.edamontology.pubfetcher.core.common.Version;
 import org.edamontology.pubfetcher.core.db.publication.Publication;
+import org.edamontology.pubfetcher.core.db.publication.PublicationIds;
 import org.edamontology.pubfetcher.core.db.publication.PublicationPart;
 import org.edamontology.pubfetcher.core.db.publication.PublicationPartName;
 import org.edamontology.pubfetcher.core.db.webpage.Webpage;
@@ -282,8 +283,11 @@ public class Report {
 			writer.write("<span class=\"obsolete\">");
 		}
 		writer.write("<strong>" + PubFetcher.getLinkHtml(edamUri.toString(), concept.getLabel() + " (" + edamUri.getNrString() + ")") + "</strong>");
+		if (match.getEdamUriReplaced() != null) {
+			writer.write(" (replacement for <span class=\"obsolete\">" + PubFetcher.getLinkHtml(match.getEdamUriReplaced().toString(), concepts.get(match.getEdamUriReplaced()).getLabel() + " (" + match.getEdamUriReplaced().getNrString() + ")") + "</span>)");
+		}
 		if (match.getConceptMatch().getType() != ConceptMatchType.label && match.getConceptMatch().getType() != ConceptMatchType.none) {
-			writer.write(" (" + conceptMatchString(concept, match.getConceptMatch()) + ")");
+			writer.write(" (" + conceptMatchString(concepts.get(match.getEdamUriOriginal()), match.getConceptMatch()) + ")");
 		}
 		if (concept.isObsolete()) {
 			writer.write("</span>");
@@ -307,8 +311,13 @@ public class Report {
 			if (text) return PubFetcher.getLinkHtml(query.getDocUrls().get(index).getUrl(), type.toString());
 			else return PubFetcher.getLinkHtml(query.getDocUrls().get(index).getUrl());
 		} else if (type.isPublication() && index >= 0) {
-			if (text) return PubFetcher.getIdLinkHtml(query.getPublicationIds().get(index), type.toString());
-			else return PubFetcher.getIdLinkHtml(query.getPublicationIds().get(index));
+			PublicationIds pubIds = query.getPublicationIds().get(index);
+			if ((type == QueryMatchType.publication_efo || type == QueryMatchType.publication_go || type == QueryMatchType.publication_fulltext)
+					&& (!pubIds.getPmcid().isEmpty() || !pubIds.getDoi().isEmpty())) {
+				pubIds = new PublicationIds(null, pubIds.getPmcid(), pubIds.getDoi(), null, pubIds.getPmcidUrl(), pubIds.getDoiUrl());
+			}
+			if (text) return PubFetcher.getIdLinkHtml(pubIds, type.toString());
+			else return PubFetcher.getIdLinkHtml(pubIds);
 		} else {
 			if (text) return type.toString();
 			else return "";
@@ -423,7 +432,7 @@ public class Report {
 				writer.write("\t\t\t\t</div>\n");
 				List<MatchAverageStats> matchAverageStats = match.getMatchAverageStats();
 				if (matchAverageStats != null && !matchAverageStats.isEmpty()) {
-					Concept concept = concepts.get(match.getEdamUri());
+					Concept conceptOriginal = concepts.get(match.getEdamUriOriginal());
 					writer.write("\t\t\t\t<div class=\"details-div\">\n");
 					writer.write("\t\t\t\t\t<div class=\"details\" tabindex=\"0\"></div>\n");
 					writer.write("\t\t\t\t\t<div class=\"details-box\" tabindex=\"0\">\n");
@@ -434,7 +443,7 @@ public class Report {
 						ConceptMatchType conceptType = mas.getConceptMatch().getType();
 						writer.write("<span>" + conceptType + "</span>");
 						if (conceptType != ConceptMatchType.definition && conceptType != ConceptMatchType.comment && conceptType != ConceptMatchType.none) {
-							writer.write("<br>" + conceptMatchString(concept, mas.getConceptMatch()));
+							writer.write("<br>" + conceptMatchString(conceptOriginal, mas.getConceptMatch()));
 						}
 						writer.write("<br>" + percent(mas.getConceptMatch().getScore()) + "</div><div>");
 						writer.write("<span>" + percent(mas.getScore()) + "</span></div></div>\n");

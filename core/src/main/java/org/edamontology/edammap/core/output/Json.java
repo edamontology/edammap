@@ -97,6 +97,9 @@ public class Json {
 	private static void concept(Map<EdamUri, Concept> concepts, Match match, JsonGenerator generator) throws IOException {
 		EdamUri edamUri = match.getEdamUri();
 		generator.writeStringField("edamUri", edamUri.toString());
+		if (match.getEdamUriReplaced() != null) {
+			generator.writeStringField("edamUriReplaced", match.getEdamUriReplaced().toString());
+		}
 		Concept concept = concepts.get(edamUri);
 		generator.writeStringField("label", concept.getLabel());
 		generator.writeBooleanField("obsolete", concept.isObsolete());
@@ -434,8 +437,8 @@ public class Json {
 					Match match = matchTest.getMatch();
 					concept(concepts, match, generator);
 					queryMatch(query, publications, match.getQueryMatch(), true, generator);
-					Concept concept = concepts.get(match.getEdamUri());
-					conceptMatch(concept, match.getConceptMatch(), true, generator);
+					Concept conceptOriginal = concepts.get(match.getEdamUriOriginal());
+					conceptMatch(conceptOriginal, match.getConceptMatch(), true, generator);
 					score(args.getMapperArgs().getScoreArgs(), branch, match, generator);
 					generator.writeStringField("test", matchTest.getTest().name());
 					if (full) {
@@ -446,7 +449,7 @@ public class Json {
 							for (MatchAverageStats mas : matchAverageStats) {
 								generator.writeStartObject();
 								queryMatch(query, publications, mas.getQueryMatch(), false, generator);
-								conceptMatch(concept, mas.getConceptMatch(), false, generator);
+								conceptMatch(conceptOriginal, mas.getConceptMatch(), false, generator);
 								generator.writeNumberField("score", mas.getScore());
 								generator.writeEndObject();
 							}

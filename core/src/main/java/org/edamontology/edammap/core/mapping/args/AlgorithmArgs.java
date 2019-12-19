@@ -32,8 +32,8 @@ import org.edamontology.pubfetcher.core.common.PositiveInteger;
 public class AlgorithmArgs extends Args {
 
 	private static final String compoundWordsId = "compoundWords";
-	private static final String compoundWordsDescription = "Try to match words that have accidentally been made compound (given number is maximum number of words in an accidental compound minus one)";
-	private static final Integer compoundWordsDefault = 0;
+	private static final String compoundWordsDescription = "Try to match words that have accidentally been made compound (given number is maximum number of words in an accidental compound minus one). Not done for tokens from fulltext, doc and webpage. Set to 0 to disable (for a slight speed increase with only slight changes to the results).";
+	private static final Integer compoundWordsDefault = 1;
 	@Parameter(names = { "--" + compoundWordsId }, validateWith = PositiveInteger.class, description = compoundWordsDescription)
 	private Integer compoundWords = compoundWordsDefault;
 
@@ -44,7 +44,7 @@ public class AlgorithmArgs extends Args {
 	private Double mismatchMultiplier = mismatchMultiplierDefault;
 
 	private static final String matchMinimumId = "matchMinimum";
-	private static final String matchMinimumDescription = "Minimum score allowed for approximate match. Set to 1 to disable approximate matching.";
+	private static final String matchMinimumDescription = "Minimum score allowed for approximate match. Not done for tokens from fulltext, doc and webpage. Set to 1 to disable approximate matching.";
 	private static final Double matchMinimumDefault = 1.0;
 	@Parameter(names = { "--" + matchMinimumId }, validateWith = ZeroToOneDouble.class, description = matchMinimumDescription)
 	private Double matchMinimum = matchMinimumDefault;
@@ -98,7 +98,7 @@ public class AlgorithmArgs extends Args {
 	private MapperStrategy mappingStrategy = mappingStrategyDefault;
 
 	private static final String parentWeightId = "parentWeight";
-	private static final String parentWeightDescription = "Weight of concept's parent when computing path enrichment. Weight of grand-parent is parent-weight times parent-weight, etc. Set to 0 to disable path enrichment.";
+	private static final String parentWeightDescription = "Weight of concept's parent when computing path enrichment. Weight of grand-parent is parentWeight times parentWeight, etc. Set to 0 to disable path enrichment.";
 	private static final Double parentWeightDefault = 0.5;
 	@Parameter(names = { "--" + parentWeightId }, validateWith = PositiveDouble.class, description = parentWeightDescription)
 	private Double parentWeight = parentWeightDefault;

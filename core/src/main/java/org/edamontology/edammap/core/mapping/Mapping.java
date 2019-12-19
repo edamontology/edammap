@@ -82,7 +82,7 @@ public class Mapping {
 		return remainingAnnotations.get(branch);
 	}
 	public void addRemainingAnnotation(Match match) {
-		remainingAnnotations.get(match.getEdamUri().getBranch()).add(match);
+		remainingAnnotations.get(match.getEdamUriOriginal().getBranch()).add(match);
 	}
 
 	public boolean isFull(Branch branch) {

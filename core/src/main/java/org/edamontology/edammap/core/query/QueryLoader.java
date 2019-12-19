@@ -19,6 +19,7 @@
 
 package org.edamontology.edammap.core.query;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -71,9 +72,7 @@ public class QueryLoader {
 
 	private static final Logger logger = LogManager.getLogger();
 
-	private static final String GENERIC = QueryType.generic.name();
 	private static final String SEQWIKI = "http://seqanswers.com/wiki/";
-	private static final String MSUTILS = "http://www.ms-utils.org/";
 	private static final String BIOC_VIEWS = "https://bioconductor.org/packages/release/BiocViews.html#___";
 	public static final String BIOTOOLS = "https://bio.tools/";
 	private static final String SERVER = QueryType.server.name();
@@ -185,7 +184,7 @@ public class QueryLoader {
 	}
 
 	private static PublicationIdsQuery publicationId(String pmid, String pmcid, String doi, String url, String type, boolean throwException, boolean logEmpty) {
-		PublicationIds publicationIds = PubFetcher.getPublicationIds(pmid, pmcid, doi, url, throwException, logEmpty);
+		PublicationIds publicationIds = PubFetcher.getPublicationIds(pmid, pmcid, doi, url, url, url, throwException, logEmpty);
 		if (publicationIds != null) {
 			return new PublicationIdsQuery(publicationIds, type);
 		} else {
@@ -275,7 +274,7 @@ public class QueryLoader {
 			.collect(Collectors.toCollection(LinkedHashSet::new));
 	}
 
-	private static Query getGeneric(Generic generic, Map<EdamUri, Concept> concepts) {
+	private static Query getGeneric(Generic generic, Map<EdamUri, Concept> concepts, String filename) {
 		return new Query(
 			generic.getId() != null ? generic.getId().trim() : null,
 			generic.getName().trim(),
@@ -283,7 +282,7 @@ public class QueryLoader {
 			generic.getDescription() != null ? generic.getDescription().trim() : null,
 			links(split(generic.getWebpageUrls()), null, false, 0),
 			links(split(generic.getDocUrls()), null, false, 0),
-			publicationIds(split(generic.getPublicationIds()), GENERIC, null, false, 0),
+			publicationIds(split(generic.getPublicationIds()), filename, null, false, 0),
 			edamUris(split(generic.getAnnotations()), concepts));
 	}
 
@@ -298,7 +297,7 @@ public class QueryLoader {
 		}
 		return null;
 	}
-	private static Query getSEQwiki(SEQwiki SEQwiki, Map<EdamUri, Concept> concepts) {
+	private static Query getSEQwiki(SEQwiki SEQwiki, Map<EdamUri, Concept> concepts, String filename) {
 		List<Keyword> keywords = new ArrayList<>();
 		List<Keyword> domainKeywords = keywords(split(SEQwiki.getDomains(), INTERNAL_SEPARATOR_COMMA), "Domain", SEQWIKI, 0);
 		if (domainKeywords != null) {
@@ -329,11 +328,11 @@ public class QueryLoader {
 			SEQwiki.getSummary().trim(),
 			webpageUrls,
 			links(split(SEQwiki.getDocs(), INTERNAL_SEPARATOR_COMMA), null, false, 0),
-			publicationIds(split(SEQwiki.getPublications(), INTERNAL_SEPARATOR_COMMA), SEQWIKI, null, false, 0),
+			publicationIds(split(SEQwiki.getPublications(), INTERNAL_SEPARATOR_COMMA), filename, null, false, 0),
 			annotations);
 	}
 
-	private static Query getMsutils(Msutils msutils, Map<EdamUri, Concept> concepts) {
+	private static Query getMsutils(Msutils msutils, Map<EdamUri, Concept> concepts, String filename) {
 		List<Link> webpageUrls = new ArrayList<>();
 		addLink(msutils.getWeblink(), "Weblink", false, webpageUrls);
 		addLink(msutils.getLink(), "Link", false, webpageUrls);
@@ -363,7 +362,7 @@ public class QueryLoader {
 			msutils.getDescription().trim(),
 			webpageUrls,
 			null,
-			publicationIds(split(msutils.getPaper()), MSUTILS, null, false, 0),
+			publicationIds(split(msutils.getPaper()), filename, null, false, 0),
 			annotations);
 	}
 
@@ -404,7 +403,7 @@ public class QueryLoader {
 			annotations);
 	}
 
-	private static Query getBiotools14(Biotools14 biotools, Map<EdamUri, Concept> concepts) {
+	private static Query getBiotools14(Biotools14 biotools, Map<EdamUri, Concept> concepts, String filename) {
 		List<Link> webpageUrls = new ArrayList<>();
 		addLink(biotools.getHomepage(), "Homepage", false, webpageUrls);
 		List<Link> mirrorLinks = links(biotools.getMirrors().stream(), "Mirror", false, 0);
@@ -417,10 +416,10 @@ public class QueryLoader {
 		addLink(biotools.getDocsGithub(), "Github", false, docUrls);
 
 		List<PublicationIdsQuery> publicationIds = new ArrayList<>();
-		addPublicationId(biotools.getPublicationsPrimaryID(), BIOTOOLS, "Primary", false, publicationIds);
-		List<PublicationIdsQuery> otherPublicationIds = publicationIds(biotools.getPublicationsOtherIDs().stream(), BIOTOOLS, "Other", false, 0);
+		addPublicationId(biotools.getPublicationsPrimaryID(), filename, "Primary", false, publicationIds);
+		List<PublicationIdsQuery> otherPublicationIds = publicationIds(biotools.getPublicationsOtherIDs().stream(), filename, "Other", false, 0);
 		if (otherPublicationIds != null) {
-			publicationIds.addAll(publicationIds(biotools.getPublicationsOtherIDs().stream(), BIOTOOLS, "Other", false, 0));
+			publicationIds.addAll(publicationIds(biotools.getPublicationsOtherIDs().stream(), filename, "Other", false, 0));
 		}
 
 		Set<EdamUri> annotations = new LinkedHashSet<>();
@@ -452,7 +451,7 @@ public class QueryLoader {
 			annotations);
 	}
 
-	public static Query getBiotools(Tool tool, Map<EdamUri, Concept> concepts, int maxLinks, int maxPublicationIds) {
+	public static Query getBiotools(Tool tool, Map<EdamUri, Concept> concepts, int maxLinks, int maxPublicationIds, String filename) {
 		List<Link> webpageUrls = new ArrayList<>();
 		addLink(tool.getHomepage(), "Homepage", false, webpageUrls);
 		if (tool.getLink() != null) {
@@ -497,7 +496,7 @@ public class QueryLoader {
 		List<PublicationIdsQuery> publicationIds = new ArrayList<>();
 		if (tool.getPublication() != null) {
 			for (Publication publication : tool.getPublication()) {
-				addPublicationId(publication.getPmid(), publication.getPmcid(), publication.getDoi(), BIOTOOLS, publication.getType(), false, false, publicationIds);
+				addPublicationId(publication.getPmid(), publication.getPmcid(), publication.getDoi(), filename, publication.getType(), false, false, publicationIds);
 			}
 		}
 
@@ -563,15 +562,16 @@ public class QueryLoader {
 		}
 
 		Set<Query> queries = new LinkedHashSet<>();
+		String filename = new File(queryPath).getName();
 
 		for (InputType input : inputs) {
 			switch (type) {
-				case generic: queries.add(getGeneric((Generic) input, concepts)); break;
-				case SEQwiki: queries.add(getSEQwiki((SEQwiki) input, concepts)); break;
-				case msutils: queries.add(getMsutils((Msutils) input, concepts)); break;
+				case generic: queries.add(getGeneric((Generic) input, concepts, filename)); break;
+				case SEQwiki: queries.add(getSEQwiki((SEQwiki) input, concepts, filename)); break;
+				case msutils: queries.add(getMsutils((Msutils) input, concepts, filename)); break;
 				case Bioconductor: queries.add(getBioconductor((Bioconductor) input, concepts)); break;
-				case biotools14: queries.add(getBiotools14((Biotools14) input, concepts)); break;
-				case biotools: queries.add(getBiotools((Tool) input, concepts, 0, 0)); break;
+				case biotools14: queries.add(getBiotools14((Biotools14) input, concepts, filename)); break;
+				case biotools: queries.add(getBiotools((Tool) input, concepts, 0, 0, filename)); break;
 				case server: break;
 			}
 		}
@@ -625,7 +625,7 @@ public class QueryLoader {
 				if (s.size() == 1) {
 					publicationIds = PubFetcher.getPublicationIds(s.get(0), SERVER, true);
 				} else if (s.size() == 3) {
-					publicationIds = PubFetcher.getPublicationIds(s.get(0), s.get(1), s.get(2), SERVER, true, true);
+					publicationIds = PubFetcher.getPublicationIds(s.get(0), s.get(1), s.get(2), SERVER, SERVER, SERVER, true, true);
 				} else {
 					throw new IllegalRequestException("Publication ID has illegal number of parts (" + s.size() + ")" + (s.size() > 0 ? ", first part is " + s.get(0) : ""));
 				}

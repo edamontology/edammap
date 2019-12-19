@@ -44,7 +44,7 @@ public class CliMain {
 
 		int status;
 		try {
-			Cli.run(args, version, false, false);
+			Cli.run(args, version, false);
 			status = 0;
 		} catch (Throwable e) {
 			logger.error("Exception!", e);

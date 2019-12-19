@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016, 2017, 2018 Erik Jaaniso
+ * Copyright © 2016, 2017, 2018, 2019 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -82,8 +82,6 @@ public class Processor {
 	private ConceptProcessed processConcept(Concept concept, IdfMake idfMake, PreProcessor preProcessor) {
 		ConceptProcessed processedConcept = new ConceptProcessed();
 
-		processedConcept.setObsolete(concept.isObsolete());
-
 		if (concept.getLabel() != null) {
 			List<String> labelTokens = preProcessor.process(concept.getLabel());
 			processedConcept.setLabelTokens(labelTokens);
@@ -109,21 +107,28 @@ public class Processor {
 		}
 
 		if (concept.getDefinition() != null) {
-			List<String> definitionTokens = preProcessor.process(concept.getDefinition());
-			processedConcept.setDefinitionTokens(definitionTokens);
-			idfMake.addTerms(definitionTokens);
+			for (String definitionSentence : preProcessor.sentences(concept.getDefinition())) {
+				List<String> definitionTokens = preProcessor.process(definitionSentence);
+				processedConcept.addDefinitionTokens(definitionTokens);
+				idfMake.addTerms(definitionTokens);
+			}
 		}
 
 		if (concept.getComment() != null) {
-			List<String> commentTokens = preProcessor.process(concept.getComment());
-			processedConcept.setCommentTokens(commentTokens);
-			idfMake.addTerms(commentTokens);
+			for (String commentSentence : preProcessor.sentences(concept.getComment())) {
+				List<String> commentTokens = preProcessor.process(commentSentence);
+				processedConcept.addCommentTokens(commentTokens);
+				idfMake.addTerms(commentTokens);
+			}
 		}
 
 		idfMake.endDocument();
 
 		processedConcept.setDirectParents(concept.getDirectParents());
 		processedConcept.setDirectChildren(concept.getDirectChildren());
+
+		processedConcept.setObsolete(concept.isObsolete());
+		processedConcept.setReplacedBy(concept.getReplacedBy());
 
 		return processedConcept;
 	}
@@ -146,11 +151,15 @@ public class Processor {
 		}
 
 		if (processedConcept.getDefinitionTokens() != null) {
-			processedConcept.setDefinitionIdfs(idf.getIdf(processedConcept.getDefinitionTokens()));
+			for (List<String> definitionTokens : processedConcept.getDefinitionTokens()) {
+				processedConcept.addDefinitionIdfs(idf.getIdf(definitionTokens));
+			}
 		}
 
 		if (processedConcept.getCommentTokens() != null) {
-			processedConcept.setCommentIdfs(idf.getIdf(processedConcept.getCommentTokens()));
+			for (List<String> commentTokens : processedConcept.getCommentTokens()) {
+				processedConcept.addCommentIdfs(idf.getIdf(commentTokens));
+			}
 		}
 	}
 
@@ -186,16 +195,20 @@ public class Processor {
 			}
 		}
 		if (processedConcept.getDefinitionTokens() != null && multiplierArgs.getDefinitionMultiplier() > 0) {
-			processedConcept.addTokens(processedConcept.getDefinitionTokens());
-			processedConcept.addIdfs(processedConcept.getDefinitionIdfs());
-			processedConcept.addScaling(idfArgs.getConceptIdfScaling());
-			processedConcept.addMultiplier(multiplierArgs.getDefinitionMultiplier());
+			for (int i = 0; i < processedConcept.getDefinitionTokens().size(); ++i) {
+				processedConcept.addTokens(processedConcept.getDefinitionTokens().get(i));
+				processedConcept.addIdfs(processedConcept.getDefinitionIdfs().get(i));
+				processedConcept.addScaling(idfArgs.getConceptIdfScaling());
+				processedConcept.addMultiplier(multiplierArgs.getDefinitionMultiplier());
+			}
 		}
 		if (processedConcept.getCommentTokens() != null && multiplierArgs.getCommentMultiplier() > 0) {
-			processedConcept.addTokens(processedConcept.getCommentTokens());
-			processedConcept.addIdfs(processedConcept.getCommentIdfs());
-			processedConcept.addScaling(idfArgs.getConceptIdfScaling());
-			processedConcept.addMultiplier(multiplierArgs.getCommentMultiplier());
+			for (int i = 0; i < processedConcept.getCommentTokens().size(); ++i) {
+				processedConcept.addTokens(processedConcept.getCommentTokens().get(i));
+				processedConcept.addIdfs(processedConcept.getCommentIdfs().get(i));
+				processedConcept.addScaling(idfArgs.getConceptIdfScaling());
+				processedConcept.addMultiplier(multiplierArgs.getCommentMultiplier());
+			}
 		}
 	}
 
@@ -261,23 +274,27 @@ public class Processor {
 		}
 
 		if (publication.getAbstract().isUsable(fetcherArgs)) {
-			List<String> abstractTokens = pp.process(publication.getAbstract().getContent());
-			if (!abstractTokens.isEmpty()) {
-				publicationProcessed.setAbstractTokens(abstractTokens);
-				if (queryIdf != null) {
-					publicationProcessed.setAbstractIdfs(queryIdf.getIdf(abstractTokens));
+			for (String abstractSentence : pp.sentences(publication.getAbstract().getContent())) {
+				List<String> abstractTokens = pp.process(abstractSentence);
+				if (!abstractTokens.isEmpty()) {
+					publicationProcessed.addAbstractTokens(abstractTokens);
+					if (queryIdf != null) {
+						publicationProcessed.addAbstractIdfs(queryIdf.getIdf(abstractTokens));
+					}
 				}
 			}
 		}
 
 		int fulltextWordCount = 0;
 		if (publication.getFulltext().isUsable(fetcherArgs)) {
-			List<String> fulltextTokens = pp.process(publication.getFulltext().getContent());
-			if (!fulltextTokens.isEmpty()) {
-				publicationProcessed.setFulltextTokens(fulltextTokens);
-				fulltextWordCount = fulltextTokens.size();
-				if (queryIdf != null) {
-					publicationProcessed.setFulltextIdfs(queryIdf.getIdf(fulltextTokens));
+			for (String fulltextSentence : pp.sentences(publication.getFulltext().getContent())) {
+				List<String> fulltextTokens = pp.process(fulltextSentence);
+				if (!fulltextTokens.isEmpty()) {
+					publicationProcessed.addFulltextTokens(fulltextTokens);
+					fulltextWordCount += fulltextTokens.size();
+					if (queryIdf != null) {
+						publicationProcessed.addFulltextIdfs(queryIdf.getIdf(fulltextTokens));
+					}
 				}
 			}
 		}
@@ -324,14 +341,32 @@ public class Processor {
 	}
 
 	private void addWebpage(Webpage webpage, QueryProcessed queryProcessed, PreProcessor pp, Idf queryIdf, FetcherArgs fetcherArgs, Iterator<Link> it) {
-		List<String> webpageTokens = null;
-		List<Double> webpageIdfs = null;
+		List<List<String>> webpageTokens = null;
+		List<List<Double>> webpageIdfs = null;
 		if (webpage != null && webpage.isUsable(fetcherArgs)) {
-			webpageTokens = pp.process(webpage.getTitle() + "\n" + webpage.getContent());
-			if (webpageTokens.isEmpty()) {
-				webpageTokens = null;
-			} else if (queryIdf != null) {
-				webpageIdfs = queryIdf.getIdf(webpageTokens);
+			List<String> titleProcessed = pp.process(webpage.getTitle());
+			if (!titleProcessed.isEmpty()) {
+				webpageTokens = new ArrayList<>();
+				webpageTokens.add(titleProcessed);
+				if (queryIdf != null) {
+					webpageIdfs = new ArrayList<>();
+					webpageIdfs.add(queryIdf.getIdf(titleProcessed));
+				}
+			}
+			for (String contentSentence : pp.sentences(webpage.getContent())) {
+				List<String> contentSentenceProcessed = pp.process(contentSentence);
+				if (!contentSentenceProcessed.isEmpty()) {
+					if (webpageTokens == null) {
+						webpageTokens = new ArrayList<>();
+					}
+					webpageTokens.add(contentSentenceProcessed);
+					if (queryIdf != null) {
+						if (webpageIdfs == null) {
+							webpageIdfs = new ArrayList<>();
+						}
+						webpageIdfs.add(queryIdf.getIdf(contentSentenceProcessed));
+					}
+				}
 			}
 		}
 		if (webpageTokens == null && it != null) {
@@ -344,14 +379,32 @@ public class Processor {
 	}
 
 	private void addDoc(Webpage doc, QueryProcessed queryProcessed, PreProcessor pp, Idf queryIdf, FetcherArgs fetcherArgs, Iterator<Link> it) {
-		List<String> docTokens = null;
-		List<Double> docIdfs = null;
+		List<List<String>> docTokens = null;
+		List<List<Double>> docIdfs = null;
 		if (doc != null && doc.isUsable(fetcherArgs)) {
-			docTokens = pp.process(doc.getTitle() + "\n" + doc.getContent());
-			if (docTokens.isEmpty()) {
-				docTokens = null;
-			} else if (queryIdf != null) {
-				docIdfs = queryIdf.getIdf(docTokens);
+			List<String> titleProcessed = pp.process(doc.getTitle());
+			if (!titleProcessed.isEmpty()) {
+				docTokens = new ArrayList<>();
+				docTokens.add(titleProcessed);
+				if (queryIdf != null) {
+					docIdfs = new ArrayList<>();
+					docIdfs.add(queryIdf.getIdf(titleProcessed));
+				}
+			}
+			for (String contentSentence : pp.sentences(doc.getContent())) {
+				List<String> contentSentenceProcessed = pp.process(contentSentence);
+				if (!contentSentenceProcessed.isEmpty()) {
+					if (docTokens == null) {
+						docTokens = new ArrayList<>();
+					}
+					docTokens.add(contentSentenceProcessed);
+					if (queryIdf != null) {
+						if (docIdfs == null) {
+							docIdfs = new ArrayList<>();
+						}
+						docIdfs.add(queryIdf.getIdf(contentSentenceProcessed));
+					}
+				}
 			}
 		}
 		if (docTokens == null && it != null) {
@@ -407,11 +460,14 @@ public class Processor {
 		}
 
 		if (query.getDescription() != null) {
-			List<String> descriptionTokens = pp.process(query.getDescription());
-			if (!descriptionTokens.isEmpty()) {
-				queryProcessed.setDescriptionTokens(descriptionTokens);
-				if (queryIdf != null) {
-					queryProcessed.setDescriptionIdfs(queryIdf.getIdf(descriptionTokens));
+			for (String descriptionSentence : pp.sentences(query.getDescription())) {
+				if (descriptionSentence.startsWith("|||")) continue;
+				List<String> descriptionTokens = pp.process(descriptionSentence);
+				if (!descriptionTokens.isEmpty()) {
+					queryProcessed.addDescriptionTokens(descriptionTokens);
+					if (queryIdf != null) {
+						queryProcessed.addDescriptionIdfs(queryIdf.getIdf(descriptionTokens));
+					}
 				}
 			}
 		}
@@ -503,16 +559,24 @@ public class Processor {
 			for (List<String> keywordTokens : processedQuery.getKeywordsTokens()) {
 				if (keywordTokens != null) idfMake.addTerms(keywordTokens);
 			}
-			if (processedQuery.getDescriptionTokens() != null) {
-				idfMake.addTerms(processedQuery.getDescriptionTokens());
+			for (List<String> descriptionSentenceTokens : processedQuery.getDescriptionTokens()) {
+				idfMake.addTerms(descriptionSentenceTokens);
 			}
 
 			if (webpagesDocs) {
-				for (List<String> webpageTokens : processedQuery.getWebpagesTokens()) {
-					if (webpageTokens != null) idfMake.addTerms(webpageTokens);
+				for (List<List<String>> webpageTokens : processedQuery.getWebpagesTokens()) {
+					if (webpageTokens != null) {
+						for (List<String> webpageSentenceTokens : webpageTokens) {
+							idfMake.addTerms(webpageSentenceTokens);
+						}
+					}
 				}
-				for (List<String> docTokens : processedQuery.getDocsTokens()) {
-					if (docTokens != null) idfMake.addTerms(docTokens);
+				for (List<List<String>> docTokens : processedQuery.getDocsTokens()) {
+					if (docTokens != null) {
+						for (List<String> docSentenceTokens : docTokens) {
+							idfMake.addTerms(docSentenceTokens);
+						}
+					}
 				}
 			}
 
@@ -534,13 +598,13 @@ public class Processor {
 				for (List<String> goTermTokens : processedPublication.getGoTermsTokens()) {
 					if (goTermTokens != null) idfMake.addTerms(goTermTokens);
 				}
-				if (processedPublication.getAbstractTokens() != null) {
-					idfMake.addTerms(processedPublication.getAbstractTokens());
+				for (List<String> abstractSentenceTokens : processedPublication.getAbstractTokens()) {
+					idfMake.addTerms(abstractSentenceTokens);
 				}
 
 				if (fulltext) {
-					if (processedPublication.getFulltextTokens() != null) {
-						idfMake.addTerms(processedPublication.getFulltextTokens());
+					for (List<String> fulltextSentenceTokens : processedPublication.getFulltextTokens()) {
+						idfMake.addTerms(fulltextSentenceTokens);
 					}
 				}
 			}

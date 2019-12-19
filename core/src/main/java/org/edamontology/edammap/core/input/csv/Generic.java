@@ -53,6 +53,7 @@ public class Generic implements InputType {
 
 	@Override
 	public void check(int i) throws ParseException {
+		// TODO add more validation (https://www.univocity.com/pages/java_beans.html#validation)
 		if (name == null || name.equals("")) {
 			parseException("name", i);
 		}

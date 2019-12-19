@@ -1,0 +1,43 @@
+
+### Synonyms not loaded from the EDAM ontology
+
+# Geriatric medicine
+Aging
+Ageing
+
+# Deposition
+Submission
+
+# Enrichment analysis
+Enrichment
+
+# Parsing
+Loading
+
+# Molecular interactions, pathways and networks
+Networks
+Interactions
+
+# Structure analysis
+Structures
+
+# Environmental science
+Environment
+
+# Read binning
+Binning
+
+# Transcription factors and regulatory sites
+Enhancers
+
+# Software engineering
+Algorithms
+
+# Small molecules
+Targets
+
+# Literature and language
+Citations
+Documentation
+Language
+References

@@ -1,7 +1,8 @@
 
-### Organisational concepts not intended for annotation
+### Organisational concepts not intended for annotation (these can still contribute in path enrichment)
 
-### Top-level concepts
+## Top-level concepts
+
 # Topic
 http://edamontology.org/topic_0003
 # Operation
@@ -11,11 +12,13 @@ http://edamontology.org/data_0006
 # Format
 http://edamontology.org/format_1915
 
-### From topic branch
+## From topic branch
+
 # Omics
 http://edamontology.org/topic_3391
 
-### From operation branch
+## From operation branch
+
 # Comparison
 http://edamontology.org/operation_2424
 # Design
@@ -41,5 +44,12 @@ http://edamontology.org/operation_0227
 # Classification
 http://edamontology.org/operation_2990
 
-### Block also "Literature and language", as it causes too many FPs
-http://edamontology.org/topic_3068
+
+### Block some obsolete concepts that would cause too many FPs when obsolete concepts are included or replaced
+
+# Classification
+http://edamontology.org/topic_2230
+# Pathogens
+http://edamontology.org/topic_0783
+# Threading
+http://edamontology.org/topic_0184

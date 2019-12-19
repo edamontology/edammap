@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016, 2017 Erik Jaaniso
+ * Copyright © 2016, 2017, 2019 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -26,8 +26,6 @@ import org.edamontology.edammap.core.edam.EdamUri;
 
 public class ConceptProcessed {
 
-	private boolean obsolete = false;
-
 	private List<String> labelTokens = null;
 	private List<Double> labelIdfs = null;
 
@@ -40,11 +38,11 @@ public class ConceptProcessed {
 	private List<List<String>> broadSynonymsTokens = new ArrayList<>();
 	private List<List<Double>> broadSynonymsIdfs = new ArrayList<>();
 
-	private List<String> definitionTokens = null;
-	private List<Double> definitionIdfs = null;
+	private List<List<String>> definitionTokens =  new ArrayList<>();
+	private List<List<Double>> definitionIdfs =  new ArrayList<>();
 
-	private List<String> commentTokens = null;
-	private List<Double> commentIdfs = null;
+	private List<List<String>> commentTokens =  new ArrayList<>();
+	private List<List<Double>> commentIdfs =  new ArrayList<>();
 
 	private List<List<String>> tokens = new ArrayList<>();
 	private List<List<Double>> idfs = new ArrayList<>();
@@ -54,12 +52,8 @@ public class ConceptProcessed {
 	private List<EdamUri> directParents = new ArrayList<>();
 	private List<EdamUri> directChildren = new ArrayList<>();
 
-	public boolean isObsolete() {
-		return obsolete;
-	}
-	public void setObsolete(boolean obsolete) {
-		this.obsolete = obsolete;
-	}
+	private boolean obsolete = false;
+	private List<EdamUri> replacedBy = new ArrayList<>();
 
 	public List<String> getLabelTokens() {
 		return labelTokens;
@@ -113,30 +107,30 @@ public class ConceptProcessed {
 		this.broadSynonymsIdfs.add(broadSynonymIdfs);
 	}
 
-	public List<String> getDefinitionTokens() {
+	public List<List<String>> getDefinitionTokens() {
 		return definitionTokens;
 	}
-	public void setDefinitionTokens(List<String> definitionTokens) {
-		this.definitionTokens = definitionTokens;
+	public void addDefinitionTokens(List<String> definitionTokens) {
+		this.definitionTokens.add(definitionTokens);
 	}
-	public List<Double> getDefinitionIdfs() {
+	public List<List<Double>> getDefinitionIdfs() {
 		return definitionIdfs;
 	}
-	public void setDefinitionIdfs(List<Double> definitionIdfs) {
-		this.definitionIdfs = definitionIdfs;
+	public void addDefinitionIdfs(List<Double> definitionIdfs) {
+		this.definitionIdfs.add(definitionIdfs);
 	}
 
-	public List<String> getCommentTokens() {
+	public List<List<String>> getCommentTokens() {
 		return commentTokens;
 	}
-	public void setCommentTokens(List<String> commentTokens) {
-		this.commentTokens = commentTokens;
+	public void addCommentTokens(List<String> commentTokens) {
+		this.commentTokens.add(commentTokens);
 	}
-	public List<Double> getCommentIdfs() {
+	public List<List<Double>> getCommentIdfs() {
 		return commentIdfs;
 	}
-	public void setCommentIdfs(List<Double> commentIdfs) {
-		this.commentIdfs = commentIdfs;
+	public void addCommentIdfs(List<Double> commentIdfs) {
+		this.commentIdfs.add(commentIdfs);
 	}
 
 	public List<List<String>> getTokens() {
@@ -176,5 +170,19 @@ public class ConceptProcessed {
 	}
 	public void setDirectChildren(List<EdamUri> directChildren) {
 		this.directChildren = directChildren;
+	}
+
+	public boolean isObsolete() {
+		return obsolete;
+	}
+	public void setObsolete(boolean obsolete) {
+		this.obsolete = obsolete;
+	}
+
+	public List<EdamUri> getReplacedBy() {
+		return replacedBy;
+	}
+	public void setReplacedBy(List<EdamUri> replacedBy) {
+		this.replacedBy = replacedBy;
 	}
 }

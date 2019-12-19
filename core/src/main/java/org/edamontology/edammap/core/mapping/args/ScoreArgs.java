@@ -21,6 +21,7 @@ package org.edamontology.edammap.core.mapping.args;
 
 import com.beust.jcommander.Parameter;
 
+import org.edamontology.edammap.core.args.PositiveDouble;
 import org.edamontology.edammap.core.args.ZeroToOneDouble;
 
 import org.edamontology.pubfetcher.core.common.Arg;
@@ -107,6 +108,12 @@ public class ScoreArgs extends Args {
 	@Parameter(names = { "--" + passableBadScoresInTopNId }, validateWith = PositiveInteger.class, description = passableBadScoresInTopNDescription)
 	private Integer passableBadScoresInTopN = passableBadScoresInTopNDefault;
 
+	private static final String topScorePartOutlierId = "topScorePartOutlier";
+	private static final String topScorePartOutlierDescription = "If --mappingStrategy average is used, then each non-disabled and non-empty query part will have a corresponding score part. If the score of the top score part is more than the given number of times larger than the score of the next largest score part, then the entire match will be discarded. Only done in topic and operation branches and only when there are at least two score parts and only if the publication fulltext, doc or web query part is the top score part. Set to a value less than 1 to disable in all cases.";
+	private static final Double topScorePartOutlierDefault = 42.0;
+	@Parameter(names = { "--" + topScorePartOutlierId }, validateWith = PositiveDouble.class, description = topScorePartOutlierDescription)
+	private Double topScorePartOutlier = topScorePartOutlierDefault;
+
 	@Override
 	protected void addArgs() {
 		args.add(new Arg<>(this::getGoodScoreTopic, this::setGoodScoreTopic, goodScoreTopicDefault, 0.0, 1.0, goodScoreTopicId, "Good score for topic", goodScoreTopicDescription, null));
@@ -122,6 +129,7 @@ public class ScoreArgs extends Args {
 		args.add(new Arg<>(this::isOutputBadScores, this::setOutputBadScores, outputBadScoresDefault, outputBadScoresId, "Matches with bad scores", outputBadScoresDescription, null));
 		args.add(new Arg<>(this::getPassableBadScoreInterval, this::setPassableBadScoreInterval, passableBadScoreIntervalDefault, passableBadScoreIntervalId, "Passable bad score interval", passableBadScoreIntervalDescription, null));
 		args.add(new Arg<>(this::getPassableBadScoresInTopN, this::setPassableBadScoresInTopN, passableBadScoresInTopNDefault, passableBadScoresInTopNId, "Passable bad scores in top n", passableBadScoresInTopNDescription, null));
+		args.add(new Arg<>(this::getTopScorePartOutlier, this::setTopScorePartOutlier, topScorePartOutlierDefault, topScorePartOutlierId, "Top score part is outlier", topScorePartOutlierDescription, null));
 	}
 
 	@Override
@@ -223,5 +231,12 @@ public class ScoreArgs extends Args {
 	}
 	public void setPassableBadScoresInTopN(Integer passableBadScoresInTopN) {
 		this.passableBadScoresInTopN = passableBadScoresInTopN;
+	}
+
+	public Double getTopScorePartOutlier() {
+		return topScorePartOutlier;
+	}
+	public void setTopScorePartOutlier(Double topScorePartOutlier) {
+		this.topScorePartOutlier = topScorePartOutlier;
 	}
 }

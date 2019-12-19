@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016, 2017, 2018 Erik Jaaniso
+ * Copyright © 2016, 2017, 2018, 2019 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -43,6 +44,8 @@ public class Edam {
 
 	public static Map<EdamUri, Concept> load(String edamPath) throws IOException {
 
+		List<String> blacklistSynonyms = PubFetcher.getResource(Edam.class, "edam/blacklist_synonyms.txt");
+
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		OWLOntology ontology;
 		try {
@@ -62,18 +65,25 @@ public class Edam {
 					EntitySearcher.getAnnotations(c, ontology).forEachOrdered(a -> {
 						if (a.getProperty().isLabel())
 							concept.setLabel(a.getValue().asLiteral().get().getLiteral());
-						else if (a.getProperty().isDeprecated())
-							concept.setObsolete(true);
-						else if (a.getProperty().toStringID().equals("http://www.geneontology.org/formats/oboInOwl#hasExactSynonym") && a.getValue().asLiteral().isPresent())
-							concept.addExactSynonym(a.getValue().asLiteral().get().getLiteral());
-						else if (a.getProperty().toStringID().equals("http://www.geneontology.org/formats/oboInOwl#hasNarrowSynonym") && a.getValue().asLiteral().isPresent())
-							concept.addNarrowSynonym(a.getValue().asLiteral().get().getLiteral());
-						else if (a.getProperty().toStringID().equals("http://www.geneontology.org/formats/oboInOwl#hasBroadSynonym") && a.getValue().asLiteral().isPresent())
-							concept.addBroadSynonym(a.getValue().asLiteral().get().getLiteral());
-						else if (a.getProperty().toStringID().equals("http://www.geneontology.org/formats/oboInOwl#hasDefinition") && a.getValue().asLiteral().isPresent())
+						else if (a.getProperty().toStringID().equals("http://www.geneontology.org/formats/oboInOwl#hasExactSynonym") && a.getValue().asLiteral().isPresent()) {
+							if (!blacklistSynonyms.contains(a.getValue().asLiteral().get().getLiteral()))
+								concept.addExactSynonym(a.getValue().asLiteral().get().getLiteral());
+						} else if (a.getProperty().toStringID().equals("http://www.geneontology.org/formats/oboInOwl#hasNarrowSynonym") && a.getValue().asLiteral().isPresent()) {
+							if (!blacklistSynonyms.contains(a.getValue().asLiteral().get().getLiteral()))
+								concept.addNarrowSynonym(a.getValue().asLiteral().get().getLiteral());
+						} else if (a.getProperty().toStringID().equals("http://www.geneontology.org/formats/oboInOwl#hasBroadSynonym") && a.getValue().asLiteral().isPresent()) {
+							if (!blacklistSynonyms.contains(a.getValue().asLiteral().get().getLiteral()))
+								concept.addBroadSynonym(a.getValue().asLiteral().get().getLiteral());
+						} else if (a.getProperty().toStringID().equals("http://www.geneontology.org/formats/oboInOwl#hasDefinition") && a.getValue().asLiteral().isPresent())
 							concept.setDefinition(a.getValue().asLiteral().get().getLiteral());
 						else if (a.getProperty().isComment() && a.getValue().asLiteral().isPresent())
-							concept.setComment(a.getValue().asLiteral().get().getLiteral());
+							concept.addComment(a.getValue().asLiteral().get().getLiteral());
+						else if (a.getProperty().isDeprecated())
+							concept.setObsolete(true);
+						else if (a.getProperty().toStringID().equals("http://www.geneontology.org/formats/oboInOwl#replacedBy") && a.getValue().asIRI().isPresent())
+							concept.addReplacedBy(new EdamUri(a.getValue().asIRI().get().getIRIString(), EdamUri.DEFAULT_PREFIX));
+						else if (a.getProperty().toStringID().equals("http://www.geneontology.org/formats/oboInOwl#consider") && a.getValue().asIRI().isPresent())
+							concept.addReplacedBy(new EdamUri(a.getValue().asIRI().get().getIRIString(), EdamUri.DEFAULT_PREFIX));
 					});
 					concept.setDirectParents(EntitySearcher.getSuperClasses(c, ontology)
 						.filter(a -> a.isOWLClass() && !a.asOWLClass().getIRI().toString().equals("http://www.w3.org/2002/07/owl#DeprecatedClass"))

@@ -60,7 +60,7 @@ public class PreProcessor {
 
 	// Sometimes there is no space after a period at the end of a sentence (also consider ? ending a sentence, but not !)
 	private final Pattern PERIOD_FIX_UPPERCASE = Pattern.compile("(.)(\\.|\\?)(\\p{Lu})");
-	private final Pattern PERIOD_FIX_NUMBER = Pattern.compile("([^\\p{N}])(\\.|\\?)(\\p{N})");
+	private final Pattern PERIOD_FIX_NUMBER = Pattern.compile("([^\\p{N}" + WHITESPACE_CODES + "])(\\.|\\?)(\\p{N})");
 
 	// Characters that can be used to represent an apostrophe, will be changed to ' (\\u0027)
 	private final Pattern APOSTROPHE = Pattern.compile("[" + APOSTROPHE_CODES + "]");
@@ -301,32 +301,42 @@ public class PreProcessor {
 
 		input = periodFix(input);
 
-		input = WHITESPACE.matcher(input).replaceAll(" ");
+		List<String> output = new ArrayList<>();
 
-		input = INTERNAL_TRIM.matcher(input).replaceAll(" ");
+		for (String block : input.split("(\n\n)|(\n\r\n)")) {
+			block = WHITESPACE.matcher(block).replaceAll(" ");
 
-		input = input.trim();
+			block = INTERNAL_TRIM.matcher(block).replaceAll(" ");
 
-		List<String> output = Arrays.stream(input.split("(\\. )|(\\? )|(\\.$)|(\\?$)")).collect(Collectors.toList());
+			block = block.trim();
 
-		for (int i = 0; i < output.size(); ++i) {
-			output.set(i, output.get(i).trim());
-		}
+			if (block.startsWith("|||")) {
+				output.add(block);
+			} else {
+				List<String> sentences = Arrays.stream(block.split("(\\. )|(\\? )|(\\.$)|(\\?$)")).collect(Collectors.toList());
 
-		output.removeIf(s -> s.isEmpty());
+				for (int i = 0; i < sentences.size(); ++i) {
+					sentences.set(i, sentences.get(i).trim());
+				}
 
-		if (output.size() > 1) {
-			if (!output.get(0).contains(" ")) {
-				output.set(1, output.get(0) + " " + output.get(1));
-				output.remove(0);
-			}
-		}
-		for (int i = 1; i < output.size(); ++i) {
-			String current = output.get(i);
-			if (!current.contains(" ") || !UPPERCASE_LETTER.matcher(current.substring(0, 1)).matches()) {
-				output.set(i - 1, output.get(i - 1) + ". " + current);
-				output.remove(i);
-				--i;
+				sentences.removeIf(s -> s.isEmpty());
+
+				if (sentences.size() > 1) {
+					if (!sentences.get(0).contains(" ")) {
+						sentences.set(1, sentences.get(0) + " " + sentences.get(1));
+						sentences.remove(0);
+					}
+				}
+				for (int i = 1; i < sentences.size(); ++i) {
+					String current = sentences.get(i);
+					if (!current.contains(" ") || !UPPERCASE_LETTER.matcher(current.substring(0, 1)).matches()) {
+						sentences.set(i - 1, sentences.get(i - 1) + ". " + current);
+						sentences.remove(i);
+						--i;
+					}
+				}
+
+				output.addAll(sentences);
 			}
 		}
 

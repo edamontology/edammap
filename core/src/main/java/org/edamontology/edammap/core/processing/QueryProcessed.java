@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016, 2018 Erik Jaaniso
+ * Copyright © 2016, 2018, 2019 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -33,16 +33,16 @@ public class QueryProcessed {
 	private List<List<String>> keywordsTokens = new ArrayList<>();
 	private List<List<Double>> keywordsIdfs = new ArrayList<>();
 
-	private List<String> descriptionTokens = null;
-	private List<Double> descriptionIdfs = null;
+	private List<List<String>> descriptionTokens = new ArrayList<>();
+	private List<List<Double>> descriptionIdfs = null;
 
 	private List<Webpage> webpages = new ArrayList<>();
-	private List<List<String>> webpagesTokens = new ArrayList<>();
-	private List<List<Double>> webpagesIdfs = new ArrayList<>();
+	private List<List<List<String>>> webpagesTokens = new ArrayList<>();
+	private List<List<List<Double>>> webpagesIdfs = new ArrayList<>();
 
 	private List<Webpage> docs = new ArrayList<>();
-	private List<List<String>> docsTokens = new ArrayList<>();
-	private List<List<Double>> docsIdfs = new ArrayList<>();
+	private List<List<List<String>>> docsTokens = new ArrayList<>();
+	private List<List<List<Double>>> docsIdfs = new ArrayList<>();
 
 	private List<Publication> publications = new ArrayList<>();
 	private List<PublicationProcessed> processedPublications = new ArrayList<>();
@@ -73,17 +73,20 @@ public class QueryProcessed {
 		this.keywordsIdfs.add(keywordIdfs);
 	}
 
-	public List<String> getDescriptionTokens() {
+	public List<List<String>> getDescriptionTokens() {
 		return descriptionTokens;
 	}
-	public void setDescriptionTokens(List<String> descriptionTokens) {
-		this.descriptionTokens = descriptionTokens;
+	public void addDescriptionTokens(List<String> descriptionTokens) {
+		this.descriptionTokens.add(descriptionTokens);
 	}
-	public List<Double> getDescriptionIdfs() {
+	public List<List<Double>> getDescriptionIdfs() {
 		return descriptionIdfs;
 	}
-	public void setDescriptionIdfs(List<Double> descriptionIdfs) {
-		this.descriptionIdfs = descriptionIdfs;
+	public void addDescriptionIdfs(List<Double> descriptionIdfs) {
+		if (this.descriptionIdfs == null) {
+			this.descriptionIdfs = new ArrayList<>();
+		}
+		this.descriptionIdfs.add(descriptionIdfs);
 	}
 
 	public List<Webpage> getWebpages() {
@@ -92,16 +95,16 @@ public class QueryProcessed {
 	public void addWebpage(Webpage webpage) {
 		this.webpages.add(webpage);
 	}
-	public List<List<String>> getWebpagesTokens() {
+	public List<List<List<String>>> getWebpagesTokens() {
 		return webpagesTokens;
 	}
-	public void addWebpageTokens(List<String> webpageTokens) {
+	public void addWebpageTokens(List<List<String>> webpageTokens) {
 		this.webpagesTokens.add(webpageTokens);
 	}
-	public List<List<Double>> getWebpagesIdfs() {
+	public List<List<List<Double>>> getWebpagesIdfs() {
 		return webpagesIdfs;
 	}
-	public void addWebpageIdfs(List<Double> webpageIdfs) {
+	public void addWebpageIdfs(List<List<Double>> webpageIdfs) {
 		this.webpagesIdfs.add(webpageIdfs);
 	}
 
@@ -111,16 +114,16 @@ public class QueryProcessed {
 	public void addDoc(Webpage doc) {
 		this.docs.add(doc);
 	}
-	public List<List<String>> getDocsTokens() {
+	public List<List<List<String>>> getDocsTokens() {
 		return docsTokens;
 	}
-	public void addDocTokens(List<String> docTokens) {
+	public void addDocTokens(List<List<String>> docTokens) {
 		this.docsTokens.add(docTokens);
 	}
-	public List<List<Double>> getDocsIdfs() {
+	public List<List<List<Double>>> getDocsIdfs() {
 		return docsIdfs;
 	}
-	public void addDocIdfs(List<Double> docIdfs) {
+	public void addDocIdfs(List<List<Double>> docIdfs) {
 		this.docsIdfs.add(docIdfs);
 	}
 
