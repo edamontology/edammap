@@ -15,15 +15,67 @@
 package org.edamontology.edammap.core.cots;
 
 /*
-@@ -231,6 +232,7 @@
-    {  if (b[k] == 's')
-       {  if (ends("sses")) k -= 2; else
-          if (ends("ies")) setto("i"); else
-+         if (ends("'s")) k -= 2; else
-          if (b[k-1] != 's') k--;
-       }
-       if (ends("eed")) { if (m() > 0) k--; } else
-*/
+ * Remove possessive
+ */
+
+//@@ -231,6 +231,7 @@
+//{  if (b[k] == 's')
+//   {  if (ends("sses")) k -= 2; else
+//      if (ends("ies")) setto("i"); else
+//+         if (ends("'s")) k -= 2; else
+//      if (b[k-1] != 's') k--;
+//   }
+//   if (ends("eed")) { if (m() > 0) k--; } else
+
+/*
+ * Support some British English (-ised, -ising, -iser, -isation, -alise, -ise)
+ * Note, that there are many words where -ise should not be removed (see https://www.drupal.org/project/porterstemmer/issues/335030),
+ * however in our case the benefits, i.e. supporting most of British English in EDAM (https://github.com/edamontology/edamontology/issues/184), should outweigh the drawbacks
+ */
+
+//@@ -239,6 +240,7 @@
+//      if (ends("at")) setto("ate"); else
+//      if (ends("bl")) setto("ble"); else
+//      if (ends("iz")) setto("ize"); else
+//+         if (ends("is")) setto("ise"); else
+//      if (doublec(k))
+//      {  k--;
+//         {  int ch = b[k];
+//@@ -266,6 +268,7 @@
+//              if (ends("anci")) { r("ance"); break; }
+//              break;
+//    case 'e': if (ends("izer")) { r("ize"); break; }
+//+                 if (ends("iser")) { r("ise"); break; }
+//              break;
+//    case 'l': if (ends("bli")) { r("ble"); break; }
+//              if (ends("alli")) { r("al"); break; }
+//@@ -274,6 +277,7 @@
+//              if (ends("ousli")) { r("ous"); break; }
+//              break;
+//    case 'o': if (ends("ization")) { r("ize"); break; }
+//+                 if (ends("isation")) { r("ise"); break; }
+//              if (ends("ation")) { r("ate"); break; }
+//              if (ends("ator")) { r("ate"); break; }
+//              break;
+//@@ -296,6 +300,7 @@
+//    case 'e': if (ends("icate")) { r("ic"); break; }
+//              if (ends("ative")) { r(""); break; }
+//              if (ends("alize")) { r("al"); break; }
+//+                 if (ends("alise")) { r("al"); break; }
+//              break;
+//    case 'i': if (ends("iciti")) { r("ic"); break; }
+//              break;
+//@@ -326,7 +331,8 @@
+//                                 /* j >= 0 fixes Bug 2 */
+//                 if (ends("ou")) break; return;
+//                 /* takes care of -ous */
+//-          case 's': if (ends("ism")) break; return;
+//+          case 's': if (ends("ism")) break;
+//+                    if (ends("ise")) break; return;
+//       case 't': if (ends("ate")) break;
+//                 if (ends("iti")) break; return;
+//       case 'u': if (ends("ous")) break; return;
+//@@ -365,62 +371,62 @@
 
 /*
 
@@ -266,6 +318,7 @@ public class Stemmer
          if (ends("at")) setto("ate"); else
          if (ends("bl")) setto("ble"); else
          if (ends("iz")) setto("ize"); else
+         if (ends("is")) setto("ise"); else
          if (doublec(k))
          {  k--;
             {  int ch = b[k];
@@ -293,6 +346,7 @@ public class Stemmer
                  if (ends("anci")) { r("ance"); break; }
                  break;
        case 'e': if (ends("izer")) { r("ize"); break; }
+                 if (ends("iser")) { r("ise"); break; }
                  break;
        case 'l': if (ends("bli")) { r("ble"); break; }
                  if (ends("alli")) { r("al"); break; }
@@ -301,6 +355,7 @@ public class Stemmer
                  if (ends("ousli")) { r("ous"); break; }
                  break;
        case 'o': if (ends("ization")) { r("ize"); break; }
+                 if (ends("isation")) { r("ise"); break; }
                  if (ends("ation")) { r("ate"); break; }
                  if (ends("ator")) { r("ate"); break; }
                  break;
@@ -323,6 +378,7 @@ public class Stemmer
        case 'e': if (ends("icate")) { r("ic"); break; }
                  if (ends("ative")) { r(""); break; }
                  if (ends("alize")) { r("al"); break; }
+                 if (ends("alise")) { r("al"); break; }
                  break;
        case 'i': if (ends("iciti")) { r("ic"); break; }
                  break;
@@ -353,7 +409,8 @@ public class Stemmer
                                     /* j >= 0 fixes Bug 2 */
                     if (ends("ou")) break; return;
                     /* takes care of -ous */
-          case 's': if (ends("ism")) break; return;
+          case 's': if (ends("ism")) break;
+                    if (ends("ise")) break; return;
           case 't': if (ends("ate")) break;
                     if (ends("iti")) break; return;
           case 'u': if (ends("ous")) break; return;
