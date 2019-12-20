@@ -22,9 +22,10 @@ package org.edamontology.edammap.core.input.json;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public enum LinkType {
-	// TODO not in schema, remove
-	@JsonProperty("Browser")
-	BROWSER("Browser"),
+	@JsonProperty("Discussion forum")
+	DISCUSSION_FORUM("Discussion forum"),
+	@JsonProperty("Galaxy service")
+	GALAXY_SERVICE("Galaxy service"),
 	@JsonProperty("Helpdesk")
 	HELPDESK("Helpdesk"),
 	@JsonProperty("Issue tracker")
@@ -33,25 +34,24 @@ public enum LinkType {
 	MAILING_LIST("Mailing list"),
 	@JsonProperty("Mirror")
 	MIRROR("Mirror"),
-	@JsonProperty("Registry")
-	REGISTRY("Registry"),
+	@JsonProperty("Software catalogue")
+	SOFTWARE_CATALOGUE("Software catalogue"),
 	@JsonProperty("Repository")
 	REPOSITORY("Repository"),
-	@JsonProperty("Social media")
-	SOCIAL_MEDIA("Social media"),
-	@JsonProperty("Scientific benchmark")
-	SCIENTIFIC_BENCHMARK("Scientific benchmark"),
-	@JsonProperty("Technical monitoring")
-	TECHNICAL_MONITORING("Technical monitoring"),
-	// TODO not in schema, remove
-	@JsonProperty("Galaxy service")
-	GALAXY_SERVICE("Galaxy service"),
 	@JsonProperty("Service")
 	SERVICE("Service"),
+	@JsonProperty("Social media")
+	SOCIAL_MEDIA("Social media"),
+	@JsonProperty("Technical monitoring")
+	TECHNICAL_MONITORING("Technical monitoring"),
 	@JsonProperty("Other")
 	OTHER("Other"),
-	@JsonProperty("Discussion forum")
-	DISCUSSION_FORUM("Discussion forum");
+	// TODO remove (not in schema)
+	@JsonProperty("Registry")
+	REGISTRY("Registry"),
+	// TODO remove (not in schema)
+	@JsonProperty("Browser")
+	BROWSER("Browser");
 
 	private String type;
 

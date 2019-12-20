@@ -28,40 +28,51 @@ public enum DownloadType {
 	BIOLOGICAL_DATA("Biological data"),
 	@JsonProperty("Binaries")
 	BINARIES("Binaries"),
-	@JsonProperty("Binary package")
-	BINARY_PACKAGE("Binary package"),
 	@JsonProperty("Command-line specification")
 	COMMAND_LINE_SPECIFICATION("Command-line specification"),
 	@JsonProperty("Container file")
 	CONTAINER_FILE("Container file"),
-	@JsonProperty("CWL file")
-	CWL_FILE("CWL file"),
 	@JsonProperty("Icon")
 	ICON("Icon"),
-	@JsonProperty("Ontology")
-	ONTOLOGY("Ontology"),
+	@JsonProperty("Software package")
+	SOFTWARE_PACKAGE("Software package"),
 	@JsonProperty("Screenshot")
 	SCREENSHOT("Screenshot"),
 	@JsonProperty("Source code")
 	SOURCE_CODE("Source code"),
-	@JsonProperty("Source package")
-	SOURCE_PACKAGE("Source package"),
 	@JsonProperty("Test data")
 	TEST_DATE("Test data"),
 	@JsonProperty("Test script")
 	TEST_SCRIPT("Test script"),
-	@JsonProperty("Tool wrapper (galaxy)")
-	TOOL_WRAPPER_GALAXY("Tool wrapper (galaxy)"),
-	@JsonProperty("Tool wrapper (taverna)")
-	TOOL_WRAPPER_TAVERNA("Tool wrapper (taverna)"),
-	@JsonProperty("Tool wrapper (other)")
-	TOOL_WRAPPER_OTHER("Tool wrapper (other)"),
+	@JsonProperty("Tool wrapper (CWL)")
+	TOOL_WRAPPER_CWL("Tool wrapper (CWL)"),
+	@JsonProperty("Tool wrapper (Galaxy)")
+	TOOL_WRAPPER_GALAXY("Tool wrapper (Galaxy)"),
+	@JsonProperty("Tool wrapper (Taverna)")
+	TOOL_WRAPPER_TAVERNA("Tool wrapper (Taverna)"),
+	@JsonProperty("Tool wrapper (Other)")
+	TOOL_WRAPPER_OTHER("Tool wrapper (Other)"),
 	@JsonProperty("VM image")
 	VM_IMAGE("VM image"),
 	@JsonProperty("Downloads page")
 	DOWNLOADS_PAGE("Downloads page"),
 	@JsonProperty("Other")
-	OTHER("Other");
+	OTHER("Other"),
+	// TODO remove (not in schema)
+	@JsonProperty("Binary package")
+	BINARY_PACKAGE("Binary package"),
+	// TODO remove (not in schema)
+	@JsonProperty("Source package")
+	SOURCE_PACKAGE("Source package"),
+	// TODO remove (not in schema)
+	@JsonProperty("CWL file")
+	CWL_FILE("CWL file"),
+	// TODO remove (not in schema)
+	@JsonProperty("Tool wrapper (galaxy)")
+	TOOL_WRAPPER_GALAXY_OLD("Tool wrapper (galaxy)"),
+	// TODO remove (not in schema)
+	@JsonProperty("Tool wrapper (other)")
+	TOOL_WRAPPER_OTHER_OLD("Tool wrapper (other)");
 
 	private String type;
 

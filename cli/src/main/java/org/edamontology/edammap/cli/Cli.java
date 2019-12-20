@@ -146,6 +146,20 @@ public class Cli implements Runnable {
 			argsMain.add(new ArgMain(arg.getValue(), arg, false));
 		}
 
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			@Override
+			public void run() {
+				logger.info("Stopping EDAMmap");
+				if (processor != null) {
+					try {
+						processor.closeDatabase();
+					} catch (IOException e) {
+						logger.error("Exception!", e);
+					}
+				}
+			}
+		});
+
 		Output output = new Output(args.getOutput(), args.getReport(), args.getJson(), args.getBiotools(), args.getType(), false);
 
 		stopwords = PreProcessor.getStopwords(args.getCoreArgs().getPreProcessorArgs().getStopwords());
@@ -207,10 +221,9 @@ public class Cli implements Runnable {
 				try {
 					lock.wait();
 				} catch (InterruptedException e) {
-					// TODO exit threads cleanly? give timeout for threads to exit? close db? print that exiting and waiting for threads to terminate?
-					// Runtime.getRuntime().addShutdownHook(new Thread() {
+					Thread.currentThread().interrupt();
 					logger.error("Exception!", e);
-					System.exit(1);
+					throw new RuntimeException(e);
 				}
 			}
 		}

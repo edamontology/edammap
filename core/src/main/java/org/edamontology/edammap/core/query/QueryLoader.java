@@ -460,6 +460,7 @@ public class QueryLoader {
 					LinkType.REPOSITORY.toString(),
 					LinkType.BROWSER.toString(),
 					LinkType.REGISTRY.toString(),
+					LinkType.SOFTWARE_CATALOGUE.toString(),
 					LinkType.GALAXY_SERVICE.toString(),
 					LinkType.SERVICE.toString(),
 					LinkType.OTHER.toString()
@@ -471,6 +472,7 @@ public class QueryLoader {
 					DownloadType.BIOLOGICAL_DATA.toString(),
 					DownloadType.COMMAND_LINE_SPECIFICATION.toString(),
 					DownloadType.CWL_FILE.toString(),
+					DownloadType.TOOL_WRAPPER_CWL.toString(),
 					DownloadType.SOURCE_CODE.toString(),
 					DownloadType.TEST_SCRIPT.toString(),
 					DownloadType.DOWNLOADS_PAGE.toString(),
@@ -483,6 +485,7 @@ public class QueryLoader {
 			docUrls.addAll(linksJson(tool.getDocumentation().stream(), Arrays.asList(
 					DocumentationType.GENERAL.toString(),
 					DocumentationType.MANUAL.toString(),
+					DocumentationType.USER_MANUAL.toString(),
 					DocumentationType.API_DOCUMENTATION.toString(),
 					DocumentationType.TRAINING_MATERIAL.toString(),
 					DocumentationType.TUTORIAL.toString(),
