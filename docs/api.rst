@@ -509,27 +509,27 @@ One way to test the API is to send JSON data using ``curl``. For example, for se
 .. code-block:: json
 
   {
-    "name": "test"
+    "name": "aTool"
   }
 
 issue the command:
 
 .. code-block:: bash
 
-  $ curl -H "Content-Type: application/json" -X POST -d '{"name":"test"}' https://biit.cs.ut.ee/edammap/api
+  $ curl -H "Content-Type: application/json" -X POST -d '{"name":"aTool"}' https://biit.cs.ut.ee/edammap/api
 
 In the output, no results can be seen:
 
-.. code-block::
+.. code::
 
-    "results" : {
-      "topic" : [ ],
-      "operation" : [ ],
-      "data" : null,
-      "format" : null
-    }
+  "results" : {
+    "topic" : [ ],
+    "operation" : [ ],
+    "data" : null,
+    "format" : null
+  }
 
-Which is not surprising, given only the tool name was supplied ("test"), which is too little for EDAMmap to work with.
+Which is not surprising, given only the tool name was supplied ("aTool"), which is too little for EDAMmap to work with.
 
 A more meaningful input might look like this:
 
@@ -558,7 +558,7 @@ A more meaningful input might look like this:
       "http://edamontology.org/format_1964"
     ],
     "branches": [ "topic", "operation", "data", "format" ],
-    "matches": 5,
+    "matches": 6,
     "obsolete": true
   }
 
@@ -614,8 +614,8 @@ To supply the same data (except the "keywords") as `bio.tools input`_, the follo
       }]
     },
     "branches": [ "topic", "operation", "data", "format" ],
-    "compoundWords": 0,
-    "outputBadScores": true
+    "matches": 6,
+    "obsolete": true
   }
 
 
