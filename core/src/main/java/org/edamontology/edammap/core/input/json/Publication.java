@@ -33,6 +33,8 @@ public class Publication {
 
 	private String version;
 
+	private String note;
+
 	// TODO not in schema
 	private PublicationMetadata metadata;
 
@@ -75,6 +77,13 @@ public class Publication {
 	}
 	public void setVersion(String version) {
 		this.version = version;
+	}
+
+	public String getNote() {
+		return note;
+	}
+	public void setNote(String note) {
+		this.note = note;
 	}
 
 	public PublicationMetadata getMetadata() {

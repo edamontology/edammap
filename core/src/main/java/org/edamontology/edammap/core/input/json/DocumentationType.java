@@ -49,13 +49,7 @@ public enum DocumentationType {
 	@JsonProperty("Training material")
 	TRAINING_MATERIAL("Training material"),
 	@JsonProperty("Other")
-	OTHER("Other"),
-	// TODO remove (not in schema)
-	@JsonProperty("Tutorial")
-	TUTORIAL("Tutorial"),
-	// TODO remove (not in schema)
-	@JsonProperty("Manual")
-	MANUAL("Manual");
+	OTHER("Other");
 
 	private String type;
 

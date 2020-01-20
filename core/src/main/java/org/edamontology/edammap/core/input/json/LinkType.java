@@ -47,9 +47,6 @@ public enum LinkType {
 	@JsonProperty("Other")
 	OTHER("Other"),
 	// TODO remove (not in schema)
-	@JsonProperty("Registry")
-	REGISTRY("Registry"),
-	// TODO remove (not in schema)
 	@JsonProperty("Browser")
 	BROWSER("Browser");
 

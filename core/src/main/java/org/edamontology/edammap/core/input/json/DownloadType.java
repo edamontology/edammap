@@ -57,22 +57,7 @@ public enum DownloadType {
 	@JsonProperty("Downloads page")
 	DOWNLOADS_PAGE("Downloads page"),
 	@JsonProperty("Other")
-	OTHER("Other"),
-	// TODO remove (not in schema)
-	@JsonProperty("Binary package")
-	BINARY_PACKAGE("Binary package"),
-	// TODO remove (not in schema)
-	@JsonProperty("Source package")
-	SOURCE_PACKAGE("Source package"),
-	// TODO remove (not in schema)
-	@JsonProperty("CWL file")
-	CWL_FILE("CWL file"),
-	// TODO remove (not in schema)
-	@JsonProperty("Tool wrapper (galaxy)")
-	TOOL_WRAPPER_GALAXY_OLD("Tool wrapper (galaxy)"),
-	// TODO remove (not in schema)
-	@JsonProperty("Tool wrapper (other)")
-	TOOL_WRAPPER_OTHER_OLD("Tool wrapper (other)");
+	OTHER("Other");
 
 	private String type;
 

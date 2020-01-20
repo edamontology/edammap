@@ -32,6 +32,8 @@ public class Credit {
 
 	private String orcidid;
 
+	private String gridid;
+
 	private EntityType typeEntity;
 
 	private List<RoleType> typeRole;
@@ -70,6 +72,13 @@ public class Credit {
 	}
 	public void setOrcidid(String orcidid) {
 		this.orcidid = orcidid;
+	}
+
+	public String getGridid() {
+		return gridid;
+	}
+	public void setGridid(String gridid) {
+		this.gridid = gridid;
 	}
 
 	public EntityType getTypeEntity() {
