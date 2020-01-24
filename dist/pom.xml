@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Copyright © 2020 Erik Jaaniso
+
+   This file is part of EDAMmap.
+
+   EDAMmap is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   EDAMmap is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with EDAMmap.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.edamontology.edammap</groupId>
+    <artifactId>edammap</artifactId>
+    <version>0.2-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>edammap-dist</artifactId>
+  <packaging>pom</packaging>
+
+  <name>EDAMmap-Dist</name>
+  <url>https://github.com/edamontology/edammap/releases</url>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.edamontology.edammap</groupId>
+      <artifactId>edammap-core</artifactId>
+      <version>${edammap.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.edamontology.edammap</groupId>
+      <artifactId>edammap-util</artifactId>
+      <version>${edammap.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.edamontology.edammap</groupId>
+      <artifactId>edammap-cli</artifactId>
+      <version>${edammap.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.edamontology.edammap</groupId>
+      <artifactId>edammap-server</artifactId>
+      <version>${edammap.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <finalName>edammap-${edammap.version}</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>assembly.xml</descriptor>
+              </descriptors>
+              <appendAssemblyId>false</appendAssemblyId>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
