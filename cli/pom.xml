@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.edamontology.edammap</groupId>
     <artifactId>edammap</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>1.0.0</version>
   </parent>
 
   <artifactId>edammap-cli</artifactId>
