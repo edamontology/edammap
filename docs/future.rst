@@ -23,7 +23,7 @@ Algorithm
 *********
 
 * Currently, scores are not totally comparable across queries. Try to make a score in one query mean the same thing in another query as exactly as possible.
-* An extra query part could be tags present in some web pages, like software registries or code repositories. This would require `changes in PubFetcher <https://pubfetcher.readthedocs.io/en/latest/future.html#structure-changes>`_.
+* An extra query part could be tags present in some web pages, like software registries or code repositories. This would require `changes in PubFetcher <https://pubfetcher.readthedocs.io/en/stable/future.html#structure-changes>`_.
 * Maybe `WordNet <https://wordnet.princeton.edu/>`_ could be used as part of the mapping algorithm. For example use lemmatisation instead of stemming.
 * In results got from running EDAMmap against existing entries of bio.tools, look at FNs and see if anything can be done to increase their score.
 
@@ -76,7 +76,8 @@ Server
 Maintenance
 ***********
 
-* Update PubFetcher's `scraping rules <https://pubfetcher.readthedocs.io/en/latest/scraping.html#scraping-rules>`_, by `testing the rules <https://pubfetcher.readthedocs.io/en/latest/scraping.html#testing-of-rules>`_ and modifying outdated rules in `journals.yaml <https://github.com/edamontology/pubfetcher/blob/master/core/src/main/resources/scrape/journals.yaml>`_, `webpages.yaml <https://github.com/edamontology/pubfetcher/blob/master/core/src/main/resources/scrape/webpages.yaml>`_ and most importantly the hardcoded rules for `Europe PMC <https://europepmc.org/>`_ and other built-in `resources <https://pubfetcher.readthedocs.io/en/latest/fetcher.html#resources>`_.
+* Update PubFetcher's `scraping rules <https://pubfetcher.readthedocs.io/en/stable/scraping.html#scraping-rules>`_, by `testing the rules <https://pubfetcher.readthedocs.io/en/stable/scraping.html#testing-of-rules>`_ and modifying outdated rules in `journals.yaml <https://github.com/edamontology/pubfetcher/blob/master/core/src/main/resources/scrape/journals.yaml>`_, `webpages.yaml <https://github.com/edamontology/pubfetcher/blob/master/core/src/main/resources/scrape/webpages.yaml>`_ and most importantly the hardcoded rules for `Europe PMC <https://europepmc.org/>`_ and other built-in `resources <https://pubfetcher.readthedocs.io/en/stable/fetcher.html#resources>`_.
 * Update dependencies in `pom.xml <https://github.com/edamontology/edammap/blob/master/pom.xml>`_ (but care should be taken to not cause regressions).
+* Check for broken links in the documentation using ``make linkcheck``.
 * When a new `biotoolsSchema <https://github.com/bio-tools/biotoolsSchema>`_ is released, some code modifications might be necessary to adhere to it.
 * Also, when a new `EDAM ontology <https://github.com/edamontology/edamontology>`_ is released, some modifications might be necessary (for example in `blacklist.txt <https://github.com/edamontology/edammap/blob/master/core/src/main/resources/edam/blacklist.txt>`_ and `blacklist_synonyms.txt <https://github.com/edamontology/edammap/blob/master/core/src/main/resources/edam/blacklist_synonyms.txt>`_; also, any running :ref:`server` instances could be restarted to use the new ontology version).

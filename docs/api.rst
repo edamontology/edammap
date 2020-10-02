@@ -83,7 +83,7 @@ minLength  ``1``         ``0``  When all pre-processing steps are done, tokens w
 Fetching
 --------
 
-The fetching parameters are implemented in `PubFetcher <https://github.com/edamontology/pubfetcher>`_ and thus are described in its documentation: `Fetching parameters <https://pubfetcher.readthedocs.io/en/latest/cli.html#fetching>`_.
+The fetching parameters are implemented in `PubFetcher <https://github.com/edamontology/pubfetcher>`_ and thus are described in its documentation: `Fetching parameters <https://pubfetcher.readthedocs.io/en/stable/cli.html#fetching>`_.
 
 .. _mapping:
 
@@ -108,7 +108,7 @@ Mapping algorithm
 ====================  =============  =======  =======  ===========
 Parameter             Default        Min      Max      Description
 ====================  =============  =======  =======  ===========
-compoundWords         ``1``          ``0``             Try to match words that have accidentally been made compound (given number is maximum number of words in an accidental compound minus one). Not done for tokens from `fulltext <https://pubfetcher.readthedocs.io/en/latest/fetcher.html#fulltext>`_, `doc <https://pubfetcher.readthedocs.io/en/latest/output.html#content-of-docs>`_ and `webpage <https://pubfetcher.readthedocs.io/en/latest/output.html#content-of-webpages>`_. Set to 0 to disable (for a slight speed increase with only slight changes to the results).
+compoundWords         ``1``          ``0``             Try to match words that have accidentally been made compound (given number is maximum number of words in an accidental compound minus one). Not done for tokens from `fulltext <https://pubfetcher.readthedocs.io/en/stable/fetcher.html#fulltext>`_, `doc <https://pubfetcher.readthedocs.io/en/stable/output.html#content-of-docs>`_ and `webpage <https://pubfetcher.readthedocs.io/en/stable/output.html#content-of-webpages>`_. Set to 0 to disable (for a slight speed increase with only slight changes to the results).
 mismatchMultiplier    ``2.0``        ``0.0``           Multiplier for score decrease caused by mismatch
 matchMinimum          ``1.0``        ``0.0``  ``1.0``  Minimum score allowed for approximate match. Not done for tokens from fulltext_, doc_ and webpage_. Set to ``1`` to disable approximate matching.
 positionOffBy1        ``0.35``       ``0.0``  ``1.0``  Multiplier of a position score component for the case when a word is inserted between matched words or matched words are switched
@@ -164,14 +164,14 @@ Parameter                       Default    Min      Max      Description
 nameNormaliser                  ``0.81``   ``0.0``  ``1.0``  Score normaliser for matching a query name. Set to ``0`` to disable matching of names.
 keywordNormaliser               ``0.77``   ``0.0``  ``1.0``  Score normaliser for matching a query keyword. Set to ``0`` to disable matching of keywords.
 descriptionNormaliser           ``0.92``   ``0.0``  ``1.0``  Score normaliser for matching a query description. Set to ``0`` to disable matching of descriptions.
-publicationTitleNormaliser      ``0.91``   ``0.0``  ``1.0``  Score normaliser for matching a publication `title <https://pubfetcher.readthedocs.io/en/latest/fetcher.html#title>`_. Set to ``0`` to disable matching of titles.
-publicationKeywordNormaliser    ``0.77``   ``0.0``  ``1.0``  Score normaliser for matching a publication `keyword <https://pubfetcher.readthedocs.io/en/latest/fetcher.html#keywords>`_. Set to ``0`` to disable matching of keywords.
-publicationMeshNormaliser       ``0.75``   ``0.0``  ``1.0``  Score normaliser for matching a publication `MeSH term <https://pubfetcher.readthedocs.io/en/latest/fetcher.html#mesh>`_. Set to ``0`` to disable matching of MeSH terms.
-publicationMinedTermNormaliser  ``1.0``    ``0.0``  ``1.0``  Score normaliser for matching a publication mined term (`EFO <https://pubfetcher.readthedocs.io/en/latest/fetcher.html#efo>`_, `GO <https://pubfetcher.readthedocs.io/en/latest/fetcher.html#go>`_). Set to ``0`` to disable matching of mined terms.
-publicationAbstractNormaliser   ``0.985``  ``0.0``  ``1.0``  Score normaliser for matching a publication `abstract <https://pubfetcher.readthedocs.io/en/latest/fetcher.html#theabstract>`_. Set to ``0`` to disable matching of abstracts.
-publicationFulltextNormaliser   ``1.0``    ``0.0``  ``1.0``  Score normaliser for matching a publication `fulltext <https://pubfetcher.readthedocs.io/en/latest/fetcher.html#fulltext>`_. Set to ``0`` to disable matching of fulltexts.
-docNormaliser                   ``1.0``    ``0.0``  ``1.0``  Score normaliser for matching a query `doc <https://pubfetcher.readthedocs.io/en/latest/output.html#content-of-docs>`_. Set to ``0`` to disable matching of docs.
-webpageNormaliser               ``1.0``    ``0.0``  ``1.0``  Score normaliser for matching a query `webpage <https://pubfetcher.readthedocs.io/en/latest/output.html#content-of-webpages>`_. Set to ``0`` to disable matching of webpages.
+publicationTitleNormaliser      ``0.91``   ``0.0``  ``1.0``  Score normaliser for matching a publication `title <https://pubfetcher.readthedocs.io/en/stable/fetcher.html#title>`_. Set to ``0`` to disable matching of titles.
+publicationKeywordNormaliser    ``0.77``   ``0.0``  ``1.0``  Score normaliser for matching a publication `keyword <https://pubfetcher.readthedocs.io/en/stable/fetcher.html#keywords>`_. Set to ``0`` to disable matching of keywords.
+publicationMeshNormaliser       ``0.75``   ``0.0``  ``1.0``  Score normaliser for matching a publication `MeSH term <https://pubfetcher.readthedocs.io/en/stable/fetcher.html#mesh>`_. Set to ``0`` to disable matching of MeSH terms.
+publicationMinedTermNormaliser  ``1.0``    ``0.0``  ``1.0``  Score normaliser for matching a publication mined term (`EFO <https://pubfetcher.readthedocs.io/en/stable/fetcher.html#efo>`_, `GO <https://pubfetcher.readthedocs.io/en/stable/fetcher.html#go>`_). Set to ``0`` to disable matching of mined terms.
+publicationAbstractNormaliser   ``0.985``  ``0.0``  ``1.0``  Score normaliser for matching a publication `abstract <https://pubfetcher.readthedocs.io/en/stable/fetcher.html#theabstract>`_. Set to ``0`` to disable matching of abstracts.
+publicationFulltextNormaliser   ``1.0``    ``0.0``  ``1.0``  Score normaliser for matching a publication `fulltext <https://pubfetcher.readthedocs.io/en/stable/fetcher.html#fulltext>`_. Set to ``0`` to disable matching of fulltexts.
+docNormaliser                   ``1.0``    ``0.0``  ``1.0``  Score normaliser for matching a query `doc <https://pubfetcher.readthedocs.io/en/stable/output.html#content-of-docs>`_. Set to ``0`` to disable matching of docs.
+webpageNormaliser               ``1.0``    ``0.0``  ``1.0``  Score normaliser for matching a query `webpage <https://pubfetcher.readthedocs.io/en/stable/output.html#content-of-webpages>`_. Set to ``0`` to disable matching of webpages.
 ==============================  =========  =======  =======  ===========
 
 .. _query_weights:
@@ -371,7 +371,7 @@ _`args`
     fetching
       Always ``true``
     db
-      Name of the used `database <https://pubfetcher.readthedocs.io/en/latest/output.html#database>`_ file
+      Name of the used `database <https://pubfetcher.readthedocs.io/en/stable/output.html#database>`_ file
     idf
       Name of the used :ref:`IDF <idf>` file
     idfStemmed
@@ -406,11 +406,11 @@ The type_ ``"full"`` includes everything from core_, plus the following:
 mapping
   queryFetched
     _`webpages`
-      Array of metadata objects corresponding to webpageUrls_ in query_. Webpages are implemented in PubFetcher_ and thus are described in its documentation: `Content of webpages <https://pubfetcher.readthedocs.io/en/latest/output.html#content-of-webpages>`_. The structure of webpages here will be the same as described in PubFetcher, except for `content <https://pubfetcher.readthedocs.io/en/latest/output.html#webpage-content>`_ which will be missing. The values of `startUrl <https://pubfetcher.readthedocs.io/en/latest/output.html#starturl>`_ of webpages will be the URLs given in webpageUrls_ in query_.
+      Array of metadata objects corresponding to webpageUrls_ in query_. Webpages are implemented in PubFetcher_ and thus are described in its documentation: `Content of webpages <https://pubfetcher.readthedocs.io/en/stable/output.html#content-of-webpages>`_. The structure of webpages here will be the same as described in PubFetcher, except for `content <https://pubfetcher.readthedocs.io/en/stable/output.html#webpage-content>`_ which will be missing. The values of `startUrl <https://pubfetcher.readthedocs.io/en/stable/output.html#starturl>`_ of webpages will be the URLs given in webpageUrls_ in query_.
     _`docs`
       Array of metadata objects corresponding to docUrls_ in query_. Structure of objects same as in webpages_.
     _`publications`
-      Array of metadata objects corresponding to publicationIds_ in query_. Publications are implemented in PubFetcher_ and thus are described in its documentation: `Content of publications <https://pubfetcher.readthedocs.io/en/latest/output.html#content-of-publications>`_. The structure of publications here will be the same as described in PubFetcher, except for fulltext_ which will be missing.
+      Array of metadata objects corresponding to publicationIds_ in query_. Publications are implemented in PubFetcher_ and thus are described in its documentation: `Content of publications <https://pubfetcher.readthedocs.io/en/stable/output.html#content-of-publications>`_. The structure of publications here will be the same as described in PubFetcher, except for fulltext_ which will be missing.
   results
     topic/operation/data/format
       Array of objects defined in topic_, i.e. the same content as in core_, plus the field parts_ defined below.
@@ -625,7 +625,7 @@ To supply the same data (except the "keywords") as `bio.tools input`_, the follo
 Prefetching
 ***********
 
-Once a query has been received by the API, content corresponding to webpageUrls_, docUrls_ and publicationIds_ has to be `fetched <https://pubfetcher.readthedocs.io/en/latest/fetcher.html>`_ (unless it has been fetched and stored in some previous occurrence), before mapping can take place.
+Once a query has been received by the API, content corresponding to webpageUrls_, docUrls_ and publicationIds_ has to be `fetched <https://pubfetcher.readthedocs.io/en/stable/fetcher.html>`_ (unless it has been fetched and stored in some previous occurrence), before mapping can take place.
 
 This content could be prefetched and prestored in the database_ as a separate step, before the mapping query is sent. This is useful in the web application, where content can be fetched as soon as the user has entered the corresponding query details, and thus mapping time could be less when the entire query form is finally submitted. It might be of less use in the API, but has been included nevertheless.
 
@@ -652,7 +652,7 @@ webpageUrls
   id
     A webpage URL specified in the request
   status
-    The status of that webpage. One of "`broken <https://pubfetcher.readthedocs.io/en/latest/output.html#broken>`_", "`empty <https://pubfetcher.readthedocs.io/en/latest/output.html#webpage-empty>`_", "non-`usable <https://pubfetcher.readthedocs.io/en/latest/output.html#webpage-usable>`_", "non-`final <https://pubfetcher.readthedocs.io/en/latest/output.html#webpage-final>`_", "`final <https://pubfetcher.readthedocs.io/en/latest/output.html#webpage-final>`_".
+    The status of that webpage. One of "`broken <https://pubfetcher.readthedocs.io/en/stable/output.html#broken>`_", "`empty <https://pubfetcher.readthedocs.io/en/stable/output.html#webpage-empty>`_", "non-`usable <https://pubfetcher.readthedocs.io/en/stable/output.html#webpage-usable>`_", "non-`final <https://pubfetcher.readthedocs.io/en/stable/output.html#webpage-final>`_", "`final <https://pubfetcher.readthedocs.io/en/stable/output.html#webpage-final>`_".
 
 /api/doc
 ========
@@ -689,12 +689,12 @@ publicationIds
     doi
       The DOI of the publication
   status
-    The status of that publication. One of `"empty" <https://pubfetcher.readthedocs.io/en/latest/output.html#publication-empty>`_, "non-`usable" <https://pubfetcher.readthedocs.io/en/latest/output.html#publication-usable>`_, "non-`final" <https://pubfetcher.readthedocs.io/en/latest/output.html#publication-final>`_, `"final" <https://pubfetcher.readthedocs.io/en/latest/output.html#publication-final>`_, `"totally final" <https://pubfetcher.readthedocs.io/en/latest/output.html#totallyfinal>`_.
+    The status of that publication. One of `"empty" <https://pubfetcher.readthedocs.io/en/stable/output.html#publication-empty>`_, "non-`usable" <https://pubfetcher.readthedocs.io/en/stable/output.html#publication-usable>`_, "non-`final" <https://pubfetcher.readthedocs.io/en/stable/output.html#publication-final>`_, `"final" <https://pubfetcher.readthedocs.io/en/stable/output.html#publication-final>`_, `"totally final" <https://pubfetcher.readthedocs.io/en/stable/output.html#totallyfinal>`_.
 
 Example
 =======
 
-Try to prefetch the publication with PMID "23479348" and PMCID "PMC3654706", increasing connect and read `timeout <https://pubfetcher.readthedocs.io/en/latest/cli.html#timeout>`_ to give the server more time to fetch the whole publication:
+Try to prefetch the publication with PMID "23479348" and PMCID "PMC3654706", increasing connect and read `timeout <https://pubfetcher.readthedocs.io/en/stable/cli.html#timeout>`_ to give the server more time to fetch the whole publication:
 
 .. code-block:: bash
 

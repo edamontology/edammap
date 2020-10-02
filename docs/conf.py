@@ -3,7 +3,7 @@
 
 project = 'EDAMmap'
 author = 'Erik Jaaniso'
-copyright = '2016-2019, Erik Jaaniso'
+copyright = '2016-2020, Erik Jaaniso'
 version = '1.0.1-SNAPSHOT'
 release = '1.0.1-SNAPSHOT'
 
