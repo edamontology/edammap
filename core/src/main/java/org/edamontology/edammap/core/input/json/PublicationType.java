@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Erik Jaaniso
+ * Copyright © 2020 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -21,38 +21,23 @@ package org.edamontology.edammap.core.input.json;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public enum LinkType {
-	@JsonProperty("Discussion forum")
-	DISCUSSION_FORUM("Discussion forum"),
-	@JsonProperty("Galaxy service")
-	GALAXY_SERVICE("Galaxy service"),
-	@JsonProperty("Helpdesk")
-	HELPDESK("Helpdesk"),
-	@JsonProperty("Issue tracker")
-	ISSUE_TRACKER("Issue tracker"),
-	@JsonProperty("Mailing list")
-	MAILING_LIST("Mailing list"),
-	@JsonProperty("Mirror")
-	MIRROR("Mirror"),
-	@JsonProperty("Software catalogue")
-	SOFTWARE_CATALOGUE("Software catalogue"),
-	@JsonProperty("Repository")
-	REPOSITORY("Repository"),
-	@JsonProperty("Social media")
-	SOCIAL_MEDIA("Social media"),
-	@JsonProperty("Service")
-	SERVICE("Service"),
-	@JsonProperty("Technical monitoring")
-	TECHNICAL_MONITORING("Technical monitoring"),
+public enum PublicationType {
+	@JsonProperty("Primary")
+	PRIMARY("Primary"),
+	@JsonProperty("Method")
+	METHOD("Method"),
+	@JsonProperty("Usage")
+	USAGE("Usage"),
+	@JsonProperty("Benchmarking study")
+	BENCHMARKING_STUDY("Benchmarking study"),
+	@JsonProperty("Review")
+	REVIEW("Review"),
 	@JsonProperty("Other")
-	OTHER("Other"),
-	// TODO remove (not in schema)
-	@JsonProperty("Browser")
-	BROWSER("Browser");
+	OTHER("Other");
 
 	private String type;
 
-	private LinkType(String type) {
+	private PublicationType(String type) {
 		this.type = type;
 	}
 

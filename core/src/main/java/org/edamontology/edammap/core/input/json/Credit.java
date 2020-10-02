@@ -34,6 +34,10 @@ public class Credit {
 
 	private String gridid;
 
+	private String rorid;
+
+	private String fundrefid;
+
 	private EntityType typeEntity;
 
 	private List<RoleType> typeRole;
@@ -79,6 +83,20 @@ public class Credit {
 	}
 	public void setGridid(String gridid) {
 		this.gridid = gridid;
+	}
+
+	public String getRorid() {
+		return rorid;
+	}
+	public void setRorid(String rorid) {
+		this.rorid = rorid;
+	}
+
+	public String getFundrefid() {
+		return fundrefid;
+	}
+	public void setFundrefid(String fundrefid) {
+		this.fundrefid = fundrefid;
 	}
 
 	public EntityType getTypeEntity() {

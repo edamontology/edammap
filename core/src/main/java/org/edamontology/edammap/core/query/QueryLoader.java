@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016, 2017, 2018 Erik Jaaniso
+ * Copyright © 2016, 2017, 2018, 2020 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -65,6 +65,7 @@ import org.edamontology.edammap.core.input.json.Function;
 import org.edamontology.edammap.core.input.json.InputOutput;
 import org.edamontology.edammap.core.input.json.LinkType;
 import org.edamontology.edammap.core.input.json.Publication;
+import org.edamontology.edammap.core.input.json.PublicationType;
 import org.edamontology.edammap.core.input.json.Tool;
 import org.edamontology.edammap.core.input.xml.Biotools14;
 
@@ -146,9 +147,17 @@ public class QueryLoader {
 		return collection;
 	}
 
-	private static List<Link> linksJson(Stream<? extends org.edamontology.edammap.core.input.json.Link<?>> links, List<String> types, boolean throwException) {
+	private static List<Link> linksJson(Stream<? extends org.edamontology.edammap.core.input.json.Link<?>> links, List<?> types, boolean throwException) {
 		return links
-			.filter(l -> types.contains(l.getType().toString()))
+			.filter(l -> !Collections.disjoint(l.getType(), types))
+			.filter(l -> !BIOTOOLS_LINKS_EXCLUDE.matcher(l.getUrl().trim()).matches())
+			.map(l -> link(l.getUrl(), l.toStringType(), throwException))
+			.filter(Objects::nonNull)
+			.collect(Collectors.toList());
+	}
+	private static List<Link> downloadLinksJson(Stream<? extends org.edamontology.edammap.core.input.json.LinkDownload> links, List<DownloadType> types, boolean throwException) {
+		return links
+			.filter(l -> types.contains(l.getType()))
 			.filter(l -> !BIOTOOLS_LINKS_EXCLUDE.matcher(l.getUrl().trim()).matches())
 			.map(l -> link(l.getUrl(), l.getType().toString(), throwException))
 			.filter(Objects::nonNull)
@@ -416,10 +425,10 @@ public class QueryLoader {
 		addLink(biotools.getDocsGithub(), "Github", false, docUrls);
 
 		List<PublicationIdsQuery> publicationIds = new ArrayList<>();
-		addPublicationId(biotools.getPublicationsPrimaryID(), filename, "Primary", false, publicationIds);
-		List<PublicationIdsQuery> otherPublicationIds = publicationIds(biotools.getPublicationsOtherIDs().stream(), filename, "Other", false, 0);
+		addPublicationId(biotools.getPublicationsPrimaryID(), filename, PublicationType.PRIMARY.toString(), false, publicationIds);
+		List<PublicationIdsQuery> otherPublicationIds = publicationIds(biotools.getPublicationsOtherIDs().stream(), filename, PublicationType.OTHER.toString(), false, 0);
 		if (otherPublicationIds != null) {
-			publicationIds.addAll(publicationIds(biotools.getPublicationsOtherIDs().stream(), filename, "Other", false, 0));
+			publicationIds.addAll(publicationIds(biotools.getPublicationsOtherIDs().stream(), filename, PublicationType.OTHER.toString(), false, 0));
 		}
 
 		Set<EdamUri> annotations = new LinkedHashSet<>();
@@ -456,46 +465,47 @@ public class QueryLoader {
 		addLink(tool.getHomepage(), "Homepage", false, webpageUrls);
 		if (tool.getLink() != null) {
 			webpageUrls.addAll(linksJson(tool.getLink().stream(), Arrays.asList(
-					LinkType.MIRROR.toString(),
-					LinkType.REPOSITORY.toString(),
-					LinkType.BROWSER.toString(),
-					LinkType.SOFTWARE_CATALOGUE.toString(),
-					LinkType.GALAXY_SERVICE.toString(),
-					LinkType.SERVICE.toString(),
-					LinkType.OTHER.toString()
+					LinkType.GALAXY_SERVICE,
+					LinkType.MIRROR,
+					LinkType.SOFTWARE_CATALOGUE,
+					LinkType.REPOSITORY,
+					LinkType.SERVICE,
+					LinkType.OTHER,
+					LinkType.BROWSER
 				), false));
 		}
-		if (tool.getLink() != null) {
-			webpageUrls.addAll(linksJson(tool.getLink().stream(), Arrays.asList(
-					DownloadType.API_SPECIFICATION.toString(),
-					DownloadType.BIOLOGICAL_DATA.toString(),
-					DownloadType.COMMAND_LINE_SPECIFICATION.toString(),
-					DownloadType.TOOL_WRAPPER_CWL.toString(),
-					DownloadType.SOURCE_CODE.toString(),
-					DownloadType.TEST_SCRIPT.toString(),
-					DownloadType.DOWNLOADS_PAGE.toString(),
-					DownloadType.OTHER.toString()
+		if (tool.getDownload() != null) {
+			webpageUrls.addAll(downloadLinksJson(tool.getDownload().stream(), Arrays.asList(
+					DownloadType.API_SPECIFICATION,
+					DownloadType.BIOLOGICAL_DATA,
+					DownloadType.COMMAND_LINE_SPECIFICATION,
+					DownloadType.SOURCE_CODE,
+					DownloadType.TEST_SCRIPT,
+					DownloadType.TOOL_WRAPPER_CWL,
+					DownloadType.DOWNLOADS_PAGE,
+					DownloadType.OTHER
 				), false));
 		}
 
 		List<Link> docUrls = new ArrayList<>();
 		if (tool.getDocumentation() != null) {
 			docUrls.addAll(linksJson(tool.getDocumentation().stream(), Arrays.asList(
-					DocumentationType.GENERAL.toString(),
-					DocumentationType.USER_MANUAL.toString(),
-					DocumentationType.API_DOCUMENTATION.toString(),
-					DocumentationType.TRAINING_MATERIAL.toString(),
-					DocumentationType.INSTALLATION_INSTRUCTIONS.toString(),
-					DocumentationType.OTHER.toString(),
-					DocumentationType.FAQ.toString(),
-					DocumentationType.COMMAND_LINE_OPTIONS.toString()
+					DocumentationType.API_DOCUMENTATION,
+					DocumentationType.COMMAND_LINE_OPTIONS,
+					DocumentationType.FAQ,
+					DocumentationType.GENERAL,
+					DocumentationType.INSTALLATION_INSTRUCTIONS,
+					DocumentationType.QUICK_START_GUIDE,
+					DocumentationType.TRAINING_MATERIAL,
+					DocumentationType.USER_MANUAL,
+					DocumentationType.OTHER
 				), false));
 		}
 
 		List<PublicationIdsQuery> publicationIds = new ArrayList<>();
 		if (tool.getPublication() != null) {
 			for (Publication publication : tool.getPublication()) {
-				addPublicationId(publication.getPmid(), publication.getPmcid(), publication.getDoi(), filename, publication.getType(), false, false, publicationIds);
+				addPublicationId(publication.getPmid(), publication.getPmcid(), publication.getDoi(), filename, publication.toStringType(), false, false, publicationIds);
 			}
 		}
 

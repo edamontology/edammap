@@ -56,7 +56,7 @@ public class Tool implements InputType {
 
 	private List<Link<LinkType>> link = new ArrayList<>();
 
-	private List<LinkVersion<DownloadType>> download = new ArrayList<>();
+	private List<LinkDownload> download = new ArrayList<>();
 
 	private List<Link<DocumentationType>> documentation = new ArrayList<>();
 
@@ -206,10 +206,10 @@ public class Tool implements InputType {
 		this.link = link;
 	}
 
-	public List<LinkVersion<DownloadType>> getDownload() {
+	public List<LinkDownload> getDownload() {
 		return download;
 	}
-	public void setDownload(List<LinkVersion<DownloadType>> download) {
+	public void setDownload(List<LinkDownload> download) {
 		this.download = download;
 	}
 

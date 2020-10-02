@@ -20,6 +20,7 @@
 package org.edamontology.edammap.core.input.json;
 
 import java.text.ParseException;
+import java.util.List;
 
 public class Publication {
 
@@ -29,7 +30,7 @@ public class Publication {
 
 	private String pmcid;
 
-	private String type;
+	private List<PublicationType> type;
 
 	private String version;
 
@@ -65,10 +66,10 @@ public class Publication {
 		this.pmcid = pmcid;
 	}
 
-	public String getType() {
+	public List<PublicationType> getType() {
 		return type;
 	}
-	public void setType(String type) {
+	public void setType(List<PublicationType> type) {
 		this.type = type;
 	}
 
@@ -91,5 +92,15 @@ public class Publication {
 	}
 	public void setMetadata(PublicationMetadata metadata) {
 		this.metadata = metadata;
+	}
+
+	public String toStringType() {
+		if (type == null || type.isEmpty()) {
+			return "";
+		} else if (type.size() == 1) {
+			return type.get(0).toString();
+		} else {
+			return type.toString();
+		}
 	}
 }

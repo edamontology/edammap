@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Erik Jaaniso
+ * Copyright © 2019, 2020 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -19,9 +19,47 @@
 
 package org.edamontology.edammap.core.input.json;
 
-public class LinkVersion<T> extends Link<T> {
+import java.text.ParseException;
+
+public class LinkDownload {
+
+	private String url;
+
+	private DownloadType type;
+
+	private String note;
 
 	private String version;
+
+	public void check(Tool tool, int i, String index) throws ParseException {
+		if (url == null || url.equals("")) {
+			tool.parseException("url", i, index);
+		}
+		if (type == null) {
+			tool.parseException("type", i, index);
+		}
+	}
+
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public DownloadType getType() {
+		return type;
+	}
+	public void setType(DownloadType type) {
+		this.type = type;
+	}
+
+	public String getNote() {
+		return note;
+	}
+	public void setNote(String note) {
+		this.note = note;
+	}
 
 	public String getVersion() {
 		return version;

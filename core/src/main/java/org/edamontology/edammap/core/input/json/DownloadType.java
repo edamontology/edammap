@@ -34,12 +34,12 @@ public enum DownloadType {
 	CONTAINER_FILE("Container file"),
 	@JsonProperty("Icon")
 	ICON("Icon"),
-	@JsonProperty("Software package")
-	SOFTWARE_PACKAGE("Software package"),
 	@JsonProperty("Screenshot")
 	SCREENSHOT("Screenshot"),
 	@JsonProperty("Source code")
 	SOURCE_CODE("Source code"),
+	@JsonProperty("Software package")
+	SOFTWARE_PACKAGE("Software package"),
 	@JsonProperty("Test data")
 	TEST_DATE("Test data"),
 	@JsonProperty("Test script")

@@ -40,14 +40,16 @@ public enum DocumentationType {
 	GOVERNANCE("Governance"),
 	@JsonProperty("Installation instructions")
 	INSTALLATION_INSTRUCTIONS("Installation instructions"),
-	@JsonProperty("User manual")
-	USER_MANUAL("User manual"),
+	@JsonProperty("Quick start guide")
+	QUICK_START_GUIDE("Quick start guide"),
 	@JsonProperty("Release notes")
 	RELEASE_NOTES("Release notes"),
 	@JsonProperty("Terms of use")
 	TERMS_OF_USE("Terms of use"),
 	@JsonProperty("Training material")
 	TRAINING_MATERIAL("Training material"),
+	@JsonProperty("User manual")
+	USER_MANUAL("User manual"),
 	@JsonProperty("Other")
 	OTHER("Other");
 

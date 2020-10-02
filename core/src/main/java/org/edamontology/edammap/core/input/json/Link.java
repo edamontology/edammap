@@ -20,18 +20,22 @@
 package org.edamontology.edammap.core.input.json;
 
 import java.text.ParseException;
+import java.util.List;
 
 public class Link<T> {
 
 	private String url;
 
-	private T type;
+	private List<T> type;
 
 	private String note;
 
 	public void check(Tool tool, int i, String index) throws ParseException {
 		if (url == null || url.equals("")) {
 			tool.parseException("url", i, index);
+		}
+		if (type == null || type.isEmpty()) {
+			tool.parseException("type", i, index);
 		}
 	}
 
@@ -42,10 +46,10 @@ public class Link<T> {
 		this.url = url;
 	}
 
-	public T getType() {
+	public List<T> getType() {
 		return type;
 	}
-	public void setType(T type) {
+	public void setType(List<T> type) {
 		this.type = type;
 	}
 
@@ -54,5 +58,13 @@ public class Link<T> {
 	}
 	public void setNote(String note) {
 		this.note = note;
+	}
+
+	public String toStringType() {
+		if (type.size() == 1) {
+			return type.get(0).toString();
+		} else {
+			return type.toString();
+		}
 	}
 }
