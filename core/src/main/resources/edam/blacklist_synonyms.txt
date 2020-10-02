@@ -41,3 +41,9 @@ Citations
 Documentation
 Language
 References
+
+# Structural variation
+Deletion
+Duplication
+Insertion
+Inversion
