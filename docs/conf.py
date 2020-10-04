@@ -4,8 +4,8 @@
 project = 'EDAMmap'
 author = 'Erik Jaaniso'
 copyright = '2016-2020, Erik Jaaniso'
-version = '1.1.0'
-release = '1.1.0'
+version = '1.1.0-SNAPSHOT'
+release = '1.1.0-SNAPSHOT'
 
 master_doc = 'index'
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
