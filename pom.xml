@@ -23,7 +23,7 @@
 
   <groupId>org.edamontology.edammap</groupId>
   <artifactId>edammap</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.1.0</version>
   <packaging>pom</packaging>
 
   <name>EDAMmap</name>
@@ -54,8 +54,8 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <edammap.version>1.0.1-SNAPSHOT</edammap.version>
-    <pubfetcher.version>1.0.1-SNAPSHOT</pubfetcher.version>
+    <edammap.version>1.1.0</edammap.version>
+    <pubfetcher.version>1.1.0</pubfetcher.version>
     <maven.enforcer.version>3.0.0-M3</maven.enforcer.version>
     <maven.compiler.version>3.8.1</maven.compiler.version>
     <maven.jar.version>3.2.0</maven.jar.version>
