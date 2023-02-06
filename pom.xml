@@ -56,27 +56,27 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <edammap.version>1.1.1-SNAPSHOT</edammap.version>
     <pubfetcher.version>1.1.1-SNAPSHOT</pubfetcher.version>
-    <maven.enforcer.version>3.0.0</maven.enforcer.version>
-    <maven.compiler.version>3.9.0</maven.compiler.version>
-    <maven.jar.version>3.2.2</maven.jar.version>
-    <maven.dependency.version>3.2.0</maven.dependency.version>
-    <maven.resources.version>3.2.0</maven.resources.version>
+    <maven.enforcer.version>3.1.0</maven.enforcer.version>
+    <maven.compiler.version>3.10.1</maven.compiler.version>
+    <maven.jar.version>3.3.0</maven.jar.version>
+    <maven.dependency.version>3.4.0</maven.dependency.version>
+    <maven.resources.version>3.3.0</maven.resources.version>
     <maven.source.version>3.2.1</maven.source.version>
-    <maven.clean.version>3.1.0</maven.clean.version>
-    <maven.surefire.version>3.0.0-M5</maven.surefire.version>
-    <maven.install.version>3.0.0-M1</maven.install.version>
-    <maven.deploy.version>3.0.0-M2</maven.deploy.version>
-    <maven.site.version>3.10.0</maven.site.version>
-    <maven.assembly.version>3.3.0</maven.assembly.version>
+    <maven.clean.version>3.2.0</maven.clean.version>
+    <maven.surefire.version>3.0.0-M7</maven.surefire.version>
+    <maven.install.version>3.1.0</maven.install.version>
+    <maven.deploy.version>3.0.0</maven.deploy.version>
+    <maven.site.version>3.12.1</maven.site.version>
+    <maven.assembly.version>3.4.2</maven.assembly.version>
     <jcommander.version>1.82</jcommander.version>
-    <jsoup.version>1.14.3</jsoup.version>
-    <jackson.version>2.13.1</jackson.version>
-    <owlapi.version>5.1.19</owlapi.version>
+    <jsoup.version>1.15.3</jsoup.version>
+    <jackson.version>2.14.1</jackson.version>
+    <owlapi.version>5.1.20</owlapi.version>
     <univocity.version>2.9.1</univocity.version>
-    <jersey.version>2.35</jersey.version>
+    <jersey.version>2.37</jersey.version>
     <grizzly.version>2.4.4</grizzly.version>
-    <log4j.version>2.17.1</log4j.version>
-    <slf4j.version>1.7.35</slf4j.version>
+    <log4j.version>2.19.0</log4j.version>
+    <slf4j.version>1.7.36</slf4j.version>
     <hppc.version>0.8.2</hppc.version>
   </properties>
 

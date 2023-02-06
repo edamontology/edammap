@@ -1,4 +1,4 @@
-FROM openjdk:8u265-jre-buster
+FROM eclipse-temurin:8u362-b09-jre-ubi9-minimal
 COPY target /opt/edammap
 WORKDIR /var/lib/edammap
 EXPOSE 8080

@@ -53,3 +53,15 @@ http://edamontology.org/topic_2230
 http://edamontology.org/topic_0783
 # Threading
 http://edamontology.org/topic_0184
+
+
+### Extra <notRecommendedForAnnotation>true</notRecommendedForAnnotation>
+
+# <!-- http://edamontology.org/operation_0337 --> (Visualisation)
+# <!-- http://edamontology.org/operation_2409 --> (Data handling)
+# <!-- http://edamontology.org/operation_2425 --> (Optimisation and refinement)
+# <!-- http://edamontology.org/operation_2426 --> (Modelling and simulation)
+# <!-- http://edamontology.org/operation_2428 --> (Validation)
+# <!-- http://edamontology.org/operation_2429 --> (Mapping)
+# <!-- http://edamontology.org/operation_3432 --> (Clustering)
+# <!-- http://edamontology.org/operation_3799 --> (Quantification)
