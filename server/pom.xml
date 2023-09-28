@@ -73,6 +73,11 @@
       <groupId>org.glassfish.jersey.media</groupId>
       <artifactId>jersey-media-json-binding</artifactId>
     </dependency>
+    <dependency>
+      <groupId>jakarta.activation</groupId>
+      <artifactId>jakarta.activation-api</artifactId>
+      <version>${jakarta.activation.version}</version>
+    </dependency>
   </dependencies>
 
   <build>

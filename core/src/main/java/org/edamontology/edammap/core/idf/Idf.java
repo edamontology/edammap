@@ -33,22 +33,22 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.carrotsearch.hppc.ObjectDoubleScatterMap;
-import com.carrotsearch.hppc.ObjectIntScatterMap;
+import com.carrotsearch.hppc.ObjectDoubleHashMap;
+import com.carrotsearch.hppc.ObjectIntHashMap;
 
 public class Idf {
 
 	private static final Logger logger = LogManager.getLogger();
 
-	private final ObjectDoubleScatterMap<String> idfMap;
+	private final ObjectDoubleHashMap<String> idfMap;
 
-	private final ObjectIntScatterMap<String> countsMap;
+	private final ObjectIntHashMap<String> countsMap;
 
 	private final int documentCount;
 
 	private final List<IdfTop> idfTop;
 
-	public Idf(ObjectDoubleScatterMap<String> idfMap, ObjectIntScatterMap<String> countsMap, int documentCount) {
+	public Idf(ObjectDoubleHashMap<String> idfMap, ObjectIntHashMap<String> countsMap, int documentCount) {
 		this.idfMap = idfMap;
 		this.countsMap = countsMap;
 		this.documentCount = documentCount;
@@ -75,8 +75,8 @@ public class Idf {
 				this.idfMap = null;
 				this.countsMap = null;
 			} else {
-				this.idfMap = new ObjectDoubleScatterMap<>();
-				this.countsMap = new ObjectIntScatterMap<>();
+				this.idfMap = new ObjectDoubleHashMap<>();
+				this.countsMap = new ObjectIntHashMap<>();
 				String line = br.readLine();
 				if (line != null) {
 					this.documentCount = Integer.parseInt(line);

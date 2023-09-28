@@ -24,11 +24,11 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.json.Json;
-import javax.json.stream.JsonGenerator;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status;
+import jakarta.json.Json;
+import jakarta.json.stream.JsonGenerator;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response.Status;
 
 public final class ExceptionCommon {
 

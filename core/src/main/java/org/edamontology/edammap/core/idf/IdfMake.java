@@ -33,8 +33,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import com.carrotsearch.hppc.ObjectDoubleScatterMap;
-import com.carrotsearch.hppc.ObjectIntScatterMap;
+import com.carrotsearch.hppc.ObjectDoubleHashMap;
+import com.carrotsearch.hppc.ObjectIntHashMap;
 
 import org.edamontology.pubfetcher.core.common.PubFetcher;
 
@@ -80,8 +80,8 @@ public class IdfMake {
 	}
 
 	// no +1, as for concepts, where all words will be in IDF
-	public ObjectDoubleScatterMap<String> getIdf() {
-		ObjectDoubleScatterMap<String> idfMap = new ObjectDoubleScatterMap<>();
+	public ObjectDoubleHashMap<String> getIdf() {
+		ObjectDoubleHashMap<String> idfMap = new ObjectDoubleHashMap<>();
 		double idf_max = Math.log10(documentCount);
 		for (Map.Entry<String, Integer> termCount : termCounts.entrySet()) {
 			double idf = Math.log10(documentCount / (double)(termCount.getValue())) / idf_max;
@@ -90,8 +90,8 @@ public class IdfMake {
 		return idfMap;
 	}
 
-	public ObjectIntScatterMap<String> getCounts() {
-		ObjectIntScatterMap<String> countsMap = new ObjectIntScatterMap<>();
+	public ObjectIntHashMap<String> getCounts() {
+		ObjectIntHashMap<String> countsMap = new ObjectIntHashMap<>();
 		for (Map.Entry<String, Integer> termCount : termCounts.entrySet()) {
 			countsMap.put(termCount.getKey(), termCount.getValue());
 		}
