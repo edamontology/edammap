@@ -88,7 +88,7 @@ public final class Util {
 		logger.info("Copying server CSS, JS and fonts to {}", outputPath);
 		Path path = PubFetcher.outputPath(outputPath, true, false);
 		Files.createDirectory(path);
-		Server.copyHtmlResources(path);
+		Server.copyHtmlResources(Server.class, path);
 		Report.copyFontResources(path);
 		logger.info("Copying output CSS and fonts to {}", outputPath);
 		Path versionPath = PubFetcher.outputPath(outputPath + "/" + version.getVersion(), true, false);
@@ -246,10 +246,10 @@ public final class Util {
 		}
 
 		if (args.biotoolsFull != null) {
-			BiotoolsFull.get(args.biotoolsFull, args.fetcherArgs, false, false);
+			BiotoolsFull.get(args.biotoolsFull, args.fetcherArgs.getTimeout(), args.fetcherArgs.getPrivateArgs().getUserAgent(), false, false);
 		}
 		if (args.biotoolsDevFull != null) {
-			BiotoolsFull.get(args.biotoolsDevFull, args.fetcherArgs, true, false);
+			BiotoolsFull.get(args.biotoolsDevFull, args.fetcherArgs.getTimeout(), args.fetcherArgs.getPrivateArgs().getUserAgent(), true, false);
 		}
 
 		if (args.makeServerFiles != null) {

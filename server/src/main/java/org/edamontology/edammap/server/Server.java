@@ -32,10 +32,12 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,18 +52,20 @@ import org.glassfish.grizzly.http.util.ContentType;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
+import org.edamontology.pubfetcher.core.common.Arg;
+import org.edamontology.pubfetcher.core.common.BasicArgs;
+import org.edamontology.pubfetcher.core.common.PubFetcher;
+import org.edamontology.pubfetcher.core.common.Version;
+
 import org.edamontology.edammap.core.args.ArgMain;
 import org.edamontology.edammap.core.edam.Concept;
 import org.edamontology.edammap.core.edam.Edam;
 import org.edamontology.edammap.core.edam.EdamUri;
 import org.edamontology.edammap.core.idf.Idf;
+import org.edamontology.edammap.core.output.Report;
 import org.edamontology.edammap.core.preprocessing.PreProcessor;
 import org.edamontology.edammap.core.preprocessing.Stopwords;
 import org.edamontology.edammap.core.processing.Processor;
-
-import org.edamontology.pubfetcher.core.common.Arg;
-import org.edamontology.pubfetcher.core.common.BasicArgs;
-import org.edamontology.pubfetcher.core.common.Version;
 
 public final class Server {
 
@@ -82,8 +86,6 @@ public final class Server {
 
 	static Map<EdamUri, Concept> concepts;
 
-	static final String VERSION_ID = "version";
-
 	static List<ArgMain> getArgsMain(boolean input, Boolean txt, Boolean html, Boolean json) {
 		List<ArgMain> argsMain = new ArrayList<>();
 		for (Arg<?, ?> arg : args.getArgs()) {
@@ -97,44 +99,47 @@ public final class Server {
 		return argsMain;
 	}
 
-	public static void copyHtmlResources(Path path) throws IOException {
-		Files.copy(Server.class.getResourceAsStream("/style.css"), path.resolve("style.css"));
-		Files.copy(Server.class.getResourceAsStream("/script.js"), path.resolve("script.js"));
+	public static void copyHtmlResources(Class<?> clazz, Path path) throws IOException {
+		Files.copy(clazz.getResourceAsStream("/style.css"), path.resolve("style.css"));
+		Files.copy(clazz.getResourceAsStream("/script.js"), path.resolve("script.js"));
 	}
 
-	private static void run() throws IOException, ParseException {
-		Path filesDir = Paths.get(args.getServerPrivateArgs().getFiles() + "/" + version.getVersion());
-		if (!Files.isDirectory(filesDir) || !Files.isWritable(filesDir)) {
-			throw new AccessDeniedException(filesDir.toAbsolutePath().normalize() + " is not a writeable directory!");
+	public static void makeFiles(Class<?> clazz, Version version, ServerPrivateArgsBase serverPrivateArgs, boolean filesVersionResources, Logger logger) throws IOException {
+		if (!Files.isDirectory(Paths.get(serverPrivateArgs.getFiles())) || (!Files.isReadable(Paths.get(serverPrivateArgs.getFiles() + "/style.css")) && !Files.isReadable(Paths.get(serverPrivateArgs.getFiles() + "/script.js")))) {
+			logger.info("Copying server CSS, JS and fonts to {}", serverPrivateArgs.getFiles());
+			Path filesPath = Paths.get(serverPrivateArgs.getFiles());
+			if (!Files.isDirectory(filesPath)) {
+				Files.createDirectory(filesPath);
+			}
+			copyHtmlResources(clazz, filesPath);
+			Report.copyFontResources(filesPath);
 		}
-
-		for (Stopwords stopwords : Stopwords.values()) {
-			stopwordsAll.put(stopwords, PreProcessor.getStopwords(stopwords));
+		String filesVersionPathString = serverPrivateArgs.getFiles() + "/" + version.getVersion();
+		Path filesVersionPath = Paths.get(filesVersionPathString);
+		if (!Files.isDirectory(filesVersionPath)) {
+			filesVersionPath = PubFetcher.outputPath(filesVersionPathString, true, false);
+			if (filesVersionResources) {
+				logger.info("Copying output CSS and fonts to {}", filesVersionPathString);
+				Files.createDirectory(filesVersionPath);
+				Report.copyHtmlResources(filesVersionPath, version);
+				Report.copyFontResources(filesVersionPath);
+			} else {
+				Files.createDirectory(filesVersionPath);
+			}
 		}
-
-		edamBlacklist = Edam.getBlacklist();
-
-		processor = new Processor(args.getProcessorArgs(), args.getFetcherPrivateArgs());
-
-		if (args.getProcessorArgs().getIdf() != null && !args.getProcessorArgs().getIdf().isEmpty()) {
-			logger.info("Loading IDF from {}", args.getProcessorArgs().getIdf());
-			idf = new Idf(args.getProcessorArgs().getIdf());
+		if (!Files.isWritable(filesVersionPath)) {
+			throw new AccessDeniedException(filesVersionPathString + " is not a writeable directory!");
 		}
-		if (args.getProcessorArgs().getIdfStemmed() != null && !args.getProcessorArgs().getIdfStemmed().isEmpty()) {
-			logger.info("Loading IDF from {}", args.getProcessorArgs().getIdfStemmed());
-			idfStemmed = new Idf(args.getProcessorArgs().getIdfStemmed());
-		}
+	}
 
-		logger.info("Loading concepts from {}", args.getEdam());
-		concepts = Edam.load(args.getEdam());
-
+	public static void run(String packages, Version version, String logName, ServerPrivateArgsBase serverPrivateArgs, String path, String log, BiFunction<MultivaluedMap<String, String>, Request, String> runGet, Processor processor, Logger logger) throws IOException {
 		logger.info("Configuring server");
 
-		final ResourceConfig rc = new ResourceConfig().packages("org.edamontology.edammap.server");
+		final ResourceConfig rc = new ResourceConfig().packages(packages);
 
-		HttpServer httpServer = GrizzlyHttpServerFactory.createHttpServer(URI.create(args.getServerPrivateArgs().getBaseUri() + "/" + args.getServerPrivateArgs().getPath() + "/api"), rc, false);
+		HttpServer httpServer = GrizzlyHttpServerFactory.createHttpServer(URI.create(serverPrivateArgs.getBaseUri() + "/" + path + "/api"), rc, false);
 
-		final StaticHttpHandler filesHttpHandler = new StaticHttpHandler(args.getServerPrivateArgs().getFiles()) {
+		final StaticHttpHandler filesHttpHandler = new StaticHttpHandler(serverPrivateArgs.getFiles()) {
 			@Override
 			protected boolean handle(String uri, Request request, Response response) throws Exception {
 				response.getResponse().setCharacterEncoding("utf-8");
@@ -147,7 +152,7 @@ public final class Server {
 			}
 		};
 		filesHttpHandler.setDirectorySlashOff(true);
-		httpServer.getServerConfiguration().addHttpHandler(filesHttpHandler, "/" + args.getServerPrivateArgs().getPath() + "/*");
+		httpServer.getServerConfiguration().addHttpHandler(filesHttpHandler, "/" + path + "/*");
 
 		httpServer.getServerConfiguration().addHttpHandler(
 			new HttpHandler() {
@@ -155,7 +160,7 @@ public final class Server {
 				public void service(Request request, Response response) throws Exception {
 					String responseText = null;
 					try {
-						responseText = Resource.runGet(request.getParameterMap().entrySet().stream()
+						responseText = runGet.apply(request.getParameterMap().entrySet().stream()
 							.collect(Collectors.toMap(Map.Entry::getKey, e -> Arrays.asList(e.getValue()), (k, v) -> { throw new AssertionError(); }, MultivaluedHashMap<String, String>::new)), request);
 					} catch (ParamException e) {
 						if (e.getResponse().getEntity() instanceof String) {
@@ -171,14 +176,14 @@ public final class Server {
 					response.getWriter().write(responseText);
 				}
 			},
-			"/" + args.getServerPrivateArgs().getPath() + "/");
+			"/" + path + "/");
 
-		if (args.getLog() != null) {
-			Path accessDir = Paths.get(args.getLog() + "/access");
+		if (log != null) {
+			Path accessDir = Paths.get(log + "/access");
 			if (!Files.exists(accessDir)) {
 				Files.createDirectory(accessDir);
 			}
-			final AccessLogBuilder builder = new AccessLogBuilder(accessDir + "/edammap-access.log");
+			final AccessLogBuilder builder = new AccessLogBuilder(accessDir + "/" + logName + "-access.log");
 			builder.rotatedDaily();
 			// Default access log format is ApacheLogFormat.COMBINED
 			builder.format(ApacheLogFormat.COMBINED);
@@ -204,6 +209,32 @@ public final class Server {
 				logger.info("{} has stopped", version.getName());
 			}
 		});
+	}
+
+	private static void run() throws IOException, ParseException {
+		makeFiles(Server.class, version, args.getServerPrivateArgs(), true, logger);
+
+		for (Stopwords stopwords : Stopwords.values()) {
+			stopwordsAll.put(stopwords, PreProcessor.getStopwords(stopwords));
+		}
+
+		edamBlacklist = Edam.getBlacklist();
+
+		processor = new Processor(args.getProcessorArgs(), args.getFetcherPrivateArgs());
+
+		if (args.getProcessorArgs().getIdf() != null && !args.getProcessorArgs().getIdf().isEmpty()) {
+			logger.info("Loading IDF from {}", args.getProcessorArgs().getIdf());
+			idf = new Idf(args.getProcessorArgs().getIdf());
+		}
+		if (args.getProcessorArgs().getIdfStemmed() != null && !args.getProcessorArgs().getIdfStemmed().isEmpty()) {
+			logger.info("Loading IDF from {}", args.getProcessorArgs().getIdfStemmed());
+			idfStemmed = new Idf(args.getProcessorArgs().getIdfStemmed());
+		}
+
+		logger.info("Loading concepts from {}", args.getEdam());
+		concepts = Edam.load(args.getEdam());
+
+		run("org.edamontology.edammap.server", version, "edammap", args.getServerPrivateArgs(), args.getServerPrivateArgs().getPath(), args.getLog(), Resource::runGet, processor, logger);
 	}
 
 	public static void main(String[] argv) throws IOException, ReflectiveOperationException {

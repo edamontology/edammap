@@ -25,6 +25,7 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -744,7 +745,7 @@ public class Report {
 
 	public static void copyFontResources(Path path) throws IOException {
 		for (String resource : FONT_RESOURCES) {
-			Files.copy(Report.class.getResourceAsStream("/html/" + resource), path.resolve(resource));
+			Files.copy(Report.class.getResourceAsStream("/html/" + resource), path.resolve(resource), StandardCopyOption.REPLACE_EXISTING);
 		}
 	}
 

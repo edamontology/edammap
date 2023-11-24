@@ -22,21 +22,9 @@ package org.edamontology.edammap.server;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParametersDelegate;
 
-import java.io.File;
-
-import org.edamontology.edammap.core.processing.ProcessorArgs;
-
 import org.edamontology.pubfetcher.core.common.Arg;
-import org.edamontology.pubfetcher.core.common.BasicArgs;
-import org.edamontology.pubfetcher.core.common.FetcherPrivateArgs;
 
-public class ServerArgs extends BasicArgs {
-
-	private static final String edamId = "edam";
-	private static final String edamDescription = "Path of the EDAM ontology file";
-	private static final String edamDefault = null;
-	@Parameter(names = { "-e", "--" + edamId }, required = true, description = edamDescription)
-	private String edam;
+public class ServerArgs extends ServerArgsBase {
 
 	static final String txtId = "txt";
 	private static final String txtDescription = "Output results to a plain text file for queries made through the web application. The value can be changed in the web application itself.";
@@ -58,25 +46,17 @@ public class ServerArgs extends BasicArgs {
 	@ParametersDelegate
 	private ServerPrivateArgs serverPrivateArgs = new ServerPrivateArgs();
 
-	@ParametersDelegate
-	private ProcessorArgs processorArgs = new ProcessorArgs();
-
-	@ParametersDelegate
-	private FetcherPrivateArgs fetcherPrivateArgs = new FetcherPrivateArgs();
-
 	@Override
 	protected void addArgs() {
-		args.add(new Arg<>(this::getEdamFilename, null, edamDefault, edamId, "Ontology file", edamDescription, null, "https://github.com/edamontology/edamontology/tree/master/releases"));
+		super.addArgs();
 		args.add(new Arg<>(this::isTxt, null, txtDefault, txtId, "Results to text", txtDescription, null));
 		args.add(new Arg<>(this::isHtml, null, htmlDefault, htmlId, "Results to HTML", htmlDescription, null));
 		args.add(new Arg<>(this::isJson, null, jsonDefault, jsonId, "Results to JSON", jsonDescription, null));
 	}
 
-	public String getEdam() {
-		return edam;
-	}
-	public String getEdamFilename() {
-		return new File(edam).getName();
+	@Override
+	public String getLabel() {
+		return "EDAMmap-Server";
 	}
 
 	public Boolean isTxt() {
@@ -93,13 +73,5 @@ public class ServerArgs extends BasicArgs {
 
 	public ServerPrivateArgs getServerPrivateArgs() {
 		return serverPrivateArgs;
-	}
-
-	public ProcessorArgs getProcessorArgs() {
-		return processorArgs;
-	}
-
-	public FetcherPrivateArgs getFetcherPrivateArgs() {
-		return fetcherPrivateArgs;
 	}
 }

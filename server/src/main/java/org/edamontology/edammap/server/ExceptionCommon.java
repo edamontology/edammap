@@ -32,7 +32,7 @@ import jakarta.ws.rs.core.Response.Status;
 
 public final class ExceptionCommon {
 
-	static String time() {
+	public static String time() {
 		return Instant.ofEpochMilli(System.currentTimeMillis()).toString();
 	}
 

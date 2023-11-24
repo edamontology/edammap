@@ -29,7 +29,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import org.edamontology.pubfetcher.core.common.FetcherArgs;
 import org.edamontology.pubfetcher.core.common.PubFetcher;
 
 import org.edamontology.edammap.core.input.json.Biotools;
@@ -38,7 +37,7 @@ public final class BiotoolsFull {
 
 	private static final Logger logger = LogManager.getLogger();
 
-	public static int get(String outputPath, FetcherArgs fetcherArgs, boolean dev, boolean stderr) throws IOException {
+	public static int get(String outputPath, int timeout, String userAgent, boolean dev, boolean stderr) throws IOException {
 		logger.info("Make full {}bio.tools JSON to {}", dev ? "dev." : "", outputPath);
 
 		String api = "https://" + (dev ? "dev." : "") + "bio.tools/api/tool";
@@ -59,7 +58,7 @@ public final class BiotoolsFull {
 		long start = System.currentTimeMillis();
 		while (next != null) {
 			++page;
-			try (InputStream is = Input.newInputStream(api + next + "&format=json", false, fetcherArgs.getTimeout(), fetcherArgs.getPrivateArgs().getUserAgent())) {
+			try (InputStream is = Input.newInputStream(api + next + "&format=json", false, timeout, userAgent)) {
 				Biotools biotools = mapper.readValue(is, Biotools.class);
 
 				if (stderr) {

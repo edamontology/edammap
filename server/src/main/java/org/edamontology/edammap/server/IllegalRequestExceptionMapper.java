@@ -19,31 +19,13 @@
 
 package org.edamontology.edammap.server;
 
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.HttpHeaders;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
-import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
 
-import org.edamontology.pubfetcher.core.common.IllegalRequestException;
-import org.edamontology.pubfetcher.core.common.PubFetcher;
-import org.glassfish.grizzly.http.server.util.HtmlHelper;
-
 @Provider
-public class IllegalRequestExceptionMapper implements ExceptionMapper<IllegalRequestException> {
-
-	@Context
-	private HttpHeaders headers;
+public class IllegalRequestExceptionMapper extends IllegalRequestExceptionMapperBase {
 
 	@Override
-	public Response toResponse(IllegalRequestException e) {
-		boolean json = ExceptionCommon.isJson(headers);
-		return Response.status(Status.BAD_REQUEST)
-			.entity(json ?
-				ExceptionCommon.toJson(Status.BAD_REQUEST, e.getMessage()) :
-				HtmlHelper.getErrorPage("IllegalRequestException", PubFetcher.escapeHtml(e.getMessage()) + "<br>" + ExceptionCommon.time(), Server.version.getName() + " " + Server.version.getVersion()))
-			.type(json ? MediaType.APPLICATION_JSON : MediaType.TEXT_HTML + ";charset=utf-8").build();
+	protected String getServerName() {
+		return Server.version.getName() + " " + Server.version.getVersion();
 	}
 }

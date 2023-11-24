@@ -73,6 +73,11 @@ public class Processor {
 		}
 	}
 
+	@Deprecated
+	public Database getDatabase() {
+		return database;
+	}
+
 	public void closeDatabase() throws IOException {
 		if (database != null) {
 			database.close();

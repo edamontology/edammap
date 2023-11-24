@@ -460,9 +460,16 @@ public class QueryLoader {
 			annotations);
 	}
 
-	public static Query getBiotools(Tool tool, Map<EdamUri, Concept> concepts, int maxLinks, int maxPublicationIds, String filename) {
+	public static Query getBiotools(Tool tool, Map<EdamUri, Concept> concepts, int maxLinks, int maxPublicationIds, String filename, boolean isHomepageDoc, boolean homepageMissing) {
 		List<Link> webpageUrls = new ArrayList<>();
-		addLink(tool.getHomepage(), "Homepage", false, webpageUrls);
+		List<Link> docUrls = new ArrayList<>();
+		if (!homepageMissing) {
+			if (isHomepageDoc) {
+				addLink(tool.getHomepage(), "Homepage", false, docUrls);
+			} else {
+				addLink(tool.getHomepage(), "Homepage", false, webpageUrls);
+			}
+		}
 		if (tool.getLink() != null) {
 			webpageUrls.addAll(linksJson(tool.getLink().stream(), Arrays.asList(
 					LinkType.GALAXY_SERVICE,
@@ -486,8 +493,6 @@ public class QueryLoader {
 					DownloadType.OTHER
 				), false));
 		}
-
-		List<Link> docUrls = new ArrayList<>();
 		if (tool.getDocumentation() != null) {
 			docUrls.addAll(linksJson(tool.getDocumentation().stream(), Arrays.asList(
 					DocumentationType.API_DOCUMENTATION,
@@ -580,7 +585,7 @@ public class QueryLoader {
 				case msutils: queries.add(getMsutils((Msutils) input, concepts, filename)); break;
 				case Bioconductor: queries.add(getBioconductor((Bioconductor) input, concepts)); break;
 				case biotools14: queries.add(getBiotools14((Biotools14) input, concepts, filename)); break;
-				case biotools: queries.add(getBiotools((Tool) input, concepts, 0, 0, filename)); break;
+				case biotools: queries.add(getBiotools((Tool) input, concepts, 0, 0, filename, false, false)); break;
 				case server: break;
 			}
 		}
@@ -614,7 +619,7 @@ public class QueryLoader {
 		}
 		return new Query(
 			input.getId() != null ? input.getId().trim() : null,
-			input.getName().trim(),
+			input.getName() != null ? input.getName().trim() : null,
 			keywords(parseServer(input.getKeywords()), "Keywords", null, maxKeywords),
 			input.getDescription() != null ? input.getDescription().trim() : null,
 			links(parseServer(input.getWebpageUrls()), null, true, maxLinks),

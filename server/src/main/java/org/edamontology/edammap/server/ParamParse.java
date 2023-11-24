@@ -28,9 +28,10 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import org.edamontology.edammap.core.args.CoreArgs;
 import org.edamontology.pubfetcher.core.common.Arg;
 import org.edamontology.pubfetcher.core.common.FetcherArgs;
+
+import org.edamontology.edammap.core.args.CoreArgs;
 
 public final class ParamParse {
 
@@ -49,7 +50,7 @@ public final class ParamParse {
 			((Arg<E, ?>) arg).setValue(getEnum(key, values, enumClass, json));
 		}
 	}
-	static <E extends Enum<E>> E getParamEnum(MultivaluedMap<String, String> params, String key, Class<E> enumClass, boolean json) {
+	public static <E extends Enum<E>> E getParamEnum(MultivaluedMap<String, String> params, String key, Class<E> enumClass, boolean json) {
 		List<String> values = params.get(key);
 		if (values != null && values.size() > 0 && !values.get(values.size() - 1).isEmpty()) {
 			return getEnum(key, values, enumClass, json);
@@ -142,7 +143,7 @@ public final class ParamParse {
 			return null;
 		}
 	}
-	static String getParamStrings(MultivaluedMap<String, String> params, String key) {
+	public static String getParamStrings(MultivaluedMap<String, String> params, String key) {
 		List<String> values = params.get(key);
 		if (values != null && values.size() > 0) {
 			return String.join("\n", values);

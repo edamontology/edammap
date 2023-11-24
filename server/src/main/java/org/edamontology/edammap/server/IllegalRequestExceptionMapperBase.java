@@ -19,32 +19,32 @@
 
 package org.edamontology.edammap.server;
 
-import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.ext.ExceptionMapper;
 
 import org.glassfish.grizzly.http.server.util.HtmlHelper;
 
+import org.edamontology.pubfetcher.core.common.IllegalRequestException;
 import org.edamontology.pubfetcher.core.common.PubFetcher;
 
-public class ParamException extends WebApplicationException {
+public abstract class IllegalRequestExceptionMapperBase implements ExceptionMapper<IllegalRequestException> {
 
-	private static final long serialVersionUID = 7240254492703489733L;
+	@Context
+	private HttpHeaders headers;
 
-	private static String toText(String key, String value, String reason) {
-		return "Param \"" + key + "=" + value + "\" " + reason;
-	}
+	protected abstract String getServerName();
 
-	private static String toTextJson(String key, String value, String reason) {
-		return "Param '" + key + "=" + value + "' " + reason;
-	}
-
-	ParamException(String key, String value, String reason, boolean json) {
-		super(Response.status(Status.BAD_REQUEST)
+	@Override
+	public Response toResponse(IllegalRequestException e) {
+		boolean json = ExceptionCommon.isJson(headers);
+		return Response.status(Status.BAD_REQUEST)
 			.entity(json ?
-				ExceptionCommon.toJson(Status.BAD_REQUEST, toTextJson(key, value, reason)) :
-				HtmlHelper.getErrorPage("ParamException", PubFetcher.escapeHtml(toText(key, value, reason)) + "<br>" + ExceptionCommon.time(), Server.version.getName() + " " + Server.version.getVersion()))
-			.type(json ? MediaType.APPLICATION_JSON : MediaType.TEXT_HTML + ";charset=utf-8").build());
+				ExceptionCommon.toJson(Status.BAD_REQUEST, e.getMessage()) :
+				HtmlHelper.getErrorPage("IllegalRequestException", PubFetcher.escapeHtml(e.getMessage()) + "<br>" + ExceptionCommon.time(), getServerName()))
+			.type(json ? MediaType.APPLICATION_JSON : MediaType.TEXT_HTML + ";charset=utf-8").build();
 	}
 }

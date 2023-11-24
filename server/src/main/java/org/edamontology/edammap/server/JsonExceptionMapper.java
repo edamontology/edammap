@@ -19,24 +19,9 @@
 
 package org.edamontology.edammap.server;
 
-import jakarta.json.JsonException;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
-import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 @Provider
-public class JsonExceptionMapper implements ExceptionMapper<JsonException> {
+public class JsonExceptionMapper extends JsonExceptionMapperBase {
 
-	private static final Logger logger = LogManager.getLogger();
-
-	@Override
-	public Response toResponse(JsonException e) {
-		logger.error("Exception!", e);
-		return Response.status(Status.BAD_REQUEST).entity(ExceptionCommon.toJson(Status.BAD_REQUEST, e.getMessage())).type(MediaType.APPLICATION_JSON).build();
-	}
 }

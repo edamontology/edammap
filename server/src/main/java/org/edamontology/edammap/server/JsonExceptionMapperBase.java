@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018, 2019 Erik Jaaniso
+ * Copyright © 2018 Erik Jaaniso
  *
  * This file is part of EDAMmap.
  *
@@ -19,13 +19,22 @@
 
 package org.edamontology.edammap.server;
 
-import jakarta.ws.rs.ext.Provider;
+import jakarta.json.JsonException;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.ext.ExceptionMapper;
 
-@Provider
-public class ThrowableMapper extends ThrowableMapperBase {
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+public abstract class JsonExceptionMapperBase implements ExceptionMapper<JsonException> {
+
+	private static final Logger logger = LogManager.getLogger();
 
 	@Override
-	protected String getServerName() {
-		return Server.version.getName() + " " + Server.version.getVersion();
+	public Response toResponse(JsonException e) {
+		logger.error("Exception!", e);
+		return Response.status(Status.BAD_REQUEST).entity(ExceptionCommon.toJson(Status.BAD_REQUEST, e.getMessage())).type(MediaType.APPLICATION_JSON).build();
 	}
 }

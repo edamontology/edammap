@@ -42,8 +42,13 @@ public class ServerInput implements InputType {
 
 	private final String annotations;
 
+	private final boolean nameMandatory;
+
+	private final boolean publicationIdsMandatory;
+
 	public ServerInput(String name, String keywords, String description,
-			String webpageUrls,	String docUrls,	String publicationIds, String annotations) {
+			String webpageUrls, String docUrls, String publicationIds, String annotations,
+			boolean nameMandatory, boolean publicationIdsMandatory) {
 		this.name = crlf(name);
 		this.keywords = crlf(keywords);
 		this.description = crlf(description);
@@ -51,12 +56,21 @@ public class ServerInput implements InputType {
 		this.docUrls = crlf(docUrls);
 		this.publicationIds = crlf(publicationIds);
 		this.annotations = crlf(annotations);
+		this.nameMandatory = nameMandatory;
+		this.publicationIdsMandatory = publicationIdsMandatory;
 	}
 
 	@Override
 	public void check(int i) throws ParseException {
-		if (name == null || name.equals("")) {
-			parseException("name", i);
+		if (nameMandatory) {
+			if (name == null || name.equals("")) {
+				parseException("name", i);
+			}
+		}
+		if (publicationIdsMandatory) {
+			if (publicationIds == null || publicationIds.equals("")) {
+				parseException("publicationIds", i);
+			}
 		}
 	}
 

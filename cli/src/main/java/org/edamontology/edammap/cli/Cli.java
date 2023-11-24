@@ -237,7 +237,7 @@ public class Cli implements Runnable {
 
 		logger.info("Outputting results");
 		output.output(args.getCoreArgs(), argsMain, args.getQuery(), null, args.getReportPageSize(), args.getReportPaginationSize(),
-			concepts, queries, webpages, docs, publications, results, null, start, stop, version, JSON_VERSION);
+			concepts, queries, webpages, docs, publications, results, null, start, stop, version, JSON_VERSION, true);
 
 		logger.info("{} : {}", results.toStringMeasure(Measure.recall), Measure.recall);
 		logger.info("{} : {}", results.toStringMeasure(Measure.AveP), Measure.AveP);

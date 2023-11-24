@@ -222,7 +222,7 @@ public class Json {
 		generator.writeEndObject();
 	}
 
-	private static JsonGenerator createGenerator(Writer writer, Path json, ObjectMapper mapper) throws IOException {
+	public static JsonGenerator createGenerator(Writer writer, Path json, ObjectMapper mapper) throws IOException {
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
 		mapper.enable(SerializationFeature.CLOSE_CLOSEABLE);
 		JsonFactory factory = mapper.getFactory();
@@ -236,8 +236,197 @@ public class Json {
 		return generator;
 	}
 
+	public static void writeTime(JsonGenerator generator, long start, long stop) throws IOException {
+		generator.writeFieldName("time");
+		generator.writeStartObject();
+		generator.writeNumberField("start", start);
+		generator.writeStringField("startHuman", Instant.ofEpochMilli(start).toString());
+		generator.writeNumberField("stop", stop);
+		generator.writeStringField("stopHuman", Instant.ofEpochMilli(stop).toString());
+		generator.writeNumberField("duration", (stop - start) / 1000.0);
+		generator.writeEndObject();
+	}
+
+	public static void writeMapping(JsonGenerator generator, Map<EdamUri, Concept> concepts, Query query, List<Publication> publications, List<Webpage> webpages, List<Webpage> docs, MappingTest mapping, CoreArgs args, boolean server, boolean full) throws IOException {
+		generator.writeStartObject();
+
+		generator.writeFieldName("query");
+		generator.writeStartObject();
+
+		if (server || query.getId() == null) {
+			generator.writeStringField(Query.ID, query.getId());
+		} else {
+			generator.writeStringField(Query.ID, QueryLoader.BIOTOOLS + query.getId());
+		}
+
+		generator.writeStringField(Query.NAME, query.getName());
+
+		generator.writeFieldName(Query.KEYWORDS);
+		if (query.getKeywords() != null) {
+			generator.writeStartArray();
+			for (Keyword keyword : query.getKeywords()) {
+				if (server) {
+					generator.writeString(keyword.getValue());
+				} else {
+					generator.writeObject(keyword);
+				}
+			}
+			generator.writeEndArray();
+		} else {
+			generator.writeObject(null);
+		}
+
+		generator.writeStringField(Query.DESCRIPTION, query.getDescription());
+
+		generator.writeFieldName(Query.WEBPAGE_URLS);
+		if (query.getWebpageUrls() != null) {
+			generator.writeStartArray();
+			for (Link webpageUrl : query.getWebpageUrls()) {
+				if (server) {
+					generator.writeString(webpageUrl.getUrl());
+				} else {
+					generator.writeObject(webpageUrl);
+				}
+			}
+			generator.writeEndArray();
+		} else {
+			generator.writeObject(null);
+		}
+
+		generator.writeFieldName(Query.DOC_URLS);
+		if (query.getDocUrls() != null) {
+			generator.writeStartArray();
+			for (Link docUrl : query.getDocUrls()) {
+				if (server) {
+					generator.writeString(docUrl.getUrl());
+				} else {
+					generator.writeObject(docUrl);
+				}
+			}
+			generator.writeEndArray();
+		} else {
+			generator.writeObject(null);
+		}
+
+		generator.writeFieldName(Query.PUBLICATION_IDS);
+		if (query.getPublicationIds() != null) {
+			generator.writeStartArray();
+			for (PublicationIdsQuery publicationIds : query.getPublicationIds()) {
+				if (server) {
+					generator.writeStartObject();
+					generator.writeStringField("pmid", publicationIds.getPmid());
+					generator.writeStringField("pmcid", publicationIds.getPmcid());
+					generator.writeStringField("doi", publicationIds.getDoi());
+					generator.writeEndObject();
+				} else {
+					generator.writeObject(publicationIds);
+				}
+			}
+			generator.writeEndArray();
+		} else {
+			generator.writeObject(null);
+		}
+
+		generator.writeFieldName(Query.ANNOTATIONS);
+		if (query.getAnnotations() != null) {
+			generator.writeStartArray();
+			for (EdamUri edamUri : query.getAnnotations()) {
+				generator.writeString(edamUri.toString());
+			}
+			generator.writeEndArray();
+		} else {
+			generator.writeObject(null);
+		}
+
+		generator.writeEndObject();
+
+		if (full) {
+			generator.writeFieldName("queryFetched");
+			generator.writeStartObject();
+
+			generator.writeFieldName("webpages");
+			generator.writeStartArray();
+			for (Webpage webpage : webpages) {
+				if (webpage != null) {
+					webpage.toStringJson(generator, args.getFetcherArgs(), false);
+				} else {
+					generator.writeNull();
+				}
+			}
+			generator.writeEndArray();
+
+			generator.writeFieldName("docs");
+			generator.writeStartArray();
+			for (Webpage doc : docs) {
+				if (doc != null) {
+					doc.toStringJson(generator, args.getFetcherArgs(), false);
+				} else {
+					generator.writeNull();
+				}
+			}
+			generator.writeEndArray();
+
+			generator.writeFieldName("publications");
+			generator.writeStartArray();
+			for (Publication publication : publications) {
+				if (publication != null) {
+					publication.toStringJson(generator, args.getFetcherArgs(), false);
+				} else {
+					generator.writeNull();
+				}
+			}
+			generator.writeEndArray();
+
+			generator.writeEndObject();
+		}
+
+		generator.writeFieldName("results");
+		generator.writeStartObject();
+
+		for (Branch branch : Branch.values()) {
+			generator.writeFieldName(branch.name());
+			List<MatchTest> matches = mapping.getMatches(branch);
+			if (matches.isEmpty() && !args.getMapperArgs().getBranches().contains(branch)) {
+				generator.writeObject(null);
+				continue;
+			}
+			generator.writeStartArray();
+			for (MatchTest matchTest : matches) {
+				generator.writeStartObject();
+				Match match = matchTest.getMatch();
+				concept(concepts, match, generator);
+				queryMatch(query, publications, match.getQueryMatch(), true, generator);
+				Concept conceptOriginal = concepts.get(match.getEdamUriOriginal());
+				conceptMatch(conceptOriginal, match.getConceptMatch(), true, generator);
+				score(args.getMapperArgs().getScoreArgs(), branch, match, generator);
+				generator.writeStringField("test", matchTest.getTest().name());
+				if (full) {
+					List<MatchAverageStats> matchAverageStats = match.getMatchAverageStats();
+					if (matchAverageStats != null && !matchAverageStats.isEmpty()) {
+						generator.writeFieldName("parts");
+						generator.writeStartArray();
+						for (MatchAverageStats mas : matchAverageStats) {
+							generator.writeStartObject();
+							queryMatch(query, publications, mas.getQueryMatch(), false, generator);
+							conceptMatch(conceptOriginal, mas.getConceptMatch(), false, generator);
+							generator.writeNumberField("score", mas.getScore());
+							generator.writeEndObject();
+						}
+						generator.writeEndArray();
+					}
+				}
+				generator.writeEndObject();
+			}
+			generator.writeEndArray();
+		}
+
+		generator.writeEndObject();
+
+		generator.writeEndObject();
+	}
+
 	// concepts must contain the key match.getEdamUri(), but also all keys match.getParents(), match.getChildren(), etc
-	public static String output(CoreArgs args, List<ArgMain> argsMain, Map<String, String> jsonFields, QueryType type, JsonType jsonType, Path json, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publicationsAll, List<List<Webpage>> webpagesAll, List<List<Webpage>> docsAll, Results results, Tool tool, long start, long stop, Version version, String jsonVersion) throws IOException {
+	public static String output(CoreArgs args, List<ArgMain> argsMain, Map<String, String> jsonFields, QueryType type, JsonType jsonType, Path json, Map<EdamUri, Concept> concepts, List<Query> queries, List<List<Publication>> publicationsAll, List<List<Webpage>> webpagesAll, List<List<Webpage>> docsAll, Results results, Tool tool, long start, long stop, Version version, String jsonVersion, boolean includePrivate) throws IOException {
 		StringWriter writer = new StringWriter();
 		ObjectMapper mapper = new ObjectMapper();
 		JsonGenerator generator = createGenerator(writer, json, mapper);
@@ -266,14 +455,7 @@ public class Json {
 		generator.writeFieldName("generator");
 		generator.writeObject(version);
 
-		generator.writeFieldName("time");
-		generator.writeStartObject();
-		generator.writeNumberField("start", start);
-		generator.writeStringField("startHuman", Instant.ofEpochMilli(start).toString());
-		generator.writeNumberField("stop", stop);
-		generator.writeStringField("stopHuman", Instant.ofEpochMilli(stop).toString());
-		generator.writeNumberField("duration", (stop - start) / 1000.0);
-		generator.writeEndObject();
+		writeTime(generator, start, stop);
 
 		if (server) {
 			generator.writeFieldName("mapping");
@@ -289,181 +471,7 @@ public class Json {
 			List<Publication> publications = publicationsAll.get(i);
 			MappingTest mapping = results.getMappings().get(i);
 
-			generator.writeStartObject();
-
-			generator.writeFieldName("query");
-			generator.writeStartObject();
-
-			if (server || query.getId() == null) {
-				generator.writeStringField(Query.ID, query.getId());
-			} else {
-				generator.writeStringField(Query.ID, QueryLoader.BIOTOOLS + query.getId());
-			}
-
-			generator.writeStringField(Query.NAME, query.getName());
-
-			generator.writeFieldName(Query.KEYWORDS);
-			if (query.getKeywords() != null) {
-				generator.writeStartArray();
-				for (Keyword keyword : query.getKeywords()) {
-					if (server) {
-						generator.writeString(keyword.getValue());
-					} else {
-						generator.writeObject(keyword);
-					}
-				}
-				generator.writeEndArray();
-			} else {
-				generator.writeObject(null);
-			}
-
-			generator.writeStringField(Query.DESCRIPTION, query.getDescription());
-
-			generator.writeFieldName(Query.WEBPAGE_URLS);
-			if (query.getWebpageUrls() != null) {
-				generator.writeStartArray();
-				for (Link webpageUrl : query.getWebpageUrls()) {
-					if (server) {
-						generator.writeString(webpageUrl.getUrl());
-					} else {
-						generator.writeObject(webpageUrl);
-					}
-				}
-				generator.writeEndArray();
-			} else {
-				generator.writeObject(null);
-			}
-
-			generator.writeFieldName(Query.DOC_URLS);
-			if (query.getDocUrls() != null) {
-				generator.writeStartArray();
-				for (Link docUrl : query.getDocUrls()) {
-					if (server) {
-						generator.writeString(docUrl.getUrl());
-					} else {
-						generator.writeObject(docUrl);
-					}
-				}
-				generator.writeEndArray();
-			} else {
-				generator.writeObject(null);
-			}
-
-			generator.writeFieldName(Query.PUBLICATION_IDS);
-			if (query.getPublicationIds() != null) {
-				generator.writeStartArray();
-				for (PublicationIdsQuery publicationIds : query.getPublicationIds()) {
-					if (server) {
-						generator.writeStartObject();
-						generator.writeStringField("pmid", publicationIds.getPmid());
-						generator.writeStringField("pmcid", publicationIds.getPmcid());
-						generator.writeStringField("doi", publicationIds.getDoi());
-						generator.writeEndObject();
-					} else {
-						generator.writeObject(publicationIds);
-					}
-				}
-				generator.writeEndArray();
-			} else {
-				generator.writeObject(null);
-			}
-
-			generator.writeFieldName(Query.ANNOTATIONS);
-			if (query.getAnnotations() != null) {
-				generator.writeStartArray();
-				for (EdamUri edamUri : query.getAnnotations()) {
-					generator.writeString(edamUri.toString());
-				}
-				generator.writeEndArray();
-			} else {
-				generator.writeObject(null);
-			}
-
-			generator.writeEndObject();
-
-			if (full) {
-				generator.writeFieldName("queryFetched");
-				generator.writeStartObject();
-
-				generator.writeFieldName("webpages");
-				generator.writeStartArray();
-				for (Webpage webpage : webpages) {
-					if (webpage != null) {
-						webpage.toStringJson(generator, args.getFetcherArgs(), false);
-					} else {
-						generator.writeNull();
-					}
-				}
-				generator.writeEndArray();
-
-				generator.writeFieldName("docs");
-				generator.writeStartArray();
-				for (Webpage doc : docs) {
-					if (doc != null) {
-						doc.toStringJson(generator, args.getFetcherArgs(), false);
-					} else {
-						generator.writeNull();
-					}
-				}
-				generator.writeEndArray();
-
-				generator.writeFieldName("publications");
-				generator.writeStartArray();
-				for (Publication publication : publications) {
-					if (publication != null) {
-						publication.toStringJson(generator, args.getFetcherArgs(), false);
-					} else {
-						generator.writeNull();
-					}
-				}
-				generator.writeEndArray();
-
-				generator.writeEndObject();
-			}
-
-			generator.writeFieldName("results");
-			generator.writeStartObject();
-
-			for (Branch branch : Branch.values()) {
-				generator.writeFieldName(branch.name());
-				List<MatchTest> matches = mapping.getMatches(branch);
-				if (matches.isEmpty() && !args.getMapperArgs().getBranches().contains(branch)) {
-					generator.writeObject(null);
-					continue;
-				}
-				generator.writeStartArray();
-				for (MatchTest matchTest : matches) {
-					generator.writeStartObject();
-					Match match = matchTest.getMatch();
-					concept(concepts, match, generator);
-					queryMatch(query, publications, match.getQueryMatch(), true, generator);
-					Concept conceptOriginal = concepts.get(match.getEdamUriOriginal());
-					conceptMatch(conceptOriginal, match.getConceptMatch(), true, generator);
-					score(args.getMapperArgs().getScoreArgs(), branch, match, generator);
-					generator.writeStringField("test", matchTest.getTest().name());
-					if (full) {
-						List<MatchAverageStats> matchAverageStats = match.getMatchAverageStats();
-						if (matchAverageStats != null && !matchAverageStats.isEmpty()) {
-							generator.writeFieldName("parts");
-							generator.writeStartArray();
-							for (MatchAverageStats mas : matchAverageStats) {
-								generator.writeStartObject();
-								queryMatch(query, publications, mas.getQueryMatch(), false, generator);
-								conceptMatch(conceptOriginal, mas.getConceptMatch(), false, generator);
-								generator.writeNumberField("score", mas.getScore());
-								generator.writeEndObject();
-							}
-							generator.writeEndArray();
-						}
-					}
-					generator.writeEndObject();
-				}
-				generator.writeEndArray();
-			}
-
-			generator.writeEndObject();
-
-			generator.writeEndObject();
+			writeMapping(generator, concepts, query, publications, webpages, docs, mapping, args, server, full);
 		}
 		if (!server) {
 			generator.writeEndArray();
@@ -474,7 +482,7 @@ public class Json {
 		Params.writeMain(argsMain, generator);
 		Params.writeProcessing(args.getProcessorArgs(), generator);
 		Params.writePreProcessing(args.getPreProcessorArgs(), generator);
-		Params.writeFetching(args.getFetcherArgs(), !server, generator);
+		Params.writeFetching(args.getFetcherArgs(), includePrivate, generator);
 		Params.writeMapping(args.getMapperArgs(), generator);
 		generator.writeEndObject();
 
@@ -575,7 +583,7 @@ public class Json {
 		return edamUri.toString() + " (" + concepts.get(edamUri).getLabel() + ")";
 	}
 
-	private static void addAnnotations(CoreArgs args, Tool tool, MappingTest mapping, Map<EdamUri, Concept> concepts) {
+	public static void addAnnotations(CoreArgs args, Tool tool, MappingTest mapping, Map<EdamUri, Concept> concepts) {
 		if (args.getMapperArgs().getBranches().contains(Branch.topic)) {
 			List<Edam> topic = tool.getTopic();
 			if (topic == null) {

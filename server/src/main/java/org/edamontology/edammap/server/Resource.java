@@ -22,25 +22,12 @@ package org.edamontology.edammap.server;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
-import jakarta.json.JsonArray;
-import jakarta.json.JsonNumber;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonString;
-import jakarta.json.JsonValue;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -48,7 +35,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
@@ -58,67 +44,35 @@ import org.apache.logging.log4j.Logger;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.util.Header;
 
+import org.edamontology.pubfetcher.core.common.FetcherPrivateArgs;
+import org.edamontology.pubfetcher.core.db.publication.Publication;
+import org.edamontology.pubfetcher.core.db.webpage.Webpage;
+
 import org.edamontology.edammap.core.args.CoreArgs;
-import org.edamontology.edammap.core.benchmarking.Benchmark;
 import org.edamontology.edammap.core.benchmarking.Results;
+import org.edamontology.edammap.core.edam.Concept;
 import org.edamontology.edammap.core.edam.EdamUri;
-import org.edamontology.edammap.core.idf.Idf;
-import org.edamontology.edammap.core.input.DatabaseEntryId;
 import org.edamontology.edammap.core.input.ServerInput;
 import org.edamontology.edammap.core.input.json.Tool;
-import org.edamontology.edammap.core.mapping.Mapper;
-import org.edamontology.edammap.core.mapping.Mapping;
-import org.edamontology.edammap.core.output.DatabaseEntryEntry;
 import org.edamontology.edammap.core.output.Json;
 import org.edamontology.edammap.core.output.JsonType;
 import org.edamontology.edammap.core.output.Output;
 import org.edamontology.edammap.core.preprocessing.PreProcessor;
 import org.edamontology.edammap.core.processing.ConceptProcessed;
+import org.edamontology.edammap.core.processing.Processor;
 import org.edamontology.edammap.core.processing.QueryProcessed;
 import org.edamontology.edammap.core.query.Query;
-import org.edamontology.edammap.core.query.QueryLoader;
 import org.edamontology.edammap.core.query.QueryType;
 
-import org.edamontology.pubfetcher.core.common.FetcherArgs;
-import org.edamontology.pubfetcher.core.common.IllegalRequestException;
-import org.edamontology.pubfetcher.core.db.DatabaseEntryType;
-import org.edamontology.pubfetcher.core.db.publication.Publication;
-import org.edamontology.pubfetcher.core.db.webpage.Webpage;
-
 @Path("/")
-public class Resource {
+public class Resource extends ResourceBase {
 
 	private static final Logger logger = LogManager.getLogger();
-
-	static final int MAX_NAME_LENGTH = 1000;
-	static final int MAX_KEYWORDS_LENGTH = 10000;
-	static final int MAX_DESCRIPTION_LENGTH = 100000;
-	static final int MAX_LINKS_LENGTH = 10000;
-	static final int MAX_PUBLICATION_IDS_LENGTH = 10000;
-	static final int MAX_ANNOTATIONS_LENGTH = 10000;
-
-	private static final int MAX_KEYWORDS_SIZE = 100;
-	private static final int MAX_LINKS_SIZE = 10;
-	private static final int MAX_PUBLICATION_IDS_SIZE = 10;
-
-	private static final int MAX_JSON_TOOL_LENGTH = 1000000;
-
-	private class PostResult {
-		private final String jsonString;
-		private final URI htmlLocation;
-		private PostResult(String jsonString, URI htmlLocation) {
-			this.jsonString = jsonString;
-			this.htmlLocation = htmlLocation;
-		}
-	}
 
 	static String runGet(MultivaluedMap<String, String> params, Request request) {
 		try {
 			logger.info("GET {} from {}", params, request.getRemoteAddr());
-			CoreArgs args = new CoreArgs();
-			ParamParse.parseParams(params, args, false);
-			args.setProcessorArgs(Server.args.getProcessorArgs());
-			args.getFetcherArgs().setPrivateArgs(Server.args.getFetcherPrivateArgs());
+			CoreArgs args = newCoreArgs(params, false, Server.args.getProcessorArgs(), Server.args.getFetcherPrivateArgs());
 			boolean txt = Server.args.isTxt();
 			boolean json = Server.args.isJson();
 			Boolean valueBoolean;
@@ -142,30 +96,17 @@ public class Resource {
 		return Response.ok(responseText).header(Header.ContentLength.toString(), responseText.getBytes().length).build();
 	}
 
-	private PostResult runPost(MultivaluedMap<String, String> params, Tool tool, Request request, boolean isJson) throws IOException, URISyntaxException {
+	@Override
+	protected PostResult runPost(MultivaluedMap<String, String> params, Tool tool, Request request, boolean isJson) throws IOException, URISyntaxException {
 		logger.info("POST {} from {}", params, request.getRemoteAddr());
 
 		long start = System.currentTimeMillis();
 		Instant startInstant = Instant.ofEpochMilli(start);
 		logger.info("Start: {}", startInstant);
 
-		String jsonVersion = null;
-		if (isJson) {
-			if ((jsonVersion = ParamParse.getParamString(params, Server.VERSION_ID)) != null) {
-				if (!jsonVersion.equals("1")) {
-					throw new IllegalRequestException("Illegal API version: '" + jsonVersion + "'; possible values: '1'");
-				}
-			} else {
-				jsonVersion = "1";
-			}
-		} else {
-			jsonVersion = "1";
-		}
+		String jsonVersion = jsonVersion(params, isJson);
 
-		CoreArgs coreArgs = new CoreArgs();
-		ParamParse.parseParams(params, coreArgs, isJson);
-		coreArgs.setProcessorArgs(Server.args.getProcessorArgs());
-		coreArgs.getFetcherArgs().setPrivateArgs(Server.args.getFetcherPrivateArgs());
+		CoreArgs coreArgs = newCoreArgs(params, isJson, Server.args.getProcessorArgs(), Server.args.getFetcherPrivateArgs());
 
 		boolean txt = (isJson ? false : Server.args.isTxt());
 		boolean html = (isJson ? false : true);
@@ -184,72 +125,12 @@ public class Resource {
 			}
 		}
 
-		ServerInput serverInput = null;
-		if (isJson) {
-			if (tool == null) {
-				serverInput = new ServerInput(
-					ParamParse.getParamStrings(params, Query.NAME),
-					ParamParse.getParamStrings(params, Query.KEYWORDS),
-					ParamParse.getParamStrings(params, Query.DESCRIPTION),
-					ParamParse.getParamStrings(params, Query.WEBPAGE_URLS),
-					ParamParse.getParamStrings(params, Query.DOC_URLS),
-					ParamParse.getParamStrings(params, Query.PUBLICATION_IDS),
-					ParamParse.getParamStrings(params, Query.ANNOTATIONS));
-			}
-		} else {
-			serverInput = new ServerInput(
-				ParamParse.getParamString(params, Query.NAME),
-				ParamParse.getParamString(params, Query.KEYWORDS),
-				ParamParse.getParamString(params, Query.DESCRIPTION),
-				ParamParse.getParamString(params, Query.WEBPAGE_URLS),
-				ParamParse.getParamString(params, Query.DOC_URLS),
-				ParamParse.getParamString(params, Query.PUBLICATION_IDS),
-				ParamParse.getParamString(params, Query.ANNOTATIONS));
-		}
+		ServerInput serverInput = getServerInput(params, isJson, tool, true, false);
 
-		if (serverInput != null) {
-			if (serverInput.getName() != null && serverInput.getName().length() > MAX_NAME_LENGTH) {
-				throw new IllegalRequestException("Name length (" + serverInput.getName().length() + ") is greater than maximum allowed (" + MAX_NAME_LENGTH + ")");
-			}
-			if (serverInput.getKeywords() != null && serverInput.getKeywords().length() > MAX_KEYWORDS_LENGTH) {
-				throw new IllegalRequestException("Keywords length (" + serverInput.getKeywords().length() + ") is greater than maximum allowed (" + MAX_KEYWORDS_LENGTH + ")");
-			}
-			if (serverInput.getDescription() != null && serverInput.getDescription().length() > MAX_DESCRIPTION_LENGTH) {
-				throw new IllegalRequestException("Description length (" + serverInput.getDescription().length() + ") is greater than maximum allowed (" + MAX_DESCRIPTION_LENGTH + ")");
-			}
-			if (serverInput.getWebpageUrls() != null && serverInput.getWebpageUrls().length() > MAX_LINKS_LENGTH) {
-				throw new IllegalRequestException("Webpage URLs length (" + serverInput.getWebpageUrls().length() + ") is greater than maximum allowed (" + MAX_LINKS_LENGTH + ")");
-			}
-			if (serverInput.getDocUrls() != null && serverInput.getDocUrls().length() > MAX_LINKS_LENGTH) {
-				throw new IllegalRequestException("Doc URLs length (" + serverInput.getDocUrls().length() + ") is greater than maximum allowed (" + MAX_LINKS_LENGTH + ")");
-			}
-			if (serverInput.getPublicationIds() != null && serverInput.getPublicationIds().length() > MAX_PUBLICATION_IDS_LENGTH) {
-				throw new IllegalRequestException("Publication IDs length (" + serverInput.getPublicationIds().length() + ") is greater than maximum allowed (" + MAX_PUBLICATION_IDS_LENGTH + ")");
-			}
-			if (serverInput.getAnnotations() != null && serverInput.getAnnotations().length() > MAX_ANNOTATIONS_LENGTH) {
-				throw new IllegalRequestException("Annotations length (" + serverInput.getAnnotations().length() + ") is greater than maximum allowed (" + MAX_ANNOTATIONS_LENGTH + ")");
-			}
-		} else {
-			if (tool.getName() != null && tool.getName().length() > MAX_NAME_LENGTH) {
-				throw new IllegalRequestException("Name length (" + tool.getName().length() + ") is greater than maximum allowed (" + MAX_NAME_LENGTH + ")");
-			}
-			if (tool.getDescription() != null && tool.getDescription().length() > MAX_DESCRIPTION_LENGTH) {
-				throw new IllegalRequestException("Description length (" + tool.getDescription().length() + ") is greater than maximum allowed (" + MAX_DESCRIPTION_LENGTH + ")");
-			}
-		}
+		checkInput(serverInput, tool);
 
 		String uuidDirPrefix = Server.args.getServerPrivateArgs().getFiles() + "/";
-		String uuidButLast;
-		String uuid;
-		do {
-			uuidButLast = Server.version.getVersion() + "/" + DateTimeFormatter.ofPattern("uuuu-MM").format(LocalDateTime.ofInstant(startInstant, ZoneId.of("Z")));
-			uuid = uuidButLast + "/" + UUID.randomUUID().toString();
-			if (isJson) {
-				uuid += "-json";
-			}
-		} while (Files.exists(Paths.get(uuidDirPrefix + uuid)));
-		Files.createDirectories(Paths.get(uuidDirPrefix + uuidButLast));
-		Files.createDirectory(Paths.get(uuidDirPrefix + uuid));
+		String uuid = getUuid(isJson ? "-json" : "", uuidDirPrefix, Server.version, startInstant);
 		boolean toolMissingId = false;
 		if (serverInput != null) {
 			serverInput.setId(uuid);
@@ -257,7 +138,6 @@ public class Resource {
 			toolMissingId = true;
 			tool.setBiotoolsID(uuid);
 		}
-		logger.info("UUID: {}", uuid);
 
 		String txtOutput = (txt ? uuid + "/results.txt" : null);
 		String htmlOutput = (html ? uuid + "/" : null);
@@ -269,51 +149,18 @@ public class Resource {
 
 		PreProcessor preProcessor = new PreProcessor(coreArgs.getPreProcessorArgs(), Server.stopwordsAll.get(coreArgs.getPreProcessorArgs().getStopwords()));
 
-		logger.info("Processing {} concepts", Server.concepts.size());
-		long startConcepts = System.currentTimeMillis();
+		Map<EdamUri, ConceptProcessed> processedConcepts = getProcessedConcepts(coreArgs, preProcessor);
 
-		Map<EdamUri, ConceptProcessed> processedConcepts = Server.processor.getProcessedConcepts(Server.concepts,
-			coreArgs.getMapperArgs().getIdfArgs(), coreArgs.getMapperArgs().getMultiplierArgs(), preProcessor);
+		Query query = getQuery(serverInput, tool, toolMissingId, false, false);
 
-		logger.info("Processing concepts took {}s", (System.currentTimeMillis() - startConcepts) / 1000.0);
-
-		logger.info("Loading query");
-		long startQuery = System.currentTimeMillis();
-
-		Query query;
-		if (serverInput != null) {
-			query = QueryLoader.fromServer(serverInput, Server.concepts, MAX_KEYWORDS_SIZE, MAX_LINKS_SIZE, MAX_PUBLICATION_IDS_SIZE);
-		} else {
-			query = QueryLoader.getBiotools(tool, Server.concepts, MAX_LINKS_SIZE, MAX_PUBLICATION_IDS_SIZE, QueryType.server.name());
-			if (toolMissingId) {
-				tool.setBiotoolsID(null);
-			}
-		}
-
-		Idf idf;
-		if (coreArgs.getPreProcessorArgs().isStemming()) {
-			idf = Server.idfStemmed;
-		} else {
-			idf = Server.idf;
-		}
-
-		QueryProcessed processedQuery = Server.processor.getProcessedQuery(query, QueryType.server, preProcessor, idf, coreArgs.getFetcherArgs(), Server.args.getServerPrivateArgs().getFetchingThreads());
-
-		logger.info("Loading query took {}s", (System.currentTimeMillis() - startQuery) / 1000.0);
-
-		logger.info("Mapping query");
-		long startMapping = System.currentTimeMillis();
-
-		Mapping mapping = new Mapper(processedConcepts, Server.edamBlacklist).map(query, processedQuery, coreArgs.getMapperArgs());
+		QueryProcessed processedQuery = getProcessedQuery(coreArgs, Server.idf, Server.idfStemmed, query, preProcessor);
 
 		List<Query> queries = Collections.singletonList(query);
 		List<List<Webpage>> webpages = Collections.singletonList(processedQuery.getWebpages());
 		List<List<Webpage>> docs = Collections.singletonList(processedQuery.getDocs());
 		List<List<Publication>> publications = Collections.singletonList(processedQuery.getPublications());
-		List<Mapping> mappings = Collections.singletonList(mapping);
-		Results results = Benchmark.calculate(queries, mappings);
 
-		logger.info("Mapping query took {}s", (System.currentTimeMillis() - startMapping) / 1000.0);
+		Results results = getResults(processedConcepts, query, queries, processedQuery, coreArgs, Server.edamBlacklist);
 
 		URI baseLocation = new URI(Server.args.getServerPrivateArgs().isHttpsProxy() ? "https" : request.getScheme(), null, request.getServerName(), Server.args.getServerPrivateArgs().isHttpsProxy() ? 443 : request.getServerPort(), null, null, null);
 		URI apiLocation = new URI(baseLocation.getScheme(), null, baseLocation.getHost(), baseLocation.getPort(), "/" + Server.args.getServerPrivateArgs().getPath() + "/api", null, null);
@@ -343,7 +190,7 @@ public class Resource {
 		logger.info("Outputting results");
 
 		output.output(coreArgs, Server.getArgsMain(false, txt, html, json), null, jsonFields, 1, 1,
-			Server.concepts, queries, webpages, docs, publications, results, tool, start, stop, Server.version, jsonVersion);
+			Server.concepts, queries, webpages, docs, publications, results, tool, start, stop, Server.version, jsonVersion, false);
 
 		String jsonString = null;
 		if (isJson) {
@@ -355,7 +202,7 @@ public class Resource {
 				}
 			}
 			jsonString = Json.output(coreArgs, Server.getArgsMain(false, txt, html, json), jsonFields, QueryType.server, jsonType, null,
-				Server.concepts, queries, publications, webpages, docs, results, tool, start, stop, Server.version, jsonVersion);
+				Server.concepts, queries, publications, webpages, docs, results, tool, start, stop, Server.version, jsonVersion, false);
 		}
 
 		if (isJson) {
@@ -378,153 +225,23 @@ public class Resource {
 		}
 	}
 
-	private String toJsonString(JsonValue jsonValue) {
-		if (jsonValue == null) return "";
-		switch (jsonValue.getValueType()) {
-			case STRING: return ((JsonString) jsonValue).getString();
-			case NUMBER: return ((JsonNumber) jsonValue).toString();
-			case TRUE: return "true";
-			case FALSE: return "false";
-			default: return "";
-		}
+	@Override
+	protected FetcherPrivateArgs getFetcherPrivateArgs() {
+		return Server.args.getFetcherPrivateArgs();
 	}
 
-	private MultivaluedHashMap<String, String> parseJson(JsonObject json) {
-		return json.entrySet().stream()
-			.collect(Collectors.toMap(Map.Entry::getKey, e -> {
-				switch (e.getValue().getValueType()) {
-					case STRING: case NUMBER: case TRUE: case FALSE: return Collections.singletonList(toJsonString(e.getValue()));
-					case ARRAY:
-						List<String> array = new ArrayList<>();
-						for (JsonValue value : (JsonArray) e.getValue()) {
-							switch (value.getValueType()) {
-								case STRING: case NUMBER: case TRUE: case FALSE: array.add(toJsonString(value)); break;
-								case OBJECT:
-									if (e.getKey().equals(Query.PUBLICATION_IDS)) {
-										JsonObject object = (JsonObject) value;
-										array.add(toJsonString(object.get("pmid")) + "\t" + toJsonString(object.get("pmcid")) + "\t" + toJsonString(object.get("doi")));
-									}
-									break;
-								default: break;
-							}
-						}
-						return array;
-					default: return Collections.emptyList();
-				}
-			}, (k, v) -> { throw new AssertionError(); }, MultivaluedHashMap<String, String>::new));
+	@Override
+	protected ServerPrivateArgsBase getServerPrivateArgs() {
+		return Server.args.getServerPrivateArgs();
 	}
 
-	@POST
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public String json(JsonObject json, @Context Request request) throws IOException, URISyntaxException {
-		try {
-			logger.info("POST JSON {} from {}", json, request.getRemoteAddr());
-
-			JsonObject tool;
-			try {
-				tool = json.getJsonObject("tool");
-			} catch (ClassCastException e) {
-				throw new IllegalRequestException(e);
-			}
-			String toolString = null;
-			if (tool != null) {
-				toolString = tool.toString();
-				if (toolString.length() > MAX_JSON_TOOL_LENGTH) {
-					throw new IllegalRequestException("\"tool\" length (" + toolString.length() + ") is greater than maximum allowed (" + MAX_JSON_TOOL_LENGTH + ")");
-				}
-			}
-
-			PostResult postResult = runPost(parseJson(json), toolString != null ? Tool.fromString(toolString) : null, request, true);
-
-			return postResult.jsonString;
-		} catch (Throwable e) {
-			logger.error("Exception!", e);
-			throw e;
-		}
+	@Override
+	protected Map<EdamUri, Concept> getConcepts() {
+		return Server.concepts;
 	}
 
-	private Response patch(JsonObject json, String key, Request request, String resource, DatabaseEntryType type, int max) throws IOException {
-		logger.info("PATCH JSON {} {} from {}", resource, json, request.getRemoteAddr());
-		MultivaluedHashMap<String, String> params = parseJson(json);
-		List<String> databaseEntryIds = params.get(key);
-		String requestString = "";
-		if (databaseEntryIds != null) {
-			requestString = String.join("\n", databaseEntryIds);
-		}
-		logger.info("PATCH {} {} from {}", resource, requestString, request.getRemoteAddr());
-		FetcherArgs fetcherArgs = new FetcherArgs();
-		ParamParse.parseFetcherParams(params, fetcherArgs, true);
-		fetcherArgs.setPrivateArgs(Server.args.getFetcherPrivateArgs());
-		List<DatabaseEntryId> ids = new ArrayList<>();
-		for (Object id : QueryLoader.fromServerEntry(requestString, type, max)) {
-			ids.add(new DatabaseEntryId(id, type));
-		}
-		List<DatabaseEntryEntry> databaseEntries = Server.processor.getDatabaseEntries(ids, fetcherArgs, Server.args.getServerPrivateArgs().getFetchingThreads());
-		Response response = Response.ok(Json.fromDatabaseEntries(key, databaseEntries, fetcherArgs)).type(MediaType.APPLICATION_JSON).build();
-		logger.info("PATCHED {} {}", resource, response.getEntity());
-		return response;
-	}
-
-	@Path("web")
-	@POST
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response patchWeb(JsonObject json, @Context Request request) throws IOException {
-		try {
-			return patch(json, Query.WEBPAGE_URLS, request, "/web", DatabaseEntryType.webpage, MAX_LINKS_SIZE);
-		} catch (Throwable e) {
-			logger.error("Exception!", e);
-			throw e;
-		}
-	}
-
-	@Path("doc")
-	@POST
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response patchDoc(JsonObject json, @Context Request request) throws IOException {
-		try {
-			return patch(json, Query.DOC_URLS, request, "/doc", DatabaseEntryType.doc, MAX_LINKS_SIZE);
-		} catch (Throwable e) {
-			logger.error("Exception!", e);
-			throw e;
-		}
-	}
-
-	@Path("pub")
-	@POST
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response patchPub(JsonObject json, @Context Request request) throws IOException {
-		try {
-			return patch(json, Query.PUBLICATION_IDS, request, "/pub", DatabaseEntryType.publication, MAX_PUBLICATION_IDS_SIZE);
-		} catch (Throwable e) {
-			logger.error("Exception!", e);
-			throw e;
-		}
-	}
-
-	@Path("edam")
-	@POST
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response checkEdam(JsonObject json, @Context Request request) throws IOException {
-		try {
-			logger.info("CHECK JSON /edam {} from {}", json, request.getRemoteAddr());
-			MultivaluedHashMap<String, String> params = parseJson(json);
-			List<String> annotations = params.get(Query.ANNOTATIONS);
-			String requestString = "";
-			if (annotations != null) {
-				requestString = String.join("\n", annotations);
-			}
-			logger.info("CHECK /edam {} from {}", requestString, request.getRemoteAddr());
-			Response response = Response.ok(Json.fromAnnotations(QueryLoader.fromServerEdam(requestString, Server.concepts))).type(MediaType.APPLICATION_JSON).build();
-			logger.info("CHECKED /edam {}", response.getEntity());
-			return response;
-		} catch (Throwable e) {
-			logger.error("Exception!", e);
-			throw e;
-		}
+	@Override
+	protected Processor getProcessor() {
+		return Server.processor;
 	}
 }
