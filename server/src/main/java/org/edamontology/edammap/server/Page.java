@@ -45,12 +45,12 @@ public final class Page {
 		writer.write("\t<meta name=\"author\" content=\"Erik Jaaniso\">\n");
 		writer.write("\t<meta name=\"description\" content=\"A tool for mapping various text input to EDAM ontology concepts. It is designed to assist not replace a curator.\">\n");
 		writer.write("\t<title>" + Server.version.getName() + " " + Server.version.getVersion() + "</title>\n");
-		writer.write("\t<link rel=\"stylesheet\" href=\"/" + Server.args.getServerPrivateArgs().getPath() + "/style.css\">\n");
+		writer.write("\t<link rel=\"stylesheet\" href=\"" + Server.args.getServerPrivateArgs().getPath() + "/style.css\">\n");
 		writer.write("</head>\n\n");
 
 		writer.write("<body>\n\n");
 
-		writer.write("<form action=\"/" + Server.args.getServerPrivateArgs().getPath() + "/api\" method=\"post\">\n\n");
+		writer.write("<form action=\"" + Server.args.getServerPrivateArgs().getPath() + "/api\" method=\"post\">\n\n");
 
 		writer.write("<header>\n\n");
 
@@ -110,7 +110,7 @@ public final class Page {
 		writer.write("\t\t<h3>Links</h3>\n");
 		writer.write("\t\t<div>\n");
 		writer.write("\t\t\t<div class=\"input\">\n");
-		writer.write("\t\t\t\t<textarea id=\"" + Query.WEBPAGE_URLS + "\" name=\"" + Query.WEBPAGE_URLS + "\" rows=\"3\" onblur=\"check('" + Query.WEBPAGE_URLS + "','/" + Server.args.getServerPrivateArgs().getPath() + "/api/web')\" maxlength=\"" + Resource.MAX_LINKS_LENGTH + "\" placeholder=\"URLs of homepage, etc\"></textarea>\n");
+		writer.write("\t\t\t\t<textarea id=\"" + Query.WEBPAGE_URLS + "\" name=\"" + Query.WEBPAGE_URLS + "\" rows=\"3\" onblur=\"check('" + Query.WEBPAGE_URLS + "','" + Server.args.getServerPrivateArgs().getPath() + "/api/web')\" maxlength=\"" + Resource.MAX_LINKS_LENGTH + "\" placeholder=\"URLs of homepage, etc\"></textarea>\n");
 		writer.write("\t\t\t\t<span class=\"more\" tabindex=\"0\"></span>\n");
 		writer.write("\t\t\t\t<div class=\"more-box\" tabindex=\"0\">\n");
 		writer.write("\t\t\t\t\tURLs of homepage, etc<br><span class=\"ex\">Ex:</span> <span class=\"example\">https://biit.cs.ut.ee/gprofiler/</span>\n");
@@ -124,7 +124,7 @@ public final class Page {
 		writer.write("\t\t<h3>Documentation</h3>\n");
 		writer.write("\t\t<div>\n");
 		writer.write("\t\t\t<div class=\"input\">\n");
-		writer.write("\t\t\t\t<textarea id=\"" + Query.DOC_URLS + "\" name=\"" + Query.DOC_URLS + "\" rows=\"3\" onblur=\"check('" + Query.DOC_URLS + "','/" + Server.args.getServerPrivateArgs().getPath() + "/api/doc')\" maxlength=\"" + Resource.MAX_LINKS_LENGTH + "\" placeholder=\"URLs of documentations\"></textarea>\n");
+		writer.write("\t\t\t\t<textarea id=\"" + Query.DOC_URLS + "\" name=\"" + Query.DOC_URLS + "\" rows=\"3\" onblur=\"check('" + Query.DOC_URLS + "','" + Server.args.getServerPrivateArgs().getPath() + "/api/doc')\" maxlength=\"" + Resource.MAX_LINKS_LENGTH + "\" placeholder=\"URLs of documentations\"></textarea>\n");
 		writer.write("\t\t\t\t<span class=\"more\" tabindex=\"0\"></span>\n");
 		writer.write("\t\t\t\t<div class=\"more-box\" tabindex=\"0\">\n");
 		writer.write("\t\t\t\t\tURLs of documentations<br><span class=\"ex\">Ex:</span> <span class=\"example\">https://biit.cs.ut.ee/gprofiler/help.cgi</span>\n");
@@ -138,7 +138,7 @@ public final class Page {
 		writer.write("\t\t<h3>Publications</h3>\n");
 		writer.write("\t\t<div>\n");
 		writer.write("\t\t\t<div class=\"input\">\n");
-		writer.write("\t\t\t\t<textarea id=\"" + Query.PUBLICATION_IDS + "\" name=\"" + Query.PUBLICATION_IDS + "\" rows=\"3\" onblur=\"check('" + Query.PUBLICATION_IDS + "','/" + Server.args.getServerPrivateArgs().getPath() + "/api/pub')\" maxlength=\"" + Resource.MAX_PUBLICATION_IDS_LENGTH + "\" placeholder=\"PMID/PMCID/DOI of journal article\"></textarea>\n");
+		writer.write("\t\t\t\t<textarea id=\"" + Query.PUBLICATION_IDS + "\" name=\"" + Query.PUBLICATION_IDS + "\" rows=\"3\" onblur=\"check('" + Query.PUBLICATION_IDS + "','" + Server.args.getServerPrivateArgs().getPath() + "/api/pub')\" maxlength=\"" + Resource.MAX_PUBLICATION_IDS_LENGTH + "\" placeholder=\"PMID/PMCID/DOI of journal article\"></textarea>\n");
 		writer.write("\t\t\t\t<span class=\"more\" tabindex=\"0\"></span>\n");
 		writer.write("\t\t\t\t<div class=\"more-box\" tabindex=\"0\">\n");
 		writer.write("\t\t\t\t\tPMID/PMCID/DOI of journal article<br><span class=\"ex\">Ex:</span> <span class=\"example\">17478515<br>PMC3125778<br>10.1093/nar/gkw199</span>\n");
@@ -152,7 +152,7 @@ public final class Page {
 		writer.write("\t\t<h3>Annotations</h3>\n");
 		writer.write("\t\t<div>\n");
 		writer.write("\t\t\t<div class=\"input\">\n");
-		writer.write("\t\t\t\t<textarea id=\"" + Query.ANNOTATIONS + "\" name=\"" + Query.ANNOTATIONS + "\" rows=\"4\" onblur=\"check('" + Query.ANNOTATIONS + "','/" + Server.args.getServerPrivateArgs().getPath() + "/api/edam')\" maxlength=\"" + Resource.MAX_ANNOTATIONS_LENGTH + "\" placeholder=\"Existing annotations from EDAM\"></textarea>\n");
+		writer.write("\t\t\t\t<textarea id=\"" + Query.ANNOTATIONS + "\" name=\"" + Query.ANNOTATIONS + "\" rows=\"4\" onblur=\"check('" + Query.ANNOTATIONS + "','" + Server.args.getServerPrivateArgs().getPath() + "/api/edam')\" maxlength=\"" + Resource.MAX_ANNOTATIONS_LENGTH + "\" placeholder=\"Existing annotations from EDAM\"></textarea>\n");
 		writer.write("\t\t\t\t<span class=\"more\" tabindex=\"0\"></span>\n");
 		writer.write("\t\t\t\t<div class=\"more-box\" tabindex=\"0\">\n");
 		writer.write("\t\t\t\t\tExisting annotations from EDAM<br><span class=\"ex\">Ex:</span> <span class=\"example\">http://edamontology.org/topic_1775<br>operation_2436<br>data_3021<br>http://edamontology.org/format_1964</span>\n");
@@ -191,7 +191,7 @@ public final class Page {
 
 		writer.write("</form>\n\n");
 
-		writer.write("<script src=\"/" + Server.args.getServerPrivateArgs().getPath() + "/script.js\"></script>\n\n");
+		writer.write("<script src=\"" + Server.args.getServerPrivateArgs().getPath() + "/script.js\"></script>\n\n");
 
 		writer.write("</body>\n\n");
 

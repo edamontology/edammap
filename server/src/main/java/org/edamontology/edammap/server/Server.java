@@ -137,7 +137,7 @@ public final class Server {
 
 		final ResourceConfig rc = new ResourceConfig().packages(packages);
 
-		HttpServer httpServer = GrizzlyHttpServerFactory.createHttpServer(URI.create(serverPrivateArgs.getBaseUri() + "/" + path + "/api"), rc, false);
+		HttpServer httpServer = GrizzlyHttpServerFactory.createHttpServer(URI.create(serverPrivateArgs.getBaseUri() + path + "/api"), rc, false);
 
 		final StaticHttpHandler filesHttpHandler = new StaticHttpHandler(serverPrivateArgs.getFiles()) {
 			@Override
@@ -152,7 +152,7 @@ public final class Server {
 			}
 		};
 		filesHttpHandler.setDirectorySlashOff(true);
-		httpServer.getServerConfiguration().addHttpHandler(filesHttpHandler, "/" + path + "/*");
+		httpServer.getServerConfiguration().addHttpHandler(filesHttpHandler, path + "/*");
 
 		httpServer.getServerConfiguration().addHttpHandler(
 			new HttpHandler() {
@@ -176,7 +176,7 @@ public final class Server {
 					response.getWriter().write(responseText);
 				}
 			},
-			"/" + path + "/");
+			path + "/");
 
 		if (log != null) {
 			Path accessDir = Paths.get(log + "/access");

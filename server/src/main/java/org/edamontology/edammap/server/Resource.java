@@ -163,18 +163,18 @@ public class Resource extends ResourceBase {
 		Results results = getResults(processedConcepts, query, queries, processedQuery, coreArgs, Server.edamBlacklist);
 
 		URI baseLocation = new URI(Server.args.getServerPrivateArgs().isHttpsProxy() ? "https" : request.getScheme(), null, request.getServerName(), Server.args.getServerPrivateArgs().isHttpsProxy() ? 443 : request.getServerPort(), null, null, null);
-		URI apiLocation = new URI(baseLocation.getScheme(), null, baseLocation.getHost(), baseLocation.getPort(), "/" + Server.args.getServerPrivateArgs().getPath() + "/api", null, null);
+		URI apiLocation = new URI(baseLocation.getScheme(), null, baseLocation.getHost(), baseLocation.getPort(), Server.args.getServerPrivateArgs().getPath() + "/api", null, null);
 		URI txtLocation = null;
 		if (txtOutput != null) {
-			txtLocation = new URI(baseLocation.getScheme(), null, baseLocation.getHost(), baseLocation.getPort(), "/" + Server.args.getServerPrivateArgs().getPath() + "/" + txtOutput, null, null);
+			txtLocation = new URI(baseLocation.getScheme(), null, baseLocation.getHost(), baseLocation.getPort(), Server.args.getServerPrivateArgs().getPath() + "/" + txtOutput, null, null);
 		}
 		URI htmlLocation = null;
 		if (htmlOutput != null) {
-			htmlLocation = new URI(baseLocation.getScheme(), null, baseLocation.getHost(), baseLocation.getPort(), "/" + Server.args.getServerPrivateArgs().getPath() + "/" + htmlOutput, null, null);
+			htmlLocation = new URI(baseLocation.getScheme(), null, baseLocation.getHost(), baseLocation.getPort(), Server.args.getServerPrivateArgs().getPath() + "/" + htmlOutput, null, null);
 		}
 		URI jsonLocation = null;
 		if (jsonOutput != null) {
-			jsonLocation = new URI(baseLocation.getScheme(), null, baseLocation.getHost(), baseLocation.getPort(), "/" + Server.args.getServerPrivateArgs().getPath() + "/" + jsonOutput, null, null);
+			jsonLocation = new URI(baseLocation.getScheme(), null, baseLocation.getHost(), baseLocation.getPort(), Server.args.getServerPrivateArgs().getPath() + "/" + jsonOutput, null, null);
 		}
 
 		Map<String, String> jsonFields = new LinkedHashMap<>();
