@@ -91,7 +91,7 @@ public abstract class ResourceBase {
 	private static final String VERSION_ID = "version";
 
 	private static final int RETRY_LIMIT_DEFAULT = 0;
-	private static final int TIMEOUT_DEFAULT = 5000;
+	private static final int TIMEOUT_DEFAULT = 7500;
 	private static final boolean QUICK_DEFAULT = true;
 
 	public static final int MAX_NAME_LENGTH = 1000;
