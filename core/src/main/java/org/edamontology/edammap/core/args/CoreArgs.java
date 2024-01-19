@@ -36,10 +36,18 @@ public class CoreArgs {
 	private PreProcessorArgs preProcessorArgs = new PreProcessorArgs();
 
 	@ParametersDelegate
-	private FetcherArgs fetcherArgs = new FetcherArgs();
+	private FetcherArgs fetcherArgs;
 
 	@ParametersDelegate
 	private MapperArgs mapperArgs = new MapperArgs();
+
+	public CoreArgs() {
+		fetcherArgs = new FetcherArgs();
+	}
+
+	public CoreArgs(int retryLimit, int timeout, boolean quick) {
+		fetcherArgs = new FetcherArgs(retryLimit, timeout, quick);
+	}
 
 	public ProcessorArgs getProcessorArgs() {
 		return processorArgs;

@@ -90,6 +90,10 @@ public abstract class ResourceBase {
 
 	private static final String VERSION_ID = "version";
 
+	private static final int RETRY_LIMIT_DEFAULT = 0;
+	private static final int TIMEOUT_DEFAULT = 5000;
+	private static final boolean QUICK_DEFAULT = true;
+
 	public static final int MAX_NAME_LENGTH = 1000;
 	public static final int MAX_KEYWORDS_LENGTH = 10000;
 	public static final int MAX_DESCRIPTION_LENGTH = 100000;
@@ -113,7 +117,7 @@ public abstract class ResourceBase {
 	}
 
 	protected static CoreArgs newCoreArgs(MultivaluedMap<String, String> params, boolean json, ProcessorArgs processorArgs, FetcherPrivateArgs fetcherPrivateArgs) {
-		CoreArgs coreArgs = new CoreArgs();
+		CoreArgs coreArgs = new CoreArgs(RETRY_LIMIT_DEFAULT, TIMEOUT_DEFAULT, QUICK_DEFAULT);
 		ParamParse.parseParams(params, coreArgs, json);
 		coreArgs.setProcessorArgs(processorArgs);
 		coreArgs.getFetcherArgs().setPrivateArgs(fetcherPrivateArgs);
@@ -350,7 +354,7 @@ public abstract class ResourceBase {
 			requestString = String.join("\n", databaseEntryIds);
 		}
 		logger.info("PATCH {} {} from {}", resource, requestString, request.getRemoteAddr());
-		FetcherArgs fetcherArgs = new FetcherArgs();
+		FetcherArgs fetcherArgs = new FetcherArgs(RETRY_LIMIT_DEFAULT, TIMEOUT_DEFAULT, QUICK_DEFAULT);
 		ParamParse.parseFetcherParams(params, fetcherArgs, true);
 		fetcherArgs.setPrivateArgs(getFetcherPrivateArgs());
 		List<DatabaseEntryId> ids = new ArrayList<>();

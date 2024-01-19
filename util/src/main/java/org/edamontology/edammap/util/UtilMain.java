@@ -101,7 +101,9 @@ public final class UtilMain {
 			else docUrls.addAll(docQuery(args.allQuery, args.queryType, args.fetcherArgs));
 		}
 
-		PubFetcherMethods.run(args.pubFetcherArgs, new Fetcher(args.fetcherArgs.getPrivateArgs()), args.fetcherArgs, publicationIds, webpageUrls, docUrls, version, argv);
+		try (Fetcher fetcher = new Fetcher(args.fetcherArgs.getPrivateArgs())) {
+			PubFetcherMethods.run(args.pubFetcherArgs, fetcher, args.fetcherArgs, publicationIds, webpageUrls, docUrls, version, argv);
+		}
 
 		Util.run(args, version);
 	}

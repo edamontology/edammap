@@ -82,6 +82,9 @@ public class Processor {
 		if (database != null) {
 			database.close();
 		}
+		if (fetcher != null) {
+			fetcher.close();
+		}
 	}
 
 	private ConceptProcessed processConcept(Concept concept, IdfMake idfMake, PreProcessor preProcessor) {
