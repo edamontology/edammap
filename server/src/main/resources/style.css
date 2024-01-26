@@ -129,6 +129,9 @@ body {
 	padding: 0.5rem 0;
 	line-height: 1.5;
 }
+body.progress, body.progress * {
+	cursor: progress !important;
+}
 
 a {
 	text-decoration: underline;
@@ -356,8 +359,19 @@ article > section > div {
 	font-weight: 700;
 	font-size: 150%;
 }
+#map-output {
+	text-align: center;
+}
 
 /* param tabs */
+
+#parameters::before {
+	font-family: 'Font Awesome 5 Free';
+	content: "\f0da\ ";
+}
+#parameters.opened::before {
+	content: "\f0d7\ ";
+}
 
 #tabs {
 	position: relative;

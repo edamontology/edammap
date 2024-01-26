@@ -48,9 +48,9 @@ public final class Page {
 		writer.write("\t<link rel=\"stylesheet\" href=\"" + Server.args.getServerPrivateArgs().getPath() + "/style.css\">\n");
 		writer.write("</head>\n\n");
 
-		writer.write("<body>\n\n");
+		writer.write("<body onpageshow=\"document.body.classList.remove('progress'); document.getElementById('map-output').innerHTML = ''\">\n\n");
 
-		writer.write("<form action=\"" + Server.args.getServerPrivateArgs().getPath() + "/api\" method=\"post\">\n\n");
+		writer.write("<form action=\"" + Server.args.getServerPrivateArgs().getPath() + "/api\" method=\"post\" onsubmit=\"if (document.getElementById('" + Query.NAME + "').value.trim() !== '') { document.body.classList.add('progress'); document.getElementById('map-output').innerHTML = '<span>Working...</span>' }\">\n\n");
 
 		writer.write("<header>\n\n");
 
@@ -164,15 +164,16 @@ public final class Page {
 
 		writer.write("</article>\n\n");
 
-		writer.write("<div id=\"map\"><span><input type=\"submit\" value=\"MAP\"></span></div>\n\n");
+		writer.write("<div id=\"map\"><span><input type=\"submit\" value=\"MAP\"></span></div>\n");
+		writer.write("<div id=\"map-output\" class=\"output output-medium\"><span></span></div>\n\n");
 
 		writer.write("</main>\n\n");
 
 		writer.write("<footer>\n\n");
 
-		writer.write("<h2>Parameters</h2>\n\n");
+		writer.write("<h2 id=\"parameters\" onclick=\"if (this.classList.contains('opened')) { this.classList.remove('opened'); document.getElementById('tabs').style.display = 'none' } else { this.classList.add('opened'); document.getElementById('tabs').style.display = 'block' }\" style=\"cursor: pointer;\">Parameters</h2>\n\n");
 
-		writer.write("<section id=\"tabs\">\n");
+		writer.write("<section id=\"tabs\" style=\"display: none;\">\n");
 		writer.write("\n");
 		try {
 			Params.writeMain(Server.getArgsMain(true, txt, true, json), writer);

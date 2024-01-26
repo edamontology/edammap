@@ -3,9 +3,11 @@ var entities = {
 	'&': '&amp;',
 	'<': '&lt;',
 	'>': '&gt;',
+	'"': '&quot;',
+	"'": '&#39;'
 };
 var escape = function(text) {
-	return String(text).replace(/[&<>]/g, function(s) { return entities[s] });
+	return String(text).replace(/[&<>"']/g, function(s) { return entities[s] });
 };
 
 var get_params = function(selector) {
