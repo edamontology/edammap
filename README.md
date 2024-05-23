@@ -10,7 +10,7 @@ EDAMmap can be run on the command line, but also as a web server. For the latter
 
 ## Documentation
 
-Documentation for EDAMmap can be found at https://edammap.readthedocs.io/.
+Documentation for EDAMmap can be found at https://edammap.readthedocs.io/en/latest/.
 
 ## Support
 
