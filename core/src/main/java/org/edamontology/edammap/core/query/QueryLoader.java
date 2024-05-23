@@ -232,6 +232,10 @@ public class QueryLoader {
 
 	private static boolean checkEdamUri(EdamUri edamUri, Map<EdamUri, Concept> concepts) {
 		if (concepts != null && concepts.get(edamUri) == null) {
+			if ("http://edamontology.org/topic_3557".equalsIgnoreCase(edamUri.getUri())) { // TODO remove when not present in bio.tools anymore
+				logger.error("Non-existent EDAM URI: " + edamUri);
+				return false;
+			}
 			throw new IllegalRequestException("Non-existent EDAM URI: " + edamUri);
 		}
 		return true;

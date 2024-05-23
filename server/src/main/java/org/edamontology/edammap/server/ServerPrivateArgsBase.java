@@ -42,7 +42,7 @@ public abstract class ServerPrivateArgsBase extends Args {
 	private Boolean httpsProxy = httpsProxyDefault;
 
 	private static final String filesId = "files";
-	private static final String filesDescription = "An existing directory where the results will be output. It must contain required CSS, JavaScript and font resources pre-generated with EDAMmap-Util.";
+	private static final String filesDescription = "A directory where the results will be output. It must also contain required CSS, JavaScript and font resources. Will be created, if missing.";
 	private static final String filesDefault = null;
 	@Parameter(names = { "-f", "--" + filesId }, required = true, description = filesDescription)
 	private String files;

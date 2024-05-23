@@ -246,10 +246,10 @@ public final class Util {
 		}
 
 		if (args.biotoolsFull != null) {
-			BiotoolsFull.get(args.biotoolsFull, args.fetcherArgs.getTimeout(), args.fetcherArgs.getPrivateArgs().getUserAgent(), false, false);
+			BiotoolsFull.get(args.biotoolsFull, args.fetcherArgs.getTimeout(), args.fetcherArgs.getPrivateArgs().getUserAgent(), null, false);
 		}
 		if (args.biotoolsDevFull != null) {
-			BiotoolsFull.get(args.biotoolsDevFull, args.fetcherArgs.getTimeout(), args.fetcherArgs.getPrivateArgs().getUserAgent(), true, false);
+			BiotoolsFull.get(args.biotoolsDevFull.get(0), args.fetcherArgs.getTimeout(), args.fetcherArgs.getPrivateArgs().getUserAgent(), args.biotoolsDevFull.get(1), false);
 		}
 
 		if (args.makeServerFiles != null) {

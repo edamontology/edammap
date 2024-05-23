@@ -203,7 +203,7 @@ So, for example, to map the example tool ("g:Profiler") defined in the `Input`_ 
 
 .. code-block:: bash
 
-  $ java -jar edammap-cli-<version>.jar -e EDAM_1.21.owl -q example.csv -r gprofiler --idfStemmed biotools.stemmed.idf -l gprofiler.log
+  $ java -jar edammap-cli-<version>.jar -e EDAM_1.25.owl -q example.csv -r gprofiler --idfStemmed biotools.stemmed.idf -l gprofiler.log
 
 Contents for webpages_, docs_ and publications_ described in the query ``example.csv`` will be `fetched <https://pubfetcher.readthedocs.io/en/stable/fetcher.html>`_ (but not stored for potential later reuse, as no database_ file is specified), the IDF file ``biotools.stemmed.idf`` obtained in the `Setup`_ section (where words are stemmed as by default ``--stemming`` is ``true``) will be used as an input to the mapping algorithm and results_ will be output to the HTML file ``gprofiler/index.html``, with `log lines <https://pubfetcher.readthedocs.io/en/stable/output.html#log-file>`_ of the whole process appended to ``gprofiler.log``.
 
@@ -211,7 +211,7 @@ Another example is the mapping of the whole content of bio.tools:
 
 .. code-block:: bash
 
-  $ java -jar edammap-cli-<version>.jar -e EDAM_1.21.owl -q biotools.json -t biotools -o results.txt -r results -j results.json --threads 8 --fetching false --db db.db --idfStemmed biotools.stemmed.idf --branches topic operation data format --matches 6 --log biotools.log
+  $ java -jar edammap-cli-<version>.jar -e EDAM_1.25.owl -q biotools.json -t biotools -o results.txt -r results -j results.json --threads 8 --fetching false --db db.db --idfStemmed biotools.stemmed.idf --branches topic operation data format --matches 6 --log biotools.log
 
 The query ``biotools.json`` is the whole content of bio.tools as obtained with the ``-biotools-full`` command of `EDAMmap-Util`_. Contents of webpages, docs and publications has been pre-fetched to the database file ``db.db`` (as described under IDF_), thus ``--fetching`` is disabled. Results will be output as plain text to ``results.txt``, as HTML files to the directory ``results`` and as JSON to ``results.json``. Results will contain up to 6 term matches from each EDAM branch. As EDAMmap was run on the whole content of bio.tools, then the benchmarking results can be consulted to assess the performance and as webpages, docs and publications have been stored on disk, then EDAMmap can easily be re-run while varying the parameters to tune these results.
 
@@ -245,7 +245,7 @@ All command-line arguments suppliable to an EDAMmap server can be seen with:
 
   $ java -jar edammap-server-<version>.jar -h
 
-In addition to Processing_ and `Fetching private`_ parameters, EDAMmap Server accepts arguments described in the following table (entries marked with * are mandatory).
+In addition to Processing_ and `Fetching private`_ parameters, EDAMmap-Server accepts arguments described in the following table (entries marked with * are mandatory).
 
 =======================  ==========================  =========================  ===========
 Parameter                Parameter args              Default                    Description
@@ -254,19 +254,19 @@ Parameter                Parameter args              Default                    
 ``--txt``                *<boolean>*                 ``true``                   Output results to a plain text file for queries made through the web application. The value can be changed in the web application itself.
 ``--json``               *<boolean>*                 ``false``                  Output results to a JSON file for queries made through the web application. The value can be changed in the web application itself.
 ``--baseUri`` or ``-b``  *<string>*                  ``http://localhost:8080``  URI where the server will be deployed (as schema://host:port)
-``--path`` or ``-p``     *<string>*                  ``edammap``                Path where the server will be deployed (only one single path segment supported)
+``--path`` or ``-p``     *<string>*                  ``/edammap``               Path where the server will be deployed (only one single path segment supported, prepend with '/')
 ``--httpsProxy``                                                                Use if we are behind a HTTPS proxy
-``--files`` or ``-f`` *  *<directory path>*                                     An existing directory where the results will be output. It must contain required CSS, JavaScript and font resources pre-generated with `EDAMmap-Util`_.
+``--files`` or ``-f`` *  *<directory path>*                                     A directory where the results will be output. It must also contain required CSS, JavaScript and font resources. Will be created, if missing.
 ``--fetchingThreads``    *<positive integer>*        ``8``                      How many threads to create (maximum) for fetching individual database entries of one query
 =======================  ==========================  =========================  ===========
 
-To setup the server version of EDAMmap, a new directory with required CSS, JavaScript and font resources must be created:
+The results directory with required CSS, JavaScript and font resources will be automatically created, if a nonexistent directory path is supplied. If wanted, this directory could also be manually created with (the version of EDAMmap-Server the files are created for must match the version of EDAMmap-Util running the command):
 
 .. code-block:: bash
 
   $ java -jar edammap-util-<version>.jar -make-server-files files
 
-If wanted (i.e. if ``--db`` will be used when running the server), an initial empty database_ for storing fetched_ webpages_, docs_ and publications_ can also be created:
+Likewise, if ``--db`` is used to specify a nonexistent file, an initial empty database_ for storing fetched_ webpages_, docs_ and publications_ is automatically created. This could also be done manually beforehand with:
 
 .. code-block:: bash
 
@@ -276,7 +276,7 @@ EDAMmap-Server can now be run with:
 
 .. code-block:: bash
 
-  $ java -jar edammap-server-<version>.jar -b http://127.0.0.1:8080 -p edammap -e EDAM_1.21.owl -f files --fetching true --db server.db --idf biotools.idf --idfStemmed biotools.stemmed.idf --log serverlogs
+  $ java -jar edammap-server-<version>.jar -b http://127.0.0.1:8080 -p /edammap -e EDAM_1.25.owl -f files --fetching true --db server.db --idf biotools.idf --idfStemmed biotools.stemmed.idf --log serverlogs
 
 The web application can now be accessed locally at http://127.0.0.1:8080/edammap and the :ref:`API <api>` is at http://127.0.0.1:8080/edammap/api. How to obtain the IDF files ``biotools.idf`` and ``biotools.stemmed.idf`` is described in the `Setup`_ section. In contrast to the other EDAMmap tools, the server will not log to a single `log file <https://pubfetcher.readthedocs.io/en/stable/output.html#log-file>`_, but with ``-l`` or ``--log`` a directory can be defined where log files, that are rotated daily, will be stored. The log directory will also contain daily rotated access logs compatible with Apache's combined format.
 
@@ -318,7 +318,7 @@ Parameter                     Parameter args                                 Def
 ``-print-idf``                *<IDF path> <term> <term> ...*                               Print given terms along with their IDF scores (between 0 and 1) read from the given IDF file. Given terms are preprocessed, but stemming is not done, thus terms in the given IDF file must not be stemmed either.
 ``-print-idf-stemmed``        *<IDF path> <term> <term> ...*                               Print given terms along with their IDF scores (between 0 and 1) read from the given IDF file. Given terms are preprocessed, with stemming being done, thus terms in the given IDF file must also be stemmed.
 ``-biotools-full``            *<file path>*                                                Fetch all content (by following ``"next"`` until the last page) from https://bio.tools/api/tool to the specified JSON file. Fetching parameters `-\-timeout`_ and `-\-userAgent`_ can be used.
-``-biotools-dev-full``        *<file path>*                                                Fetch all content (by following ``"next"`` until the last page) from https://dev.bio.tools/api/tool to the specified JSON file. Fetching parameters `-\-timeout`_ and `-\-userAgent`_ can be used.
+``-biotools-dev-full``        *<file path> <URL>*                                          Fetch all bio.tools content (by following ``"next"`` until the last page) from the given URL to the specified JSON file. Fetching parameters `-\-timeout`_ and `-\-userAgent`_ can be used.
 ``-make-server-files``        *<directory path>*                                           Create new directory with CSS, JavaScript and font files required by `EDAMmap-Server`_. The version of EDAMmap-Server the files are created for must match the version of EDAMmap-Util running the command.
 ``-make-options-conf``        *<file path>*                                                Create new options configuration file
 ============================  =============================================  ============  ===========

@@ -80,8 +80,8 @@ public class UtilArgs extends BasicArgs {
 	@Parameter(names = { "-biotools-full" }, description = "Fetch all content (by following \"next\" until the last page) from https://bio.tools/api/tool to the specified JSON file. Fetching parameters --timeout and --userAgent can be used.")
 	String biotoolsFull = null;
 
-	@Parameter(names = { "-biotools-dev-full" }, description = "Fetch all content (by following \"next\" until the last page) from https://dev.bio.tools/api/tool to the specified JSON file. Fetching parameters --timeout and --userAgent can be used.")
-	String biotoolsDevFull = null;
+	@Parameter(names = { "-biotools-dev-full" }, arity = 2, description = "Fetch all bio.tools content (by following \"next\" until the last page) from the given URL to the specified JSON file. Fetching parameters --timeout and --userAgent can be used.")
+	List<String> biotoolsDevFull = null;
 
 	@Parameter(names = { "-make-server-files" }, description = "Create new directory with CSS, JavaScript and font files required by EDAMmap-Server. The version of EDAMmap-Server the files are created for must match the version of EDAMmap-Util running the command.")
 	String makeServerFiles = null;

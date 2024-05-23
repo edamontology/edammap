@@ -26,7 +26,7 @@ The query data to be mapped can be supplied in two different ways: as strings or
 EDAMmap input
 -------------
 
-The following data can be given, with only the "name" being mandatory.
+The following data can be given, with only the ``"name"`` being mandatory.
 
 ==============  ========================  ===========
 Key             Type                      Description
@@ -45,7 +45,7 @@ annotations     array of strings          Existing annotations from EDAM
 bio.tools input
 ---------------
 
-Under the field name "tool", a JSON object adhering to `biotoolsSchema <https://biotoolsschema.readthedocs.io/>`_ can be specified. All values possible in bio.tools can be specified, but only values relevant to EDAMmap will be used. A few attributes are mandatory: `name <https://biotools.readthedocs.io/en/latest/curators_guide.html#name-tool>`_, `description <https://biotools.readthedocs.io/en/latest/curators_guide.html#description>`_ and `homepage <https://biotools.readthedocs.io/en/latest/curators_guide.html#homepage>`_. The input will be mirrored under tool_ in the response_, but with found EDAM terms added to it.
+Under the field name ``"tool"``, a JSON object adhering to `biotoolsSchema <https://biotoolsschema.readthedocs.io/>`_ can be specified. All values possible in bio.tools can be specified, but only values relevant to EDAMmap will be used. A few attributes are mandatory: `name <https://biotools.readthedocs.io/en/latest/curators_guide.html#name-tool>`_, `description <https://biotools.readthedocs.io/en/latest/curators_guide.html#description>`_ and `homepage <https://biotools.readthedocs.io/en/latest/curators_guide.html#homepage>`_. The input will be mirrored under tool_ in the response_, but with found EDAM terms added to it.
 
 .. _api_parameters:
 
@@ -84,6 +84,8 @@ Fetching
 --------
 
 The fetching parameters are implemented in `PubFetcher <https://github.com/edamontology/pubfetcher>`_ and thus are described in its documentation: `Fetching parameters <https://pubfetcher.readthedocs.io/en/stable/cli.html#fetching>`_.
+
+The defaults of the following fetching parameters have been changed in EDAMmap API: `retryLimit <https://pubfetcher.readthedocs.io/en/stable/cli.html#retrylimit>`_ from ``3`` to ``0``, `timeout <https://pubfetcher.readthedocs.io/en/stable/cli.html#timeout>`_ from ``15000`` to ``7500`` and `quick <https://pubfetcher.readthedocs.io/en/stable/cli.html#quick>`_ from ``false`` to ``true``.
 
 .. _mapping:
 
@@ -244,7 +246,7 @@ html
   Location of HTML results directory (or ``null`` if not created)
 json
   Location of JSON results file
-generator
+_`generator`
   Information about the application that generated the response
 
   name
@@ -253,7 +255,7 @@ generator
     Homepage of the application
   version
     Version of the application
-time
+_`time`
   start
     Start time of mapping as `UNIX time <https://en.wikipedia.org/wiki/Unix_time>`_ (in milliseconds)
   startHuman
@@ -264,7 +266,7 @@ time
     Stop time of mapping as `ISO 8601`_ combined date and time
   duration
     Duration of mapping in seconds
-mapping
+_`mapping`
   _`query`
     id
       Unique ID assigned to the query (and by extension, to this response)
@@ -365,11 +367,11 @@ _`args`
       ``true``, if output of HTML results was requested; ``false`` otherwise
     json
       Always ``true``
-  processorArgs
+  _`processorArgs`
     Processing parameters
 
     fetching
-      Always ``true``
+      Always ``true`` (if the :ref:`server <server>` was started with default fetching value)
     db
       Name of the used `database <https://pubfetcher.readthedocs.io/en/stable/output.html#database>`_ file
     idf
@@ -568,7 +570,7 @@ For testing, this input could be saved in a file, e.g. ``input.json``, and then 
 
   $ curl -H "Content-Type: application/json" -X POST -d '@/path/to/input.json' https://biit.cs.ut.ee/edammap/api
 
-To supply the same data (except the "keywords") as `bio.tools input`_, the following could be used:
+To supply the same data (except the ``"keywords"``) as `bio.tools input`_, the following could be used:
 
 .. code-block:: json
 
@@ -579,7 +581,7 @@ To supply the same data (except the "keywords") as `bio.tools input`_, the follo
       "homepage": "https://biit.cs.ut.ee/gprofiler/",
       "documentation": [{
         "url": "https://biit.cs.ut.ee/gprofiler/help.cgi",
-        "type": "General",
+        "type": [ "General" ],
         "note": null
       }],
       "publication": [{
@@ -771,8 +773,7 @@ Syntax error in JSON
 
     {
         "success": false,
-        "status": 400,
-        "message": "Invalid token=CURLYCLOSE at (line no=1, column no=8, offset=7). Expected tokens are: [COLON]",
+        "status": 500,
         "time": "2018-05-28T12:59:57.389Z"
     }
 

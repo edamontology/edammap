@@ -37,10 +37,10 @@ public final class BiotoolsFull {
 
 	private static final Logger logger = LogManager.getLogger();
 
-	public static int get(String outputPath, int timeout, String userAgent, boolean dev, boolean stderr) throws IOException {
-		logger.info("Make full {}bio.tools JSON to {}", dev ? "dev." : "", outputPath);
+	public static int get(String outputPath, int timeout, String userAgent, String dev, boolean stderr) throws IOException {
+		logger.info("Make full {}bio.tools JSON{} to {}", dev != null ? "dev." : "", dev != null ? " from " + dev : "", outputPath);
 
-		String api = "https://" + (dev ? "dev." : "") + "bio.tools/api/tool";
+		String api = (dev != null ? dev : "https://bio.tools/api/tool");
 
 		Path output = PubFetcher.outputPath(outputPath);
 
@@ -80,14 +80,14 @@ public final class BiotoolsFull {
 		mapper.writeValue(output.toFile(), biotoolsFull);
 
 		if (count != biotoolsFull.getCount()) {
-			logger.error("Got {} {}bio.tools entries instead of advertised {}", count, dev ? "dev." : "", biotoolsFull.getCount());
+			logger.error("Got {} {}bio.tools entries instead of advertised {}", count, dev != null ? "dev." : "", biotoolsFull.getCount());
 		}
-		logger.info("Made {}bio.tools JSON with {} entries", dev ? "dev." : "", count);
+		logger.info("Made {}bio.tools JSON with {} entries", dev != null ? "dev." : "", count);
 
 		if (count != biotoolsFull.getCount()) {
-			throw new RuntimeException("Got " + count + " " + (dev ? "dev." : "") + "bio.tools entries instead of advertised " + biotoolsFull.getCount());
+			throw new RuntimeException("Got " + count + " " + (dev != null ? "dev." : "") + "bio.tools entries instead of advertised " + biotoolsFull.getCount());
 		} else if (error) {
-			throw new RuntimeException("Error getting full " + (dev ? "dev." : "") + "bio.tools content");
+			throw new RuntimeException("Error getting full " + (dev != null ? "dev." : "") + "bio.tools content");
 		}
 
 		return count;

@@ -16,6 +16,7 @@ General
 * Generalise to other ontologies besides `EDAM <http://edamontology.org/page>`_ (`#8 <https://github.com/edamontology/edammap/issues/8>`_). However, optimising specifically for EDAM is one of the goals of EDAMmap.
 * Use existing libraries of some other tools, like `Maui <https://github.com/zelandiya/maui>`_ or `Kea <http://www.nzdl.org/Kea/>`_, in addition to the current self-made approach.
 * Try to use machine learning. Challenges include a large number of EDAM terms and the quality of manual annotations currently in `bio.tools <https://bio.tools>`_. Also, there will be annotations added by previous versions of EDAMmap in bio.tools. Maybe the ontology needs to be simplified, for example more specific terms removed.
+* Supersede/complement the current algorithm by using `embeddings <https://en.wikipedia.org/wiki/Word_embedding>`_ and `LLMs <https://en.wikipedia.org/wiki/Large_language_model>`_.
 
 
 *********
@@ -77,7 +78,9 @@ Maintenance
 ***********
 
 * Update PubFetcher's `scraping rules <https://pubfetcher.readthedocs.io/en/stable/scraping.html#scraping-rules>`_, by `testing the rules <https://pubfetcher.readthedocs.io/en/stable/scraping.html#testing-of-rules>`_ and modifying outdated rules in `journals.yaml <https://github.com/edamontology/pubfetcher/blob/master/core/src/main/resources/scrape/journals.yaml>`_, `webpages.yaml <https://github.com/edamontology/pubfetcher/blob/master/core/src/main/resources/scrape/webpages.yaml>`_ and most importantly the hardcoded rules for `Europe PMC <https://europepmc.org/>`_ and other built-in `resources <https://pubfetcher.readthedocs.io/en/stable/fetcher.html#resources>`_.
+* Check if there are new popular journals or webpages that are missing scraping rules by using `top hosts <https://pubfetcher.readthedocs.io/en/stable/cli.html#top-hosts>`_ and ``-not-has-scrape`` on a recent large enough fetch.
 * Update dependencies in `pom.xml <https://github.com/edamontology/edammap/blob/master/pom.xml>`_ (but care should be taken to not cause regressions).
+* Update the default used for `-\-userAgent <https://pubfetcher.readthedocs.io/en/stable/cli.html#useragent>`_ in PubFetcher.
 * Check for broken links in the documentation using ``make linkcheck``.
 * When a new `biotoolsSchema <https://github.com/bio-tools/biotoolsSchema>`_ is released, some code modifications might be necessary to adhere to it.
 * Also, when a new `EDAM ontology <https://github.com/edamontology/edamontology>`_ is released, some modifications might be necessary (for example in `blacklist.txt <https://github.com/edamontology/edammap/blob/master/core/src/main/resources/edam/blacklist.txt>`_ and `blacklist_synonyms.txt <https://github.com/edamontology/edammap/blob/master/core/src/main/resources/edam/blacklist_synonyms.txt>`_; also, any running :ref:`server` instances could be restarted to use the new ontology version).
