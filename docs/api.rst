@@ -266,7 +266,10 @@ _`time`
     Stop time of mapping as `ISO 8601`_ combined date and time
   duration
     Duration of mapping in seconds
-_`mapping`
+
+.. _mapping_output:
+
+mapping
   _`query`
     id
       Unique ID assigned to the query (and by extension, to this response)
@@ -472,7 +475,7 @@ _`measures`
   Measures of EDAMmap performance against existing annotations_ provided in query_. Does not make much sense in case of one query-results pair (if queriesSize_ and resultsSize_ are ``1``), but included for completeness.
 
   _`precision`
-    `The precision <https://en.wikipedia.org/wiki/Precision_and_recall#Precision>`_
+    `The precision <https://en.wikipedia.org/wiki/Precision_and_recall>`_
 
     topic
       Precision in the topic branch
@@ -485,7 +488,7 @@ _`measures`
     total
       Precision over all branches
   recall
-    `Recall <https://en.wikipedia.org/wiki/Precision_and_recall#Recall>`_. Same structure as in precision_.
+    `Recall <https://en.wikipedia.org/wiki/Precision_and_recall>`_. Same structure as in precision_.
   f1
     `F1 score <https://en.wikipedia.org/wiki/F1_score>`_. Same structure as in precision_.
   f2
@@ -495,7 +498,7 @@ _`measures`
   AveP
     `Average precision <https://en.wikipedia.org/wiki/Evaluation_measures_(information_retrieval)#Average_precision>`_. Same structure as in precision_.
   RP
-    `R-precision <https://en.wikipedia.org/wiki/Evaluation_measures_(information_retrieval)#R-Precision>`_. Same structure as in precision_.
+    `R-precision <https://en.wikipedia.org/wiki/Evaluation_measures_(information_retrieval)#R-precision>`_. Same structure as in precision_.
   DCG
     `Discounted cumulative gain <https://en.wikipedia.org/wiki/Discounted_cumulative_gain>`_. Same structure as in precision_.
   DCGa

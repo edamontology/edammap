@@ -20,13 +20,13 @@
 package org.edamontology.edammap.core.benchmarking;
 
 public enum Measure {
-	precision("Precision", "https://en.wikipedia.org/wiki/Precision_and_recall#Precision"),
-	recall("Recall", "https://en.wikipedia.org/wiki/Precision_and_recall#Recall"),
+	precision("Precision", "https://en.wikipedia.org/wiki/Precision_and_recall"),
+	recall("Recall", "https://en.wikipedia.org/wiki/Precision_and_recall"),
 	f1("F1 score", "https://en.wikipedia.org/wiki/F1_score"),
 	f2("F2 score", "https://en.wikipedia.org/wiki/F1_score"),
 	Jaccard("Jaccard index", "https://en.wikipedia.org/wiki/Jaccard_index"),
 	AveP("Average precision", "https://en.wikipedia.org/wiki/Evaluation_measures_(information_retrieval)#Average_precision"),
-	RP("R-precision", "https://en.wikipedia.org/wiki/Evaluation_measures_(information_retrieval)#R-Precision"),
+	RP("R-precision", "https://en.wikipedia.org/wiki/Evaluation_measures_(information_retrieval)#R-precision"),
 	DCG("Discounted cumulative gain", "https://en.wikipedia.org/wiki/Discounted_cumulative_gain"),
 	DCGa("DCG (alternative)", "https://en.wikipedia.org/wiki/Discounted_cumulative_gain");
 
