@@ -20,6 +20,7 @@
 package org.edamontology.edammap.core.input.json;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
 
 public enum PublicationType {
 	@JsonProperty("Primary")
@@ -32,8 +33,12 @@ public enum PublicationType {
 	BENCHMARKING_STUDY("Benchmarking study"),
 	@JsonProperty("Review")
 	REVIEW("Review"),
+    @JsonProperty("Preprint")
+	PREPRINT("Preprint"),
 	@JsonProperty("Other")
+	@JsonEnumDefaultValue
 	OTHER("Other");
+
 
 	private String type;
 
